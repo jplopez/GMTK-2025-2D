@@ -373,3 +373,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/BetterHierarchy.csproj
+/BetterHierarchyDemoScripts.csproj
+/CFXR.WelcomeScreen.csproj
+/CFXRDemo.csproj
+/CFXREditor.csproj
+/CFXRRuntime.csproj
+/KinoBloom.Runtime.csproj
+/sc.utilities.screenshot.editor.csproj
+/ToonyColorsPro.Demo.Editor.csproj
