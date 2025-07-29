@@ -3,6 +3,18 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+
+Library/
+Logs/
+obj/
+Packages/
+Temp/
+Assets/Plugins/
+Assets/Resources/
+Assets/ThirdParty/
+Assets/ScreenshotUtility
+Assets/UnityTechnologies
+
 # User-specific files
 *.rsuser
 *.suo
