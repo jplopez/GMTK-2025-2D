@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7a74b409a6939846b3cfd2553464c9d, type: 3}
+  m_Name: AssymetricalSlope
+  m_EditorClassIdentifier: 
+  Sprite: {fileID: -6895716492971166485, guid: a2148ef9adec91944bad6865156bce1e, type: 3}
+  SizeInGridUnits: {x: 3, y: 1}
+  ForceStaticRigidBody: 1
+  Mass: 1
+  AngularDamping: 0.05
+  Gravity: 1
+  Friction: 1
+  Bounciness: 0
