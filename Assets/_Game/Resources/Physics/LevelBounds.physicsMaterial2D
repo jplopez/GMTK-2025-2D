@@ -6,9 +6,9 @@ PhysicsMaterial2D:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FMid_BLow_Material
+  m_Name: LevelBounds
   serializedVersion: 2
-  friction: 0.6
-  bounciness: 0.1
-  m_FrictionCombine: 2
-  m_BounceCombine: 2
+  friction: 0.7
+  bounciness: 1
+  m_FrictionCombine: 4
+  m_BounceCombine: 4

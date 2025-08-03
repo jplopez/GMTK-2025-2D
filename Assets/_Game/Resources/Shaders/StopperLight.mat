@@ -12,7 +12,7 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ENABLEMETAL_ON
+  - _ENABLESHIFTING_ON
   - _SHADERFADING_NONE
   - _SHADERSPACE_UV
   - _TEXTURELAYER1SHEETTOGGLE_ON
@@ -220,7 +220,7 @@ Material:
     - _EnableHue: 0
     - _EnableInkSpread: 0
     - _EnableInnerOutline: 0
-    - _EnableMetal: 1
+    - _EnableMetal: 0
     - _EnableNegative: 0
     - _EnableOuterOutline: 0
     - _EnablePingPongGlow: 0
@@ -235,7 +235,7 @@ Material:
     - _EnableShadow: 0
     - _EnableSharpen: 0
     - _EnableShiftHue: 0
-    - _EnableShifting: 0
+    - _EnableShifting: 1
     - _EnableShine: 0
     - _EnableSineGlow: 0
     - _EnableSineMove: 0
@@ -261,7 +261,7 @@ Material:
     - _EnableWorldTiling: 0
     - _EnchantedBrightness: 1
     - _EnchantedContrast: 0.5
-    - _EnchantedFade: 1
+    - _EnchantedFade: 0.62
     - _EnchantedLerpToggle: 0
     - _EnchantedRainbowDensity: 0.5
     - _EnchantedRainbowSaturation: 0.8
@@ -508,7 +508,7 @@ Material:
     - _CamouflageDistortionSpeed: {r: 0.1, g: 0.1, b: 0, a: 0}
     - _CamouflageNoiseScaleA: {r: 0.25, g: 0.25, b: 0, a: 0}
     - _CamouflageNoiseScaleB: {r: 0.25, g: 0.25, b: 0, a: 0}
-    - _Color: {r: 0.1745283, g: 0.10980352, b: 0.09467337, a: 1}
+    - _Color: {r: 0.05900679, g: 0.9622642, b: 0.7563358, a: 1}
     - _ColorReplaceFromColor: {r: 0, g: 0, b: 0, a: 0}
     - _ColorReplaceToColor: {r: 0, g: 0, b: 0.2, a: 0}
     - _CustomFadeNoiseScale: {r: 1, g: 1, b: 0, a: 0}
@@ -519,8 +519,8 @@ Material:
     - _DirectionalGlowFadeEdgeColor: {r: 11.98431, g: 0.6901961, b: 0.6901961, a: 0}
     - _DirectionalGlowFadeNoiseScale: {r: 0.4, g: 0.4, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _EnchantedHighColor: {r: 0, g: 0.7098798, b: 4.237095, a: 0}
-    - _EnchantedLowColor: {r: 2.996078, g: 0, b: 0, a: 0}
+    - _EnchantedHighColor: {r: 3.980087, g: 5.176555, b: 4.871823, a: 0}
+    - _EnchantedLowColor: {r: 0, g: 0.08724427, b: 2.9960783, a: 0}
     - _EnchantedScale: {r: 0.1, g: 0.1, b: 0, a: 0}
     - _EnchantedSpeed: {r: 0, g: 1, b: 0, a: 0}
     - _FadingNoiseScale: {r: 0.2, g: 0.2, b: 0, a: 0}
@@ -593,8 +593,8 @@ Material:
     - _ScreenTilingScale: {r: 1, g: 1, b: 0, a: 0}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 0}
     - _ShadowOffset: {r: 0.05, g: -0.05, b: 0, a: 0}
-    - _ShiftingColorA: {r: 1.498039, g: 0, b: 0, a: 0}
-    - _ShiftingColorB: {r: 1.498039, g: 0.7490196, b: 0, a: 0}
+    - _ShiftingColorA: {r: 0.20069414, g: 1.0377357, b: 0.7414968, a: 0}
+    - _ShiftingColorB: {r: 0.064524725, g: 0.54716974, b: 0.11882767, a: 0}
     - _ShineColor: {r: 11.98431, g: 11.98431, b: 11.98431, a: 0}
     - _SineGlowColor: {r: 1.962264, g: 1.4250084, b: 0.39800638, a: 0}
     - _SineMoveFrequency: {r: 1, g: 1, b: 0, a: 0}
