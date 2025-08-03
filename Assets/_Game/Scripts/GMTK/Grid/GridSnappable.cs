@@ -79,7 +79,7 @@ namespace GMTK {
       // Ensure the GameObject has a SpriteRenderer
       if (gameObject.TryGetComponent(out SpriteRenderer renderer)) {
         _model = renderer;
-        _model.sortingLayerName = "Interactives";
+        //_model.sortingLayerName = "Interactives";
       }
       else {
         Debug.LogWarning($"[GridSnappable] No SpriteRenderer found on {gameObject.name}.");
@@ -136,15 +136,18 @@ namespace GMTK {
 
     public void OnPointerOut() => SetGlow(false);
 
-    public virtual void OnRegistered(Vector2Int coord) => _isRegistered = true;
-
-    public virtual void OnRemoved(Vector2Int coord) => _isRegistered = false;
+    public virtual void SetRegistered(bool registered=true) => _isRegistered = registered;
 
     public virtual void SetGlow(bool active) { if (HighlightModel != null) HighlightModel.SetActive(active); }
 
     public void UpdatePosition(Vector3 newPos) => SnapTransform.position = newPos;
 
     public void Rotate(Quaternion rot) => SnapTransform.rotation = rot;
+
+    public void SetRotationAt(float angleDegrees) {
+      if (!CanRotate) return;
+      SnapTransform.rotation = Quaternion.Euler(0f, 0f, angleDegrees);
+    }
 
     public Quaternion GetRotation() => SnapTransform.rotation;
 

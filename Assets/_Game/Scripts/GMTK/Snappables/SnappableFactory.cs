@@ -16,7 +16,7 @@ namespace GMTK {
       col.sharedMaterial = SnappableMaterialStrategy.GetMaterial(template.Friction, template.Bounciness);
 
       var snappable = go.AddComponent<GridSnappable>();
-      GridManager.RegisterElement(snappable);
+      GridManager.Register(snappable);
 
       return go;
     }

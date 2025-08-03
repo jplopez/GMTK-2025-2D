@@ -11,7 +11,7 @@ public class GridManagerEditor : UnityEditor.Editor {
     UnityEditor.EditorGUILayout.Space();
     UnityEditor.EditorGUILayout.LabelField("Occupied Grid Cells", UnityEditor.EditorStyles.boldLabel);
 
-    foreach (var view in manager.EditorGridView) {
+    foreach (var view in manager.EditorView) {
       if(view.Element != null && view.Element.isActiveAndEnabled)
         UnityEditor.EditorGUILayout.LabelField($"Coord: {view.Coord}", $"Element: {view.Element.name}");
     }

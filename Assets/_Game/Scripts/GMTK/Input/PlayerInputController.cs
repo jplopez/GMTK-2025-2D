@@ -11,7 +11,7 @@ namespace GMTK {
 
   public class PlayerInputController : MonoBehaviour, IGameplayActions {
 
-    [SerializeField] private GridManager Grid;
+    //[SerializeField] private GridManager Grid;
     [SerializeField] private GridSnappable CurrentElement;
 
     public bool IsMoving { get => (_controllerState == PlayerControllerStates.MovingElement); }
@@ -20,6 +20,13 @@ namespace GMTK {
 
     public static event Action<GridSnappable> OnElementHovered;
     public static event Action OnElementUnhovered;
+    //public static event Action<GridSnappable> OnElementRegistered;
+    public static event Action<GridSnappable> OnElementUnregistered;
+
+    public static event Action<GridSnappable> OnElementSelected;
+    public static event Action<GridSnappable> OnElementDropped;
+    public static event Action<GridSnappable> OnElementSecondary;
+
 
     protected GridSnappable _lastElementOver;
     private Vector2 _pointerScreenPos;
@@ -78,24 +85,25 @@ namespace GMTK {
       if (target == null) return;
 
       action.Invoke(target);
-      Debug.Log($"[PlayerInputController] {debugLabel} on {(target == CurrentElement ? "current" : "over")} element.");
+      //Debug.Log($"[PlayerInputController] {debugLabel} on {(target == CurrentElement ? "current" : "over")} element.");
     }
 
     private void HandleSelectPressed() {
       switch (_controllerState) {
         case PlayerControllerStates.Idle:
-          Debug.Log("[PlayerInputController] Clicked in Idle state");
+          //Debug.Log("[PlayerInputController] Clicked in Idle state");
           BeginMovingCurrentElement();
           break;
         case PlayerControllerStates.MovingElement:
-          Debug.LogWarning("[PlayerInputController] Clicked while already moving an element");
+          //Debug.LogWarning("[PlayerInputController] Clicked while already moving an element");
           break;
         case PlayerControllerStates.OverElement:
-          Debug.LogWarning("[PlayerInputController] Clicked while over an element");
+          //Debug.LogWarning("[PlayerInputController] Clicked while over an element");
           CurrentElement = _lastElementOver;
           BeginMovingCurrentElement();
           break;
       }
+
     }
 
     private void HandleSelectReleased() {
@@ -104,7 +112,7 @@ namespace GMTK {
           Debug.LogWarning("[PlayerInputController] Released click while in Idle state");
           break;
         case PlayerControllerStates.MovingElement:
-          Debug.Log("[PlayerInputController] Released click while moving an element");
+          //Debug.Log("[PlayerInputController] Released click while moving an element");
           EndMovingCurrentElement();
           break;
         case PlayerControllerStates.OverElement:
@@ -115,26 +123,23 @@ namespace GMTK {
     }
 
     private void HandleSecondaryPressed() {
+      GridSnappable element = null;
       switch (_controllerState) {
         case PlayerControllerStates.Idle:
-          Debug.Log("[PlayerInputController] Right-clicked in Idle state");
-          if (TryGetElementOnCurrentPointer(out GridSnappable element)) {
-            Debug.Log("[PlayerInputController] Found element under cursor, removing it.");
-            RemoveElement(element);
-          }
-          else {
-            Debug.Log("[PlayerInputController] No element under cursor to remove.");
+          if (TryGetElementOnCurrentPointer(out element)) {
+            //Debug.Log("[PlayerInputController:SecondaryPressed] found element under cursor.");
           }
           break;
         case PlayerControllerStates.MovingElement:
-          Debug.Log("[PlayerInputController] Right-clicked while moving an element");
-          RemoveCurrentElement();
+          //Debug.Log("[PlayerInputController:SecondaryPressed] CurrentElement");
+          element = CurrentElement;
           break;
         case PlayerControllerStates.OverElement:
-          Debug.Log("[PlayerInputController] Right-clicked while over an element");
-          RemoveOverElement();
+          //Debug.Log("[PlayerInputController:SecondaryPressed] Last Element Over");
+          element = _lastElementOver;
           break;
       }
+      HandleSecondaryOnElement(element);
     }
 
     #endregion
@@ -152,6 +157,7 @@ namespace GMTK {
     void Update() {
       //updates CurrentElement position if controller is moving.
       Vector3 worldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPos);
+
       if (IsMoving && CurrentElement != null) {
         worldPos.z = 0f;
         CurrentElement.UpdatePosition(worldPos);
@@ -217,30 +223,26 @@ namespace GMTK {
       // Raycast to detect the element under the cursor
       Vector2 worldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPos);
       RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
-      // only update CurrentElement if is a GridSnappable
+      //check if we hit something
       if (hit && hit.collider != null && hit.collider.gameObject is var selected) {
-        if (selected.TryGetComponent(out GridSnappable gridElement)) {
-          element = gridElement;
-          //check if it's registered in the grid
-          if (element.IsRegistered) Grid.RemoveElement(element); // temporarily remove it from the grid
-        }
-        else {
-          Debug.Log($"[PlayerInputController] GameObject found at {_pointerScreenPos} (worldPos:{worldPos}) does not have a GridInteractive compatible component");
-          element = null;
+        // check if is a GridSnappable and is draggable
+        if (selected.TryGetComponent(out element) && element.Draggable) {
+          return true;
         }
       }
-      else {
-        element = null;
-      }
-      return (element != null);
+      element = null;
+      return false;
     }
     private void BeginMovingCurrentElement() {
       _controllerState = PlayerControllerStates.MovingElement;
 
       if (TryGetElementOnCurrentPointer(out GridSnappable element)) {
-        Debug.Log($"[PlayerInputController] Found element under cursor, picking it up.");
+        //Debug.Log($"[PlayerInputController] Found element under cursor, picking it up.");
         CurrentElement = element;
-        Grid.RemoveElement(CurrentElement);
+        OnElementSelected?.Invoke(CurrentElement);
+        //Grid.Register(CurrentElement);
+        //OnElementRegistered?.Invoke(CurrentElement);
+        //HandleRegisterElement(CurrentElement);
       }
       //else {
       //  Debug.Log($"[PlayerInputController] No element under cursor, creating a new one.");
@@ -249,29 +251,41 @@ namespace GMTK {
     private void EndMovingCurrentElement() {
       // Only snap if we have a current element being moved
       if (CurrentElement != null) {
-        if (!Grid.RegisterElement(CurrentElement)) {
-          Debug.LogWarning($"[PlayerInputController] Could not place element, cell occupied. Returning to original position.");
-          // Optionally, you could implement logic to return the element to its original position
-        }
+        OnElementDropped?.Invoke(CurrentElement);
+        //if (!Grid.Register(CurrentElement)) {
+        //if (!HandleRegisterElement(CurrentElement)) {
+        //    Debug.LogWarning($"[PlayerInputController] Could not place element, cell occupied. Returning to original position.");
+        //  // Optionally, you could implement logic to return the element to its original position
+        //}
         CurrentElement = null;
       }
-      else {
-        Debug.LogWarning($"[PlayerInputController] No current element to place.");
-      }
+      //else {
+      //  Debug.LogWarning($"[PlayerInputController] No current element to place.");
+      //}
       _controllerState = PlayerControllerStates.Idle;
     }
 
-    private void RemoveElement(GridSnappable element) {
+    private void HandleSecondaryOnElement(GridSnappable element) {
       if (element != null) {
-        Grid.RemoveElement(element);
-        element = null;
-        _controllerState = PlayerControllerStates.Idle;
+        //Grid.Unregister(element);
+        if(element.IsRegistered) OnElementUnregistered?.Invoke(element);
+        else OnElementSecondary?.Invoke(element);
       }
     }
 
-    protected virtual void RemoveCurrentElement() => RemoveElement(CurrentElement);
+    //private bool HandleRegisterElement(GridSnappable element) {
+    //  if (element != null && !element.IsRegistered) {
+    //    if (Grid.Register(element)) {
+    //      OnElementRegistered?.Invoke(element);
+    //      return true;
+    //    }
+    //    else {
+    //      Debug.LogWarning($"[PlayerInputController] Could not register element at {element.transform.position}, cell occupied.");
+    //    }
+    //  }
+    //  return false;
+    //}
 
-    protected virtual void RemoveOverElement() => RemoveElement(_lastElementOver);
     #endregion
 
   }
@@ -301,15 +315,15 @@ namespace GMTK {
       if (!CanExecute(currentState)) return;
 
       if (context.started) {
-        Debug.Log($"[GridInputCommand] {Name} started");
+        //Debug.Log($"[GridInputCommand] {Name} started");
         _onStarted?.Invoke();
       }
       else if (context.performed) {
-        Debug.Log($"[GridInputCommand] {Name} performed");
+        //Debug.Log($"[GridInputCommand] {Name} performed");
         _onPerformed?.Invoke();
       }
       else if (context.canceled) {
-        Debug.Log($"[GridInputCommand] {Name} canceled");
+        //Debug.Log($"[GridInputCommand] {Name} canceled");
         _onCanceled?.Invoke();
       }
     }

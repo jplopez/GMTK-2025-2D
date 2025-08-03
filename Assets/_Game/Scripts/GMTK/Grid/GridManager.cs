@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,172 +9,153 @@ namespace GMTK {
   /// <remarks>This class provides functionality to align positions to a _grid and determine the _grid coordinates
   /// of a given position. The _grid is defined by a cell size and an Origin point, which can be configured using the
   /// <see cref="CellSize"/> and <see cref="Origin"/> fields.</remarks>
-  public class GridManager : MonoBehaviour {
+  public class GridManager : SnappableZoneManager {
+
+    public EdgeCollider2D GridTopBound;
+    public EdgeCollider2D GridBottomBound;
+    public EdgeCollider2D GridLeftBound;
+    public EdgeCollider2D GridRightBound;
 
     public float CellSize = 1f; // Matches your peg spacing
     public Vector2 Origin = Vector2.zero;
 
-    [SerializeField] private Material ghostMaterial; // Transparent shader
-    private GameObject _ghostPreview;
-
-    [SerializeField] private GameObject snappableUIPrefab;
-    private GameObject _activeUI;
-
-
-#if UNITY_EDITOR
-    public IReadOnlyList<GridElementView> EditorGridView => _editorGridView;
-#endif
-
-    [SerializeField, HideInInspector]
-    private List<GridElementView> _editorGridView = new();
-
     private Dictionary<Vector2Int, GridSnappable> _gridElements = new();
 
-    public event Action<GridSnappable, Vector2Int> OnElementRegistered;
-    public event Action<GridSnappable, Vector2Int> OnElementRemoved;
+#if UNITY_EDITOR
+    protected virtual void EditorScanAndRegisterElements() => ScanZone();
+#endif
 
+    public virtual void OnEnable() {
+      PlayerInputController.OnElementUnregistered += HandleRemoveRequest;
+      PlayerInputController.OnElementDropped += HandleRegisterRequest;
+      //PlayerInputController.OnElementSelected += HandleRemoveRequest;
+      PlayerInputController.OnElementSecondary += HandleRemoveRequest;
 
-    #region MonoBehaviour methods
+      // This is to handle the case where an element is unregistered from the inventory and needs to be re-registered in the grid
+      InventoryInputController.OnInventoryExit += HandleRegisterRequest;
+    }
+    public virtual void OnDisable() {
+      PlayerInputController.OnElementUnregistered -= HandleRemoveRequest;
+      PlayerInputController.OnElementDropped -= HandleRegisterRequest;
+      //PlayerInputController.OnElementSelected -= HandleRemoveRequest;
+      PlayerInputController.OnElementSecondary -= HandleRemoveRequest;
 
-    void Start() {
-      // Find all GridInteractive components in the scene
-      GridSnappable[] foundElements = FindObjectsByType<GridSnappable>(FindObjectsSortMode.None);
+      InventoryInputController.OnInventoryExit -= HandleRegisterRequest;
 
-      foreach (var element in foundElements) {
-        if (!RegisterElement(element)) {
-          Debug.LogWarning($"[GridManager] Failed to register element at {element.transform.position}");
+    }
+
+    #region ZoneManager overrides
+    public override bool Register(GridSnappable element) {
+      //attempt to register in base zone manager, which will add to _elements list
+      if (base.Register(element)) {
+        //place element at snapped position. If outside zone, snap to origin
+        Vector2 elementPos = SnapToGrid(Vector2.zero);
+        if (IsInsideZone(element)) {
+          elementPos = SnapToGrid(element.transform.position);
         }
+        element.transform.position = elementPos;
+        RegisterAtGrid(element);
+        Debug.Log($"[GridManager] Element '{element.name}' snapped to grid at {elementPos}");
       }
-      Debug.Log($"[GridManager] Registered {foundElements.Length} initial grid elements.");
-    }
-
-    private void OnDestroy() {
-      if (_ghostPreview != null) Destroy(_ghostPreview);
-    }
-
-
-    private void OnEnable() => GridSnappableUIController.OnRemoveRequested += HandleRemoveRequest;
-
-    private void OnDisable() => GridSnappableUIController.OnRemoveRequested -= HandleRemoveRequest;
-
-    private void HandleRemoveRequest(GridSnappable snappable) => RemoveElement(snappable);
-
-    #endregion
-
-    #region Element management
-    public bool RegisterElement(GridSnappable element) {
-      Vector2Int coord = GetGridCoord(element.transform.position);
-
-      if (_gridElements.ContainsKey(coord)) {
-        Debug.LogWarning($"[GridManager] Grid cell {coord} already occupied.");
+      else {
+        Debug.LogWarning($"[GridManager] Base registration failed for element at {element.name}");
+        //UnregisterFromGrid(element);
         return false;
       }
-      _gridElements[coord] = element;
-      element.transform.position = SnapToGrid(element.transform.position);
-      Debug.Log($"Element snapped to grid at {coord}");
-      element.OnRegistered(coord);
-      OnElementRegistered?.Invoke(element, coord);
-
-#if UNITY_EDITOR
-      _editorGridView.Add(new GridElementView { Coord = coord, Element = element });
-#endif
       return true;
     }
 
-    public void RemoveElement(GridSnappable element) {
+    //public override void Unregister(GridSnappable element) {
+    //  try {
+    //    base.Unregister(element);
+    //  }
+    //  catch (Exception ex) {
+    //    Debug.LogWarning($"[GridManager] Exception during base Unregister: {ex.Message}");
+    //    return;
+    //  }
+
+    //  try {
+    //    UnregisterFromGrid(element);
+    //  }
+    //  catch (Exception ex) {
+    //    Debug.LogWarning($"[GridManager] Exception during UnregisterFromGrid: {ex.Message}");
+    //  }
+    //}
+
+    #endregion
+
+    #region Grid element Methods
+
+    private bool RegisterAtGrid(GridSnappable element) {
       Vector2Int coord = GetGridCoord(element.transform.position);
-      if (_gridElements.ContainsKey(coord) && _gridElements[coord] == element) {
-        _gridElements.Remove(coord);
-        element.OnRemoved(coord);
-        OnElementRemoved?.Invoke(element, coord);
+      if (IsOccupied(coord) && _gridElements[coord] != element) {
+        Debug.LogWarning($"[GridManager] Grid position {coord} is already occupied by '{_gridElements[coord].name}'. Cannot register '{element.name}' here.");
+        return false; //position occupied by another element
       }
+      _gridElements[coord] = element;
+      Debug.LogWarning($"[GridManager] {element.name} added to Grid position {coord}");
+      return true;
     }
 
-    public GridSnappable GetElementAtScreenPosition(Vector2 screenPos) {
-      Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
-      RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
-      //return gameObject on collider if it has a GridInteractive component
-      if (hit.collider != null && (hit.collider.gameObject is var go)) {
-        if (go.TryGetComponent(out GridSnappable gridElement)) {
-          return gridElement;
-        }
-        else {
-          Debug.Log($"[GridManager] GameObject found at {screenPos} (worldPos:{worldPos} does not have a GridInteractive compatible component");
-        }
+    //private void UnregisterFromGrid(GridSnappable element) {
+    //  Vector2Int coord = GetGridCoord(element.transform.position);
+    //  if (_gridElements.ContainsValue(element) && _gridElements[coord] == element) {
+    //    _gridElements.Remove(coord);
+    //    element.SetRegistered(false);
+    //  }
+    //}
+
+    //public virtual GridSnappable GetElementAtScreenPosition(Vector2 screenPos) {
+    //  Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
+    //  RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
+    //  //return gameObject on collider if it has a GridInteractive component
+    //  if (hit.collider != null && (hit.collider.gameObject is var go)) {
+    //    if (go.TryGetComponent(out GridSnappable gridElement)) {
+    //      return gridElement;
+    //    }
+    //    else {
+    //      Debug.Log($"[GridManager] GameObject found at {screenPos} (worldPos:{worldPos} does not have a GridInteractive compatible component");
+    //    }
+    //  }
+    //  return null;
+    //}
+    //public virtual bool TryGetElementAtScreenPosition(Vector2 screenPos, out GridSnappable element) {
+    //  element = GetElementAtScreenPosition(screenPos);
+    //  return element != null;
+    //}
+    //public virtual bool TryGetElementCoord(GameObject element, out Vector2Int coord) {
+    //  foreach (var kvp in _gridElements) {
+    //    if (kvp.Value == element) {
+    //      coord = kvp.Key;
+    //      return true;
+    //    }
+    //  }
+    //  coord = default;
+    //  return false;
+    //}
+
+    public virtual bool IsOccupied(Vector2Int coord) => _gridElements.ContainsKey(coord);
+
+    public virtual bool IsOccupied(Vector2 position) => IsOccupied(GetGridCoord(position));
+
+    // The GridManager's implementation checks against the EdgeCollider2d defining the bounds of the grid
+    public override bool IsInsideZone(GridSnappable element) {
+      // Check if the element's position is within the bounds defined by the edge colliders
+      if (element == null) return false;
+
+      Vector2 pos = element.transform.position;
+      if (GridTopBound == null || GridBottomBound == null || GridLeftBound == null || GridRightBound == null) {
+        Debug.LogWarning("[GridManager] One or more grid boundary colliders are not assigned.");
+        return false;
       }
-      //else {
-      //  Debug.Log($"[GridManager] No GameObject found at {screenPos} (worldPos:{worldPos}");
-      //}
-      return null;
+      return (pos.y <= GridTopBound.bounds.max.y) &&
+                    (pos.y >= GridBottomBound.bounds.min.y) &&
+                    (pos.x >= GridLeftBound.bounds.min.x) &&
+                    (pos.x <= GridRightBound.bounds.max.x);
     }
-    public bool TryGetElementAtScreenPosition(Vector2 screenPos, out GridSnappable element) {
-      element = GetElementAtScreenPosition(screenPos);
-      return element != null;
-    }
-    public bool TryGetElementCoord(GameObject element, out Vector2Int coord) {
-      foreach (var kvp in _gridElements) {
-        if (kvp.Value == element) {
-          coord = kvp.Key;
-          return true;
-        }
-      }
-      coord = default;
-      return false;
-    }
-
-    public bool IsOccupied(Vector2Int coord) => _gridElements.ContainsKey(coord);
-
-    public bool IsOccupied(Vector2 position) => IsOccupied(GetGridCoord(position));
-
-    public void ShowSnappableUI(GridSnappable snappable) {
-      if (_activeUI != null) Destroy(_activeUI);
-
-      _activeUI = Instantiate(snappableUIPrefab);
-      _activeUI.transform.position = snappable.transform.position + Vector3.up * 1.5f;
-
-      var controller = _activeUI.GetComponent<GridSnappableUIController>();
-      controller.Bind(snappable);
-    }
-
-    public void HideSnappableUI() {
-      if (_activeUI != null) {
-        _activeUI.GetComponent<GridSnappableUIController>()?.Unbind();
-        Destroy(_activeUI);
-      }
-    }
-
 
     #endregion
 
-
-    #region Ghot Preview
-
-    public void ShowGhostPreview(GridSnappable sourceElement, Vector2 worldPosition) {
-      if (_ghostPreview == null) {
-        _ghostPreview = new GameObject("GhostPreview");
-        var sr = _ghostPreview.AddComponent<SpriteRenderer>();
-        sr.material = ghostMaterial;
-        sr.sortingLayerName = "Foreground"; // Optional
-        sr.sortingOrder = 100;              // Renders above normal elements
-      }
-
-      if (sourceElement.TryGetComponent(out SpriteRenderer sourceRenderer)
-        && sourceRenderer.sprite is var sourceSprite) {
-        var sr = _ghostPreview.GetComponent<SpriteRenderer>();
-        sr.sprite = sourceSprite;
-      }
-
-      Vector2 snapPos = SnapToGrid(worldPosition);
-      _ghostPreview.transform.position = snapPos;
-      _ghostPreview.SetActive(true);
-    }
-
-    public void HideGhostPreview() {
-      if (_ghostPreview != null)
-        _ghostPreview.SetActive(false);
-    }
-
-    #endregion
 
     #region Grid utilities
     public Vector2 SnapToGrid(Vector2 position) {
@@ -192,25 +171,6 @@ namespace GMTK {
     }
     #endregion
 
-#if UNITY_EDITOR
-    [ContextMenu("Scan Elements")]
-    private void EditorScanAndRegisterElements() {
-      var foundElements = FindObjectsByType<GridSnappable>(FindObjectsSortMode.None);
-
-      int registeredCount = 0;
-      foreach (var element in foundElements) {
-        if (RegisterElement(element)) {
-          registeredCount++;
-        }
-        else {
-          Debug.LogWarning($"[GridManager] Failed to register element at {element.transform.position}");
-        }
-      }
-
-      Debug.Log($"[GridManager] Editor scan registered {registeredCount} of {foundElements.Length} elements.");
-    }
-#endif
   }
-
 
 }

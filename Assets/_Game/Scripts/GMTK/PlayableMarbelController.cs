@@ -11,6 +11,8 @@ namespace GMTK {
     public float GravityScale = 1f;
     public float AngularDamping = 0.05f;
 
+    public Vector2 InitialForce = Vector2.zero;
+
     [Header("Spawn")]
     public Transform SpawnTransform;
     public bool LaunchOnStart = false;
@@ -40,16 +42,22 @@ namespace GMTK {
         Model.transform.position = SpawnTransform.position;
       }
       else { Model.transform.position = Vector3.zero; }
-      ResetForces();
+      StopMarble();
+    }
+
+    public void StopMarble() {      
       GravityScale = 0f;
+      ResetForces();
     }
 
     public void Launch() {
       ResetForces();
       GravityScale = 1f;
+      _rb.AddForce(InitialForce, ForceMode2D.Impulse);
     }
 
     private void ResetForces() {
+      if (_rb == null) return;
       _rb.linearVelocity = Vector2.zero;
       _rb.angularVelocity = 0f;
       _rb.rotation = 0f;
@@ -57,6 +65,10 @@ namespace GMTK {
     private bool IsGrounded() {
       RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, GroundedMask);
       return hit.collider != null;
+    }
+
+    public void ApplyBoost(Vector2 boostForce) {
+      _rb.AddForce(boostForce, ForceMode2D.Impulse);
     }
 
   }

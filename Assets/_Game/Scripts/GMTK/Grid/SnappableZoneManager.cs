@@ -32,23 +32,23 @@ namespace GMTK {
     [SerializeField, HideInInspector]
     private List<GridElementView> _editorView = new();
 
-    // Events for when elements are registered or unregistered
-    public event Action<GridSnappable> OnElementRegistered;
-    public event Action<GridSnappable> OnElementUnregistered;
-
     public virtual void Start() => ScanZone();
-    public virtual void OnEnable() => GridSnappableUIController.OnRemoveRequested += HandleRemoveRequest;
-    public virtual void OnDisable() => GridSnappableUIController.OnRemoveRequested -= HandleRemoveRequest;
-
 
     protected virtual void HandleRemoveRequest(GridSnappable snappable) => Unregister(snappable);
+
+    protected virtual void HandleRegisterRequest(GridSnappable snappable) {
+      if (snappable == null) return;
+      if (IsInsideZone(snappable)) {
+        Register(snappable);
+      }
+    }
 
     protected virtual void ScanZone() {
       _elements.Clear();
       int regesteredCount = 0;
       var foundElements = FindObjectsByType<GridSnappable>(FindObjectsSortMode.None);
       foreach (var snappable in foundElements) {
-        if (zoneCollider.bounds.Contains(snappable.GetPosition())) {
+        if (IsInsideZone(snappable)) {
           if (!Register(snappable)) {
             Debug.LogWarning($"[ZoneManager] Failed to register element at {snappable.transform.position}");
           }
@@ -59,11 +59,13 @@ namespace GMTK {
     }
 
     public virtual bool Register(GridSnappable element) {
-      if(!_elements.Contains(element)) {
+      if(element != null && !_elements.Contains(element) ) {
+        Debug.Log($"[ZoneManager] Registering element {element.name} in zone '{name}'");
         _elements.Add(element);
         return true;
       }
-      OnElementRegistered?.Invoke(element);
+      element.SetRegistered();
+      //OnElementRegistered?.Invoke(element);
 
 #if UNITY_EDITOR
       _editorView.Add(new GridElementView { Element = element });
@@ -73,8 +75,9 @@ namespace GMTK {
 
     public virtual void Unregister(GridSnappable element) {
       if (element == null || !_elements.Contains(element)) return;
+      Debug.Log($"[ZoneManager] Unregistering element {element.name} from zone '{name}'");
       _elements.Remove(element);
-      OnElementUnregistered?.Invoke(element);
+      element.SetRegistered(false);
 #if UNITY_EDITOR
       _editorView.Remove(new GridElementView { Element = element });
 #endif

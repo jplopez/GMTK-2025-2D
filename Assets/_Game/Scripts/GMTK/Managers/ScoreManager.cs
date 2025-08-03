@@ -9,8 +9,10 @@ namespace GMTK {
     [SerializeField] private TMP_Text scoreText;
 
     private void OnEnable() {
-      if (scoreEvents != null)
-        scoreEvents.OnIntRaised += HandleScoreAdded;
+      if (scoreEvents != null) {
+        scoreEvents.AddChannelListener(EventChannel.EventChannelType.RaiseInt, HandleScoreAdded);
+        scoreEvents.AddChannelListener(EventChannel.EventChannelType.SetInt, HandleScoreSet);
+      }
 
       if (scoreData != null)
         scoreData.OnValueChanged.AddListener(UpdateScoreText);
@@ -19,8 +21,10 @@ namespace GMTK {
     }
 
     private void OnDisable() {
-      if (scoreEvents != null)
-        scoreEvents.OnIntRaised -= HandleScoreAdded;
+      if (scoreEvents != null) {
+        scoreEvents.RemoveChannelListener(EventChannel.EventChannelType.RaiseInt, HandleScoreAdded);
+        scoreEvents.AddChannelListener(EventChannel.EventChannelType.SetInt, HandleScoreSet);
+      }
 
       if (scoreData != null)
         scoreData.OnValueChanged.RemoveListener(UpdateScoreText);
@@ -28,12 +32,15 @@ namespace GMTK {
 
     private void HandleScoreAdded(int amount) {
       scoreData.Add(amount);
-      Debug.Log($"ScoreData updated: {scoreData.Value}");
+      //Debug.Log($"ScoreData updated: {scoreData.Value}");
     }
-
+    private void HandleScoreSet(int amount) {
+      scoreData.Value = amount;
+      //Debug.Log($"ScoreData set: {scoreData.Value}");
+    }
     private void UpdateScoreText(int newScore) {
       scoreText.text = $"{newScore:N0}";
-      Debug.Log($"ScoreText updated: {scoreText.text}");
+      //Debug.Log($"ScoreText updated: {scoreText.text}");
     }
 
   }
