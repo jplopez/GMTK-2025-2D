@@ -62,22 +62,33 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\GMTK\SO\RuntimeMap.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\ScoreManager.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridSnappableUIController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\LevelCompleteManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\SO\SceneLoaderSO.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\SnappableFactory.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\SO\EventChannel.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Grid\InventoryManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayerInputController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\SO\FloatVariable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridSnappable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Attributes\DisplayWithoutEdit.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\InventoryInputController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\PlayableMarbelController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\SceneLoaderInvoker.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\SnappableTemplate.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\GameManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\SnappableMaterialStrategy.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridZoneTracker.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\SO\LevelSequence.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\ScoreManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\TutorialManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\DrawerController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\PlayerControls.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Checkpoint.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\LevelManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\SO\IntVariable.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\GameManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\StartSceneManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Grid\SnappableZoneManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Booster.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_Game\Scripts\GMTK\GMTK.asmdef" />
@@ -1141,6 +1152,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Ameba.GMTK.csproj">
+      <Project>{2D6EF55E-55FE-74A1-5778-7A3D2EFEC8B9}</Project>
+      <Name>Ameba.GMTK</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

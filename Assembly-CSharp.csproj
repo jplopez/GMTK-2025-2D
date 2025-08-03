@@ -1556,10 +1556,6 @@
       <Project>{EF04D81F-7401-B63E-15A9-8E615B7BBBF6}</Project>
       <Name>GMTK.Editor</Name>
     </ProjectReference>
-    <ProjectReference Include="Ameba.GMTK.Editor.csproj">
-      <Project>{DFB22E9B-4013-7586-900A-04374B7190C3}</Project>
-      <Name>Ameba.GMTK.Editor</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
