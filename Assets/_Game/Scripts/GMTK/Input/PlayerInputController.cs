@@ -85,7 +85,7 @@ namespace GMTK {
       if (target == null) return;
 
       action.Invoke(target);
-      //Debug.Log($"[PlayerInputController] {debugLabel} on {(target == CurrentElement ? "current" : "over")} element.");
+      //Debug.Log($"[PlayerInputController] {debugLabel} on {(target == _currentElement ? "current" : "over")} element.");
     }
 
     private void HandleSelectPressed() {
@@ -131,7 +131,7 @@ namespace GMTK {
           }
           break;
         case PlayerControllerStates.MovingElement:
-          //Debug.Log("[PlayerInputController:SecondaryPressed] CurrentElement");
+          //Debug.Log("[PlayerInputController:SecondaryPressed] _currentElement");
           element = CurrentElement;
           break;
         case PlayerControllerStates.OverElement:
@@ -155,7 +155,7 @@ namespace GMTK {
     public void OnDisable() => _controls.Gameplay.Disable();
 
     void Update() {
-      //updates CurrentElement position if controller is moving.
+      //updates _currentElement position if controller is moving.
       Vector3 worldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPos);
 
       if (IsMoving && CurrentElement != null) {
@@ -240,9 +240,9 @@ namespace GMTK {
         //Debug.Log($"[PlayerInputController] Found element under cursor, picking it up.");
         CurrentElement = element;
         OnElementSelected?.Invoke(CurrentElement);
-        //Grid.Register(CurrentElement);
-        //OnElementRegistered?.Invoke(CurrentElement);
-        //HandleRegisterElement(CurrentElement);
+        //Grid.Register(_currentElement);
+        //OnElementRegistered?.Invoke(_currentElement);
+        //HandleRegisterElement(_currentElement);
       }
       //else {
       //  Debug.Log($"[PlayerInputController] No element under cursor, creating a new one.");
@@ -252,8 +252,8 @@ namespace GMTK {
       // Only snap if we have a current element being moved
       if (CurrentElement != null) {
         OnElementDropped?.Invoke(CurrentElement);
-        //if (!Grid.Register(CurrentElement)) {
-        //if (!HandleRegisterElement(CurrentElement)) {
+        //if (!Grid.Register(_currentElement)) {
+        //if (!HandleRegisterElement(_currentElement)) {
         //    Debug.LogWarning($"[PlayerInputController] Could not place element, cell occupied. Returning to original position.");
         //  // Optionally, you could implement logic to return the element to its original position
         //}

@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(GridSnappable))]
+[CanEditMultipleObjects]
 public class GridSnappableEditor : Editor {
   private SnappableTemplate template;
 

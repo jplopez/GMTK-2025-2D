@@ -103,7 +103,7 @@ namespace GMTK.Editor {
 
       EditorGUILayout.Space();
       if (GUILayout.Button("Clear Map")) {
-        if (EditorUtility.DisplayDialog("Clear RuntimeMap", "Are you sure you want to clear all entries?", "Yes", "Cancel")) {
+        if (EditorUtility.DisplayDialog("Clear RuntimeMap", "Are you sure you want to clear all Entries?", "Yes", "Cancel")) {
           Undo.RecordObject(_map, "Clear RuntimeMap");
           _map.Clear();
           RebuildRegistry();

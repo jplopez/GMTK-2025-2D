@@ -5,22 +5,14 @@ namespace GMTK {
   [CreateAssetMenu(menuName = "GMTK/Event Channel")]
   public class EventChannel : ScriptableObject {
 
-    public enum EventChannelType {
-      RaiseInt,
-      SetInt
-    }
-
+    public enum EventChannelType { RaiseInt, SetInt }
 
     private UnityAction<int> OnIntRaised;
     private UnityAction<int> OnIntSet;
 
-    public void NotifyRaiseInt(int amount) {
-      OnIntRaised?.Invoke(amount);
-    }
+    public void NotifyRaiseInt(int amount) => OnIntRaised?.Invoke(amount);
 
-    public void NotifySetInt(int value) {
-       OnIntSet?.Invoke(value);
-    }
+    public void NotifySetInt(int value) => OnIntSet?.Invoke(value);
 
     public void AddChannelListener(EventChannelType type, UnityAction<int> listener) {
       switch (type) {

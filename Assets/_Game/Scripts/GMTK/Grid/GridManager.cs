@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace GMTK {
 
@@ -21,27 +23,32 @@ namespace GMTK {
 
     private Dictionary<Vector2Int, GridSnappable> _gridElements = new();
 
+    //Gizmos
+    [Header("Gizmo Settings")]
+    [SerializeField] private bool enableGizmo = true;
+    [SerializeField] private bool useCellSizeForGizmo = true;
+    [SerializeField] private float gizmoCellSize = 1f;
+    [SerializeField] private int gridWidth = 10;
+    [SerializeField] private int gridHeight = 10;
+    [SerializeField] private Color gridColor = Color.gray;
+
 #if UNITY_EDITOR
     protected virtual void EditorScanAndRegisterElements() => ScanZone();
 #endif
 
     public virtual void OnEnable() {
-      PlayerInputController.OnElementUnregistered += HandleRemoveRequest;
-      PlayerInputController.OnElementDropped += HandleRegisterRequest;
-      //PlayerInputController.OnElementSelected += HandleRemoveRequest;
-      PlayerInputController.OnElementSecondary += HandleRemoveRequest;
-
-      // This is to handle the case where an element is unregistered from the inventory and needs to be re-registered in the grid
-      InventoryInputController.OnInventoryExit += HandleRegisterRequest;
+      SnappableInputHandler.OnElementDropped += HandleElementDropped;
+      SnappableInputHandler.OnElementHovered += HandleElementHovered;
+      SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
+      SnappableInputHandler.OnElementSelected += HandleElementSelected;
     }
+
+
     public virtual void OnDisable() {
-      PlayerInputController.OnElementUnregistered -= HandleRemoveRequest;
-      PlayerInputController.OnElementDropped -= HandleRegisterRequest;
-      //PlayerInputController.OnElementSelected -= HandleRemoveRequest;
-      PlayerInputController.OnElementSecondary -= HandleRemoveRequest;
-
-      InventoryInputController.OnInventoryExit -= HandleRegisterRequest;
-
+      SnappableInputHandler.OnElementDropped -= HandleElementDropped;
+      SnappableInputHandler.OnElementHovered -= HandleElementHovered;
+      SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
+      SnappableInputHandler.OnElementSelected -= HandleElementSelected;
     }
 
     #region ZoneManager overrides
@@ -64,28 +71,9 @@ namespace GMTK {
       }
       return true;
     }
-
-    //public override void Unregister(GridSnappable element) {
-    //  try {
-    //    base.Unregister(element);
-    //  }
-    //  catch (Exception ex) {
-    //    Debug.LogWarning($"[GridManager] Exception during base Unregister: {ex.Message}");
-    //    return;
-    //  }
-
-    //  try {
-    //    UnregisterFromGrid(element);
-    //  }
-    //  catch (Exception ex) {
-    //    Debug.LogWarning($"[GridManager] Exception during UnregisterFromGrid: {ex.Message}");
-    //  }
-    //}
-
     #endregion
 
     #region Grid element Methods
-
     private bool RegisterAtGrid(GridSnappable element) {
       Vector2Int coord = GetGridCoord(element.transform.position);
       if (IsOccupied(coord) && _gridElements[coord] != element) {
@@ -93,46 +81,9 @@ namespace GMTK {
         return false; //position occupied by another element
       }
       _gridElements[coord] = element;
-      Debug.LogWarning($"[GridManager] {element.name} added to Grid position {coord}");
+      Debug.Log($"[GridManager] {element.name} added to Grid position {coord}");
       return true;
     }
-
-    //private void UnregisterFromGrid(GridSnappable element) {
-    //  Vector2Int coord = GetGridCoord(element.transform.position);
-    //  if (_gridElements.ContainsValue(element) && _gridElements[coord] == element) {
-    //    _gridElements.Remove(coord);
-    //    element.SetRegistered(false);
-    //  }
-    //}
-
-    //public virtual GridSnappable GetElementAtScreenPosition(Vector2 screenPos) {
-    //  Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
-    //  RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
-    //  //return gameObject on collider if it has a GridInteractive component
-    //  if (hit.collider != null && (hit.collider.gameObject is var go)) {
-    //    if (go.TryGetComponent(out GridSnappable gridElement)) {
-    //      return gridElement;
-    //    }
-    //    else {
-    //      Debug.Log($"[GridManager] GameObject found at {screenPos} (worldPos:{worldPos} does not have a GridInteractive compatible component");
-    //    }
-    //  }
-    //  return null;
-    //}
-    //public virtual bool TryGetElementAtScreenPosition(Vector2 screenPos, out GridSnappable element) {
-    //  element = GetElementAtScreenPosition(screenPos);
-    //  return element != null;
-    //}
-    //public virtual bool TryGetElementCoord(GameObject element, out Vector2Int coord) {
-    //  foreach (var kvp in _gridElements) {
-    //    if (kvp.Value == element) {
-    //      coord = kvp.Key;
-    //      return true;
-    //    }
-    //  }
-    //  coord = default;
-    //  return false;
-    //}
 
     public virtual bool IsOccupied(Vector2Int coord) => _gridElements.ContainsKey(coord);
 
@@ -149,28 +100,115 @@ namespace GMTK {
         return false;
       }
       return (pos.y <= GridTopBound.bounds.max.y) &&
-                    (pos.y >= GridBottomBound.bounds.min.y) &&
-                    (pos.x >= GridLeftBound.bounds.min.x) &&
-                    (pos.x <= GridRightBound.bounds.max.x);
+              (pos.y >= GridBottomBound.bounds.min.y) &&
+              (pos.x >= GridLeftBound.bounds.min.x) &&
+              (pos.x <= GridRightBound.bounds.max.x);
     }
 
     #endregion
 
+    #region Event Handlers
+
+
+    private void HandleElementDropped(object sender, GridSnappableEventArgs e) {
+      var element = e.Element;
+      if (element == null) return;
+      try {
+        element.SetGlow(false);
+        if (IsInsideZone(element)) {
+          HandleRegisterRequest(element);
+        }else {
+          HandleRemoveRequest(element);
+        }
+      } catch(Exception ex) {
+        Debug.LogError($"[GridManager] Failed to handle element after ElementDropped event : {ex.Message}");
+#if UNITY_EDITOR
+        throw ex;
+#endif
+      }
+    }
+    
+    //For now, selecting an element only enables the glow from Hovered.
+    private void HandleElementSelected(object sender, GridSnappableEventArgs e) => HandleElementHovered(sender, e);
+    private void HandleElementUnhovered(object sender, GridSnappableEventArgs e) {
+      var element = e.Element;
+      if (element == null) return;
+      if (element.Draggable) {
+        element.SetGlow(false);
+      }
+    }
+
+    private void HandleElementHovered(object sender, GridSnappableEventArgs e) {
+      var element = e.Element;
+      if (element == null) return;
+      if(element.Draggable) {
+        element.SetGlow(true);
+      }
+    }
+    #endregion
 
     #region Grid utilities
+    //public Vector2 SnapToGrid(Vector2 position) {
+    //  float x = Mathf.Round((position.x - Origin.x) / CellSize) * CellSize + Origin.x;
+    //  float y = Mathf.Round((position.y - Origin.y) / CellSize) * CellSize + Origin.y;
+    //  Debug.Log($"SnapToGrid {position} => {x},{y}");
+    //  return new Vector2(x, y);
+    //}
+
     public Vector2 SnapToGrid(Vector2 position) {
-      float x = Mathf.Round((position.x - Origin.x) / CellSize) * CellSize + Origin.x;
-      float y = Mathf.Round((position.y - Origin.y) / CellSize) * CellSize + Origin.y;
+      Vector2Int index = GetGridIndex(position);
+      float x = index.x * CellSize + Origin.x;
+      float y = index.y * CellSize + Origin.y;
       return new Vector2(x, y);
     }
 
     public Vector2Int GetGridCoord(Vector2 position) {
+      return GetGridIndex(position);
+    }
+
+    //public Vector2Int GetGridCoord(Vector2 position) {
+    //  int x = Mathf.RoundToInt((position.x - Origin.x) / CellSize);
+    //  int y = Mathf.RoundToInt((position.y - Origin.y) / CellSize);
+    //  Debug.Log($"GetGridCoord {position} => {x},{y}");
+    //  return new Vector2Int(x, y);
+    //}
+
+    private Vector2Int GetGridIndex(Vector2 position) {
       int x = Mathf.RoundToInt((position.x - Origin.x) / CellSize);
       int y = Mathf.RoundToInt((position.y - Origin.y) / CellSize);
       return new Vector2Int(x, y);
     }
+
+    private float ToGridXFloat(float xPos) {
+      return Mathf.Round((xPos - Origin.x) / CellSize) * CellSize;
+    }
+
+    private int ToGridXInt(float xPos) {
+      return Mathf.RoundToInt(ToGridXFloat(xPos));
+    }
     #endregion
 
-  }
+    private void OnDrawGizmos() {
+      if (!enableGizmo) return;
+      if (useCellSizeForGizmo) gizmoCellSize = CellSize;
+      Gizmos.color = gridColor;
 
+      int halfWidth = gridWidth / 2;
+      int halfHeight = gridHeight / 2;
+
+      for (int x = -halfWidth; x <= halfWidth; x++) {
+        Vector3 start = new Vector3(Origin.x + x * gizmoCellSize, Origin.y - halfHeight * gizmoCellSize, 0f);
+        Vector3 end = new Vector3(Origin.x + x * gizmoCellSize, Origin.y + halfHeight * gizmoCellSize, 0f);
+        Gizmos.DrawLine(start, end);
+      }
+
+      for (int y = -halfHeight; y <= halfHeight; y++) {
+        Vector3 start = new Vector3(Origin.x - halfWidth * gizmoCellSize, Origin.y + y * gizmoCellSize, 0f);
+        Vector3 end = new Vector3(Origin.x + halfWidth * gizmoCellSize, Origin.y + y * gizmoCellSize, 0f);
+        Gizmos.DrawLine(start, end);
+      }
+    }
+
+
+  }
 }

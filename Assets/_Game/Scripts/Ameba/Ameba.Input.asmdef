@@ -1,7 +1,9 @@
 {
-    "name": "Ameba.GMTK",
-    "rootNamespace": "Ameba",
-    "references": [],
+    "name": "Ameba.Input",
+    "rootNamespace": "Ameba.Input",
+    "references": [
+        "Unity.InputSystem"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

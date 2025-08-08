@@ -1,8 +1,13 @@
 {
-    "name": "Ameba.GMTK.Editor",
-    "rootNamespace": "Ameba",
-    "references": [],
-    "includePlatforms": [],
+    "name": "Ameba.Input.Editor",
+    "rootNamespace": "Ameba.Input",
+    "references": [
+        "Unity.InputSystem",
+        "Ameba.Input"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

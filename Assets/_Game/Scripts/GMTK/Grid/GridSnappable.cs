@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
-using UnityEngine.EventSystems;
+
 
 namespace GMTK {
 
@@ -23,8 +20,14 @@ namespace GMTK {
     [Header("Snappable Settings")]
     [Tooltip("If set, this transform will be used for snapping instead of the GameObject's transform.")]
     public Transform SnapTransform; //if null, uses this.transform
-    [Tooltip("Optional highlight model to show when hovering or dragging.")]
+    [Tooltip("If set, this transform will be used to look for SpriteRenders, RigidBody and Collisions. If empty, it will the GameObject's transform")]
+    public Transform Model;
+    [Tooltip("(Optional) highlight model to show when hovering or dragging.")]
     public GameObject HighlightModel;
+
+    [Header("Collision (Read-Only")]
+    [SerializeField, DisplayWithoutEdit] protected Rigidbody2D _rigidBody;
+    [SerializeField, DisplayWithoutEdit] protected PolygonCollider2D _collider;
 
     [Header("Behavior Settings")]
     [Tooltip("If true, the object can be dragged with the mouse.")]
@@ -45,14 +48,7 @@ namespace GMTK {
     [Tooltip("Angular drag of the object. Higher values mean more resistance to rotation.")]
     [Range(0f, 10f)]
     public float AngularDamping = 0.05f;
-    //[Tooltip("If true, the object will be affected by gravity.")]
-    //public bool Gravity = false;
 
-    [Header("Debug. Read only")]
-    [DisplayWithoutEdit] public SpriteRenderer _model;
-    [SerializeField, DisplayWithoutEdit] protected Rigidbody2D _rigidBody;
-    [SerializeField, DisplayWithoutEdit] protected PolygonCollider2D _collider;
-    [Tooltip("whether this element is in the grid or not")]
 
     public bool IsRegistered => _isRegistered;
 
@@ -60,6 +56,8 @@ namespace GMTK {
     private Quaternion _initialRotation;
     private Vector3 _initialScale;
     protected bool _isRegistered = false;
+
+    protected SpriteRenderer _modelRenderer;
 
     void Awake() => Initialize();
 
@@ -70,73 +68,96 @@ namespace GMTK {
 
     public virtual void Initialize() {
 
+      // Default assignments
       if (SnapTransform == null) SnapTransform = this.transform;
+      if (Model == null) Model = this.transform;
 
+      //store initial position for the Reset function
       _initialPosition = SnapTransform.position;
       _initialRotation = SnapTransform.rotation;
       _initialScale = SnapTransform.localScale;
+      if(CheckForRenderers()) 
+        InitGridSnappable();
 
-      // Ensure the GameObject has a SpriteRenderer
-      if (gameObject.TryGetComponent(out SpriteRenderer renderer)) {
-        _model = renderer;
-        //_model.sortingLayerName = "Interactives";
+    }
+
+    Vector3 lastPos = Vector3.zero;
+    private void Update() {
+      if (!lastPos.Equals(transform.position)) {
+        //System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
+        Debug.Log($"Snappable {name} changed position {lastPos} -> {transform.position}");
+        lastPos = transform.position;
+      }
+    }
+
+    private bool CheckForRenderers() {
+      //Check Model has a sprite renderer
+      if (Model.TryGetComponent(out SpriteRenderer renderer)) {
+        _modelRenderer = renderer;
+        return true;
       }
       else {
-        Debug.LogWarning($"[GridSnappable] No SpriteRenderer found on {gameObject.name}.");
+        SpriteRenderer[] renderers = Model.GetComponentsInChildren<SpriteRenderer>();
+        if (renderers == null || renderers.Length == 0) {
+          Debug.LogWarning($"[GridSnappable] No SpriteRenderer found on {Model.name}.");
+        }
       }
+      return false;
+    }
+
+    private void InitGridSnappable() {
+
       //hide existing highlight
-      if (HighlightModel != null) HighlightModel.SetActive(false); 
+      if (HighlightModel != null) HighlightModel.SetActive(false);
 
-      // Ensure the GameObject has a Rigidbody2D and PolygonCollider2D
-      if (gameObject.TryGetComponent(out Rigidbody2D rb)) {
-        _rigidBody = rb;
-      }
-      else {
-        Debug.LogWarning($"[GridSnappable] No Rigidbody2D found on {gameObject.name}. Adding one.");
-        _rigidBody = gameObject.AddComponent<Rigidbody2D>();
+      // Ensure the GameObject has a Rigidbody2D and PolygonCollider2D. Add them to the Model if missing
+      if (!Model.TryGetComponent(out Rigidbody2D rb)) {
+        Debug.LogWarning($"[GridSnappable] No Rigidbody2D found on {Model.gameObject.name}. Adding one.");
+        rb = Model.gameObject.AddComponent<Rigidbody2D>();
       }
       //by default bodytype is Dynamic and no gravity
-      _rigidBody.bodyType = RigidbodyType2D.Dynamic;
-      _rigidBody.gravityScale = 0f;
+      rb.bodyType = RigidbodyType2D.Dynamic;
+      rb.gravityScale = 0f;
 
       // StaticBody using Static bodytype
-      _rigidBody.bodyType = StaticBody ? RigidbodyType2D.Static : _rigidBody.bodyType;
+      rb.bodyType = StaticBody ? RigidbodyType2D.Static : rb.bodyType;
 
       //if not draggable we freeze movements in X and Y 
       if (!Draggable) {
-        _rigidBody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
+        rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
       }
 
       // Rotation constraints. 
       // we're not doing the freezee = !Rotable, because 
       // the rigidbody could be modified from the editor
-      _rigidBody.freezeRotation = CanRotate ? false : true;
+      rb.freezeRotation = CanRotate ? false : true;
 
       // override body settings if override is true and bodytype is Dynamic
       if (OverrideBodySettings && !StaticBody) {
-        _rigidBody.mass = Mass;
-        _rigidBody.angularDamping = AngularDamping;
+        rb.mass = Mass;
+        rb.angularDamping = AngularDamping;
       }
 
-      if (gameObject.TryGetComponent(out PolygonCollider2D collider)) {
+      if (Model.gameObject.TryGetComponent(out PolygonCollider2D collider)) {
         _collider = collider;
       }
       else {
-        Debug.LogWarning($"[GridSnappable] No PolygonCollider2D found on {gameObject.name}. Adding one.");
-        _collider = gameObject.AddComponent<PolygonCollider2D>();
+        Debug.LogWarning($"[GridSnappable] No PolygonCollider2D found on {Model.gameObject.name}. Adding one.");
+        _collider = Model.gameObject.AddComponent<PolygonCollider2D>();
       }
+
     }
 
     // Ensure highlight sprites are initialized
     private void Start() {
-      Debug.Log($"[GridSnappable] {name} using SnapTransform: {SnapTransform.name}");
+      //Debug.Log($"[GridSnappable] {name} using SnapTransform: {SnapTransform.name}");
     }
 
     public void OnPointerOver() => SetGlow(true);
 
     public void OnPointerOut() => SetGlow(false);
 
-    public virtual void SetRegistered(bool registered=true) => _isRegistered = registered;
+    public virtual void SetRegistered(bool registered = true) => _isRegistered = registered;
 
     public virtual void SetGlow(bool active) { if (HighlightModel != null) HighlightModel.SetActive(active); }
 
@@ -183,6 +204,7 @@ namespace GMTK {
     }
 
     public void ResetTransform() {
+      Debug.Log($"ResetTransform {name}");
       SnapTransform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
       SnapTransform.localScale = _initialScale;
     }
