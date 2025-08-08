@@ -61,9 +61,11 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\SnappableTemplateEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\DisplayWithoutEditDrawer.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\RuntimeMapEditor.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateMachineEditor.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateTransitionDrawer.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Input\SnappableInputHandlerEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GridManagerEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GridSnappableEditor.cs" />
   </ItemGroup>
@@ -1168,6 +1170,10 @@
     <ProjectReference Include="GMTK.csproj">
       <Project>{F1EF9DBB-0766-2ED7-8397-D963BF4EB548}</Project>
       <Name>GMTK</Name>
+    </ProjectReference>
+    <ProjectReference Include="Ameba.Input.csproj">
+      <Project>{67F7F933-C7A5-DBB3-1E41-F21F231A496A}</Project>
+      <Name>Ameba.Input</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

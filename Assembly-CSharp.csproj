@@ -61,51 +61,52 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\ThirdParty\Textures\BTM_Assets\BTM_Rockets_Missiles_Bombs\Scripts\RocketRotator.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\ChangeColor.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\MSFEffectExample.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TextSwitcher\TextSwitcherTrack.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\ApplicationManager.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TextSwitcher\TextSwitcherBehaviour.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TransformTween\TransformTweenMixerBehaviour.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TimeDilation\TimeDilationClip.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\NavMeshAgentControl\NavMeshAgentControlClip.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\SubEmitterByTime.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TextSwitcher\TextSwitcherClip.cs" />
-    <Compile Include="Assets\ThirdParty\Textures\Ouroboros\Stylized Textures - Mini Set\Demo\Sources\Rotator.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\LightControl\LightControlClip.cs" />
-    <Compile Include="Assets\ThirdParty\Textures\PolyLabs\BonusAssets\Rotator.cs" />
-    <Compile Include="Assets\ThirdParty\Textures\PolyLabs\PNTD\Free\PNTDSampleConsts.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Interactive\InteractiveWindSSU.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\Scripts\FPSCounter.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\UnscaledTimeSSU.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Interactive\WindManagerSSU.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TimeDilation\TimeDilationMixerBehaviour.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Matthew Guz\Status and Auras FREE\Scripts\CameraRotation.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\Scripts\CameraOrbit.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Interactive\WindParallaxSSU.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_Camera.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\DragMe.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Matthew Guz\Status and Auras FREE\Scripts\Prefab Manager.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\NavMeshAgentControl\NavMeshAgentControlTrack.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\ShaderFaderSSU.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\ScreenFader\ScreenFaderMixerBehaviour.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\Video\VideoPlayableBehaviour.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\ActiveStateToggler.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\LightControl\LightControlBehaviour.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\DragPanel.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\AutoRotate.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\Video\VideoSchedulerPlayableBehaviour.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\MaterialInstancerSSU.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_VectorPicker.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_Display.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\Scripts\ElementsShowCase.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\MSFEffectGroupExample.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_ColorPicker.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_GUI.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\PanelManager.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\NavMeshAgentControl\NavMeshAgentControlBehaviour.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_Trigger.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\ImageSSU.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\ScreenFader\ScreenFaderBehaviour.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TextSwitcher\TextSwitcherMixerBehaviour.cs" />
@@ -113,117 +114,111 @@
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TransformTween\TransformTweenBehaviour.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_VectorFollow.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_FloatPicker.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\Scripts\SlashDecal.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TimeDilation\TimeDilationTrack.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Interactive\InteractiveSquishSSU.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\BillBoardParticle.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TransformTween\TransformTweenTrack.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TimeDilation\TimeDilationBehaviour.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\Scripts\Projectile.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\LightControl\LightControlTrack.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\Video\VideoScriptPlayableAsset.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\ShowSliderValue.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\NavMeshAgentControl\NavMeshAgentControlMixerBehaviour.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\Video\VideoScriptPlayableTrack.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\ResizePanel.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\TiltWindow.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_SpriteFader.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_Player.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Internal\InstancerSSU.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\ScreenFader\ScreenFaderClip.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Vefects\Trails VFX\Scripts\Demo_FreeCam.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Vefects\Trails VFX\Scripts\Demo_TurningAround.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_DisplayTitle.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\SpriteSheetSSU.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_Shaders.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\Scripts\ParticleAnimationEvent.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\Scripts\AttackerController.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TransformTween\TransformTweenClip.cs" />
-    <Compile Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\Scripts\PlayerInput.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\LightControl\LightControlMixerBehaviour.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\DropMe.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\BulletShooter.cs" />
-    <Compile Include="Assets\Unity UI Samples\Scripts\ScrollDetailTexture.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\MSFEffectsGroup.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\ScreenFader\ScreenFaderTrack.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\ThirdParty\Sound\Nature Sound FX\__Gift__\Weapons SFX\Weapons SFX Full Package.txt" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMPro.cginc" />
-    <None Include="Assets\ThirdParty\VFX\Vefects\Trails VFX\Demo\Resources\Character\Shaders\SH_Vefects_URP_VFX_Character_Showoff.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Roboto-Bold - License.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\CommonMesh.shader" />
-    <None Include="Assets\ThirdParty\VFX\Matthew Guz\Slash Effects FREE\Documentation\Readme IMPORTANT.txt" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\CommonParticleOneShot.shader" />
+    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Unity - OFL.txt" />
     <None Include="Assets\ThirdParty\VFX\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR_SETTINGS.cginc" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\CommonMeshLoop.shader" />
+    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Oswald-Bold - OFL.txt" />
+    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Roboto-Bold - AFL.txt" />
+    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Anton OFL.txt" />
     <None Include="Assets\ThirdParty\VFX\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR.cginc" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
-    <None Include="Assets\Unity UI Samples\Textures and Sprites\SF UI\Background\LICENSE.txt" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\Smoke.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\BlueExpSphere.shader" />
-    <None Include="Assets\Unity UI Samples\Materials\UI-Default-No-Alpha.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\CommonParticleLoop.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
-    <None Include="Assets\ThirdParty\Textures\Stylized Texture Pack\Stylized Texture Pack 2k .png\Changelogs.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\3D Lit BuiltIn SSU.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Model\Katana\Katana License.txt" />
-    <None Include="Assets\ThirdParty\VFX\Vefects\Trails VFX\VFX\Shaders\SH_Vefects_VFX_BIRP_Trail_Distortion.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
+    <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\Circle.shader" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\Multiplicative SSU.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\Standard SSU.shader" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\Additive SSU.shader" />
-    <None Include="Assets\ThirdParty\VFX\Vefects\Trails VFX\Demo\Resources\Environment\Shaders\SH_Vefects_Grid_01_BIRP.shader" />
-    <None Include="Assets\ThirdParty\Textures\Billion Mucks\30 Stylized Textures Free\Billion Mucks Links.txt" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
-    <None Include="Assets\ThirdParty\Textures\Game Buffs\Free Stylized Textures\README.txt" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Color Pick.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\ThirdParty\VFX\JMO Assets\Cartoon FX Remaster\CFXR Prefabs\Texts\_Make your own text effect.txt" />
     <None Include="Assets\ThirdParty\VFX\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR_PASSES.cginc" />
-    <None Include="Assets\ThirdParty\VFX\Vefects\Trails VFX\VFX\Shaders\SH_Vefects_VFX_BIRP_Trail_New.shader" />
-    <None Include="Assets\Unity UI Samples\Fonts\Jupiter\LICENSE.txt" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\3D Lit Cutout URP SSU.shader" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\2D Lit URP SSU.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\Shield.shader" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\GUI SSU.shader" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\3D Lit Cutout BuiltIn SSU.shader" />
-    <None Include="Assets\ThirdParty\VFX\Vefects\Trails VFX\Demo\Resources\Character\Shaders\SH_Vefects_BIRP_VFX_Character_Showoff.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\Slash.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
-    <None Include="Assets\ThirdParty\VFX\Vefects\Trails VFX\_ Extra\Shaders\SH_Vefects_Extra_Billboard_01_BIRP.shader" />
-    <None Include="Assets\ThirdParty\VFX\Hovl Studio\Procedural fire\Shaders\FireSphere.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Model\Rock\Stylized Rock Credits.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\PowDissolve.shader" />
-    <None Include="Assets\Input Sprites for TextMesh Pro\please consider checking out my other assets.txt" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\ThirdParty\Input Sprites for TextMesh Pro\please consider checking out my other assets.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\SimpleEmissive.shader" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\ASE\Readme.txt" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\3D Lit URP SSU.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\ThirdParty\VFX\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR_URP.cginc" />
     <None Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Shaders\Additive GUI SSU.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\CommonParticles.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\Shield2.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\Blood.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\ReadMe.txt" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
-    <None Include="Assets\ThirdParty\VFX\Hovl Studio\Procedural fire\Demo scene\Readme.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\ThirdParty\Sound\Universal Sound FX\version_history.txt" />
-    <None Include="Assets\ThirdParty\VFX\Vefects\Trails VFX\_ Extra\Shaders\SH_Vefects_Extra_Grid_01_BIRP.shader" />
-    <None Include="Assets\ThirdParty\VFX\Free Slash VFX\Demo\TextMesh Pro\Shaders\TMP_Sprite.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
+    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Bangers - OFL.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1508,6 +1503,10 @@
       <Project>{AF4FC8D9-9462-8D9B-6065-9388C13DD207}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
     </ProjectReference>
+    <ProjectReference Include="Ameba.Input.csproj">
+      <Project>{67F7F933-C7A5-DBB3-1E41-F21F231A496A}</Project>
+      <Name>Ameba.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="sc.utilities.screenshot.editor.csproj">
       <Project>{900D7AA2-01A0-3409-13A6-3DB57626FA0E}</Project>
       <Name>sc.utilities.screenshot.editor</Name>
@@ -1515,6 +1514,10 @@
     <ProjectReference Include="CFXRDemo.csproj">
       <Project>{2A12955F-9E65-5D83-9DC8-AC097340A6F3}</Project>
       <Name>CFXRDemo</Name>
+    </ProjectReference>
+    <ProjectReference Include="Ameba.Input.Editor.csproj">
+      <Project>{4F51E72B-8226-B03A-1C1E-AC6727CF022F}</Project>
+      <Name>Ameba.Input.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="BetterHierarchyDemoScripts.csproj">
       <Project>{EFD32E90-DF1F-8347-B207-FC2375565E82}</Project>
@@ -1527,10 +1530,6 @@
     <ProjectReference Include="KinoBloom.Runtime.csproj">
       <Project>{E38A27E6-0099-9F16-5AEB-E5CB2F6C82DC}</Project>
       <Name>KinoBloom.Runtime</Name>
-    </ProjectReference>
-    <ProjectReference Include="Ameba.GMTK.csproj">
-      <Project>{2D6EF55E-55FE-74A1-5778-7A3D2EFEC8B9}</Project>
-      <Name>Ameba.GMTK</Name>
     </ProjectReference>
     <ProjectReference Include="GMTK.csproj">
       <Project>{F1EF9DBB-0766-2ED7-8397-D963BF4EB548}</Project>
