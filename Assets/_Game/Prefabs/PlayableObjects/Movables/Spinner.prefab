@@ -117,7 +117,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7896598416932121395}
@@ -146,7 +146,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ba4adfaf3006baa4cb2e64a4f697241f, type: 2}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -219,7 +219,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppliedTemplate: {fileID: 0}
   SnapTransform: {fileID: 2377787328780317031}
+  Model: {fileID: 2377787328780317031}
   HighlightModel: {fileID: 0}
+  _rigidBody: {fileID: 2217457593522192176}
+  _collider: {fileID: 4092805948021639145}
   Draggable: 1
   CanRotate: 1
   Flippable: 1
@@ -227,9 +230,6 @@ MonoBehaviour:
   OverrideBodySettings: 1
   Mass: 20
   AngularDamping: 1
-  _model: {fileID: 3399795978445645795}
-  _rigidBody: {fileID: 2217457593522192176}
-  _collider: {fileID: 4092805948021639145}
 --- !u!60 &4092805948021639145
 PolygonCollider2D:
   m_ObjectHideFlags: 0

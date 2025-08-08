@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7a74b409a6939846b3cfd2553464c9d, type: 3}
   m_Name: MovableBucket
   m_EditorClassIdentifier: 
-  Sprite: {fileID: 2058049638561703503, guid: a2148ef9adec91944bad6865156bce1e, type: 3}
+  Sprite: {fileID: -8314368536585211056, guid: bb36e0ea7af74694bb1b0f0e8a6ae020, type: 3}
   SizeInGridUnits: {x: 2, y: 2}
   ForceStaticRigidBody: 0
+  PivotDirection: 0
   Mass: 40
   AngularDamping: 1
   Gravity: 1
-  Friction: 1
-  Bounciness: 1
+  Friction: 2
+  Bounciness: 0

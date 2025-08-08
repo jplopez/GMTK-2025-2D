@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.0125, y: 0.00047, z: 0}
-  m_LocalScale: {x: 2.033273, y: 0.6533015, z: 2}
+  m_LocalScale: {x: 4.066546, y: 1.306603, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8879746121491160761}
@@ -185,7 +185,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppliedTemplate: {fileID: 0}
   SnapTransform: {fileID: 5542800092596650057}
+  Model: {fileID: 5542800092596650057}
   HighlightModel: {fileID: 3718797714339420354}
+  _rigidBody: {fileID: 0}
+  _collider: {fileID: 771818983478109027}
   Draggable: 1
   CanRotate: 1
   Flippable: 1
@@ -193,9 +196,6 @@ MonoBehaviour:
   OverrideBodySettings: 0
   Mass: 1
   AngularDamping: 0.05
-  _model: {fileID: 3574247149974132831}
-  _rigidBody: {fileID: 794265824971413072}
-  _collider: {fileID: 771818983478109027}
 --- !u!1 &3718797714339420354
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,7 +272,7 @@ SpriteRenderer:
   m_SortingLayerID: 1878654211
   m_SortingLayer: 3
   m_SortingOrder: 1
-  m_Sprite: {fileID: -6895716492971166485, guid: a2148ef9adec91944bad6865156bce1e, type: 3}
+  m_Sprite: {fileID: -7938867026890526847, guid: 084872b9862cb6f4095a9f2dcc973d39, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5776990134103044164
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8035545643605969214}
+  - component: {fileID: 4672802933306248717}
+  m_Layer: 0
+  m_Name: LevelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8035545643605969214
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5776990134103044164}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.7000003, y: 10.7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4672802933306248717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5776990134103044164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 788ae3f78f4db154a89b12bb9fd4cb26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayableMarble: {fileID: 0}
+  MarbleInitialForce: {x: 40, y: 0}
+  StartLevelCheckpoint: {fileID: 0}
+  EndLevelCheckpoint: {fileID: 0}
+  StaleTimeThreshold: 5
+  RestartOnStale: 1
+  InfitiniteTime: 1
+  LevelMaxTime: 300
+  scoreEvents: {fileID: 11400000, guid: 5520788bcef8ee5429763a216dd7995f, type: 2}
+  ScoreMultiplier: 100
+  CheckpointsToWin: 1
+  CheckpointsReached: 0
+  LevelSequence: {fileID: 11400000, guid: be2c43cd7e157c941a8f27e588aa10e3, type: 2}

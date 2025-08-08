@@ -201,7 +201,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppliedTemplate: {fileID: 0}
   SnapTransform: {fileID: 459243548927061235}
+  Model: {fileID: 459243548927061235}
   HighlightModel: {fileID: 0}
+  _rigidBody: {fileID: 6070444942426543244}
+  _collider: {fileID: 1198778951987441337}
   Draggable: 1
   CanRotate: 1
   Flippable: 1
@@ -209,9 +212,6 @@ MonoBehaviour:
   OverrideBodySettings: 1
   Mass: 20
   AngularDamping: 1
-  _model: {fileID: 3400282841640225840}
-  _rigidBody: {fileID: 6070444942426543244}
-  _collider: {fileID: 1198778951987441337}
 --- !u!1 &888538353159952850
 GameObject:
   m_ObjectHideFlags: 0
@@ -594,7 +594,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppliedTemplate: {fileID: 0}
   SnapTransform: {fileID: 459243548927061235}
+  Model: {fileID: 5255677902885650293}
   HighlightModel: {fileID: 888538353159952850}
+  _rigidBody: {fileID: 3741162343011587280}
+  _collider: {fileID: 4380273860070125285}
   Draggable: 1
   CanRotate: 1
   Flippable: 1
@@ -602,6 +605,3 @@ MonoBehaviour:
   OverrideBodySettings: 1
   Mass: 20
   AngularDamping: 1
-  _model: {fileID: 4222763479989757896}
-  _rigidBody: {fileID: 3741162343011587280}
-  _collider: {fileID: 4380273860070125285}

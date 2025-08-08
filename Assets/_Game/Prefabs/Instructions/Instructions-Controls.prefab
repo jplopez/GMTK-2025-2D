@@ -29,13 +29,13 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 622935592155538554}
-  - {fileID: 1763424122783590606}
+  - {fileID: 9007569422554774037}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -480.5, y: 567.5}
-  m_SizeDelta: {x: 961, y: 595}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2690118617379482376
 GameObject:
@@ -63,8 +63,8 @@ Transform:
   m_GameObject: {fileID: 2690118617379482376}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.950012, y: 231.125, z: 0}
-  m_LocalScale: {x: 337.262, y: 360.2588, z: 60}
+  m_LocalPosition: {x: 0, y: -0.17504883, z: 0}
+  m_LocalScale: {x: 335.7106, y: 315.11304, z: 60}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1415666547959854116}
@@ -124,7 +124,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &8208303832326584747
+--- !u!1 &3445118562699484770
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -132,23 +132,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1763424122783590606}
-  - component: {fileID: 3823017654968738214}
-  - component: {fileID: 1285020496990063929}
-  m_Layer: 5
-  m_Name: Controls
+  - component: {fileID: 9007569422554774037}
+  - component: {fileID: 4231401252352377278}
+  - component: {fileID: 6046295288987817341}
+  m_Layer: 0
+  m_Name: HowToPlay-Controls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &1763424122783590606
+--- !u!224 &9007569422554774037
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8208303832326584747}
+  m_GameObject: {fileID: 3445118562699484770}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -158,24 +158,24 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -17.825012, y: 212.72498}
-  m_SizeDelta: {x: 963, y: 942.6501}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1021.6, y: 833}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &3823017654968738214
+--- !u!222 &4231401252352377278
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8208303832326584747}
+  m_GameObject: {fileID: 3445118562699484770}
   m_CullTransparentMesh: 1
---- !u!114 &1285020496990063929
+--- !u!114 &6046295288987817341
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8208303832326584747}
+  m_GameObject: {fileID: 3445118562699484770}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
@@ -189,17 +189,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=120%>How to Play</size>\n\u2022 The goal is getting the marble to
-    run through the entire loop returning to the starting point.\n\u2022 Use the
-    objects in the left drawer to complete the loop.\n\u2022 Use the Playback controls
-    at the bottom to move the marble or reset the scene.\n<size=120%>Controls</size>\nPress
+  m_text: "<size=120%><color=\"yellow\">How to Play</color></size>\n\u2022 The goal
+    is getting the marble to run through the entire loop returning to the starting
+    point.\n\u2022 Use the objects in the left drawer to complete the loop.\n\u2022
+    Use the Playback controls at the bottom to move the marble or reset the scene.\n<size=120%><color=\"yellow\">Controls</color></size>\nPress
     and hold <sprite name=ml> to move objects\nPress <sprite name=w> or <sprite name=s>
     to flip vertically\nPress <sprite name=a> or <sprite name=d> to flip horizontally\nPress
     <sprite name=q> or <sprite name=e> to rotate clockwise and counter-clockwise
     respectively\n"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 941512d646e7dad48b604c2806b5739e, type: 2}
+  m_sharedMaterial: {fileID: 1641404675082916182, guid: 941512d646e7dad48b604c2806b5739e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -223,21 +223,21 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
-  m_characterSpacing: 3
+  m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: 20
+  m_lineSpacing: 0
   m_lineSpacingMax: 0
-  m_paragraphSpacing: 30
+  m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
@@ -261,7 +261,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 1.7454834, y: -0.107803345, z: 2.1905518, w: 1.1715088}
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

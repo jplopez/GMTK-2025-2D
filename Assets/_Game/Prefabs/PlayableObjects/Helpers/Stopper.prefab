@@ -30,8 +30,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.55, y: 0.55, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.1, y: 1.1, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -198,7 +198,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppliedTemplate: {fileID: 0}
   SnapTransform: {fileID: 7136649407807609702}
+  Model: {fileID: 7136649407807609702}
   HighlightModel: {fileID: 0}
+  _rigidBody: {fileID: 4790291331935534932}
+  _collider: {fileID: 7685203343923285258}
   Draggable: 1
   CanRotate: 0
   Flippable: 0
@@ -206,6 +209,3 @@ MonoBehaviour:
   OverrideBodySettings: 0
   Mass: 1
   AngularDamping: 0.05
-  _model: {fileID: 7476791665513380597}
-  _rigidBody: {fileID: 4790291331935534932}
-  _collider: {fileID: 7685203343923285258}

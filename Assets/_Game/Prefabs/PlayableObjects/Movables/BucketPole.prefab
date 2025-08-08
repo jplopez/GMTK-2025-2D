@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5036, y: 1, z: 1}
+  m_LocalScale: {x: 1.0072, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 787526784158423903}
@@ -60,7 +60,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ba4adfaf3006baa4cb2e64a4f697241f, type: 2}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -184,7 +184,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppliedTemplate: {fileID: 0}
   SnapTransform: {fileID: 459243548927061235}
+  Model: {fileID: 459243548927061235}
   HighlightModel: {fileID: 0}
+  _rigidBody: {fileID: 6070444942426543244}
+  _collider: {fileID: 1198778951987441337}
   Draggable: 1
   CanRotate: 1
   Flippable: 1
@@ -192,9 +195,6 @@ MonoBehaviour:
   OverrideBodySettings: 1
   Mass: 20
   AngularDamping: 1
-  _model: {fileID: 3400282841640225840}
-  _rigidBody: {fileID: 6070444942426543244}
-  _collider: {fileID: 1198778951987441337}
 --- !u!1 &2482488247940657939
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,7 +463,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppliedTemplate: {fileID: 0}
   SnapTransform: {fileID: 459243548927061235}
+  Model: {fileID: 787526784158423903}
   HighlightModel: {fileID: 2482488247940657939}
+  _rigidBody: {fileID: -2074734947574628553}
+  _collider: {fileID: 6153986362619659162}
   Draggable: 1
   CanRotate: 1
   Flippable: 1
@@ -471,9 +474,6 @@ MonoBehaviour:
   OverrideBodySettings: 1
   Mass: 20
   AngularDamping: 1
-  _model: {fileID: 4052374013409017219}
-  _rigidBody: {fileID: -2074734947574628553}
-  _collider: {fileID: 6153986362619659162}
 --- !u!50 &-2074734947574628553
 Rigidbody2D:
   serializedVersion: 5

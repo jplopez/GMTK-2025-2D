@@ -28,7 +28,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 7258827595930639120}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 1878654211
   m_SortingLayer: 3
   m_SortingOrder: 1
-  m_Sprite: {fileID: -6895716492971166485, guid: a2148ef9adec91944bad6865156bce1e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 996a41f597fb3004198026d9c6ce630c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -116,8 +116,8 @@ Transform:
   m_GameObject: {fileID: 8930533740010895142}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.02965, y: -0.00228, z: 0}
-  m_LocalScale: {x: 1.5141491, y: 0.9715622, z: 2}
+  m_LocalPosition: {x: 0.19666, y: -0.00962, z: 0}
+  m_LocalScale: {x: 3.07123, y: 1.9729238, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1262502646931940932}
@@ -146,7 +146,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ba4adfaf3006baa4cb2e64a4f697241f, type: 2}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -241,7 +241,7 @@ PolygonCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0.089999996, y: 0.07, z: 0.03, w: 0.07}
+    border: {x: 0.12, y: 0.089999996, z: 0.07, w: 0.089999996}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 3.1, y: 3.2}
     newSize: {x: 1.2, y: 1.36}
@@ -251,14 +251,9 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 1.51, y: -1.5}
-      - {x: -1.41, y: 1.53}
-      - {x: -1.4399999, y: 1.53}
-      - {x: -1.4399999, y: 1.4699999}
-      - {x: -1.43, y: 1.4399999}
-      - {x: -1.4399999, y: -1.49}
-      - {x: -1.42, y: -1.51}
-      - {x: 1.49, y: -1.51}
+    - - {x: -1.43, y: 1.53}
+      - {x: -1.43, y: -1.51}
+      - {x: 1.5, y: -1.51}
   m_UseDelaunayMesh: 0
 --- !u!114 &8506236225779810714
 MonoBehaviour:
@@ -274,7 +269,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppliedTemplate: {fileID: 0}
   SnapTransform: {fileID: 7258827595930639120}
-  HighlightModel: {fileID: 0}
+  Model: {fileID: 7258827595930639120}
+  HighlightModel: {fileID: 822021744610847665}
+  _rigidBody: {fileID: 7553339179308787632}
+  _collider: {fileID: 3279863637007275624}
   Draggable: 1
   CanRotate: 1
   Flippable: 1
@@ -282,6 +280,3 @@ MonoBehaviour:
   OverrideBodySettings: 0
   Mass: 1
   AngularDamping: 0.05
-  _model: {fileID: 6007282902875389682}
-  _rigidBody: {fileID: 7553339179308787632}
-  _collider: {fileID: 3279863637007275624}

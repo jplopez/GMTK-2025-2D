@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 1878654211
   m_SortingLayer: 3
   m_SortingOrder: 1
-  m_Sprite: {fileID: 5372264662783423788, guid: a2148ef9adec91944bad6865156bce1e, type: 3}
+  m_Sprite: {fileID: -4954960343474209260, guid: 817e66478830abe4497dca66c4643c9f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -117,7 +117,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8399941, y: 0.78099865, z: 1}
+  m_LocalScale: {x: 3.359976, y: 3.123994, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2209268022180241391}
@@ -273,7 +273,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppliedTemplate: {fileID: 11400000, guid: ce665a2615eeecc47ba1250185588272, type: 2}
   SnapTransform: {fileID: 6566122477424756932}
+  Model: {fileID: 6566122477424756932}
   HighlightModel: {fileID: 1168465282976681170}
+  _rigidBody: {fileID: 195997670576524317}
+  _collider: {fileID: 6935627221445981007}
   Draggable: 1
   CanRotate: 1
   Flippable: 1
@@ -281,6 +284,3 @@ MonoBehaviour:
   OverrideBodySettings: 0
   Mass: 1
   AngularDamping: 0.05
-  _model: {fileID: 5159767925404240678}
-  _rigidBody: {fileID: 195997670576524317}
-  _collider: {fileID: 6935627221445981007}

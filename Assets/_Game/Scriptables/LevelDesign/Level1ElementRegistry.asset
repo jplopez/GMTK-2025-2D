@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19065bdbe596c704a9e49fa9c8bb8cf6, type: 3}
+  m_Name: Level1ElementRegistry
+  m_EditorClassIdentifier: 
+  entries:
+  - id: Stopper
+    Prefab: {fileID: 7580997707441555835, guid: 3e52a9d514780b94dbeca5237c5ea329, type: 3}
+  - id: Bucket
+    Prefab: {fileID: 286476462706750791, guid: 6804650fd7e841d4f89da68693f53603, type: 3}
+  - id: Spinner
+    Prefab: {fileID: 7723901764050706623, guid: 73dfd7ea2f5433643af110e4b5fbca3f, type: 3}
+  - id: Pencil
+    Prefab: {fileID: 617128071334964795, guid: 4b053c686a17f574c94492465ec9bb0b, type: 3}
+  - id: YengaFat
+    Prefab: {fileID: 617128071334964795, guid: e7880ef4935c18c449f85384848dc52a, type: 3}
+  - id: YengaThin
+    Prefab: {fileID: 617128071334964795, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
+  - id: Ramp1x1
+    Prefab: {fileID: 6107416296668224829, guid: 8658933ce7629674e995448c71845ea0, type: 3}
+  - id: Ramp2x1
+    Prefab: {fileID: 2410038200675348983, guid: e3e9654e9a5699b41a6200d915fb6956, type: 3}
+  - id: Ramp2x2
+    Prefab: {fileID: 2863527360892847021, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
+  - id: Ramp3x1
+    Prefab: {fileID: 2023003198559400959, guid: 29a410c513468d44caa7476a76d89a11, type: 3}
+  - id: Ramp3x2
+    Prefab: {fileID: 8930533740010895142, guid: 094f76d67fab4404d9d71c43b940b5df, type: 3}

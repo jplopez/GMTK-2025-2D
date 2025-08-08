@@ -46,15 +46,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Model: {fileID: 8854468689219663725}
-  Mass: 5
-  GravityScale: 1
+  Mass: 15
+  GravityScale: 3
   AngularDamping: 0.05
   InitialForce: {x: 0, y: 0}
   SpawnTransform: {fileID: 0}
   LaunchOnStart: 0
   GroundedMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 640
 --- !u!1 &8854468689219663725
 GameObject:
   m_ObjectHideFlags: 0
@@ -156,10 +156,10 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 5
+  m_Mass: 15
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 3
   m_Material: {fileID: 6200000, guid: ba0288f662a3a3843b07bb89d398406d, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
