@@ -883,13 +883,17 @@ PrefabInstance:
       propertyPath: OverrideBodySettings
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7926144506979983261, guid: 4b053c686a17f574c94492465ec9bb0b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
     - target: {fileID: 7956316667899920837, guid: 4b053c686a17f574c94492465ec9bb0b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.1320229
+      value: 2.7197704
       objectReference: {fileID: 0}
     - target: {fileID: 7956316667899920837, guid: 4b053c686a17f574c94492465ec9bb0b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -10.539785
+      value: -10.532851
       objectReference: {fileID: 0}
     - target: {fileID: 7956316667899920837, guid: 4b053c686a17f574c94492465ec9bb0b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2143,7 +2147,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -10, y: 12.999573}
+  m_AnchoredPosition: {x: -43, y: 20.499573}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1023304553
@@ -2482,7 +2486,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 68.98965, y: -533.9198}
+  m_AnchoredPosition: {x: 68.98965, y: -527.9198}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1182748723
@@ -2978,6 +2982,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 60533500}
     m_Modifications:
+    - target: {fileID: 1691347177200724954, guid: e3e9654e9a5699b41a6200d915fb6956, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
     - target: {fileID: 2410038200675348983, guid: e3e9654e9a5699b41a6200d915fb6956, type: 3}
       propertyPath: m_Name
       value: Ramp_2x1 (1)
@@ -3622,7 +3630,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -68.98964, y: -533.9198}
+  m_AnchoredPosition: {x: -68.98964, y: -527.9198}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1666267767

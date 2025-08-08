@@ -14,6 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StartingState: 0
   NoRestrictions: 0
+  _serializedTransitions:
+  - From: 0
+    To: 010000000700000005000000
+  - From: 1
+    To: 0200000003000000060000000700000005000000
+  - From: 2
+    To: 0300000006000000070000000400000005000000
+  - From: 3
+    To: 01000000060000000700000005000000
+  - From: 4
+    To: 0100000005000000
+  - From: 6
+    To: 010000000200000003000000
+  - From: 7
+    To: 00000000010000000200000003000000
   OnStateChanged:
     m_PersistentCalls:
       m_Calls: []
