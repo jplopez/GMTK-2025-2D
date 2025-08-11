@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &914307986244139718
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2205951209694358804}
+  - component: {fileID: 801651196068165227}
+  m_Layer: 0
+  m_Name: RollnSnapController
+  m_TagString: Untagged
+  m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2205951209694358804
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 914307986244139718}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 24, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &801651196068165227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 914307986244139718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58636ec1e7322284cbc422ed84d0de1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameStateMachine: {fileID: 11400000, guid: 01ebcf23e4e596d4394da7e6ebf4e9f1, type: 2}
+  ChangeGameStateOnStart: 1
+  StartingState: 0
+  ChangeGameStateOnEnd: 0
+  EndingState: 5
+  StartSceneName: Start
+  LoadingSceneName: Loading
+  GameOverSceneName: GameOver
+  DefaultCurrentSceneAssignment: 1
+  _levelSequence: {fileID: 11400000, guid: be2c43cd7e157c941a8f27e588aa10e3, type: 2}
+  DisableInputs: 0
+  InputRegistryName: GameplayRegistry
+  _inputRegistry: {fileID: 11400000, guid: a4e654e7233c44f41b3024fab36c23a6, type: 2}
+  _eventsChannel: {fileID: 11400000, guid: 95a9f7bb01a666548ba38fda71806925, type: 2}
+  _hud: {fileID: 11400000, guid: 52f45e5037fea8e4a842a0b5a5a0b95b, type: 2}
+  _scoreData: {fileID: 11400000, guid: 6d978f2d8c8b771468bc1d88099644ae, type: 2}
+  _marbleScoreKeeper: {fileID: 11400000, guid: 584c2a77812de864c8cc37435490bfef, type: 2}

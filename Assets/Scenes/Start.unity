@@ -129,7 +129,6 @@ GameObject:
   m_Component:
   - component: {fileID: 367911226}
   - component: {fileID: 367911227}
-  - component: {fileID: 367911228}
   m_Layer: 0
   m_Name: Intro
   m_TagString: Untagged
@@ -177,19 +176,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &367911228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 367911224}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7b839f1fba28e448a2a445710af9eda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  LevelSequence: {fileID: 11400000, guid: be2c43cd7e157c941a8f27e588aa10e3, type: 2}
 --- !u!1 &399218914
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,6 +313,17 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &508873137 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 801651196068165227, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+  m_PrefabInstance: {fileID: 1219439519}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58636ec1e7322284cbc422ed84d0de1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &716932838
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,7 +333,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 716932839}
-  - component: {fileID: 716932840}
   m_Layer: 0
   m_Name: GUI
   m_TagString: Untagged
@@ -360,19 +356,6 @@ Transform:
   - {fileID: 733917375}
   m_Father: {fileID: 367911226}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &716932840
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 716932838}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ebb96eabff3caa40921ec4333fbb8e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneLoader: {fileID: 11400000, guid: ed0dae7940bc0f149aef3164b4fd338d, type: 2}
 --- !u!1 &733917374
 GameObject:
   m_ObjectHideFlags: 0
@@ -559,9 +542,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 367911228}
-        m_TargetAssemblyTypeName: GMTK.StartSceneManager, GMTK
-        m_MethodName: StartGame
+      - m_Target: {fileID: 508873137}
+        m_TargetAssemblyTypeName: GMTK.RollnSnapController, GMTK
+        m_MethodName: LoadNextScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -878,8 +861,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 716932840}
-        m_TargetAssemblyTypeName: GMTK.SceneLoaderInvoker, GMTK
+      - m_Target: {fileID: 508873137}
+        m_TargetAssemblyTypeName: GMTK.RollnSnapController, GMTK
         m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
@@ -948,6 +931,71 @@ MonoBehaviour:
   m_FlexibleWidth: 0
   m_FlexibleHeight: 0
   m_LayoutPriority: 1
+--- !u!1001 &1219439519
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 801651196068165227, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: ResetScoreOnLoad
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 801651196068165227, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: DefaultCurrentSceneAssignment
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 914307986244139718, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_Name
+      value: RollnSnapController
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15.24043
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.33482
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
 --- !u!1 &1579908468
 GameObject:
   m_ObjectHideFlags: 0
@@ -1042,3 +1090,4 @@ SceneRoots:
   - {fileID: 399218917}
   - {fileID: 924498505}
   - {fileID: 367911226}
+  - {fileID: 1219439519}

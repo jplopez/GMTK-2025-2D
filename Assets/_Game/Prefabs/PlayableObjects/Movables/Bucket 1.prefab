@@ -76,7 +76,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 286476462706750791}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da9b17e31f29c36419dc13260e2e8d90, type: 3}
   m_Name: 
@@ -87,11 +87,11 @@ MonoBehaviour:
   HighlightModel: {fileID: 888538353159952850}
   _rigidBody: {fileID: 0}
   _collider: {fileID: 5736492543637371326}
-  Draggable: 1
+  Draggable: 0
   CanRotate: 1
-  Flippable: 1
-  StaticBody: 0
-  OverrideBodySettings: 1
+  Flippable: 0
+  StaticBody: 1
+  OverrideBodySettings: 0
   Mass: 45
   AngularDamping: 1
 --- !u!212 &6837568994525001513
@@ -135,8 +135,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1878654211
-  m_SortingLayer: 3
+  m_SortingLayerID: -616063821
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: -8314368536585211056, guid: bb36e0ea7af74694bb1b0f0e8a6ae020, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -236,7 +236,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 286476462706750791}
-  m_BodyType: 0
+  m_BodyType: 2
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -254,7 +254,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 3
 --- !u!1 &888538353159952850
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,7 +329,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 1
   m_Sprite: {fileID: -8314368536585211056, guid: bb36e0ea7af74694bb1b0f0e8a6ae020, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -415,7 +415,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 818045849
+  m_SortingLayerID: 1878654211
   m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 6901295633110193963, guid: 87d4d8016072f754fa2cccf9f8eb8328, type: 3}

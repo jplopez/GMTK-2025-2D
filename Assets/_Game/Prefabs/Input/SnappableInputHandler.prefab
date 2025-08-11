@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4271690832670957136
+--- !u!1 &9045615520726610499
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,44 +8,42 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3329538485473624513}
-  - component: {fileID: 6870017016949368375}
+  - component: {fileID: 8962115518929029186}
+  - component: {fileID: 8875153383517306038}
   m_Layer: 0
-  m_Name: TutorialManager
+  m_Name: SnappableInputHandler
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3329538485473624513
+--- !u!4 &8962115518929029186
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4271690832670957136}
+  m_GameObject: {fileID: 9045615520726610499}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -11.95449, y: 1.54351, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6870017016949368375
+--- !u!114 &8875153383517306038
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4271690832670957136}
+  m_GameObject: {fileID: 9045615520726610499}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8f154b9500ed884d9f622b77e1f1d8f, type: 3}
+  m_Script: {fileID: 11500000, guid: 033d703a44b5db749a6387d1d1fdec66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tutorialBoxes:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  ShowOnStart: 1
+  Registry: {fileID: 11400000, guid: a4e654e7233c44f41b3024fab36c23a6, type: 2}
+  _currentElement: {fileID: 0}
+  _lastElementOver: {fileID: 0}

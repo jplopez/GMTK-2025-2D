@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4210f5fa2c05fd84b84e0977446d6c4c, type: 3}
-  m_Name: ScoreData
+  m_Script: {fileID: 11500000, guid: a9117495604232443ae579deefa9946a, type: 3}
+  m_Name: MarbleScoreKeeper
   m_EditorClassIdentifier: 
-  OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  ResetOnDisable: 1
+  totalScore: 3500
+  strategy: {fileID: 0}
