@@ -44,10 +44,13 @@ TagManager:
   - name: Background
     uniqueID: 2441521005
     locked: 0
+  - name: Interactives-Back
+    uniqueID: 3678903475
+    locked: 0
   - name: Player
     uniqueID: 1799265231
     locked: 0
-  - name: Interactives
+  - name: Interactives-Front
     uniqueID: 1878654211
     locked: 0
   - name: Foreground

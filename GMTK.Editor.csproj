@@ -62,7 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\DisplayWithoutEditDrawer.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\RuntimeMapEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateMachineEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateTransitionDrawer.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Input\SnappableInputHandlerEditor.cs" />

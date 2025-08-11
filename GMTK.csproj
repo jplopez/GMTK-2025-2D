@@ -61,39 +61,34 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_Game\Scripts\GMTK\SO\RuntimeMap.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GUI\ScoreTextAnimator.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Managers\LevelCompleteManager.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\SO\RuntimeValue.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\SO\SceneLoaderSO.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\GridSnappableEventArgs.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\LevelExtensions\LevelExtension.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStateMachine.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\SO\EventChannel.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Grid\InventoryManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayerInputController.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\SO\FloatVariable.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\TurorialController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridSnappable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Attributes\DisplayWithoutEdit.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Input\InventoryInputController.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\PlayableMarbelController.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\SceneLoaderInvoker.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Checkpoint.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\GameplayInputBase.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\PlayableMarbleController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\SnappableTemplate.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\SnappableInputHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\SnappableMaterialStrategy.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\SO\LevelSequence.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\SO\LevelDefinition.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\ScoreManager.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\TutorialManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\HudController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameEventType.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Levels\LevelSequence.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridManager.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\DrawerController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Booster.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\PlayerControls.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Checkpoint.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Managers\LevelManager.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\SO\IntVariable.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Managers\GameManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Managers\StartSceneManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\SnappableZoneManager.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Booster.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\RollnSnapController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Levels\LevelDefinition.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GUI\HUD.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_Game\Scripts\GMTK\GMTK.asmdef" />

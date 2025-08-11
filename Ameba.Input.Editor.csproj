@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\Ameba\Editor\Input\InputActionRegistryEditor.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Editor\Runtime\RuntimeMapEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_Game\Scripts\Ameba\Editor\Input\readme.txt" />
