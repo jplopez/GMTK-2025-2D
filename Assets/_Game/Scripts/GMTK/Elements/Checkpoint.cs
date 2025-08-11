@@ -26,7 +26,7 @@ namespace GMTK {
     public Vector2 Position => transform.position;
     public string ID => checkpointID;
 
-    public delegate void MarbleCheckpointEvent(PlayableMarbelController marble, string checkpointID);
+    public delegate void MarbleCheckpointEvent(PlayableMarbleController marble, string checkpointID);
     public static event MarbleCheckpointEvent OnMarbleEnteringCheckpoint;
     public static event MarbleCheckpointEvent OnMarbleExitingCheckpoint;
 
@@ -46,7 +46,7 @@ namespace GMTK {
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-      if (TryGetPlayableMarble(other, out PlayableMarbelController marble))
+      if (TryGetPlayableMarble(other, out PlayableMarbleController marble))
         OnMarbleEnteringCheckpoint?.Invoke(marble, ID);
       if (CueMode == VisualCueMode.OnEnter || CueMode == VisualCueMode.Always) {
         ActivateVisualCue();
@@ -57,7 +57,7 @@ namespace GMTK {
     }
 
     private void OnTriggerExit2D(Collider2D other) {
-      if (TryGetPlayableMarble(other, out PlayableMarbelController marble))
+      if (TryGetPlayableMarble(other, out PlayableMarbleController marble))
         OnMarbleExitingCheckpoint?.Invoke(marble, ID);
       if (CueMode == VisualCueMode.OnExit || CueMode == VisualCueMode.Always) {
         ActivateVisualCue();
@@ -67,10 +67,10 @@ namespace GMTK {
       }
     }
 
-    private bool TryGetPlayableMarble(Collider2D other, out PlayableMarbelController marble) {
+    private bool TryGetPlayableMarble(Collider2D other, out PlayableMarbleController marble) {
       if (!other.TryGetComponent(out marble)) {
         //check if the parent is the marbel
-        marble = other.gameObject.GetComponentInParent<PlayableMarbelController>();
+        marble = other.gameObject.GetComponentInParent<PlayableMarbleController>();
       }
       return (marble != null && marble.isActiveAndEnabled);
     }

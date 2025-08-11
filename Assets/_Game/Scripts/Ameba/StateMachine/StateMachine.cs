@@ -27,9 +27,17 @@ namespace Ameba {
     
     protected T _currentState = default;
 
+    protected static UnityEvent<StateMachineEventArg<T>> OnStateChanged;
 
-    public UnityEvent<StateMachineEventArg<T>> OnStateChanged;
+    public static void AddListener(Action<StateMachineEventArg<T>> action) {
+      if (action == null) return;
+      OnStateChanged?.AddListener(new UnityAction<StateMachineEventArg<T>>(action));
+    }
 
+    public static void RemoveListener(Action<StateMachineEventArg<T>> action) {
+      if (action == null) return;
+      OnStateChanged?.RemoveListener(new UnityAction<StateMachineEventArg<T>>(action));
+    }
 
     protected virtual void OnEnable() {
       Reset();
@@ -96,7 +104,6 @@ namespace Ameba {
     }
 
     public void Reset() => _currentState = StartingState;
-
 
     public IReadOnlyList<T> GetValidTransitions(T state)
   => _transitions.TryGetValue(state, out var list) ? list : Array.Empty<T>();

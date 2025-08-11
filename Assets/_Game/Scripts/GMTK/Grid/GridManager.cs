@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace GMTK {
 
@@ -13,11 +12,13 @@ namespace GMTK {
   /// <see cref="CellSize"/> and <see cref="Origin"/> fields.</remarks>
   public class GridManager : SnappableZoneManager {
 
+    [Header("Grid Bounds")]
     public EdgeCollider2D GridTopBound;
     public EdgeCollider2D GridBottomBound;
     public EdgeCollider2D GridLeftBound;
     public EdgeCollider2D GridRightBound;
 
+    [Header("Cell Settings")]
     public float CellSize = 1f; // Matches your peg spacing
     public Vector2 Origin = Vector2.zero;
 

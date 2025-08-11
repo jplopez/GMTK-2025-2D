@@ -1,14 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.SceneManagement;
 
 namespace GMTK {
 
   public class LevelManager : MonoBehaviour {
 
-    public PlayableMarbelController PlayableMarble;
-
     [Header("Marble Settings")]
+    [Tooltip("Reference to the Marble prefab")]
+    public PlayableMarbleController PlayableMarble;
     [Tooltip("Initial force applied to the marble when the level starts.")]
     public Vector2 MarbleInitialForce = Vector2.zero;
 
@@ -28,30 +28,33 @@ namespace GMTK {
     public float LevelMaxTime = 300f; // 5 minutes max time for level
 
     [Header("Score Settings")]
-    [Tooltip("Event channel to notify score raising events.")]
-    [SerializeField] private EventChannel scoreEvents;
     [Tooltip("Score multiplier for the level. Higher values yield higher scores. Score gets added during over time.")]
-    public int ScoreMultiplier = 100;
+    public int ScoreMultiplier = 300;
 
     [Header("Winning Conditions")]
     [Tooltip("Number of checkpoints that must be reached to win the level. Currently not implemented.")]
     public int CheckpointsToWin = 1;
     [Tooltip("Number of checkpoints reached so far. Currently not implemented.")]
     public int CheckpointsReached = 0;
-    [Tooltip("LevelSequence to determine next level's scene name")]
-    public LevelSequence LevelSequence;
+
+    [Tooltip("LevelExtensions to encapsulate specific behaviours, that might not be needed everywhere")]
+    public List<LevelExtension> Extensions = new();
+
+    //Main Game controller 
+    protected RollnSnapController _controller;
 
     public bool IsLevelStarted => _levelStarted;
-
     public bool IsLevelStale => _timeSinceLastMove >= StaleTimeThreshold;
 
     protected bool _levelStarted = false;
     protected bool _levelEnded = false;
-    protected Vector2 _lastMarblePosition = Vector2.zero;
+    //protected Vector2 _lastMarblePosition = Vector2.zero;
     protected float _timeSinceLastMove = 0f;
     protected float _timeSinceLevelStart = 0f;
 
-    public static UnityEvent OnLevelReset;
+    protected LevelSequence _levelSequence;
+    protected GameEventChannel _eventChannel;
+    //public static UnityEvent OnLevelReset;
 
 
     private void OnEnable() {
@@ -64,7 +67,25 @@ namespace GMTK {
       Checkpoint.OnMarbleExitingCheckpoint -= HandleMarbleExit;
     }
 
-    protected void HandleMarbleEnter(PlayableMarbelController marble, string checkpointID) {
+    private void Awake() {
+      if (_controller == null) {
+        _controller = FindAnyObjectByType<RollnSnapController>();
+        _eventChannel = _controller.EventsChannel;
+        _levelSequence = _controller.LevelSequence;
+      }
+      if (_eventChannel == null) {
+        _eventChannel = Resources.Load<GameEventChannel>("GameEventChannel");
+      }
+      _eventChannel.AddListener(GameEventType.OnLevelReset, ResetLevel);
+      _eventChannel.AddListener(GameEventType.OnLevelPlay, StartLevel);
+    }
+
+    private void OnDestroy() {
+      _eventChannel.RemoveListener(GameEventType.OnLevelReset, ResetLevel);
+      _eventChannel.RemoveListener(GameEventType.OnLevelPlay, StartLevel);
+    }
+
+    protected void HandleMarbleEnter(PlayableMarbleController marble, string checkpointID) {
       if (marble == null || string.IsNullOrEmpty(checkpointID)) {
         Debug.LogWarning("[LevelManager] Marble or Checkpoint is null in HandleMarbleEnter.");
         return;
@@ -76,7 +97,7 @@ namespace GMTK {
       }
     }
 
-    protected void HandleMarbleExit(PlayableMarbelController marble, string checkpointID) {
+    protected void HandleMarbleExit(PlayableMarbleController marble, string checkpointID) {
       if (marble == null || string.IsNullOrEmpty(checkpointID)) {
         Debug.LogWarning("[LevelManager] Marble or Checkpoint is null in HandleMarbleEnter.");
         return;
@@ -99,6 +120,7 @@ namespace GMTK {
         return;
       }
       PlayableMarble.Model.transform.position = StartLevelCheckpoint.Position;
+      if (PlayableMarble.SpawnTransform == null) PlayableMarble.SpawnTransform = StartLevelCheckpoint.transform;
       EndLevelCheckpoint = EndLevelCheckpoint == null ? StartLevelCheckpoint : EndLevelCheckpoint;
       PlayableMarble.InitialForce = MarbleInitialForce;
       PlayableMarble.Spawn();
@@ -107,17 +129,38 @@ namespace GMTK {
     }
 
     public void Update() {
-      if (PlayableMarble == null) return;
       if (_levelEnded) CompleteLevel();
       if (_levelStarted) {
-        UpdateTimers();
+        _timeSinceLevelStart += Time.deltaTime;
+        //UpdateTimers();
         //check if player is out of time 
         if (!InfitiniteTime && LevelMaxTime > 0f && _timeSinceLevelStart >= LevelMaxTime) {
           Debug.Log("[LevelManager] Level Time Expired! Restarting level.");
           ResetLevel();
         }
+        CheckMarbleMovement();
       }
     }
+
+    private void CheckMarbleMovement() {
+      if (PlayableMarble == null) {
+        Debug.LogWarning($"No PlayableMarble found on LevelManager {name}");
+        return;
+      }
+      if (PlayableMarble.IsMoving) {
+        //int deltaScore = CalculateDeltaScore(Time.deltaTime);
+        //Debug.Log($"Adding {deltaScore} to Marble's Score");
+        _eventChannel.Raise(GameEventType.ScoreRaised, Time.deltaTime);
+        _timeSinceLastMove += Time.deltaTime;
+      } else {
+        _timeSinceLastMove = 0f;
+      }
+    }
+
+    //private int CalculateDeltaScore(float seed) {
+    //  //return Mathf.RoundToInt(Mathf.Clamp(seed * ScoreMultiplier,0,10));
+    //  return (int)seed * 1000;
+    //}
 
     public void StartLevel() {
       InitializeTimers();
@@ -156,41 +199,21 @@ namespace GMTK {
       _levelStarted = false;
       _levelEnded = false;
       InitializeTimers();
-      scoreEvents.NotifySetInt(0);
-      OnLevelReset?.Invoke();
+      _eventChannel.Raise(GameEventType.ScoreChanged, 0);
     }
 
     private void CompleteLevel() {
-      if(LevelSequence != null) {
-        LevelSequence.SetCurrentScene(SceneManager.GetActiveScene().name);
-        SceneManager.LoadScene("LevelComplete"); // Load a generic level complete scene
+      if(_levelSequence != null) {
+        _levelSequence.SetCurrentScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("LevelComplete"); // Load a generic level complete scene
       }
     }
-
 
     private void InitializeTimers() {
       _timeSinceLevelStart = 0f;
       _timeSinceLastMove = 0f;
-      _lastMarblePosition = PlayableMarble.Model.transform.position;
     }
-    private void UpdateTimers() {
-
-      _timeSinceLevelStart += Time.deltaTime;
-      UpdateScore(Time.deltaTime);
-      Vector2 currentMarblePosition = PlayableMarble.Model.transform.position;
-      if (Vector2.Distance(currentMarblePosition, _lastMarblePosition) < 0.01f) {
-        _timeSinceLastMove += Time.deltaTime;
-      }
-      else {
-        _timeSinceLastMove = 0f;
-        _lastMarblePosition = currentMarblePosition;
-      }
-    }
-
-    private void UpdateScore(float deltaTime) {
-      int deltaScore = Mathf.RoundToInt(ScoreMultiplier * deltaTime);
-      scoreEvents.NotifyRaiseInt(deltaScore);
-    }
+    
   }
 
 }

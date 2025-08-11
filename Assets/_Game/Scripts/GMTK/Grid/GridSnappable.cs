@@ -81,14 +81,14 @@ namespace GMTK {
 
     }
 
-    Vector3 lastPos = Vector3.zero;
-    private void Update() {
-      if (!lastPos.Equals(transform.position)) {
-        //System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
-        Debug.Log($"Snappable {name} changed position {lastPos} -> {transform.position}");
-        lastPos = transform.position;
-      }
-    }
+    //Vector3 lastPos = Vector3.zero;
+    //private void Update() {
+    //  if (!lastPos.Equals(transform.position)) {
+    //    //System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
+    //    Debug.Log($"Snappable {name} changed position {lastPos} -> {transform.position}");
+    //    lastPos = transform.position;
+    //  }
+    //}
 
     private bool CheckForRenderers() {
       //Check Model has a sprite renderer
@@ -150,7 +150,7 @@ namespace GMTK {
 
     // Ensure highlight sprites are initialized
     private void Start() {
-      //Debug.Log($"[GridSnappable] {name} using SnapTransform: {SnapTransform.name}");
+      Debug.Log($"[GridSnappable] {name} using SnapTransform: {SnapTransform.name}");
     }
 
     public void OnPointerOver() => SetGlow(true);

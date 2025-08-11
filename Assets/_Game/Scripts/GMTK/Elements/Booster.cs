@@ -28,10 +28,10 @@ namespace GMTK {
       }
     }
 
-    private bool TryGetPlayableMarble(Collider2D other, out PlayableMarbelController marble) {
-      if (!other.TryGetComponent<PlayableMarbelController>(out marble)) {
+    private bool TryGetPlayableMarble(Collider2D other, out PlayableMarbleController marble) {
+      if (!other.TryGetComponent<PlayableMarbleController>(out marble)) {
         //check if the parent is the marbel
-        marble = other.gameObject.GetComponentInParent<PlayableMarbelController>();
+        marble = other.gameObject.GetComponentInParent<PlayableMarbleController>();
       }
       return (marble != null && marble.isActiveAndEnabled);
     }

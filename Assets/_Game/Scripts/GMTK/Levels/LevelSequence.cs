@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GMTK {
 
-  [CreateAssetMenu(fileName = "LevelSequence", menuName = "GMTK/Level Sequence", order = 1)]
+  [CreateAssetMenu(fileName = "_levelSequence", menuName = "GMTK/Level Sequence", order = 1)]
   public class LevelSequence : ScriptableObject {
 
     [Tooltip("Ordered list of scene names representing the levels in this sequence.")]
@@ -19,7 +19,7 @@ namespace GMTK {
         _currentIndex = Array.IndexOf(LevelSceneNames, sceneName);
         CurrentScene = sceneName;
       } else {
-        Debug.LogWarning($"Attempted to set current scene to '{sceneName}' which is not in the LevelSequence or is not the next level.");
+        Debug.LogWarning($"Attempted to set current scene to '{sceneName}' which is not in the _levelSequence or is not the next level.");
       }
     }
 
@@ -27,7 +27,7 @@ namespace GMTK {
 
     public string GetNextLevel(string currentScene) {
       if (LevelSceneNames == null || LevelSceneNames.Length == 0) {
-        Debug.LogWarning("LevelSequence has no levels defined.");
+        Debug.LogWarning("_levelSequence has no levels defined.");
         return null;
       }
       int index = Array.IndexOf(LevelSceneNames, currentScene);
@@ -37,6 +37,7 @@ namespace GMTK {
       return null; // No next level
     }
 
+    public bool HasNextLevel() => GetNextLevel(CurrentScene) != null;
     public bool HasNextLevel(string currentScene) => GetNextLevel(currentScene) != null;
   }
 }

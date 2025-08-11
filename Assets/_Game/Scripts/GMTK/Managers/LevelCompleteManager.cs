@@ -4,36 +4,27 @@ using UnityEngine.SceneManagement;
 namespace GMTK {
   public class LevelCompleteManager : MonoBehaviour {
 
-
-    public LevelSequence LevelSequence;
-
-    public IntVariable ScoreData;
+    public RollnSnapController Controller;
 
     public TMPro.TMP_Text ScoreText;
 
-
     private Animator _animator;
 
-    private void Start() {
-      if (LevelSequence == null) {
-        Debug.LogError("LevelSequence is not assigned in LevelCompleteManager.");
-      }
-      if (ScoreData == null) {
-        Debug.LogError("ScoreData is not assigned in LevelCompleteManager.");
-      }
+    protected int _currentScore = 0;
 
+    private void Start() {
+      if (Controller == null) {
+        Debug.LogError("RollnSnap Controller is not assigned in LevelCompleteManager.");
+      }
       if (!TryGetComponent(out _animator)) {
         Debug.LogWarning("No Animator component found on LevelCompleteManager.");
       }
-
-      if (ScoreText != null && ScoreData != null) {
-        ScoreText.gameObject.SetActive(false);
-      }
+      _currentScore = Controller.MarbleScoreKeeper.GetScore();
     }
 
     public void OnIntroFinished() {
-      if (ScoreText != null && ScoreData != null) {
-        ScoreText.text = $"{ScoreData.Value}";
+      if (ScoreText != null) {
+        //ScoreText.text = $"{_currentScore:D5}";
         ScoreText.gameObject.SetActive(true);
       }
       //TODO Trigger score animation , not implemented yet
@@ -43,25 +34,25 @@ namespace GMTK {
     }
 
     public void RetryLevel() {
-      string currentScene = LevelSequence.CurrentScene;
+      string currentScene = Controller.LevelSequence.CurrentScene;
       if (string.IsNullOrEmpty(currentScene)) {
-        Debug.LogError("Current scene is not set in LevelSequence.");
+        Debug.LogError("Current scene is not set in _levelSequence.");
         return;
       }
       Debug.Log($"Retrying level: {currentScene}");
-      SceneManager.LoadScene(currentScene);
+      UnityEngine.SceneManagement.SceneManager.LoadScene(currentScene);
     }
 
     public void NextLevel() {
-      string currentScene = LevelSequence.CurrentScene;
+      string currentScene = Controller.LevelSequence.CurrentScene;
       if (string.IsNullOrEmpty(currentScene)) {
-        Debug.LogError("Current scene is not set in LevelSequence.");
+        Debug.LogError("Current scene is not set in _levelSequence.");
         return;
       }
-      string nextLevel = LevelSequence.GetNextLevel(currentScene);
+      string nextLevel = Controller.LevelSequence.GetNextLevel(currentScene);
       if (!string.IsNullOrEmpty(nextLevel)) {
         Debug.Log($"Loading next level: {nextLevel}");
-        LevelSequence.SetCurrentScene(nextLevel);
+        Controller.LevelSequence.SetCurrentScene(nextLevel);
         SceneManager.LoadScene(nextLevel);
       }
       else {

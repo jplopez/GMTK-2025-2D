@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-namespace GMTK.Editor {
+namespace Ameba.Runtime {
   [CustomEditor(typeof(RuntimeMap))]
-  public class RuntimeMapEditor : UnityEditor.Editor {
+  public class RuntimeMapEditor : Editor {
     private RuntimeMap _map;
     private Dictionary<string, object> _pendingRegistry;
     private string _newId = "";

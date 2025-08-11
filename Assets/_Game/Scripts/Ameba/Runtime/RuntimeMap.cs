@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GMTK {
-  [CreateAssetMenu(fileName = "RuntimeMap", menuName = "GMTK/RuntimeMap")]
+namespace Ameba.Runtime {
+  [CreateAssetMenu(fileName = "RuntimeMap", menuName = "Ameba/Runtime/RuntimeMap")]
   public class RuntimeMap : ScriptableObject {
 
     protected Dictionary<string, object> _registry = new();

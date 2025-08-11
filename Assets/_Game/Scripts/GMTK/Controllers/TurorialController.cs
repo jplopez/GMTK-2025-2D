@@ -4,7 +4,10 @@ using UnityEngine;
 
 namespace GMTK {
 
-  public class TurorialManager : MonoBehaviour {
+  /// <summary>
+  /// MonoBehaviour to control the toggle that shows/hides help info
+  /// </summary>
+  public class TurorialController : MonoBehaviour {
 
     public List<Transform> tutorialBoxes = new();
     public bool ShowOnStart = false;
