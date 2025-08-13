@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
@@ -39,6 +40,16 @@ namespace Ameba.Input {
     }
 
     protected virtual bool ValidateBeforeInvoke(InputAction.CallbackContext context) => true;
+    public override string ToString() {
+      StringBuilder sb = new();
+      sb.AppendLine($"'{ActionName}':");
+      sb.AppendLine($" [");
+      if (Performed != null) sb.AppendLine($"  Performed: {Performed}");
+      if (Started != null) sb.AppendLine($"  Started: {Started}");
+      if (Canceled != null) sb.AppendLine($" Canceled: {Canceled}");
+      sb.AppendLine($" ]");
+      return sb.ToString();
+    }
 
   }
 
@@ -58,6 +69,7 @@ namespace Ameba.Input {
     }
 
     public void Invoke(InputAction.CallbackContext context) => callback?.Invoke(context);
+
   }
 
 }

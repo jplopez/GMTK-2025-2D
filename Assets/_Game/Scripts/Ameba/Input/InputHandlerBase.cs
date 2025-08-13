@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -83,14 +84,14 @@ namespace Ameba.Input {
             try {
               Registry.Bind(attr.ActionName, phases: attr.Phases, handler: del);
 
-              string phasesStr = "";
-              if (attr.Phases != null) {
-                foreach (var p in attr.Phases) phasesStr += p.ToString() + " ";
-              }
-              else {
-                phasesStr += InputActionPhase.Performed.ToString();
-              }
-              Debug.Log($"  Registered: {attr.ActionName}. Phases: {phasesStr} ");
+              //string phasesStr = "";
+              //if (attr.Phases != null) {
+              //  foreach (var p in attr.Phases) phasesStr += p.ToString() + " ";
+              //}
+              //else {
+              //  phasesStr += InputActionPhase.Performed.ToString();
+              //}
+              //Debug.Log($"  Registered: {attr.ActionName}. Phases: {phasesStr} ");
             } catch(Exception e) {
               Debug.LogError($"  Error: {attr.ActionName}. Error '{e.Message}'");
 #if UNITY_EDITOR
@@ -100,6 +101,10 @@ namespace Ameba.Input {
           }
         }
       }
+      Debug.Log($"[InputHandlerBase] RegisterInputHandlers finish. Registry: '{nameof(Registry)}'");
+#if UNITY_EDITOR
+      Debug.Log(ToString());
+#endif
     }
 
     private IInputActionCollection2 CreateInputWrapper() {
@@ -167,6 +172,15 @@ namespace Ameba.Input {
       $"This likely indicates a malformed input wrapper."
         );
       disableMethod.Invoke(mapInstance, null);
+    }
+
+    public override string ToString() {
+      StringBuilder sb = new();
+      sb.AppendLine(Registry.ActionMapName);
+      foreach (InputBinding binding in Registry.Bindings) {
+        sb.AppendLine(binding.ToString());
+      }
+      return sb.ToString();
     }
 
   }

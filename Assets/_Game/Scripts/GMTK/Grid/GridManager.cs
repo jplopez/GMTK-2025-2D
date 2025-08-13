@@ -8,7 +8,7 @@ namespace GMTK {
   /// Manages a _grid system for snapping positions and calculating _grid coordinates.
   /// </summary>
   /// <remarks>This class provides functionality to align positions to a _grid and determine the _grid coordinates
-  /// of a given position. The _grid is defined by a cell size and an Origin point, which can be configured using the
+  /// of a given position. The _grid is defined by a cell size and an GridOrigin point, which can be configured using the
   /// <see cref="CellSize"/> and <see cref="Origin"/> fields.</remarks>
   public class GridManager : SnappableZoneManager {
 
@@ -150,8 +150,8 @@ namespace GMTK {
 
     #region Grid utilities
     //public Vector2 SnapToGrid(Vector2 position) {
-    //  float x = Mathf.Round((position.x - Origin.x) / CellSize) * CellSize + Origin.x;
-    //  float y = Mathf.Round((position.y - Origin.y) / CellSize) * CellSize + Origin.y;
+    //  float x = Mathf.Round((position.x - GridOrigin.x) / CellSize) * CellSize + GridOrigin.x;
+    //  float y = Mathf.Round((position.y - GridOrigin.y) / CellSize) * CellSize + GridOrigin.y;
     //  Debug.Log($"SnapToGrid {position} => {x},{y}");
     //  return new Vector2(x, y);
     //}
@@ -167,10 +167,10 @@ namespace GMTK {
       return GetGridIndex(position);
     }
 
-    //public Vector2Int GetGridCoord(Vector2 position) {
-    //  int x = Mathf.RoundToInt((position.x - Origin.x) / CellSize);
-    //  int y = Mathf.RoundToInt((position.y - Origin.y) / CellSize);
-    //  Debug.Log($"GetGridCoord {position} => {x},{y}");
+    //public Vector2Int WorldToGrid(Vector2 position) {
+    //  int x = Mathf.RoundToInt((position.x - GridOrigin.x) / CellSize);
+    //  int y = Mathf.RoundToInt((position.y - GridOrigin.y) / CellSize);
+    //  Debug.Log($"WorldToGrid {position} => {x},{y}");
     //  return new Vector2Int(x, y);
     //}
 

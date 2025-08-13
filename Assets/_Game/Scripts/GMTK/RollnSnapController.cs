@@ -6,15 +6,17 @@ using Ameba;
 namespace GMTK {
 
   /// <summary>
-  /// RollnSnapController is the brain of the game, contains the references to most
-  /// ScriptableObjects and common resources other Controllers and MonoBehaviours will need. 
-  /// It is also responsible for game state changes and scene management 
+  /// <para>RollnSnapController is a MonoBehaviour with the references to all must have 
+  /// resources like ScriptableObjects used by Controllers and MonoBehaviours
+  /// across the game.</para> 
+  /// <para>By placing it in the scene, you can define the behaviour of the game on GameStates, Scene Management, Player Inputs, Events, HUD and Score.</para> 
+  /// <para>The recommended way of using this controller is having a Prefab with all the game definitions in place, and place it on every scene.</para>
   /// </summary>
   public class RollnSnapController : MonoBehaviour {
 
     [Header("GameState Settings")]
     [Tooltip("the gamestatemachine handles the game states")]
-    [SerializeField] public GameStateMachine _gameStateMachine;
+    public GameStateMachine _gameStateMachine;
     [Tooltip("if true, the scene loading this manager changes the gamestate on Start. See 'StartingState' field")]
     public bool ChangeGameStateOnStart = false;
     [Tooltip("If 'ChangeGameStateOnStart' is true, this is the GameState this scene will assign in the Always method.")]
@@ -26,7 +28,7 @@ namespace GMTK {
 
     public enum SetCurrentSceneMode { InitialScene, Always, Never }
 
-    [Header("Level Sequence")]
+    [Header("Scene Management")]
     public string StartSceneName = "Start";
     public string LoadingSceneName = "Loading";
     public string GameOverSceneName = "GameOver";
@@ -35,7 +37,7 @@ namespace GMTK {
     [Tooltip("Source of truth for level sequences. Can resolve the next scene based on the current one")]
     [SerializeField] protected LevelSequence _levelSequence;
 
-    [Header("Input")]
+    [Header("Player Inputs")]
     [Tooltip("Disable input controls for the scene. Useful for cinematics or UI specific scenes")]
     public bool DisableInputs = false;
     [Tooltip("The Input Registry from where player Inputs will be resolved")]
@@ -44,23 +46,21 @@ namespace GMTK {
     [SerializeField] protected InputActionRegistry _inputRegistry;
 
     [Header("Events")]
-    [Tooltip("Reference to the EventChannel SO that will handle common events like 'Play button pressed', 'level start', etc")]
+    [Tooltip("Reference to the EventChannel instance to handle game events like 'Play button pressed', 'level start', etc")]
     [SerializeField] protected GameEventChannel _eventsChannel;
 
-    [Header("Game Features")]
-    [Tooltip("Reference to the scriptable object managing the HUD controls and events")]
+    [Header("Heads-Up Display (HUD)")]
+    [Tooltip("Reference to the HUD scriptable object instance to manage score, playback buttons, help toggle and game menu button")]
     [SerializeField] protected HUD _hud;
-    
 
-    //[SerializeField] protected IntVariable _scoreData;
-    [Tooltip("ScoreGateKeeper in charge of calculating and updating the marble's score")]
+    [Header("Score")]
+    [Tooltip("ScoreGateKeeper instance to calculate marble's score in the HUD. This component lives inside the HUD")]
     [SerializeField] protected ScoreGateKeeper _marbleScoreKeeper;
-    [Tooltip("If true, the score in the ScoreGateKeeper will be reseted to zero. Typically, the start scene is the only one needing this as true")]
+    [Tooltip("If true, this scene will reset the score to zero. Typically, the start scene is the only one needing this as true")]
     public bool ResetScoreOnLoad = false;
 
     public GameStateMachine StateMachine => _gameStateMachine;
     public HUD Hud => _hud;
-    //public IntVariable ScoreData => _scoreData;
     public LevelSequence LevelSequence => _levelSequence;
     public GameEventChannel EventsChannel => _eventsChannel;
     public ScoreGateKeeper MarbleScoreKeeper => _marbleScoreKeeper;
@@ -77,9 +77,6 @@ namespace GMTK {
       // GameStateMachine : if missing, scene won't be able to change gamestates
       _gameStateMachine = LoadIfNull("GameStateMachine",_gameStateMachine,
         $"There is no GameStateMachine in scene {sceneName}. The scene won't be able to change game states");
-      //if (_gameStateMachine == null) {
-      //  Debug.LogWarning($"There is no GameStateMachine in scene {sceneName}. The scene won't be able to change game states");
-      //}
 
       // _levelSequence: if missing, scene won't be able to resolve next levels
       _levelSequence = Resources.Load<LevelSequence>("LevelSequence");

@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
-
 
 namespace GMTK {
 
@@ -15,6 +15,8 @@ namespace GMTK {
   [ExecuteInEditMode]
   public class GridSnappable : MonoBehaviour {
 
+    public enum SnappableBodyType { Static, Interactive }
+
     [HideInInspector] public SnappableTemplate AppliedTemplate;
 
     [Header("Snappable Settings")]
@@ -24,6 +26,9 @@ namespace GMTK {
     public Transform Model;
     [Tooltip("(Optional) highlight model to show when hovering or dragging.")]
     public GameObject HighlightModel;
+
+    [Header("Local Grid Footprint")]
+    [SerializeField] protected List<Vector2Int> _occupiedCells = new();
 
     [Header("Collision (Read-Only")]
     [SerializeField, DisplayWithoutEdit] protected Rigidbody2D _rigidBody;
@@ -49,6 +54,13 @@ namespace GMTK {
     [Range(0f, 10f)]
     public float AngularDamping = 0.05f;
 
+    protected SnappableBodyType _bodyType = SnappableBodyType.Static;
+
+    public void SetStatic() => _bodyType = SnappableBodyType.Static;
+
+    public bool IsStatic() => _bodyType == SnappableBodyType.Static;
+    public void SetInteractive() => _bodyType= SnappableBodyType.Interactive;
+    public bool IsInteractive() => _bodyType == SnappableBodyType.Interactive;
 
     public bool IsRegistered => _isRegistered;
 
@@ -78,8 +90,28 @@ namespace GMTK {
       _initialScale = SnapTransform.localScale;
       if(CheckForRenderers()) 
         InitGridSnappable();
-
     }
+
+    public IEnumerable<Vector2Int> GetWorldOccupiedCells(Vector2Int gridOrigin, bool flippedX = false, bool flippedY = false, int rotation = 0) {
+      foreach (var local in _occupiedCells) {
+        var transformed = TransformLocalCell(local, flippedX, flippedY, rotation);
+        yield return transformed + gridOrigin;
+      }
+    }
+
+    private Vector2Int TransformLocalCell(Vector2Int cell, bool flipX, bool flipY, int rotation) {
+      int x = flipX ? -cell.x : cell.x;
+      int y = flipY ? -cell.y : cell.y;
+
+      // Rotation in 90° increments
+      return (rotation % 360) switch {
+        90 => new Vector2Int(-y, x),
+        180 => new Vector2Int(-x, -y),
+        270 => new Vector2Int(y, -x),
+        _ => new Vector2Int(x, y),
+      };
+    }
+
 
     //Vector3 lastPos = Vector3.zero;
     //private void Update() {
@@ -209,6 +241,10 @@ namespace GMTK {
       SnapTransform.localScale = _initialScale;
     }
 
+
+    public virtual void SetHovered(bool isHovered) {
+      //TODO
+    }
   }
 
 }

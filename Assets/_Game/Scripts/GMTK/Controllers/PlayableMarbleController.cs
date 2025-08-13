@@ -18,16 +18,11 @@ namespace GMTK {
     [Header("Spawn")]
     [Tooltip("Where should the Marble spawned")]
     public Transform SpawnTransform;
-    [Tooltip("If true, upon starting the level, the Marble will begin moving, without waiting for the Play button")]
-    public bool LaunchOnStart = false;
     [Tooltip("The LayerMask the marble should collide. Level and Interactables the most common")]
     public LayerMask GroundedMask;
 
     public bool Grounded { get => IsGrounded(); }
     public bool IsMoving => _timeSinceLastMove > 0f;
-
-
-
 
     protected Rigidbody2D _rb;
     protected SpriteRenderer _sr;
@@ -48,8 +43,6 @@ namespace GMTK {
       _rb = Model.GetComponent<Rigidbody2D>();
       _sr = Model.GetComponent<SpriteRenderer>();
       Spawn();
-      if (LaunchOnStart) { Launch(); }
-
     }
 
     void Update() {
