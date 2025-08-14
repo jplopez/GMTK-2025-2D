@@ -25,7 +25,7 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ENABLEOUTEROUTLINE_ON
+  - _OUTEROUTLINEDISTORTIONTOGGLE_ON
   - _SHADERFADING_NONE
   - _SHADERSPACE_UV
   - _TEXTURELAYER2SHEETTOGGLE_ON
@@ -318,7 +318,7 @@ Material:
     - _EnableInnerOutline: 0
     - _EnableMetal: 0
     - _EnableNegative: 0
-    - _EnableOuterOutline: 1
+    - _EnableOuterOutline: 0
     - _EnablePingPongGlow: 0
     - _EnablePixelOutline: 0
     - _EnablePixelate: 0
@@ -433,11 +433,11 @@ Material:
     - _NegativeFade: 1
     - _NormalIntensity: 1
     - _OcclusionStrength: 1
-    - _OuterOutlineDistortionToggle: 0
-    - _OuterOutlineFade: 1
+    - _OuterOutlineDistortionToggle: 1
+    - _OuterOutlineFade: 0.6
     - _OuterOutlineOutlineOnlyToggle: 0
     - _OuterOutlineTextureToggle: 0
-    - _OuterOutlineWidth: 0.2
+    - _OuterOutlineWidth: 0.03
     - _OverallSpeed: 1
     - _Parallax: 0.005
     - _PingPongGlowContrast: 1
@@ -698,10 +698,10 @@ Material:
     - _MetalNoiseDistortionSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _MetalNoiseScale: {r: 0.25, g: 0.25, b: 0, a: 0}
     - _MetalNoiseSpeed: {r: 0, g: 0, b: 0, a: 0}
-    - _OuterOutlineColor: {r: 0, g: 0.0011547122, b: 0.021593148, a: 1}
-    - _OuterOutlineDistortionIntensity: {r: 0.05, g: 0.05, b: 0, a: 0}
-    - _OuterOutlineNoiseScale: {r: 4, g: 4, b: 0, a: 0}
-    - _OuterOutlineNoiseSpeed: {r: 1, g: 1, b: 0, a: 0}
+    - _OuterOutlineColor: {r: 2.0078433, g: 0, b: 0.19205347, a: 1}
+    - _OuterOutlineDistortionIntensity: {r: 0.03, g: 0.03, b: 0, a: 0}
+    - _OuterOutlineNoiseScale: {r: 0.7, g: 0.7, b: 0, a: 0}
+    - _OuterOutlineNoiseSpeed: {r: 0.03, g: 0.03, b: 0, a: 0}
     - _OuterOutlineTextureSpeed: {r: 0.5, g: 0, b: 0, a: 0}
     - _PingPongGlowFrom: {r: 5.992157, g: 0.1882353, b: 0.1882353, a: 0}
     - _PingPongGlowTo: {r: 0.1882353, g: 0.1882353, b: 5.992157, a: 0}

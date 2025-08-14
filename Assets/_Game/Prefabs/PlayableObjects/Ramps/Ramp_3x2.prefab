@@ -116,7 +116,7 @@ Transform:
   m_GameObject: {fileID: 8930533740010895142}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.19666, y: -0.00962, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3.07123, y: 1.9729238, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -242,7 +242,7 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0.12, y: 0.089999996, z: 0.07, w: 0.089999996}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.040984068, y: 0.030722797}
     oldSize: {x: 3.1, y: 3.2}
     newSize: {x: 1.2, y: 1.36}
     adaptiveTilingThreshold: 0.5
@@ -251,9 +251,9 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -1.43, y: 1.53}
-      - {x: -1.43, y: -1.51}
-      - {x: 1.5, y: -1.51}
+    - - {x: 2.932949, y: -0.008312988}
+      - {x: -0.0070506283, y: 3.051687}
+      - {x: -0.0070506283, y: -0.008312988}
   m_UseDelaunayMesh: 0
 --- !u!114 &8506236225779810714
 MonoBehaviour:
@@ -271,6 +271,37 @@ MonoBehaviour:
   SnapTransform: {fileID: 7258827595930639120}
   Model: {fileID: 7258827595930639120}
   HighlightModel: {fileID: 822021744610847665}
+  _occupiedCells:
+  - {x: 0, y: 0}
+  - {x: 0, y: 1}
+  - {x: 0, y: 2}
+  - {x: 0, y: 3}
+  - {x: 0, y: 4}
+  - {x: 0, y: 5}
+  - {x: 1, y: 0}
+  - {x: 1, y: 1}
+  - {x: 1, y: 2}
+  - {x: 1, y: 3}
+  - {x: 1, y: 4}
+  - {x: 2, y: 0}
+  - {x: 2, y: 1}
+  - {x: 2, y: 2}
+  - {x: 2, y: 3}
+  - {x: 2, y: 4}
+  - {x: 3, y: 0}
+  - {x: 3, y: 1}
+  - {x: 3, y: 2}
+  - {x: 3, y: 3}
+  - {x: 4, y: 0}
+  - {x: 4, y: 1}
+  - {x: 4, y: 2}
+  - {x: 5, y: 0}
+  - {x: 5, y: 1}
+  - {x: 5, y: 2}
+  - {x: 6, y: 0}
+  - {x: 6, y: 1}
+  - {x: 7, y: 0}
+  - {x: 8, y: 0}
   _rigidBody: {fileID: 7553339179308787632}
   _collider: {fileID: 3279863637007275624}
   Draggable: 1

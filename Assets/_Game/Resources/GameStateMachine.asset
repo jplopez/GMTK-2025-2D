@@ -29,6 +29,3 @@ MonoBehaviour:
     To: 010000000200000003000000
   - From: 7
     To: 00000000010000000200000003000000
-  OnStateChanged:
-    m_PersistentCalls:
-      m_Calls: []

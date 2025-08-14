@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1002379983042068349}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,8 +71,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -732.11646, y: 456.9231}
-  m_SizeDelta: {x: 2.9500122, y: 0.64001465}
+  m_AnchoredPosition: {x: -708.1304, y: 480.9093}
+  m_SizeDelta: {x: 2.95, y: 0.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &1766465828946479746
 SpriteRenderer:
@@ -163,7 +163,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -754.8, y: 464.18854}
+  m_AnchoredPosition: {x: -730.8139, y: 485.17645}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &3346331459587953933
@@ -259,7 +259,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 16.43805}
+  m_margin: {x: 0, y: -7.0404577, z: 0, w: 16.43805}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -274,7 +274,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7119937651704137313}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Score
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,9 +312,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5708919689986461379}
   - component: {fileID: 841356134067385869}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HUDController
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -328,7 +328,7 @@ Transform:
   m_GameObject: {fileID: 5991058397970563969}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -787.6162, y: 565.58344, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -346,8 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fce4ff8082a73cc4687bc251519fc89f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreData: {fileID: 11400000, guid: 6d978f2d8c8b771468bc1d88099644ae, type: 2}
-  scoreEvents: {fileID: 11400000, guid: 5520788bcef8ee5429763a216dd7995f, type: 2}
+  hudSO: {fileID: 11400000, guid: 52f45e5037fea8e4a842a0b5a5a0b95b, type: 2}
   scoreText: {fileID: 8693071757934067874}
   ShowPlaybackButtons: 1
   DisablePlaybackButtons: 0
@@ -355,7 +354,6 @@ MonoBehaviour:
   ResetButton: {fileID: 71700162908232293}
   PlayFeedback: {fileID: 0}
   ResetFeedback: {fileID: 0}
-  gameStateMachine: {fileID: 11400000, guid: 01ebcf23e4e596d4394da7e6ebf4e9f1, type: 2}
 --- !u!1 &6573710252936658940
 GameObject:
   m_ObjectHideFlags: 0

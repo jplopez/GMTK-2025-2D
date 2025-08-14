@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 9181706170082274729}
   - component: {fileID: 2912461957871576052}
   - component: {fileID: 7225349815564392740}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 22926193706002683}
   - component: {fileID: 3097503548053823214}
   - component: {fileID: 6593899692556334446}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HowToPlay-Controls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -290,7 +290,7 @@ GameObject:
   - component: {fileID: 2976728688576113582}
   - component: {fileID: 3775182647421360516}
   - component: {fileID: 7453036760871391338}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Reset-text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -492,7 +492,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1840816107
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: afbf9aaf940d9a047a029f3b4d8560a6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -579,7 +579,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1840816107
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: afbf9aaf940d9a047a029f3b4d8560a6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -603,7 +603,7 @@ GameObject:
   - component: {fileID: 3052596958768043562}
   - component: {fileID: 5084486193727201500}
   - component: {fileID: 6982179491776236209}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Play-text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -737,7 +737,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2347164731792973851}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Instruction-help
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -839,7 +839,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1840816107
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: afbf9aaf940d9a047a029f3b4d8560a6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -862,7 +862,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3234527174928284329}
   - component: {fileID: 8721171301217243703}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TutorialManager
   m_TagString: Untagged
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
@@ -975,7 +975,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1840816107
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: afbf9aaf940d9a047a029f3b4d8560a6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -997,7 +997,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2287772759578731761}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Instructions-Controls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1034,7 +1034,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6508471270423944716}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HelpContent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1074,7 +1074,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6581371859915288343}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Instructions-Playback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1224,8 +1224,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GMTK.TurorialManager, GMTK
+      - m_Target: {fileID: 8721171301217243703}
+        m_TargetAssemblyTypeName: GMTK.TurorialController, GMTK
         m_MethodName: Toggle
         m_Mode: 1
         m_Arguments:

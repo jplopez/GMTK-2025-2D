@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 801651196068165227}
   m_Layer: 0
   m_Name: RollnSnapController
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gameStateMachine: {fileID: 11400000, guid: 01ebcf23e4e596d4394da7e6ebf4e9f1, type: 2}
   ChangeGameStateOnStart: 1
-  StartingState: 0
+  StartingState: 1
   ChangeGameStateOnEnd: 0
   EndingState: 5
   StartSceneName: Start
@@ -59,5 +59,5 @@ MonoBehaviour:
   _inputRegistry: {fileID: 11400000, guid: a4e654e7233c44f41b3024fab36c23a6, type: 2}
   _eventsChannel: {fileID: 11400000, guid: 95a9f7bb01a666548ba38fda71806925, type: 2}
   _hud: {fileID: 11400000, guid: 52f45e5037fea8e4a842a0b5a5a0b95b, type: 2}
-  _scoreData: {fileID: 11400000, guid: 6d978f2d8c8b771468bc1d88099644ae, type: 2}
   _marbleScoreKeeper: {fileID: 11400000, guid: 584c2a77812de864c8cc37435490bfef, type: 2}
+  ResetScoreOnLoad: 0
