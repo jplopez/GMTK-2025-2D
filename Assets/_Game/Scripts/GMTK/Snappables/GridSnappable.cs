@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace GMTK {
 
 
   /// <summary>
-  /// Provides functionality for snapping a game object to a _grid when dragged with the mouse.
+  /// Represents any object in the game that can be snapped into a LevelGrid.
+  /// This object controls the overall settings like transform, sprite, collider and state. 
+  /// Additional Abilities are provided by SnappableComponent-derived classes
   /// </summary>
-  /// <remarks>This component allows a game object to be moved freely with the mouse and automatically snaps it
-  /// to the nearest _grid position when the mouse is released. An optional visual highlight is displayed during dragging
-  /// to indicate the snap position.</remarks>
   /// 
   [ExecuteInEditMode]
   public class GridSnappable : MonoBehaviour {
@@ -54,22 +54,22 @@ namespace GMTK {
     [Range(0f, 10f)]
     public float AngularDamping = 0.05f;
 
-    protected SnappableBodyType _bodyType = SnappableBodyType.Static;
-
     public void SetStatic() => _bodyType = SnappableBodyType.Static;
-
     public bool IsStatic() => _bodyType == SnappableBodyType.Static;
     public void SetInteractive() => _bodyType= SnappableBodyType.Interactive;
     public bool IsInteractive() => _bodyType == SnappableBodyType.Interactive;
-
     public bool IsRegistered => _isRegistered;
 
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
     private Vector3 _initialScale;
     protected bool _isRegistered = false;
-
+    protected SnappableBodyType _bodyType = SnappableBodyType.Static;
     protected SpriteRenderer _modelRenderer;
+    protected List<SnappableComponent> _components = new();
+
+
+    #region MonoBehaviour Methods
 
     void Awake() => Initialize();
 
@@ -77,6 +77,34 @@ namespace GMTK {
       gameObject.layer = LayerMask.NameToLayer("Interactives");
       Initialize();
     }
+
+    // Ensure highlight sprites are initialized
+    private void Start() {
+      Debug.Log($"[GridSnappable] {name} using SnapTransform: {SnapTransform.name}");
+
+      InitializeAllSnappableComponents();
+    }
+
+    private void Update() {
+      _components.ForEach( component => component.RunBeforeUpdate());
+      //Add any early-update logic here
+
+      _components.ForEach(c => c.RunOnUpdate());
+      
+      //Add GridSnappable Update logic here
+    }
+
+    private void LateUpdate() {
+      _components.ForEach(c => c.RunAfterUpdate());
+    }
+
+    private void OnDestroy() {
+      _components.ForEach(c => c.RunFinalize());
+    }
+
+    #endregion
+
+    #region Initialize 
 
     public virtual void Initialize() {
 
@@ -92,35 +120,11 @@ namespace GMTK {
         InitGridSnappable();
     }
 
-    public IEnumerable<Vector2Int> GetWorldOccupiedCells(Vector2Int gridOrigin, bool flippedX = false, bool flippedY = false, int rotation = 0) {
-      foreach (var local in _occupiedCells) {
-        var transformed = TransformLocalCell(local, flippedX, flippedY, rotation);
-        yield return transformed + gridOrigin;
-      }
+    private void InitializeAllSnappableComponents() {
+      _components.Clear();
+      _components.AddRange(GetComponents<SnappableComponent>());
+      _components.ForEach(comp => comp.TryInitialize());
     }
-
-    private Vector2Int TransformLocalCell(Vector2Int cell, bool flipX, bool flipY, int rotation) {
-      int x = flipX ? -cell.x : cell.x;
-      int y = flipY ? -cell.y : cell.y;
-
-      // Rotation in 90° increments
-      return (rotation % 360) switch {
-        90 => new Vector2Int(-y, x),
-        180 => new Vector2Int(-x, -y),
-        270 => new Vector2Int(y, -x),
-        _ => new Vector2Int(x, y),
-      };
-    }
-
-
-    //Vector3 lastPos = Vector3.zero;
-    //private void Update() {
-    //  if (!lastPos.Equals(transform.position)) {
-    //    //System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
-    //    Debug.Log($"Snappable {name} changed position {lastPos} -> {transform.position}");
-    //    lastPos = transform.position;
-    //  }
-    //}
 
     private bool CheckForRenderers() {
       //Check Model has a sprite renderer
@@ -180,18 +184,56 @@ namespace GMTK {
 
     }
 
-    // Ensure highlight sprites are initialized
-    private void Start() {
-      Debug.Log($"[GridSnappable] {name} using SnapTransform: {SnapTransform.name}");
+
+
+    #endregion
+
+    #region Occupancy
+    public List<Vector2Int> GetFootprint() => _occupiedCells;
+
+    public IEnumerable<Vector2Int> GetWorldOccupiedCells(Vector2Int gridOrigin, bool flippedX = false, bool flippedY = false, int rotation = 0) {
+      foreach (var local in _occupiedCells) {
+        var transformed = TransformLocalCell(local, flippedX, flippedY, rotation);
+        yield return transformed + gridOrigin;
+      }
     }
+
+    #endregion
+
+    #region Grid Utils
+
+
+    private Vector2Int TransformLocalCell(Vector2Int cell, bool flipX, bool flipY, int rotation) {
+      int x = flipX ? -cell.x : cell.x;
+      int y = flipY ? -cell.y : cell.y;
+
+      // Rotation in 90° increments
+      return (rotation % 360) switch {
+        90 => new Vector2Int(-y, x),
+        180 => new Vector2Int(-x, -y),
+        270 => new Vector2Int(y, -x),
+        _ => new Vector2Int(x, y),
+      };
+    }
+
+    #endregion
+
+    #region EventHandlers
 
     public void OnPointerOver() => SetGlow(true);
 
     public void OnPointerOut() => SetGlow(false);
 
+
+    [Obsolete]
     public virtual void SetRegistered(bool registered = true) => _isRegistered = registered;
 
     public virtual void SetGlow(bool active) { if (HighlightModel != null) HighlightModel.SetActive(active); }
+
+
+    #endregion
+
+    #region Transformation methods
 
     public void UpdatePosition(Vector3 newPos) => SnapTransform.position = newPos;
 
@@ -235,16 +277,17 @@ namespace GMTK {
       SnapTransform.localScale += new Vector3(amount, amount, 0f);
     }
 
-    public void ResetTransform() {
-      Debug.Log($"ResetTransform {name}");
+    public void ResetSnappable() {
+      Debug.Log($"ResetSnappable {name}");
       SnapTransform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
       SnapTransform.localScale = _initialScale;
+
+      _components.ForEach( c => c.RunResetComponent() );
     }
 
+    #endregion
 
-    public virtual void SetHovered(bool isHovered) {
-      //TODO
-    }
+    public override string ToString() => name;
   }
 
 }
