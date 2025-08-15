@@ -74,7 +74,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 1
   m_Sprite: {fileID: -1439122130594229534, guid: ebc3b6a215b446043acaacb25fe7cb13, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -100,6 +100,7 @@ GameObject:
   - component: {fileID: 2217457593522192176}
   - component: {fileID: 7184646454582733539}
   - component: {fileID: 4092805948021639145}
+  - component: {fileID: 6953867020035617199}
   m_Layer: 7
   m_Name: Spinner
   m_TagString: Untagged
@@ -165,8 +166,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 4
-  m_SortingOrder: 0
+  m_SortingLayer: 5
+  m_SortingOrder: 1
   m_Sprite: {fileID: -1439122130594229534, guid: ebc3b6a215b446043acaacb25fe7cb13, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -190,7 +191,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 20
+  m_Mass: 35
   m_LinearDamping: 0
   m_AngularDamping: 1
   m_GravityScale: 0
@@ -221,6 +222,7 @@ MonoBehaviour:
   SnapTransform: {fileID: 2377787328780317031}
   Model: {fileID: 2377787328780317031}
   HighlightModel: {fileID: 0}
+  Draggable: 0
   _occupiedCells:
   - {x: 0, y: 0}
   - {x: -1, y: 0}
@@ -260,15 +262,11 @@ MonoBehaviour:
   - {x: -3, y: -4}
   - {x: 0, y: -2}
   - {x: -1, y: -2}
-  _rigidBody: {fileID: 2217457593522192176}
-  _collider: {fileID: 4092805948021639145}
-  Draggable: 1
-  CanRotate: 1
+  BehaviourDelegate: 0
   Flippable: 1
-  StaticBody: 0
-  OverrideBodySettings: 1
-  Mass: 20
-  AngularDamping: 1
+  CanRotate: 1
+  PointerOnFeedback: {fileID: 0}
+  PointerOutFeedback: {fileID: 0}
 --- !u!60 &4092805948021639145
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -431,3 +429,36 @@ PolygonCollider2D:
       - {x: -1.1153375, y: -1.4184593}
       - {x: -0.9953375, y: -1.4184593}
   m_UseDelaunayMesh: 0
+--- !u!114 &6953867020035617199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7723901764050706623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4c5a0f2acfa808409e57b1c5a6049c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsActive: 1
+  DelayRun: 0
+  InitialDelay: 0.1
+  AllowPositionChange: 0
+  AllowRotation: 1
+  RotationStep: 90
+  LimitRotationAngle: 0
+  MinRotationAngle: -45
+  MaxRotationAngle: 45
+  EnableAutoRotation: 0
+  AutoRotationSpeed: 90
+  AutoRotationDirection: 0
+  HasGravity: 0
+  GravityMultiplier: 1
+  Friction: 2
+  Bounciness: 1
+  OverrideMaterial: {fileID: 0}
+  _rigidbody2D: {fileID: 0}
+  _collider2D: {fileID: 0}
+  _assignedMaterial: {fileID: 0}
+  _currentRotation: 0

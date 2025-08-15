@@ -2289,7 +2289,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9040278970614946057}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da9b17e31f29c36419dc13260e2e8d90, type: 3}
   m_Name: 
@@ -2342,10 +2342,10 @@ MonoBehaviour:
   _rigidBody: {fileID: 0}
   _collider: {fileID: 3353452446383799903}
   Draggable: 0
-  CanRotate: 1
+  CanRotate: 0
   Flippable: 0
   StaticBody: 0
-  OverrideBodySettings: 1
+  OverrideBodySettings: 0
   Mass: 20
   AngularDamping: 1
 --- !u!114 &8506236226946415495
@@ -2530,7 +2530,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 20
   m_LinearDamping: 0
-  m_AngularDamping: 1
+  m_AngularDamping: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: a137a506321478f459c68c7af1c21789, type: 2}
   m_IncludeLayers:

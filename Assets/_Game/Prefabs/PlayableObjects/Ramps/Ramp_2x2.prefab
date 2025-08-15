@@ -74,7 +74,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 1
   m_Sprite: {fileID: -4954960343474209260, guid: 817e66478830abe4497dca66c4643c9f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -165,7 +165,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: -4954960343474209260, guid: 817e66478830abe4497dca66c4643c9f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -275,6 +275,7 @@ MonoBehaviour:
   SnapTransform: {fileID: 6566122477424756932}
   Model: {fileID: 6566122477424756932}
   HighlightModel: {fileID: 1168465282976681170}
+  _occupiedCells: []
   _rigidBody: {fileID: 195997670576524317}
   _collider: {fileID: 6935627221445981007}
   Draggable: 1
