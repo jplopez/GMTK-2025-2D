@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreMountains.Tools", "MoreMountains.Tools.csproj", "{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFXRRuntime", "CFXRRuntime.csproj", "{2C220A33-DBDD-A757-C154-397DA64BDE76}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterHierarchy", "BetterHierarchy.csproj", "{2132DBDA-A10E-28E1-18E4-4F593798F6D9}"
@@ -8,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{9EF5C02F-9CD7-0548-89A5-8840B0EC8C8C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{0FC1A9BD-01ED-5A48-7E19-17E42FC7C3D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreMountains.Tools.Editor", "MoreMountains.Tools.Editor.csproj", "{465102F4-48C3-16A1-533B-184F5AE6EA2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lofelt.NiceVibrations", "Lofelt.NiceVibrations.csproj", "{729BEF02-8FA5-5868-5525-6C7942E40077}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFXR.WelcomeScreen", "CFXR.WelcomeScreen.csproj", "{B2D37327-AC46-32B8-7471-CB8F5EB9E91E}"
 EndProject
@@ -25,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToonyColorsPro.Demo.Editor"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFXREditor", "CFXREditor.csproj", "{1DB2DAD0-5E99-A1A5-693B-244FA8D662AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lofelt.NiceVibrations.Demo", "Lofelt.NiceVibrations.Demo.csproj", "{44B95657-A14D-98AA-C957-02601C4ED70F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lofelt.NiceVibrations.Editor", "Lofelt.NiceVibrations.Editor.csproj", "{6AB64B3F-2EEE-9C87-2542-B4B390A6BD06}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMTK.Editor", "GMTK.Editor.csproj", "{EF04D81F-7401-B63E-15A9-8E615B7BBBF6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinoBloom.Runtime", "KinoBloom.Runtime.csproj", "{E38A27E6-0099-9F16-5AEB-E5CB2F6C82DC}"
@@ -39,6 +49,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C220A33-DBDD-A757-C154-397DA64BDE76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2C220A33-DBDD-A757-C154-397DA64BDE76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C220A33-DBDD-A757-C154-397DA64BDE76}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -55,6 +69,14 @@ Global
 		{0FC1A9BD-01ED-5A48-7E19-17E42FC7C3D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FC1A9BD-01ED-5A48-7E19-17E42FC7C3D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FC1A9BD-01ED-5A48-7E19-17E42FC7C3D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{465102F4-48C3-16A1-533B-184F5AE6EA2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{465102F4-48C3-16A1-533B-184F5AE6EA2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{465102F4-48C3-16A1-533B-184F5AE6EA2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{465102F4-48C3-16A1-533B-184F5AE6EA2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{729BEF02-8FA5-5868-5525-6C7942E40077}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{729BEF02-8FA5-5868-5525-6C7942E40077}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{729BEF02-8FA5-5868-5525-6C7942E40077}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{729BEF02-8FA5-5868-5525-6C7942E40077}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B2D37327-AC46-32B8-7471-CB8F5EB9E91E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B2D37327-AC46-32B8-7471-CB8F5EB9E91E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2D37327-AC46-32B8-7471-CB8F5EB9E91E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -87,6 +109,14 @@ Global
 		{1DB2DAD0-5E99-A1A5-693B-244FA8D662AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DB2DAD0-5E99-A1A5-693B-244FA8D662AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DB2DAD0-5E99-A1A5-693B-244FA8D662AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44B95657-A14D-98AA-C957-02601C4ED70F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44B95657-A14D-98AA-C957-02601C4ED70F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44B95657-A14D-98AA-C957-02601C4ED70F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44B95657-A14D-98AA-C957-02601C4ED70F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AB64B3F-2EEE-9C87-2542-B4B390A6BD06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AB64B3F-2EEE-9C87-2542-B4B390A6BD06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AB64B3F-2EEE-9C87-2542-B4B390A6BD06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AB64B3F-2EEE-9C87-2542-B4B390A6BD06}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EF04D81F-7401-B63E-15A9-8E615B7BBBF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EF04D81F-7401-B63E-15A9-8E615B7BBBF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF04D81F-7401-B63E-15A9-8E615B7BBBF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
