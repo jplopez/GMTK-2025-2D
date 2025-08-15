@@ -11,44 +11,69 @@ namespace Ameba {
   /// <typeparam name="T"></typeparam>
   public class StateMachine<T> : ScriptableObject where T : Enum {
 
+    [Header("StateMachine Settings")]
     [Tooltip("The starting state for every instance of the State machine")]
     public T StartingState = default;
-
     [Tooltip("Current State. Read Only")]
-    public T Current => _currentState; 
-
+    public T Current => _currentState;
     [Tooltip("If true, there are no restriction on state transitions")]
     public bool NoRestrictions = false;
 
-    protected Dictionary<T, List<T>> _transitions = new();
-
+    [Header("Transitions")]
+    [Tooltip("Add here the valid transitions between states")]
     [SerializeField]
     protected List<Transition<T>> _serializedTransitions = new();
-    
+
+    protected Dictionary<T, List<T>> _transitions = new();
     protected T _currentState = default;
+    protected UnityEvent<StateMachineEventArg<T>> OnStateChanged;
 
-    protected static UnityEvent<StateMachineEventArg<T>> OnStateChanged;
+    #region Object Lifecycle
 
-    public static void AddListener(Action<StateMachineEventArg<T>> action) {
-      if (action == null) return;
-      OnStateChanged?.AddListener(new UnityAction<StateMachineEventArg<T>>(action));
-    }
-
-    public static void RemoveListener(Action<StateMachineEventArg<T>> action) {
-      if (action == null) return;
-      OnStateChanged?.RemoveListener(new UnityAction<StateMachineEventArg<T>>(action));
-    }
-
+    /// <summary>
+    /// Resets to StartingState, and populates from clean all transactions 
+    /// found in the UnityEditor 
+    /// </summary>
     protected virtual void OnEnable() {
-      Reset();
-      _transitions.Clear();
+      ResetToStartingState();
+      ClearAllTransitions();
 
       //serialized transitions is accessible from Editor
       //on enable we populate the dictionary for better lookup
       foreach (var entry in _serializedTransitions) {
-        entry.To.ForEach( to => { AddTransition(entry.From, to); });
+        entry.To.ForEach(to => { AddTransition(entry.From, to); });
       }
     }
+
+    /// <summary>
+    /// Clears all Transactions from the StateMachine
+    /// </summary>
+    protected virtual void OnDisable() {
+      ClearAllTransitions();
+    }
+
+    /// <summary>
+    /// Sets current state to StartingState
+    /// </summary>
+    public void ResetToStartingState() => _currentState = StartingState;
+
+    #endregion
+
+    #region Listeners
+
+    public void AddListener(Action<StateMachineEventArg<T>> action) {
+      if (action == null) return;
+      OnStateChanged?.AddListener(new UnityAction<StateMachineEventArg<T>>(action));
+    }
+
+    public void RemoveListener(Action<StateMachineEventArg<T>> action) {
+      if (action == null) return;
+      OnStateChanged?.RemoveListener(new UnityAction<StateMachineEventArg<T>>(action));
+    }
+
+    #endregion
+
+    #region Transitions
 
     public virtual void AddTransition(T fromState, T toState) {
       if (!_transitions.TryGetValue(fromState, out List<T> validTransitions)) {
@@ -74,7 +99,7 @@ namespace Ameba {
 #endif
     }
 
-    public virtual void ClearState(T state) {
+    public virtual void ClearStateTransitions(T state) {
       if (_transitions.TryGetValue(state, out List<T> validTransitions)) {
         validTransitions.Clear();
       }
@@ -85,28 +110,16 @@ namespace Ameba {
 #endif
     }
 
-    public virtual void ClearAll() => _transitions.Clear();
-
-    public virtual bool TestTransition(T fromState, T toState) 
-      => NoRestrictions || (_transitions.TryGetValue(fromState, out List<T> validTransitions) && validTransitions.Contains(toState));
-
-    public bool ChangeState(T newState) {
-      if(TestTransition(_currentState, newState)) {
-        var oldState = _currentState;
-        _currentState = newState;
-        OnStateChanged?.Invoke(new StateMachineEventArg<T>(oldState, newState));
-        return true;
-      }
-#if UNITY_EDITOR
-      Debug.LogWarning($"Invalid transition from {_currentState} to {newState}");
-#endif
-      return false;
+    public virtual void ClearAllTransitions() {
+      _transitions.Clear();
+      _serializedTransitions.Clear();
     }
 
-    public void Reset() => _currentState = StartingState;
+    public virtual bool TestTransition(T fromState, T toState)
+      => NoRestrictions || (_transitions.TryGetValue(fromState, out List<T> validTransitions) && validTransitions.Contains(toState));
 
     public IReadOnlyList<T> GetValidTransitions(T state)
-  => _transitions.TryGetValue(state, out var list) ? list : Array.Empty<T>();
+=> _transitions.TryGetValue(state, out var list) ? list : Array.Empty<T>();
 
     public IEnumerable<T> GetStatesWithTransitions() => _transitions.Keys;
 
@@ -129,6 +142,28 @@ namespace Ameba {
       if (entry.To.Contains(toState))
         entry.To.Remove(toState);
     }
+
+
+    #endregion
+
+    #region Change State
+
+    public virtual bool ChangeState(T newState) {
+      if (TestTransition(_currentState, newState)) {
+        var oldState = _currentState;
+        _currentState = newState;
+        OnStateChanged?.Invoke(new StateMachineEventArg<T>(oldState, newState));
+        return true;
+      }
+#if UNITY_EDITOR
+      Debug.LogWarning($"Invalid transition from {_currentState} to {newState}");
+#endif
+      return false;
+    }
+
+    #endregion
+
+
   }
 
   [Serializable]
@@ -146,4 +181,5 @@ namespace Ameba {
     public T From;
     public List<T> To = new();
   }
+
 }

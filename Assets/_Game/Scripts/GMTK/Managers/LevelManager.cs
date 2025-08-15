@@ -41,7 +41,7 @@ namespace GMTK {
     public List<LevelExtension> Extensions = new();
 
     //Main Game controller 
-    protected RollnSnapController _controller;
+    protected GameContext _controller;
 
     public bool IsLevelStarted => _levelStarted;
     public bool IsLevelStale => _timeSinceLastMove >= StaleTimeThreshold;
@@ -54,7 +54,7 @@ namespace GMTK {
 
     protected LevelSequence _levelSequence;
     protected GameEventChannel _eventChannel;
-    //public static UnityEvent OnLevelReset;
+    //public static UnityEvent LevelReset;
 
 
     private void OnEnable() {
@@ -69,20 +69,20 @@ namespace GMTK {
 
     private void Awake() {
       if (_controller == null) {
-        _controller = FindAnyObjectByType<RollnSnapController>();
+        _controller = FindAnyObjectByType<GameContext>();
         _eventChannel = _controller.EventsChannel;
         _levelSequence = _controller.LevelSequence;
       }
       if (_eventChannel == null) {
         _eventChannel = Resources.Load<GameEventChannel>("GameEventChannel");
       }
-      _eventChannel.AddListener(GameEventType.OnLevelReset, ResetLevel);
-      _eventChannel.AddListener(GameEventType.OnLevelPlay, StartLevel);
+      _eventChannel.AddListener(GameEventType.LevelReset, ResetLevel);
+      _eventChannel.AddListener(GameEventType.LevelPlay, StartLevel);
     }
 
     private void OnDestroy() {
-      _eventChannel.RemoveListener(GameEventType.OnLevelReset, ResetLevel);
-      _eventChannel.RemoveListener(GameEventType.OnLevelPlay, StartLevel);
+      _eventChannel.RemoveListener(GameEventType.LevelReset, ResetLevel);
+      _eventChannel.RemoveListener(GameEventType.LevelPlay, StartLevel);
     }
 
     protected void HandleMarbleEnter(PlayableMarbleController marble, string checkpointID) {

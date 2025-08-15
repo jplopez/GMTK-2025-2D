@@ -46,7 +46,7 @@ namespace GMTK {
 
 #if UNITY_EDITOR
 
-    [ContextMenu("Reset Score")]
+    [ContextMenu("ResetToStartingState Score")]
     public void ResetScore() => MarbleScoreKeeper.ResetScore();
 #endif
   }

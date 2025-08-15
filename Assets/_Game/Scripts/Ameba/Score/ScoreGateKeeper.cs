@@ -13,7 +13,7 @@ namespace Ameba {
       strategy.Initialize(playerTransform);
     }
 
-    [ContextMenu("Reset Score")]
+    [ContextMenu("ResetToStartingState Score")]
     public void ResetScore() => totalScore = 0;
 
     public void Tick(float deltaTime) {

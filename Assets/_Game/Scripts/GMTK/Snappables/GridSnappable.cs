@@ -111,7 +111,7 @@ namespace GMTK {
       if (SnapTransform == null) SnapTransform = this.transform;
       if (Model == null) Model = this.transform;
 
-      //store initial position for the Reset function
+      //store initial position for the ResetToStartingState function
       _initialPosition = SnapTransform.position;
       _initialRotation = SnapTransform.rotation;
       _initialScale = SnapTransform.localScale;

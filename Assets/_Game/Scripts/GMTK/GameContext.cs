@@ -1,22 +1,22 @@
+using Ameba;
+using Ameba.Input;
 using System;
 using UnityEngine;
-using Ameba.Input;
-using Ameba;
 
 namespace GMTK {
 
   /// <summary>
-  /// <para>RollnSnapController is a MonoBehaviour with the references to all must have 
+  /// <para>GameContext is a MonoBehaviour with the references to all must have 
   /// resources like ScriptableObjects used by Controllers and MonoBehaviours
   /// across the game.</para> 
   /// <para>By placing it in the scene, you can define the behaviour of the game on GameStates, Scene Management, Player Inputs, Events, HUD and Score.</para> 
   /// <para>The recommended way of using this controller is having a Prefab with all the game definitions in place, and place it on every scene.</para>
   /// </summary>
-  public class RollnSnapController : MonoBehaviour {
+  public class GameContext : MonoBehaviour {
 
     [Header("GameState Settings")]
     [Tooltip("the gamestatemachine handles the game states")]
-    public GameStateMachine _gameStateMachine;
+    [SerializeField] protected GameStateMachine _gameStateMachine;
     [Tooltip("if true, the scene loading this manager changes the gamestate on Start. See 'StartingState' field")]
     public bool ChangeGameStateOnStart = false;
     [Tooltip("If 'ChangeGameStateOnStart' is true, this is the GameState this scene will assign in the Always method.")]
@@ -68,7 +68,12 @@ namespace GMTK {
     protected virtual void Awake() {
       EnsureComponents();
       UpdateCurrentScene();
+      AddGameEventListeners();
       ChangeToOnStartGameState();
+    }
+
+    private void OnDestroy() {
+      RemoveGameEventListeners();
     }
 
     private void EnsureComponents() {
@@ -132,6 +137,8 @@ namespace GMTK {
       if (ResetScoreOnLoad) {
         _marbleScoreKeeper.ResetScore();
       }
+
+      
     }
 
     #region Scene Management Methods
@@ -205,6 +212,14 @@ namespace GMTK {
 
     #region GameState Changes
 
+    public GameStates CurrentGameState => _gameStateMachine.Current;
+
+    public bool CanTransitionTo(GameStates gameStates) => _gameStateMachine.TestTransition(_gameStateMachine.Current, gameStates);
+
+    public void AddStateChangeListener(Action<StateMachineEventArg<GameStates>> action) => _gameStateMachine.AddListener(action);
+
+    public void RemoveStateChangeListener(Action<StateMachineEventArg<GameStates>> action) => _gameStateMachine.RemoveListener(action);
+
     protected virtual void ChangeToOnStartGameState() {
       if (ChangeGameStateOnStart
         && (_gameStateMachine.Current != StartingState)) {
@@ -221,6 +236,38 @@ namespace GMTK {
 
     #endregion
 
+    #region GameState Change Events
+
+    private void AddGameEventListeners() {
+      //Add here any GameEvent that should trigger a GameStateChange
+      _eventsChannel.AddListener(GameEventType.GameStarted, _gameStateMachine.HandleStartGame);
+      _eventsChannel.AddListener(GameEventType.LevelStart, _gameStateMachine.HandleLevelStart);
+      _eventsChannel.AddListener(GameEventType.LevelPlay, _gameStateMachine.HandleLevelPlay);
+      _eventsChannel.AddListener(GameEventType.LevelReset, _gameStateMachine.HandleLevelReset);
+      _eventsChannel.AddListener(GameEventType.LevelCompleted, _gameStateMachine.HandleLevelComplete);
+      _eventsChannel.AddListener(GameEventType.GameOver, _gameStateMachine.HandleGameOver);
+      _eventsChannel.AddListener(GameEventType.EnterOptions, _gameStateMachine.HandleEnterOptions);
+      _eventsChannel.AddListener(GameEventType.ExitOptions, _gameStateMachine.HandleEnterOptions);
+      _eventsChannel.AddListener(GameEventType.EnterPause, _gameStateMachine.HandleEnterPause);
+      _eventsChannel.AddListener(GameEventType.ExitPause, _gameStateMachine.HandleExitPause);
+    }
+
+    private void RemoveGameEventListeners() {
+      var eventChannel = Game.Context.EventsChannel;
+      _eventsChannel.RemoveListener(GameEventType.GameStarted, _gameStateMachine.HandleStartGame);
+      _eventsChannel.RemoveListener(GameEventType.LevelStart, _gameStateMachine.HandleLevelStart);
+      _eventsChannel.RemoveListener(GameEventType.LevelPlay, _gameStateMachine.HandleLevelPlay);
+      _eventsChannel.RemoveListener(GameEventType.LevelReset, _gameStateMachine.HandleLevelReset);
+      _eventsChannel.RemoveListener(GameEventType.LevelCompleted, _gameStateMachine.HandleLevelComplete);
+      _eventsChannel.RemoveListener(GameEventType.GameOver, _gameStateMachine.HandleGameOver);
+      _eventsChannel.RemoveListener(GameEventType.EnterOptions, _gameStateMachine.HandleEnterOptions);
+      _eventsChannel.RemoveListener(GameEventType.ExitOptions, _gameStateMachine.HandleEnterOptions);
+      _eventsChannel.RemoveListener(GameEventType.EnterPause, _gameStateMachine.HandleEnterPause);
+      _eventsChannel.RemoveListener(GameEventType.ExitPause, _gameStateMachine.HandleExitPause);
+    }
+
+
+    #endregion
 
     private T LoadIfNull<T>(string resourceName, T resource, string messageIfNotFound="Not Found") where T: ScriptableObject {
       if (resource != null) return resource;

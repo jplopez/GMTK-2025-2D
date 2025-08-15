@@ -3,10 +3,14 @@ namespace GMTK {
   public enum GameEventType {
 
     //void
-    OnLevelPlay,
-    OnLevelReset,
-    OnLevelCompleted,
+    GameStarted,
+    LevelStart,
+    LevelPlay,
+    LevelReset,
+    LevelCompleted,
     GameOver,
+    EnterOptions, ExitOptions,
+    EnterPause, ExitPause,
 
     //int
     RaiseInt,

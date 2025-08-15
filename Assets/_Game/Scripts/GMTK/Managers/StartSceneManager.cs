@@ -9,8 +9,8 @@ namespace GMTK {
     private void Start() {
       // Optionally, you could load the first level automatically here
       // Uncomment the line below to load the first level when the start scene loads
-      // UnityEngine.SceneManagement.RollnSnapController.LoadScene(FirstLevelSceneName);
-      LevelSequence.CurrentScene = null; // Reset current scene on start
+      // UnityEngine.SceneManagement.GameContext.LoadScene(FirstLevelSceneName);
+      LevelSequence.CurrentScene = null; // ResetToStartingState current scene on start
 
 
     }

@@ -51,8 +51,8 @@ namespace Ameba {
       //  }
       //}
 
-      if (GUILayout.Button("Reset States")) {
-        var resetMethod = baseType.GetMethod("Reset");
+      if (GUILayout.Button("ResetToStartingState States")) {
+        var resetMethod = baseType.GetMethod("ResetToStartingState");
         resetMethod?.Invoke(target, null);
       }
 

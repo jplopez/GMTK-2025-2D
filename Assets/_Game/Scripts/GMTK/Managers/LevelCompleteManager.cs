@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 namespace GMTK {
   public class LevelCompleteManager : MonoBehaviour {
 
-    public RollnSnapController Controller;
+    public GameContext Controller;
 
     public TMPro.TMP_Text ScoreText;
 

@@ -1,4 +1,5 @@
 using Ameba;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,8 +9,8 @@ namespace GMTK {
   /// <summary>
   /// MonoBehaviour to control the display and update of the HUD elements (score, playback buttons)
   /// Raised Events
-  ///  - OnLevelPlay when Play control button is clicked
-  ///  - OnLevelReset when Reset control button is clicked
+  ///  - LevelPlay when Play control button is clicked
+  ///  - LevelReset when ResetToStartingState control button is clicked
   /// Listener
   /// - ShowPlaybackControls(bool) to show/hide the play and reset buttons
   /// - EnablePlaybackControls(bool) to enable/disable the play and reset buttons
@@ -51,18 +52,15 @@ namespace GMTK {
       hudSO.MarbleScoreKeeper.SetStrategy(scoreStrategy, transform);
       UpdateScoreText(hudSO.MarbleScoreKeeper.GetScore());
 
-      _eventChannel.AddListener(GameEventType.ShowPlaybackControls, ShowPlayback);
-      _eventChannel.AddListener(GameEventType.EnablePlaybackControls, EnablePlayback);
-      PlayButton.onClick.AddListener(PlaybuttonFeedbacks);
-      ResetButton.onClick.AddListener(ResetbuttonFeedbacks);
+      PlayButton.onClick.AddListener(HandlePlayButtonClick);
+      ResetButton.onClick.AddListener(HandleResetButtonClick);
+      Game.Context.StateMachine.AddListener(HandleChangeState);
     }
 
     private void OnDestroy() {
-      PlayButton.onClick.RemoveListener(PlaybuttonFeedbacks);
-      ResetButton.onClick.RemoveListener(ResetbuttonFeedbacks);
-
-      _eventChannel.RemoveListener(GameEventType.ShowPlaybackControls, ShowPlayback);
-      _eventChannel.RemoveListener(GameEventType.EnablePlaybackControls, EnablePlayback);
+      PlayButton.onClick.RemoveListener(HandlePlayButtonClick);
+      ResetButton.onClick.RemoveListener(HandleResetButtonClick);
+      Game.Context.RemoveStateChangeListener(HandleChangeState);
     }
 
     private void Update() {
@@ -72,23 +70,49 @@ namespace GMTK {
       }
       UpdateScoreText(hudSO.MarbleScoreKeeper.GetScore());
     }
+
+    public void UpdateUI(GameStates gameState) {
+      switch (gameState) {
+        case GameStates.Preparation:
+          ShowPlayback(true);
+          EnablePlayback(true);
+          break;
+        case GameStates.Playing:
+        case GameStates.Reset:
+          ShowPlayback(true);
+          EnablePlayback(false);
+          break;
+      }
+    }
+
     public void ShowPlayback(bool show) {
       PlayButton.gameObject.SetActive(show);
       ResetButton.gameObject.SetActive(show);
     }
     public void EnablePlayback(bool enable) {
-      PlayButton.enabled = enable;
-      ResetButton.enabled = enable;
+      PlayButton.interactable = enable;
+      ResetButton.interactable = enable;
     }
 
-    private void PlaybuttonFeedbacks() {
-      _eventChannel.Raise(GameEventType.OnLevelPlay);
-      // Optional: local feedback
+    public void HandleChangeState(StateMachineEventArg<GameStates> eventArg) {
+      if (eventArg == null) return;
+      UpdateUI(eventArg.ToState);
     }
 
-    private void ResetbuttonFeedbacks() {
-      _eventChannel.Raise(GameEventType.OnLevelReset);
-      // Optional: local feedback
+    private void HandlePlayButtonClick() {
+      //ensure the button only triggers logic if in the correct state.
+      if (Game.Context.CanTransitionTo(GameStates.Playing)) {
+        _eventChannel.Raise(GameEventType.LevelPlay);
+        // Optional: local feedback
+      }
+    }
+
+    private void HandleResetButtonClick() {
+      //ensure the button only triggers logic if in the correct state.
+      if (Game.Context.CanTransitionTo(GameStates.Reset)) {
+        _eventChannel.Raise(GameEventType.LevelReset);
+        // Optional: local feedback
+      }
     }
     private void UpdateScoreText(int newScore) => scoreText.text = $"{newScore:D5}";
   }
