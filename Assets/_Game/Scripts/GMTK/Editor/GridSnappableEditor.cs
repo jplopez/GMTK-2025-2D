@@ -30,7 +30,7 @@ public class GridSnappableEditor : Editor {
     ApplyCollider(template, go);
 
     // Rigidbody
-    ApplyRigidBody(snappable, template, go);
+    //ApplyRigidBody(snappable, template, go);
 
     // Optional: Resize or reposition based on grid size
     go.transform.localScale = new Vector3(template.SizeInGridUnits.x, template.SizeInGridUnits.y, 1);
@@ -49,27 +49,27 @@ public class GridSnappableEditor : Editor {
     }
   }
 
-  private static void ApplyRigidBody(GridSnappable snappable, SnappableTemplate template, GameObject go) {
-    if (!go.TryGetComponent<Rigidbody2D>(out _)) {
-      go.AddComponent<Rigidbody2D>();
-    }
-    if (template.ForceStaticRigidBody) {
-      snappable.StaticBody = true;
-      var rb = go.GetComponent<Rigidbody2D>();
-      rb.bodyType = RigidbodyType2D.Static;
-      rb.mass = 0f;
-      rb.angularDamping = 0f;
-      rb.gravityScale = 0f;
-    }
-    else {
-      snappable.StaticBody = false;
-      var rb = go.GetComponent<Rigidbody2D>();
-      rb.bodyType = RigidbodyType2D.Dynamic;
-      rb.mass = template.Mass;
-      rb.angularDamping = template.AngularDamping;
-      rb.gravityScale = template.Gravity ? 1f : 0f;
-    }
-  }
+  //private static void ApplyRigidBody(GridSnappable snappable, SnappableTemplate template, GameObject go) {
+  //  if (!go.TryGetComponent<Rigidbody2D>(out _)) {
+  //    go.AddComponent<Rigidbody2D>();
+  //  }
+  //  if (template.ForceStaticRigidBody) {
+  //    snappable.StaticBody = true;
+  //    var rb = go.GetComponent<Rigidbody2D>();
+  //    rb.bodyType = RigidbodyType2D.Static;
+  //    rb.mass = 0f;
+  //    rb.angularDamping = 0f;
+  //    rb.gravityScale = 0f;
+  //  }
+  //  else {
+  //    snappable.StaticBody = false;
+  //    var rb = go.GetComponent<Rigidbody2D>();
+  //    rb.bodyType = RigidbodyType2D.Dynamic;
+  //    rb.mass = template.Mass;
+  //    rb.angularDamping = template.AngularDamping;
+  //    rb.gravityScale = template.Gravity ? 1f : 0f;
+  //  }
+  //}
 
   private static void ApplySprite(SnappableTemplate template, GameObject go) {
     // Sprite is optional, so we check if it's null

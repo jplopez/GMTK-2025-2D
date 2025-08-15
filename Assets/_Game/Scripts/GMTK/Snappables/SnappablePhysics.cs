@@ -11,12 +11,8 @@ namespace GMTK {
     public bool AllowPositionChange = false;
     [Tooltip("Whether this element can rotate")]
     public bool AllowRotation = false;
-    [Tooltip("If true, the element will always rotate using the RotationSpeed")]
-    public bool AutoRotate = false;
-    [Tooltip("Degrees per second the element rotates")]
-    public float RotationSpeed = 90f; // degrees per second
-    [Tooltip("If set to AutoRotate, this property sets direction of the rotation")]
-    public RotationDirections RotationDirection = RotationDirections.Clockwise;
+    [Tooltip("How many degrees the element will rotate every time is requested. Recommendation: multiples of 360")]
+    public float RotationStep = 90;
     [Tooltip("If true, you can limit the rotation angle using MinRotationAngle and MaxRotationAngle")]
     public bool LimitRotationAngle = false;
     [Tooltip("The min and max angle the element can rotate")]
@@ -24,6 +20,14 @@ namespace GMTK {
     public float MinRotationAngle = -45f;
     [Range(-180f, 180f)]
     public float MaxRotationAngle = 45f;
+
+    [Header("Auto Rotation")]
+    [Tooltip("If true, the element will always rotate using the AutoRotationSpeed")]
+    public bool EnableAutoRotation = false;
+    [Tooltip("Degrees per second the element rotates")]
+    public float AutoRotationSpeed = 90f; // degrees per second
+    [Tooltip("If set to EnableAutoRotation, this property sets direction of the rotation")]
+    public RotationDirections AutoRotationDirection = RotationDirections.Clockwise;
 
     [Header("Gravity")]
     [Tooltip("if true, the element is affected by gravity ")]
@@ -40,11 +44,11 @@ namespace GMTK {
     [Tooltip("Optional override for experimentation. If set, this will be used instead of auto-assigned material.")]
     public PhysicsMaterial2D OverrideMaterial;
 
-    private Rigidbody2D _rigidbody2D;
-    private PolygonCollider2D _collider2D;
-    private PhysicsMaterial2D _assignedMaterial;
-
-    private float _currentRotation = 0f;
+    [Header("Debug")]
+    [SerializeField, DisplayWithoutEdit] private Rigidbody2D _rigidbody2D;
+    [SerializeField, DisplayWithoutEdit] private PolygonCollider2D _collider2D;
+    [SerializeField, DisplayWithoutEdit] private PhysicsMaterial2D _assignedMaterial;
+    [SerializeField, DisplayWithoutEdit] private float _currentRotation = 0f;
 
     protected Vector2 _initialPosition;
     protected Vector2 _initialScale;
@@ -61,7 +65,7 @@ namespace GMTK {
         _rigidbody2D = _snappable.gameObject.AddComponent<Rigidbody2D>();
 
       _rigidbody2D.gravityScale = (HasGravity) ? 1f * GravityMultiplier : 0f;
-      _rigidbody2D.angularDamping = 0.05f;
+      //_rigidbody2D.angularDamping = 0.05f;
       _rigidbody2D.freezeRotation = !AllowRotation;
 
       _collider2D = _snappable.GetComponent<PolygonCollider2D>();
@@ -70,16 +74,33 @@ namespace GMTK {
 
       //_assignedMaterial = (OverrideMaterial != null) ? OverrideMaterial : GetPredefinedMaterial(Friction, Bounciness);
       //_collider2D.sharedMaterial = _assignedMaterial;
-
+      _currentRotation = _initialRotation.eulerAngles.z;
       UpdateMaterial();
     }
 
     protected override bool Validate() => _rigidbody2D != null && _collider2D != null;
 
     protected override void OnUpdate() {
+      //ApplyMovementControl();
+      //ApplyRotationControl();
+    }
+
+    private void FixedUpdate() {
+      _currentRotation = _rigidbody2D.rotation; // In degrees
       ApplyMovementControl();
       ApplyRotationControl();
     }
+
+    public override void OnSnappableEvent(GridSnappableEventArgs eventArgs) {
+      if(eventArgs.ComponentEventType == SnappableComponentEventType.RotateCW) {
+        RotateBy(RotationStep);
+      }
+      if(eventArgs.ComponentEventType == SnappableComponentEventType.RotateCW) {
+        RotateBy(-RotationStep);
+      }
+    }
+
+
 
     private void ApplyMovementControl() {
       _rigidbody2D.bodyType = (AllowPositionChange || AllowRotation) ?
@@ -102,24 +123,31 @@ namespace GMTK {
         _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
       }
     }
-
     private void ApplyRotationControl() {
       if (!AllowRotation) return;
 
-      if (AutoRotate) {
-        switch (RotationDirection) {
-          case RotationDirections.Counterclockwise:
-            _currentRotation += RotationSpeed * Time.deltaTime;
-            break;
-          case RotationDirections.Clockwise:
-            _currentRotation -= RotationSpeed * Time.deltaTime;
-            break;
+      if (LimitRotationAngle) {
+        if (_currentRotation < MinRotationAngle && _rigidbody2D.angularVelocity < 0f) {
+          _rigidbody2D.angularVelocity = 0f;
         }
-        if (LimitRotationAngle) {
-          _currentRotation = Mathf.Clamp(_currentRotation, MinRotationAngle, MaxRotationAngle);
+        else if (_currentRotation > MaxRotationAngle && _rigidbody2D.angularVelocity > 0f) {
+          _rigidbody2D.angularVelocity = 0f;
         }
-        _snappable.transform.rotation = Quaternion.Euler(0f, 0f, _currentRotation);
       }
+    }
+
+    public void RotateBy(float degrees) {
+      if (!AllowRotation || _rigidbody2D.bodyType != RigidbodyType2D.Dynamic)
+        return;
+      float targetAngle = _rigidbody2D.rotation + degrees;
+      if (LimitRotationAngle) {
+        targetAngle = Mathf.Clamp(
+           targetAngle,
+           MinRotationAngle,
+           MaxRotationAngle
+       );
+      }
+      _rigidbody2D.MoveRotation(targetAngle);
     }
 
     public void CancelRotation() {
@@ -135,7 +163,7 @@ namespace GMTK {
         _rigidbody2D.freezeRotation = !enabled;
     }
 
-    public void SetRotationSpeed(float speed) => RotationSpeed = speed;
+    public void SetRotationSpeed(float speed) => AutoRotationSpeed = speed;
     public void SetRotationRange(float minAngle, float maxAngle) {
       MinRotationAngle = minAngle;
       MaxRotationAngle = maxAngle;
@@ -180,6 +208,18 @@ namespace GMTK {
     }
 
     protected override void HandleElementUnhovered(object sender, GridSnappableEventArgs evt) {
+    }
+
+
+    void OnDrawGizmosSelected() {
+      //shows the min/max angles, if the snappable is using limits
+      if (AllowRotation && LimitRotationAngle) {
+        Vector3 pos = transform.position;
+        float zRotation = transform.rotation.eulerAngles.z;
+        Gizmos.color = Color.orangeRed;
+        Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, zRotation + MinRotationAngle) * Vector3.right * 2f);
+        Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, zRotation + MaxRotationAngle) * Vector3.right * 2f);
+      }
     }
   }
 }

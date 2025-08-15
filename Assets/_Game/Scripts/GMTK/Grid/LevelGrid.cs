@@ -168,11 +168,11 @@ namespace GMTK {
 
       var allSnappables = FindObjectsByType<GridSnappable>(FindObjectsSortMode.None);
       //Snappables in the playing area at the time of initializing the grid
-      //are considered as static -> player cannot move them
+      //are considered non-draggable -> player cannot move them
       foreach (var snappable in allSnappables) {
         if (IsInsidePlayableArea(snappable.transform.position)) {
           snappable.transform.position = SnapToGrid(snappable.transform.position);
-          snappable.SetStatic();
+          snappable.Draggable=false;
           var gridOrigin = WorldToGrid(snappable.transform.position);
           _occupancyMap.Register(snappable, gridOrigin);
         }

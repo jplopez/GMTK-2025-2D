@@ -2,6 +2,11 @@ using System;
 using UnityEngine;
 
 namespace GMTK {
+
+  public enum SnappableComponentEventType {
+    RotateCW, RotateCCW, FlippedX, FlippedY, OnPointerOver, OnPointerOut, MovedToInventory, MovedToGrid
+  }
+
   public class GridSnappableEventArgs : EventArgs {
     /// <summary>
     /// The GridSnappable element involved in the event.
@@ -13,26 +18,7 @@ namespace GMTK {
     /// </summary>
     public Vector2 PointerPosition { get; }
 
-
-    /// <summary>
-    /// Indicates if the element was rotated clockwise.
-    /// </summary>
-    public bool RotatedCW { get; private set; }
-
-    /// <summary>
-    /// Indicates if the element was rotated counter-clockwise.
-    /// </summary>
-    public bool RotatedCCW { get; private set; }
-
-    /// <summary>
-    /// Indicates if the element was flipped horizontally.
-    /// </summary>
-    public bool FlippedX { get; private set; }
-
-    /// <summary>
-    /// Indicates if the element was flipped vertically.
-    /// </summary>
-    public bool FlippedY { get; private set; }
+    public SnappableComponentEventType ComponentEventType { get; }
 
     /// <summary>
     /// Basic constructor with only the element reference.
@@ -47,6 +33,12 @@ namespace GMTK {
     public GridSnappableEventArgs(GridSnappable element, Vector2 pointerPosition) {
       Element = element;
       PointerPosition = pointerPosition;
+    }
+
+    public GridSnappableEventArgs(GridSnappable element, Vector2 pointerPosition, SnappableComponentEventType eventType) {
+      Element = element;
+      PointerPosition = pointerPosition;
+      ComponentEventType = eventType;
     }
 
   }

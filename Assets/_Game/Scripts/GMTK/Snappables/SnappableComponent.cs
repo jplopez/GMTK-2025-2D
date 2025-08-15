@@ -16,6 +16,7 @@ namespace GMTK {
     [Tooltip("Delay in seconds before executing the OnDelayedUpdateRun logic")]
     public float InitialDelay = 0.1f;
 
+
     protected GridSnappable _snappable;
     protected LevelGrid _levelGrid;
     protected GameEventChannel _gameEventChannel;
@@ -48,6 +49,7 @@ namespace GMTK {
       SnappableInputHandler.OnElementHovered += HandleElementHovered;
       SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
       SnappableInputHandler.OnElementSelected += HandleElementSelected;
+      if(_snappable != null) _snappable.AddComponentListener(this);
     }
 
     private void RemoveInputListeners() {
@@ -55,6 +57,7 @@ namespace GMTK {
       SnappableInputHandler.OnElementHovered -= HandleElementHovered;
       SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
       SnappableInputHandler.OnElementSelected -= HandleElementSelected;
+      if (_snappable != null) _snappable.RemoveComponentListener(this);
     }
 
     protected abstract void HandleElementSelected(object sender, GridSnappableEventArgs evt);
@@ -104,5 +107,6 @@ namespace GMTK {
     protected virtual void FinalizeComponent() { }
     protected virtual void OnDelayedUpdate() { }
     protected virtual void ResetComponent() { }
+    public virtual void OnSnappableEvent(GridSnappableEventArgs eventArgs) { }
   }
 }

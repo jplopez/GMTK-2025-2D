@@ -46,7 +46,7 @@ namespace GMTK {
         if (Camera.main == null) {
           _pointerWorldPos = Vector3.zero;
         }
-        else { 
+        else {
           _pointerWorldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPos);
         }
         _pointerWorldPos.z = 0f;
@@ -85,6 +85,7 @@ namespace GMTK {
 
     protected virtual void Update() {
 
+      //TODO change this to snappable component that decides when to update position
       if (IsMoving && _currentElement != null) {
         _currentElement.UpdatePosition(_pointerWorldPos);
       }
@@ -92,17 +93,28 @@ namespace GMTK {
       if (TryGetElementOnCurrentPointer(out GridSnappable element)) {
         IsOverElement = true;
         if (!element.Equals(_lastElementOver)) {
+          
           // moved over a different element
-          if (_lastElementOver != null) {
-            _lastElementOver.OnPointerOut();
-            RaiseEvent(OnElementUnhovered, _lastElementOver);
-          }
+          UnhoverLastElement();
+
           _lastElementOver = element;
           _lastElementOver.OnPointerOver();
           RaiseEvent(OnElementHovered, _lastElementOver);
+          Debug.Log($"OnElementHovered: {_lastElementOver.name}");
         }
       }
-      else { IsOverElement = false; }
+      //no element, means we have unhover the lastElementOver
+      else { UnhoverLastElement(); }
+    }
+
+    private void UnhoverLastElement() {
+      if (_lastElementOver != null && IsOverElement) {
+        _lastElementOver.OnPointerOut();
+        RaiseEvent(OnElementUnhovered, _lastElementOver);
+        Debug.Log($"OnElementUnhovered: {_lastElementOver.name}");
+        _lastElementOver = null;
+        IsOverElement = false;
+      }
     }
 
     private void RaiseEvent(EventHandler<GridSnappableEventArgs> evt, GridSnappable element) {
@@ -124,9 +136,9 @@ namespace GMTK {
       }
 
     }
-#endregion
+    #endregion
 
-#region GridSnappable management
+    #region GridSnappable management
 
     private void BeginMovingElement() {
       if (TryGetElementOnCurrentPointer(out GridSnappable selectedElement)) {
@@ -166,7 +178,7 @@ namespace GMTK {
       return false;
     }
 
-#endregion
+    #endregion
 
 
 #if UNITY_EDITOR
