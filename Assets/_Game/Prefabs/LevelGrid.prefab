@@ -263,6 +263,7 @@ MonoBehaviour:
   GridRightBound: {fileID: 901215048114479262}
   _gridSprite: {fileID: 7785299759478851614}
   _spriteOffset: {x: 0, y: 0}
+  _inputHandler: {fileID: 0}
   enableGizmos: 1
   useGridValuesForGizmo: 1
   gizmoCellSize: 1

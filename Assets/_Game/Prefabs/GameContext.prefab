@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2205951209694358804}
   - component: {fileID: 801651196068165227}
   m_Layer: 0
-  m_Name: RollnSnapController
+  m_Name: GameContext
   m_TagString: GameController
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -49,6 +49,7 @@ MonoBehaviour:
   StartingState: 1
   ChangeGameStateOnEnd: 0
   EndingState: 5
+  HandlerRegistry: {fileID: 11400000, guid: c19da798e2609fb40841e2951cf467ac, type: 2}
   StartSceneName: Start
   LoadingSceneName: Loading
   GameOverSceneName: GameOver
