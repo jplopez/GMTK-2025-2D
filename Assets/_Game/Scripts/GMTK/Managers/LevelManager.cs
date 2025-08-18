@@ -6,6 +6,8 @@ namespace GMTK {
 
   public class LevelManager : MonoBehaviour {
 
+    private const string LEVEL_COMPLETE_SCENE_NAME = "LevelComplete";
+
     [Header("Marble Settings")]
     [Tooltip("Reference to the Marble prefab")]
     public PlayableMarbleController PlayableMarble;
@@ -40,53 +42,39 @@ namespace GMTK {
     [Tooltip("LevelExtensions to encapsulate specific behaviours, that might not be needed everywhere")]
     public List<LevelExtension> Extensions = new();
 
-    //Main Game controller 
-    protected GameContext _controller;
-
     public bool IsLevelStarted => _levelStarted;
     public bool IsLevelStale => _timeSinceLastMove >= StaleTimeThreshold;
 
     protected bool _levelStarted = false;
     protected bool _levelEnded = false;
-    //protected Vector2 _lastMarblePosition = Vector2.zero;
     protected float _timeSinceLastMove = 0f;
     protected float _timeSinceLevelStart = 0f;
-
     protected LevelSequence _levelSequence;
     protected GameEventChannel _eventChannel;
-    //public static UnityEvent LevelReset;
-
-
-    private void OnEnable() {
-      Checkpoint.OnMarbleEnteringCheckpoint += HandleMarbleEnter;
-      Checkpoint.OnMarbleExitingCheckpoint += HandleMarbleExit;
-    }
-
-    private void OnDisable() {
-      Checkpoint.OnMarbleEnteringCheckpoint -= HandleMarbleEnter;
-      Checkpoint.OnMarbleExitingCheckpoint -= HandleMarbleExit;
-    }
 
     private void Awake() {
-      if (_controller == null) {
-        _controller = FindAnyObjectByType<GameContext>();
-        _eventChannel = _controller.EventsChannel;
-        _levelSequence = _controller.LevelSequence;
-      }
+      _eventChannel = Game.Context.EventsChannel;
+      _levelSequence = Game.Context.LevelSequence;
+
       if (_eventChannel == null) {
-        _eventChannel = Resources.Load<GameEventChannel>("GameEventChannel");
+        Debug.Log($"LevelManager: EventChannel is missing. LevelManager won't be able to handle game events");
+        return;
       }
       _eventChannel.AddListener(GameEventType.LevelReset, ResetLevel);
       _eventChannel.AddListener(GameEventType.LevelPlay, StartLevel);
+      _eventChannel.AddListener(GameEventType.EnterCheckpoint, HandleMarbleEnter);
+      _eventChannel.AddListener(GameEventType.ExitCheckpoint, HandleMarbleExit);
     }
 
     private void OnDestroy() {
       _eventChannel.RemoveListener(GameEventType.LevelReset, ResetLevel);
       _eventChannel.RemoveListener(GameEventType.LevelPlay, StartLevel);
+      _eventChannel.RemoveListener(GameEventType.EnterCheckpoint, HandleMarbleEnter);
+      _eventChannel.RemoveListener(GameEventType.ExitCheckpoint, HandleMarbleExit);
     }
 
-    protected void HandleMarbleEnter(PlayableMarbleController marble, string checkpointID) {
-      if (marble == null || string.IsNullOrEmpty(checkpointID)) {
+    protected void HandleMarbleEnter(string checkpointID) {
+      if (string.IsNullOrEmpty(checkpointID)) {
         Debug.LogWarning("[LevelManager] Marble or Checkpoint is null in HandleMarbleEnter.");
         return;
       }
@@ -97,8 +85,8 @@ namespace GMTK {
       }
     }
 
-    protected void HandleMarbleExit(PlayableMarbleController marble, string checkpointID) {
-      if (marble == null || string.IsNullOrEmpty(checkpointID)) {
+    protected void HandleMarbleExit(string checkpointID) {
+      if (string.IsNullOrEmpty(checkpointID)) {
         Debug.LogWarning("[LevelManager] Marble or Checkpoint is null in HandleMarbleEnter.");
         return;
       }
@@ -152,15 +140,11 @@ namespace GMTK {
         //Debug.Log($"Adding {deltaScore} to Marble's Score");
         _eventChannel.Raise(GameEventType.ScoreRaised, Time.deltaTime);
         _timeSinceLastMove += Time.deltaTime;
-      } else {
+      }
+      else {
         _timeSinceLastMove = 0f;
       }
     }
-
-    //private int CalculateDeltaScore(float seed) {
-    //  //return Mathf.RoundToInt(Mathf.Clamp(seed * ScoreMultiplier,0,10));
-    //  return (int)seed * 1000;
-    //}
 
     public void StartLevel() {
       InitializeTimers();
@@ -203,17 +187,16 @@ namespace GMTK {
     }
 
     private void CompleteLevel() {
-      if(_levelSequence != null) {
-        _levelSequence.SetCurrentScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-        UnityEngine.SceneManagement.SceneManager.LoadScene("LevelComplete"); // Load a generic level complete scene
-      }
+      var levelSequence = Game.Context.LevelSequence;
+      levelSequence.SetCurrentScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+      UnityEngine.SceneManagement.SceneManager.LoadScene(LEVEL_COMPLETE_SCENE_NAME); // Load a generic level complete scene
     }
 
     private void InitializeTimers() {
       _timeSinceLevelStart = 0f;
       _timeSinceLastMove = 0f;
     }
-    
+
   }
 
 }

@@ -1,3 +1,4 @@
+using Ameba;
 using UnityEngine;
 
 namespace GMTK {
@@ -29,6 +30,10 @@ namespace GMTK {
     protected GameEventChannel _eventChannel;
     protected Vector2 _lastMarblePosition = Vector2.zero;
     protected float _timeSinceLastMove = 0f;
+
+    //private void Awake() {
+    //  Game.Context.AddStateChangeListener(HandleStateChange);
+    //}
 
     void Start() {
 
@@ -72,6 +77,20 @@ namespace GMTK {
       else { Model.transform.position = Vector3.zero; }
       StopMarble();
     }
+
+    //public void HandleStateChange(StateMachineEventArg<GameStates> eventArg) {
+    //  if (eventArg == null) return;
+    //  switch(eventArg.ToState) {
+    //    case GameStates.Reset:
+    //    case GameStates.Preparation:
+    //      Spawn();
+    //      Model.SetActive(false);
+    //      break;
+    //    case GameStates.Playing:
+    //      Model.SetActive(true);
+    //      break;
+    //  }
+    //}
 
     public void StopMarble() {
       GravityScale = 0f;

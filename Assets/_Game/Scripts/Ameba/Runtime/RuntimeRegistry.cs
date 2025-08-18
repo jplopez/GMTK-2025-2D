@@ -52,6 +52,23 @@ namespace Ameba {
     public List<string> GetIds() => Entries.Select(e => e.id).ToList();
 
     public List<GameObject> GetPrefabs() => Entries.Select(e => e.Prefab).ToList();
+
+    public bool TryExecuteOnEntry(string id, Action<GameObject> action) {
+      if (Contains(id)) {
+        action.Invoke(GetPrefab(id));
+        return true;
+      }
+      return false;
+    }
+
+    public bool TryExecuteOnAll(Action<GameObject> action) {
+      foreach (var entry in Entries) {
+        if (!TryExecuteOnEntry(entry.id, action)) {
+          return false;
+        }
+      }
+      return true;
+    }
   }
 
   [Serializable]

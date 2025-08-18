@@ -24,10 +24,10 @@ namespace GMTK {
       //AddGameEventListeners();
     }
 
-    protected override void OnDisable() {
-      base.OnDisable();
-      //RemoveGameEventListeners();
-    }
+    //protected override void OnDisable() {
+    //  base.OnDisable();
+    //  RemoveGameEventListeners();
+    //}
 
     /// <summary>
     /// Overrides the default method to add support of history of previous GameState changes.
@@ -41,36 +41,6 @@ namespace GMTK {
     }
 
     #region Add/Remove Transitions
-
-    //private void AddGameEventListeners() {
-    //  var eventChannel = Game.Context.EventsChannel;
-    //  //Add here any GameEvent that should trigger a GameStateChange
-    //  eventChannel.AddListener(GameEventType.GameStarted, HandleStartGame);
-    //  eventChannel.AddListener(GameEventType.LevelStart, HandleLevelStart);
-    //  eventChannel.AddListener(GameEventType.LevelPlay, HandleLevelPlay);
-    //  eventChannel.AddListener(GameEventType.LevelReset, HandleLevelReset);
-    //  eventChannel.AddListener(GameEventType.LevelCompleted, HandleLevelComplete);
-    //  eventChannel.AddListener(GameEventType.GameOver, HandleGameOver);
-    //  eventChannel.AddListener(GameEventType.EnterOptions, HandleEnterOptions);
-    //  eventChannel.AddListener(GameEventType.ExitOptions, HandleEnterOptions);
-    //  eventChannel.AddListener(GameEventType.EnterPause, HandleEnterPause);
-    //  eventChannel.AddListener(GameEventType.ExitPause, HandleExitPause);
-    //}
-
-    //private void RemoveGameEventListeners() {
-    //  var eventChannel = Game.Context.EventsChannel;
-    //  eventChannel.RemoveListener(GameEventType.GameStarted, HandleStartGame);
-    //  eventChannel.RemoveListener(GameEventType.LevelStart, HandleLevelStart);
-    //  eventChannel.RemoveListener(GameEventType.LevelPlay, HandleLevelPlay);
-    //  eventChannel.RemoveListener(GameEventType.LevelReset, HandleLevelReset);
-    //  eventChannel.RemoveListener(GameEventType.LevelCompleted, HandleLevelComplete);
-    //  eventChannel.RemoveListener(GameEventType.GameOver, HandleGameOver);
-    //  eventChannel.RemoveListener(GameEventType.EnterOptions, HandleEnterOptions);
-    //  eventChannel.RemoveListener(GameEventType.ExitOptions, HandleEnterOptions);
-    //  eventChannel.RemoveListener(GameEventType.EnterPause, HandleEnterPause);
-    //  eventChannel.RemoveListener(GameEventType.ExitPause, HandleExitPause);
-    //}
-
     private void AddDefaultTransitions() {
 
       //Add here any transition between states the game should consider valid

@@ -15,7 +15,7 @@ namespace GMTK {
   public class GameContext : MonoBehaviour {
 
     [Header("GameState Settings")]
-    [Tooltip("the gamestatemachine handles the game states")]
+    [Tooltip("the GameStateMachine handles the game states")]
     [SerializeField] protected GameStateMachine _gameStateMachine;
     [Tooltip("if true, the scene loading this manager changes the gamestate on Start. See 'StartingState' field")]
     public bool ChangeGameStateOnStart = false;
@@ -25,6 +25,8 @@ namespace GMTK {
     public bool ChangeGameStateOnEnd = false;
     [Tooltip("If 'ChangeGameStateOnEnd' is true, this is the GameState assigned before loading the next scene.")]
     public GameStates EndingState = GameStates.Gameover;
+    [Tooltip("The HandlerRegistry knows the changes needed in the game upon a game state change")]
+    public GameStateHandlerRegistry HandlerRegistry;
 
     public enum SetCurrentSceneMode { InitialScene, Always, Never }
 
@@ -64,7 +66,7 @@ namespace GMTK {
     public LevelSequence LevelSequence => _levelSequence;
     public GameEventChannel EventsChannel => _eventsChannel;
     public ScoreGateKeeper MarbleScoreKeeper => _marbleScoreKeeper;
-
+    public InputActionRegistry InputHandler => _inputRegistry;
     protected virtual void Awake() {
       EnsureComponents();
       UpdateCurrentScene();
@@ -80,7 +82,7 @@ namespace GMTK {
       string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
       // GameStateMachine : if missing, scene won't be able to change gamestates
-      _gameStateMachine = LoadIfNull("GameStateMachine",_gameStateMachine,
+      _gameStateMachine = LoadIfNull("GameStateMachine", _gameStateMachine,
         $"There is no GameStateMachine in scene {sceneName}. The scene won't be able to change game states");
 
       // _levelSequence: if missing, scene won't be able to resolve next levels
@@ -98,13 +100,14 @@ namespace GMTK {
           else {
             try {
               _inputRegistry = (InputActionRegistry)Resources.Load(InputRegistryName);
-            } catch(Exception e) {
+            }
+            catch (Exception e) {
               Debug.LogError($"Failed to load InputActionRegistry '{InputRegistryName}': {e.Message}");
-  #if UNITY_EDITOR
+#if UNITY_EDITOR
               Debug.LogWarning(e.StackTrace);
               throw e;
-  #endif
-            }       
+#endif
+            }
           }
         }
       }
@@ -133,12 +136,18 @@ namespace GMTK {
       scoreStrategy.PointsScoredInterval = 0.25f;
       scoreStrategy.PointsPerInterval = 50;
 
-      _marbleScoreKeeper.SetStrategy(scoreStrategy,transform);
+      _marbleScoreKeeper.SetStrategy(scoreStrategy, transform);
       if (ResetScoreOnLoad) {
         _marbleScoreKeeper.ResetScore();
       }
 
-      
+      HandlerRegistry = Resources.Load<GameStateHandlerRegistry>("GameStateHandlerRegistry");
+      if (HandlerRegistry == null) {
+        Debug.LogWarning($"There is no GameStateHandlerRegistry in scene {sceneName}. The scene won't be able to respond to GameState changes");
+
+      }
+      HandlerRegistry.Initialize();
+
     }
 
     #region Scene Management Methods
@@ -239,6 +248,10 @@ namespace GMTK {
     #region GameState Change Events
 
     private void AddGameEventListeners() {
+
+      //Centralized Handler for GameState changes
+      _gameStateMachine.AddListener(HandlerRegistry.HandleStateChange);
+
       //Add here any GameEvent that should trigger a GameStateChange
       _eventsChannel.AddListener(GameEventType.GameStarted, _gameStateMachine.HandleStartGame);
       _eventsChannel.AddListener(GameEventType.LevelStart, _gameStateMachine.HandleLevelStart);
@@ -253,6 +266,10 @@ namespace GMTK {
     }
 
     private void RemoveGameEventListeners() {
+
+      //Centralized Handler for GameState changes
+      _gameStateMachine.RemoveListener(HandlerRegistry.HandleStateChange);
+
       var eventChannel = Game.Context.EventsChannel;
       _eventsChannel.RemoveListener(GameEventType.GameStarted, _gameStateMachine.HandleStartGame);
       _eventsChannel.RemoveListener(GameEventType.LevelStart, _gameStateMachine.HandleLevelStart);
@@ -269,7 +286,7 @@ namespace GMTK {
 
     #endregion
 
-    private T LoadIfNull<T>(string resourceName, T resource, string messageIfNotFound="Not Found") where T: ScriptableObject {
+    private T LoadIfNull<T>(string resourceName, T resource, string messageIfNotFound = "Not Found") where T : ScriptableObject {
       if (resource != null) return resource;
       if (string.IsNullOrEmpty(resourceName)) {
         Debug.LogWarning($"Can't load Resource with null or empty 'resourceName'");
@@ -290,6 +307,12 @@ namespace GMTK {
 #endif
         return default;
       }
+    }
+
+    [ContextMenu("Force Reinitialize GameStateHandlerRegistry")]
+    private void ForceReinitialize() {
+      _gameStateMachine.RemoveListener(HandlerRegistry.HandleStateChange);
+      HandlerRegistry.Initialize();
     }
   }
 }

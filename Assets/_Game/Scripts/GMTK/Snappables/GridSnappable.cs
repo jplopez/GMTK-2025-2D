@@ -79,8 +79,7 @@ namespace GMTK {
 
     // Ensure highlight sprites are initialized
     private void Start() {
-      Debug.Log($"[GridSnappable] {name} using SnapTransform: {SnapTransform.name}");
-
+      //Debug.Log($"[GridSnappable] {name} using SnapTransform: {SnapTransform.name}");
       InitializeAllSnappableComponents();
     }
 
@@ -141,14 +140,8 @@ namespace GMTK {
     }
 
     private void InitGridSnappable() {
-
       //hide existing highlight
       if (HighlightModel != null) HighlightModel.SetActive(false);
-
-      //if not draggable we freeze movements in X and Y 
-      if (!Draggable) {
-        //rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
-      }
 
       if (Model.gameObject.TryGetComponent(out PolygonCollider2D collider)) {
         _collider = collider;
@@ -278,7 +271,7 @@ namespace GMTK {
     }
 
     public void ResetSnappable() {
-      Debug.Log($"ResetSnappable {name}");
+      //Debug.Log($"ResetSnappable {name}");
       SnapTransform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
       SnapTransform.localScale = _initialScale;
 

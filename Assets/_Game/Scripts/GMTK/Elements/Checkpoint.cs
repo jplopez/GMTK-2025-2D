@@ -26,10 +26,6 @@ namespace GMTK {
     public Vector2 Position => transform.position;
     public string ID => checkpointID;
 
-    public delegate void MarbleCheckpointEvent(PlayableMarbleController marble, string checkpointID);
-    public static event MarbleCheckpointEvent OnMarbleEnteringCheckpoint;
-    public static event MarbleCheckpointEvent OnMarbleExitingCheckpoint;
-
     private void Awake() {
       if (!TryGetComponent<Collider2D>(out var col)) {
         Debug.LogError($"[Checkpoint] No Collider2D found on {gameObject.name}. Please add one and set it as Trigger.");
@@ -46,25 +42,23 @@ namespace GMTK {
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
+      //ignore collision if the game isn't on playing state
+      if (Game.Context.CurrentGameState != GameStates.Playing) return;
+
       if (TryGetPlayableMarble(other, out PlayableMarbleController marble))
-        OnMarbleEnteringCheckpoint?.Invoke(marble, ID);
-      if (CueMode == VisualCueMode.OnEnter || CueMode == VisualCueMode.Always) {
-        ActivateVisualCue();
-      }
-      else {
-        ActivateVisualCue(false);
-      }
+        Game.Context.EventsChannel.Raise(GameEventType.EnterCheckpoint, ID);
+
+      UpdateUI();
     }
 
     private void OnTriggerExit2D(Collider2D other) {
+      //ignore collision if the game isn't on playing state
+      if (Game.Context.CurrentGameState != GameStates.Playing) return;
+
       if (TryGetPlayableMarble(other, out PlayableMarbleController marble))
-        OnMarbleExitingCheckpoint?.Invoke(marble, ID);
-      if (CueMode == VisualCueMode.OnExit || CueMode == VisualCueMode.Always) {
-        ActivateVisualCue();
-      }
-      else {
-        ActivateVisualCue(false);
-      }
+        Game.Context.EventsChannel.Raise(GameEventType.ExitCheckpoint, ID);
+
+      UpdateUI();
     }
 
     private bool TryGetPlayableMarble(Collider2D other, out PlayableMarbleController marble) {
@@ -73,6 +67,15 @@ namespace GMTK {
         marble = other.gameObject.GetComponentInParent<PlayableMarbleController>();
       }
       return (marble != null && marble.isActiveAndEnabled);
+    }
+
+    public void UpdateUI() {
+      if (CueMode == VisualCueMode.OnExit || CueMode == VisualCueMode.Always) {
+        ActivateVisualCue();
+      }
+      else {
+        ActivateVisualCue(false);
+      }
     }
 
     private void ActivateVisualCue(bool active = true) {

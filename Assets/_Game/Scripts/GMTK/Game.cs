@@ -7,14 +7,22 @@ namespace GMTK {
   /// Convenient Lookup for GameContext
   /// </summary>
   public static class Game {
-    public static GameContext Context { get; private set; }
+    public static GameContext Context {
+      get {
+        if (_context == null) Init();
+        return _context;
+      }
+      private set => _context = value;
+    }
 
-    [RuntimeInitializeOnLoadMethod]
+    private static GameContext _context;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Init() {
-      if (Context != null) return;
+      if (_context != null) return;
 
       try {
-        Context = GameObject.FindAnyObjectByType<GameContext>();
+        _context = GameObject.FindAnyObjectByType<GameContext>();
       }
       catch (Exception ex) {
         Debug.LogError($"GameContext failed to load in scene '{SceneManager.GetActiveScene().name}'.");
@@ -27,7 +35,7 @@ namespace GMTK {
 #endif      
       }
 
-        if (Context == null) {
+      if (_context == null) {
         Debug.LogError($"GameContext not found in scene '{SceneManager.GetActiveScene().name}'.");
         Debug.LogError("GameContext is missing. Make sure a GameContext MonoBehaviour exists in the active scene or is loaded via addressables.");
 #if UNITY_EDITOR

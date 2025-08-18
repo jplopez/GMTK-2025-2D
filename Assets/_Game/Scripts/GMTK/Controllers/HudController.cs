@@ -17,8 +17,6 @@ namespace GMTK {
   /// </summary>
   public class HudController : MonoBehaviour {
 
-    [SerializeField] private HUD hudSO;
-
     [Header("Score")]
     [Tooltip("The TMP text field to display the score value")]
     [SerializeField] protected TMP_Text scoreText;
@@ -39,70 +37,73 @@ namespace GMTK {
     [Tooltip("WIP - pending Feel integration")]
     public GameObject ResetFeedback;
 
-    protected GameEventChannel _eventChannel;
+    protected HUD _hud;
+    
     private void Awake() {
 
-      if (_eventChannel == null) {
-        _eventChannel = Resources.Load<GameEventChannel>("GameEventChannel");
-      }
-      if (hudSO == null) {
-        hudSO = Resources.Load<HUD>("HUD");
+      if (_hud == null) {
+        _hud = Game.Context.Hud;
       }
       var scoreStrategy = gameObject.AddComponent<TimeBasedScoreCalculator>();
-      hudSO.MarbleScoreKeeper.SetStrategy(scoreStrategy, transform);
-      UpdateScoreText(hudSO.MarbleScoreKeeper.GetScore());
+      _hud.MarbleScoreKeeper.SetStrategy(scoreStrategy, transform);
+      UpdateScoreText(_hud.MarbleScoreKeeper.GetScore());
 
       PlayButton.onClick.AddListener(HandlePlayButtonClick);
       ResetButton.onClick.AddListener(HandleResetButtonClick);
-      Game.Context.StateMachine.AddListener(HandleChangeState);
     }
 
     private void OnDestroy() {
       PlayButton.onClick.RemoveListener(HandlePlayButtonClick);
       ResetButton.onClick.RemoveListener(HandleResetButtonClick);
-      Game.Context.RemoveStateChangeListener(HandleChangeState);
     }
 
     private void Update() {
-      if (hudSO != null) {
-        ShowPlayback(hudSO.ShowPlaybackButtons);
-        EnablePlayback(hudSO.ShowPlaybackButtons);
-      }
-      UpdateScoreText(hudSO.MarbleScoreKeeper.GetScore());
+      UpdateScoreText(_hud.MarbleScoreKeeper.GetScore());
     }
 
-    public void UpdateUI(GameStates gameState) {
+    public void UpdateUIFromGameState(GameStates gameState) {
       switch (gameState) {
         case GameStates.Preparation:
-          ShowPlayback(true);
-          EnablePlayback(true);
+          //ShowPlayback(true);
+          PlayButton.enabled = true;
+          PlayButton.interactable = true;
+          ResetButton.enabled = false;
+          ResetButton.interactable = false;
           break;
         case GameStates.Playing:
+          //ShowPlayback(true);
+          PlayButton.enabled = false;
+          PlayButton.interactable = false;
+          ResetButton.enabled = true;
+          ResetButton.interactable = true;
+          break;
         case GameStates.Reset:
-          ShowPlayback(true);
-          EnablePlayback(false);
+          PlayButton.enabled = true;
+          PlayButton.interactable = true;
+          ResetButton.enabled = true;
+          ResetButton.interactable = true;
+          
+          //Uncomment the LevelStart event for testing only.
+          //For now, reset only moves elements back to its initial place in the level
+          //and moves marble back to starting point. In the future, reset 
+          //could trigger animations or other feedbacks.
+
+          Game.Context.EventsChannel.Raise(GameEventType.LevelStart);
+          break;
+        case GameStates.Pause:
+        case GameStates.Options:
+          PlayButton.enabled = false;
+          PlayButton.interactable = false;
+          ResetButton.enabled = false;
+          ResetButton.interactable = false;
           break;
       }
-    }
-
-    public void ShowPlayback(bool show) {
-      PlayButton.gameObject.SetActive(show);
-      ResetButton.gameObject.SetActive(show);
-    }
-    public void EnablePlayback(bool enable) {
-      PlayButton.interactable = enable;
-      ResetButton.interactable = enable;
-    }
-
-    public void HandleChangeState(StateMachineEventArg<GameStates> eventArg) {
-      if (eventArg == null) return;
-      UpdateUI(eventArg.ToState);
     }
 
     private void HandlePlayButtonClick() {
       //ensure the button only triggers logic if in the correct state.
       if (Game.Context.CanTransitionTo(GameStates.Playing)) {
-        _eventChannel.Raise(GameEventType.LevelPlay);
+        Game.Context.EventsChannel.Raise(GameEventType.LevelPlay);
         // Optional: local feedback
       }
     }
@@ -110,7 +111,7 @@ namespace GMTK {
     private void HandleResetButtonClick() {
       //ensure the button only triggers logic if in the correct state.
       if (Game.Context.CanTransitionTo(GameStates.Reset)) {
-        _eventChannel.Raise(GameEventType.LevelReset);
+        Game.Context.EventsChannel.Raise(GameEventType.LevelReset);
         // Optional: local feedback
       }
     }

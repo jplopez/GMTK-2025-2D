@@ -10,7 +10,8 @@ namespace Ameba {
       Int,
       Bool,
       Float,
-      String
+      String,
+      EventArg
     }
 
     private Dictionary<Tenum, Action> voidEvents = new();
@@ -18,6 +19,7 @@ namespace Ameba {
     private Dictionary<Tenum, Action<bool>> boolEvents = new();
     private Dictionary<Tenum, Action<float>> floatEvents = new();
     private Dictionary<Tenum, Action<string>> stringEvents = new();
+    private Dictionary<Tenum, Action<EventArgs>> eventArgsEvents = new();
 
     // Add Listener
     public void AddListener(Tenum type, Action callback) {
@@ -45,6 +47,11 @@ namespace Ameba {
       stringEvents[type] += callback;
     }
 
+    public void AddListener(Tenum type, Action<EventArgs> callback) {
+      if (!eventArgsEvents.ContainsKey(type)) eventArgsEvents[type] = null;
+      eventArgsEvents[type] += callback;
+    }
+
     // Remove Listener
     public void RemoveListener(Tenum type, Action callback) {
       if (voidEvents.ContainsKey(type)) voidEvents[type] -= callback;
@@ -66,6 +73,9 @@ namespace Ameba {
       if (stringEvents.ContainsKey(type)) stringEvents[type] -= callback;
     }
 
+    public void RemoveListener(Tenum type, Action<EventArgs> callback) {
+      if (eventArgsEvents.ContainsKey(type)) eventArgsEvents[type] -= callback;
+    }
     // Raise Event
     public void Raise(Tenum type) {
       voidEvents.TryGetValue(type, out var callback);
@@ -91,5 +101,11 @@ namespace Ameba {
       stringEvents.TryGetValue(type, out var callback);
       callback?.Invoke(value);
     }
+
+    public void Raise(Tenum type, EventArgs value) {
+      eventArgsEvents.TryGetValue(type, out var callback);
+      callback?.Invoke(value);
+    }
+  
   }
 }

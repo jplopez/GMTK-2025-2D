@@ -19,7 +19,7 @@ namespace GMTK {
     [ContextMenu("Toggle Tutorial Boxes")]
     public void Toggle() => ToggleTutorialBoxes(!_showingTutorialBoxes);
 
-    private void ToggleTutorialBoxes(bool state) {
+    public void ToggleTutorialBoxes(bool state) {
       foreach (var box in tutorialBoxes) {
         box.gameObject.SetActive(state);
       }

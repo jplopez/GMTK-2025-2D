@@ -1,12 +1,9 @@
 using System.Collections.Generic;
-using Unity.Android.Gradle;
-
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
-
 
 namespace GMTK {
 
@@ -32,6 +29,10 @@ namespace GMTK {
     [Tooltip("the offset of the tiled sprite to match the grid Gizmo")]
     [SerializeField] protected Vector2 _spriteOffset = Vector2.zero;
 
+    [Header("Input Handler")]
+    [Tooltip("Reference to the InputHandler detecting moving elements")]
+    [SerializeField] protected SnappableInputHandler _inputHandler;
+
     [Header("Gizmos")]
     [SerializeField] private bool enableGizmos = true;
 
@@ -46,9 +47,15 @@ namespace GMTK {
     [SerializeField] private Color freeColor = Color.green;
     [SerializeField] private Color textColor = Color.white;
     [SerializeField] private float gizmoSize = 0.9f;
-    [SerializeField] private Vector2 occupancyOffset = new(0,0);
+    [SerializeField] private Vector2 occupancyOffset = new(0, 0);
 
     protected GridOccupancyMap _occupancyMap;
+
+    protected GridSnappable _currentSelected;
+    protected Vector2 _elementOriginalWorldPosition;
+    protected Vector2Int _elementOriginalGridPosition;
+    protected bool _elementWasInGrid;
+    protected bool _isTrackingMovement;
 
     const string TOP_BOUND_TAG = "TopBound";
     const string BOTTOM_BOUND_TAG = "BottomBound";
@@ -58,6 +65,9 @@ namespace GMTK {
     const int MIN_GRID_SIZE = 4;
     const int MAX_GRID_SIZE = 100;
 
+    public static Vector3 ELEMENT_DEFAULT_POSITION = new(-10, 0, 0);
+
+    #region Monobehavior Methods
     public virtual void Awake() => AddInputListeners();
     public virtual void OnDestroy() => RemoveInputListeners();
     public void Start() => Initialize();
@@ -66,11 +76,22 @@ namespace GMTK {
       GridSize.x = Mathf.Clamp(GridSize.x, MIN_GRID_SIZE, MAX_GRID_SIZE);
       GridSize.y = Mathf.Clamp(GridSize.y, MIN_GRID_SIZE, MAX_GRID_SIZE);
     }
+    private void Update() {
+      TrackElementMovement();
+    }
+
+    #endregion
 
 
     #region Initialization
 
     protected virtual void Initialize() {
+
+      if (_inputHandler == null) {
+        Debug.LogWarning($"LevelGrid: SnappableInputHandler is missing. LevelGrid will not be able to track player inputs on Elements");
+        return;
+      }
+
       InitializeGrid();
       InitializeAllEdgeColliderBounds();
       UpdateAllEdgeColliderBoundPoints();
@@ -172,7 +193,7 @@ namespace GMTK {
       foreach (var snappable in allSnappables) {
         if (IsInsidePlayableArea(snappable.transform.position)) {
           snappable.transform.position = SnapToGrid(snappable.transform.position);
-          snappable.Draggable=false;
+          snappable.Draggable = false;
           var gridOrigin = WorldToGrid(snappable.transform.position);
           _occupancyMap.Register(snappable, gridOrigin);
         }
@@ -180,41 +201,157 @@ namespace GMTK {
       _gridSprite = (_gridSprite == null) ? GetComponent<SpriteRenderer>() : _gridSprite;
     }
 
-
     #endregion
 
 
-    #region Event Handlers
+    #region Track Element Movements
 
+    private void TrackElementMovement() {
+      // Check if input handler has an element moving
+      if (_inputHandler.Current != null && _inputHandler.IsMoving) {
+        var currentElement = _inputHandler.Current;
 
-    /// <summary>
-    /// If the dropped element is in the playable area, the LevelGrid snaps it
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    protected virtual void HandleElementDropped(object sender, GridSnappableEventArgs e) {
-      var element = e.Element;
-      var gridOrigin = WorldToGrid(element.transform.position);
+        // If this is a new element being tracked, stop tracking current
+        // and begin tracking new
+        // otherwise, we are still tracking the same Element
+        if (_currentSelected == null || _currentSelected != currentElement) {
+          StopTrackingCurrentSelected();
+          StartTrackingElement(currentElement);
+        } 
 
-      if (CanPlace(element, gridOrigin)) {
-        Debug.Log($"Placing element {element.name} at {gridOrigin}");
-        //if element is already in grid, we need to register first
-        //to clean previous marked cells
-        if(_occupancyMap.ContainsSnappable(element)) {
-          _occupancyMap.Unregister(element, gridOrigin);
+      } else {
+        //inputhandler is not moving and we are tracking -> we need to stop tracking currentSelected
+        if (_isTrackingMovement) {
+          StopTrackingCurrentSelected();
         }
-
-        element.transform.position = SnapToGrid(gridOrigin);
-        _occupancyMap.Register(element, gridOrigin);
-      }
-      else {
-        //TODO element.ReturnToPreviousPosition();
-        Debug.Log($"Can't place element {element.name} at {gridOrigin}");
       }
     }
 
-    //TODO in the future I might apply UI controls on touch/click
-    protected virtual void HandleElementSelected(object sender, GridSnappableEventArgs e) { }
+    private void StartTrackingElement(GridSnappable element) {
+      _currentSelected = element;
+      _isTrackingMovement = true;
+
+      // Store original position and check if it was in the grid
+      var currentPosition = element.transform.position;
+      _elementWasInGrid = _occupancyMap.ContainsSnappable(element);
+
+      if (_elementWasInGrid) {
+        _elementOriginalGridPosition = WorldToGrid(currentPosition);
+        // Unregister from grid while moving to avoid conflicts
+        _occupancyMap.Unregister(element, _elementOriginalGridPosition);
+        Debug.Log($"[LevelGrid] Started tracking '{element.name}' - unregistered from ({_elementOriginalGridPosition})");
+      }
+      else {
+        Debug.Log($"[LevelGrid] Started tracking '{element.name}' - was not in grid");
+      }
+
+      // Notify DragFeedbackComponent to start visual feedback
+      if (element.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
+        dragFeedback.StartDragFeedback();
+      }
+    }
+
+    private void StopTrackingCurrentSelected() {
+      // Notify DragFeedbackComponent to stop visual feedback
+      if (_currentSelected != null) {
+        if (_currentSelected.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
+          dragFeedback.StopDragFeedback();
+        }
+      }
+      _currentSelected = null;
+      _isTrackingMovement = false;
+      _elementWasInGrid = false;
+    }
+
+    //private void UpdateMovementFeedback(GridSnappable element) {
+    //  // Optional: Add visual feedback while dragging
+    //  var currentGridPos = WorldToGrid(element.transform.position);
+    //  bool canPlaceHere = IsInsidePlayableArea(element.transform.position) && CanPlace(element, currentGridPos);
+    //  Debug.Log($"[LevelGrid] movement feedback for {element.name}");
+    //  // You could change the element's highlight color based on canPlaceHere
+    //  element.SetValidDropZone(canPlaceHere);
+    //}
+
+    #endregion
+
+    #region Event Handlers
+
+    protected virtual void HandleElementSelected(object sender, GridSnappableEventArgs e) {
+      // This now just collects element initial world and grid positions - tracking starts in Update()
+      if (e.Element != null) {
+        //_currentSelected = e.Element;
+        _elementOriginalWorldPosition = e.Element.transform.position;
+        _elementWasInGrid = _occupancyMap.ContainsSnappable(e.Element);
+        if (_elementWasInGrid) {
+          _elementOriginalGridPosition = WorldToGrid(_elementOriginalWorldPosition);
+        }
+        Debug.Log($"Element '{e.Element.name}' selected at {_elementOriginalWorldPosition}");
+        if (_elementWasInGrid) Debug.Log($"Element '{e.Element.name}' at grid {_elementOriginalGridPosition}");
+        e.Element.OnPointerOver();
+      }
+    }
+
+    protected virtual void HandleElementDropped(object sender, GridSnappableEventArgs e) {
+      var element = e.Element;
+      var newGridOrigin = WorldToGrid(element.transform.position);
+
+      // Try to place at new position
+      if (IsInsidePlayableArea(element.transform.position)) {
+
+        // Success - place at new position
+        if (CanPlace(element, newGridOrigin)) {
+          element.transform.position = SnapToGrid(newGridOrigin);
+          _occupancyMap.Register(element, newGridOrigin);
+          Debug.Log($"Placed {element.name} at {newGridOrigin}");
+        }
+        else {
+          // Failed to place - return to original position if it was in grid
+          if (_elementWasInGrid) {
+            element.transform.position = SnapToGrid(_elementOriginalGridPosition);
+            _occupancyMap.Register(element, _elementOriginalGridPosition);
+            Debug.Log($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
+          }
+          // Element came from outside grid - return to inventory
+          else {
+            HandleElementReturnToInventory(element);
+            Debug.Log($"Returned {element.name} to inventory");
+          }
+        }
+
+        // Check if this was the element we were tracking
+        if (element == _currentSelected) {
+          Debug.Log($"Dropping tracked element '{element.name}' at {newGridOrigin}");
+          // Clean up tracking
+          StopTrackingCurrentSelected();
+        }
+        else {
+          // Element wasn't being tracked (probably just clicked)
+          Debug.Log($"Element '{element.name}' clicked but not moved");
+        }
+      }
+    }
+
+    //TODO refactor when Inventory is implemented
+    private void HandleElementReturnToInventory(GridSnappable element) {
+      // Find inventory zone or return to a default position
+      var inventoryZone = GameObject.Find("InventoryZone");
+      if (inventoryZone != null) {
+        // Position randomly within inventory zone to avoid overlap
+        var bounds = new Bounds(inventoryZone.transform.position, Vector3.one);
+        if (inventoryZone.TryGetComponent<Collider2D>(out var collider)) {
+          bounds = collider.bounds;
+        }
+        var randomOffset = new Vector3(
+            Random.Range(-bounds.size.x * 0.4f, bounds.size.x * 0.4f),
+            Random.Range(-bounds.size.y * 0.4f, bounds.size.y * 0.4f),
+            0);
+        element.transform.position = bounds.center + randomOffset;
+      }
+      else {
+        // Fallback: move to a default position
+        element.transform.position = ELEMENT_DEFAULT_POSITION;
+      }
+    }
 
     // To decouple GridSnappable behaviour from the grid, this method only notifies the GridSnappable to handle the 'unhover'
     //that way we prevent from polling the mouse position from snappables on Update
@@ -268,7 +405,7 @@ namespace GMTK {
     /// </summary>
     /// <param name="position"></param>
     /// <returns>Vector2Int with the Grid coordinates that correspons</returns>
-    protected virtual Vector2Int WorldToGrid(Vector2 position) {
+    public virtual Vector2Int WorldToGrid(Vector2 position) {
       return GetGridIndex(position);
     }
 

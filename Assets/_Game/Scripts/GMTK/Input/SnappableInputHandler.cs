@@ -1,12 +1,14 @@
+using Ameba;
+using Ameba.Input;
 using System;
+using Unity.Android.Gradle;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Ameba.Input;
 
 namespace GMTK {
 
   /// <summary>
-  /// Handles player input for <see cref="GridSnappable"/> objects, enabling selection, dragging, rotation, and flipping.
+  /// MonoBehaviour to handle player input for <see cref="GridSnappable"/> objects, enabling selection, dragging, rotation, and flipping.
   /// 
   /// <para><b>Events:</b></para>
   /// <list type="bullet">
@@ -31,12 +33,31 @@ namespace GMTK {
     private Vector2 _pointerScreenPos;
     private Vector3 _pointerWorldPos;
 
+    protected bool DisableDragging = false;
+
     // Declare events using EventHadler<GridSnappableEventArgs>
     public static event EventHandler<GridSnappableEventArgs> OnElementHovered;
     public static event EventHandler<GridSnappableEventArgs> OnElementUnhovered;
     public static event EventHandler<GridSnappableEventArgs> OnElementSelected;
     public static event EventHandler<GridSnappableEventArgs> OnElementDropped;
     public static event EventHandler<GridSnappableEventArgs> OnElementSecondary;
+
+    //The element dragging is disabled during Playing, to prevent players
+    //from moving elements while the level is running
+    //In the future, this might not be always the case, which is why
+    //this specific encapsulation
+    public void UpdateFromGameState(GameStates state) {
+      switch (state) {
+        case GameStates.Preparation:
+          DisableDragging = false;
+          break;
+        case GameStates.Playing:
+          DisableDragging = true;
+          break;
+      }
+    }
+
+    #region InputHandler methods
 
     [InputHandler("PointerPosition")]
     public void HandlePointer(InputAction.CallbackContext context) {
@@ -55,6 +76,7 @@ namespace GMTK {
 
     [InputHandler("Select", InputActionPhase.Performed, InputActionPhase.Canceled)]
     public void HandleSelect(InputAction.CallbackContext context) {
+      Game.Context.EventsChannel.Raise(GameEventType.InputSelected);
       switch (context.phase) {
         case InputActionPhase.Performed: BeginMovingElement(); break;
         case InputActionPhase.Canceled: EndMovingElement(); break;
@@ -64,22 +86,35 @@ namespace GMTK {
     [InputHandler("Secondary")]
     public void HandleSecondary(InputAction.CallbackContext context) {
       Debug.Log("SnappableInputHandler.HandleSecondary : Not implemented yet");
+      Game.Context.EventsChannel.Raise(GameEventType.InputSecondary);
     }
 
     [InputHandler("RotateCW", InputActionPhase.Started)]
-    public void RotateCW(InputAction.CallbackContext context) => TryExecuteOnCurrentElement(e => e.RotateClockwise());
-
+    public void RotateCW(InputAction.CallbackContext context) {
+      Game.Context.EventsChannel.Raise(GameEventType.InputRotateCW);
+      TryExecuteOnCurrentElement(e => e.RotateClockwise());
+    }
 
     [InputHandler("RotateCCW", InputActionPhase.Started)]
-    public void RotateCCW(InputAction.CallbackContext context) => TryExecuteOnCurrentElement(e => e.RotateCounterClockwise());
-
+    public void RotateCCW(InputAction.CallbackContext context) {
+      Game.Context.EventsChannel.Raise(GameEventType.InputRotateCCW);
+      TryExecuteOnCurrentElement(e => e.RotateCounterClockwise());
+    }
 
     [InputHandler("FlipX", InputActionPhase.Started)]
-    public void FlipX(InputAction.CallbackContext context) => TryExecuteOnCurrentElement(e => e.FlipX());
-
+    public void FlipX(InputAction.CallbackContext context) {
+      Game.Context.EventsChannel.Raise(GameEventType.InputFlippedX);
+      TryExecuteOnCurrentElement(e => e.FlipX());
+    }
 
     [InputHandler("FlipY", InputActionPhase.Started)]
-    public void FlipY(InputAction.CallbackContext context) => TryExecuteOnCurrentElement(e => e.FlipY());
+    public void FlipY(InputAction.CallbackContext context) {
+      Game.Context.EventsChannel.Raise(GameEventType.InputFlippedY);
+      TryExecuteOnCurrentElement(e => e.FlipY());
+    }
+
+    #endregion
+
 
     #region MonoBehaviour methods
 
@@ -100,7 +135,9 @@ namespace GMTK {
           _lastElementOver = element;
           _lastElementOver.OnPointerOver();
           RaiseEvent(OnElementHovered, _lastElementOver);
-          Debug.Log($"OnElementHovered: {_lastElementOver.name}");
+          Game.Context.EventsChannel.Raise(GameEventType.ElementHovered, 
+              new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos));
+          //Debug.Log($"OnElementHovered: {_lastElementOver.name}");
         }
       }
       //no element, means we have unhover the lastElementOver
@@ -111,15 +148,19 @@ namespace GMTK {
       if (_lastElementOver != null && IsOverElement) {
         _lastElementOver.OnPointerOut();
         RaiseEvent(OnElementUnhovered, _lastElementOver);
-        Debug.Log($"OnElementUnhovered: {_lastElementOver.name}");
+        Game.Context.EventsChannel.Raise(GameEventType.ElementUnhovered, 
+            new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos));
+        //Debug.Log($"OnElementUnhovered: {_lastElementOver.name}");
         _lastElementOver = null;
         IsOverElement = false;
       }
     }
 
     private void RaiseEvent(EventHandler<GridSnappableEventArgs> evt, GridSnappable element) {
-      //Debug.Log($"SnappableInputHandler:RaiseEvent {nameof(evt)}. Element: {element.name}");
-      evt?.Invoke(this, new GridSnappableEventArgs(element, _pointerScreenPos));
+      //Debug.Log($"SnappableInputHandler:RaiseEvent {nameof(evt)}. Element: {element.name;}");
+      var payload = new GridSnappableEventArgs(element, _pointerScreenPos);
+      evt?.Invoke(this, payload);
+      //Game.Context.EventsChannel.Raise(GameEventType.Input, payload);
     }
 
     private void RaiseEventOrException(EventHandler<GridSnappableEventArgs> evt, GridSnappable element) {
@@ -142,10 +183,12 @@ namespace GMTK {
 
     private void BeginMovingElement() {
       if (TryGetElementOnCurrentPointer(out GridSnappable selectedElement)) {
-        if (selectedElement.Draggable) {
+        if (!DisableDragging && selectedElement.Draggable) {
           _currentElement = selectedElement;
           IsMoving = true;
           RaiseEvent(OnElementSelected, _currentElement);
+          Game.Context.EventsChannel.Raise(GameEventType.ElementSelected, 
+              new GridSnappableEventArgs(_currentElement, _pointerScreenPos));
         }
       }
     }
@@ -153,6 +196,8 @@ namespace GMTK {
     private void EndMovingElement() {
       if (_currentElement != null) {
         RaiseEvent(OnElementDropped, _currentElement);
+        Game.Context.EventsChannel.Raise(GameEventType.ElementDropped, 
+            new GridSnappableEventArgs(_currentElement, _pointerScreenPos));
         _currentElement = null;
         IsMoving = false;
       }

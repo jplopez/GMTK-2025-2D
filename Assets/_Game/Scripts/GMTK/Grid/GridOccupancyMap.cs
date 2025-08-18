@@ -14,7 +14,7 @@ namespace GMTK {
   }
 
   /// <summary>
-  /// Represents the current occupancy of cells within a LevelGrid
+  /// Represents the current occupancy of cellsToRemove within a LevelGrid
   /// Supports having multiple elements per cell, and Layer Order <c>CellLayeringOrder</c>
   /// </summary>
   public class GridOccupancyMap {
@@ -49,28 +49,30 @@ namespace GMTK {
         if (occupancyCell.HasReachedMaxOccupancy) return false;
         cells.Add(occupancyCell);
       }
-      //if foreach finishes, it means all cells are available so we assign the snappable to them
+      //if foreach finishes, it means all cellsToRemove are available so we assign the snappable to them
       cells.ForEach(c => c.Add(snappable));
       _occupantFootprint.Add(snappable, snappable.GetFootprint());
       //Debug.Log($"Snappable {snappable.name} registered:");
-      //cells.ForEach(c => Debug.Log($"  {c}"));
+      //cellsToRemove.ForEach(c => Debug.Log($"  {c}"));
       return true;
     }
 
     public virtual void Unregister(GridSnappable snappable, Vector2Int origin) {
-      List<OccupancyCell> cells = new();
-      foreach (Vector2Int snappableIndex in snappable.GetWorldOccupiedCells(origin)) {
+      List<OccupancyCell> cellsToRemove = new();
+      var occupiedCells = //snappable.GetWorldOccupiedCells(origin);
+                            _occupancy.Where(cell => cell.Value.Count > 0 && cell.Value.Contains(snappable)).Select(pair => pair.Key).ToList();
+      foreach (Vector2Int snappableIndex in occupiedCells) {
        if(_occupancy.TryGetValue(snappableIndex, out OccupancyCell occupancyCell)) {
-          cells.Add(occupancyCell);
+          cellsToRemove.Add(occupancyCell);
         }
       }
-      if(cells.Count != snappable.GetFootprint().Count) {
-        Debug.LogWarning($"Unregister: number of cells to remove doesn't match snappable footprint: {cells.Count} != {snappable.GetFootprint().Count}");
+      if(cellsToRemove.Count != snappable.GetFootprint().Count) {
+        Debug.LogWarning($"Unregister: number of cellsToRemove to remove doesn't match snappable footprint: {cellsToRemove.Count} != {snappable.GetFootprint().Count}");
       }
-      cells.ForEach(c => c.Remove(snappable));
+      cellsToRemove.ForEach(c => c.Remove(snappable));
       _occupantFootprint.Remove(snappable);
       //Debug.Log($"Snappable {snappable.name} unregistered:");
-      //cells.ForEach(c => Debug.Log($"  {c}"));
+      //cellsToRemove.ForEach(c => Debug.Log($"  {c}"));
     }
 
     #endregion
@@ -85,7 +87,7 @@ namespace GMTK {
     /// <returns></returns>
     public virtual bool HasAnyOccupants(Vector2 worldPosition) {
       var index = WorldToGrid(worldPosition);
-      return _occupancy.ContainsKey(index);
+      return _occupancy.ContainsKey(index) && _occupancy[index].HasAnyOccupant;
     }
 
     /// <summary>
