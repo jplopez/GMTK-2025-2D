@@ -45,20 +45,20 @@ namespace GMTK {
       //ignore collision if the game isn't on playing state
       if (Game.Context.CurrentGameState != GameStates.Playing) return;
 
-      if (TryGetPlayableMarble(other, out PlayableMarbleController marble))
+      if (TryGetPlayableMarble(other, out _))
         Game.Context.EventsChannel.Raise(GameEventType.EnterCheckpoint, ID);
 
-      UpdateUI();
+      ActivateVisualCue(CueMode == VisualCueMode.Always || CueMode == VisualCueMode.OnEnter);
     }
 
     private void OnTriggerExit2D(Collider2D other) {
       //ignore collision if the game isn't on playing state
       if (Game.Context.CurrentGameState != GameStates.Playing) return;
 
-      if (TryGetPlayableMarble(other, out PlayableMarbleController marble))
+      if (TryGetPlayableMarble(other, out _))
         Game.Context.EventsChannel.Raise(GameEventType.ExitCheckpoint, ID);
 
-      UpdateUI();
+      ActivateVisualCue(CueMode == VisualCueMode.Always || CueMode == VisualCueMode.OnExit);
     }
 
     private bool TryGetPlayableMarble(Collider2D other, out PlayableMarbleController marble) {
@@ -70,11 +70,16 @@ namespace GMTK {
     }
 
     public void UpdateUI() {
-      if (CueMode == VisualCueMode.OnExit || CueMode == VisualCueMode.Always) {
-        ActivateVisualCue();
-      }
-      else {
-        ActivateVisualCue(false);
+      //updates only if game is playing
+      if (Game.Context.CurrentGameState != GameStates.Playing) return;
+      //this only updates for the permanent CueModes. OnEnter/OnExit are handled on the OnTrigger* methods
+      switch (CueMode) {
+        case VisualCueMode.Always:
+          ActivateVisualCue(true); break;
+        case VisualCueMode.None:
+          ActivateVisualCue(false); break;
+        default:
+          break;
       }
     }
 

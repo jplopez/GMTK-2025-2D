@@ -15,11 +15,7 @@ namespace GMTK {
   public class GridSnappable : MonoBehaviour {
 
     public enum SnappableBodyType { Static, Interactive }
-
     public enum BehaviourDelegateType { None, Components }
-
-    [HideInInspector] public SnappableTemplate AppliedTemplate;
-
 
     [Header("Snappable Settings")]
     [Tooltip("If set, this transform will be used for snapping instead of the GameObject's transform.")]
@@ -50,11 +46,6 @@ namespace GMTK {
     [Tooltip("The feedback when the when the pointer moves out of the element.")]
     public GameObject PointerOutFeedback;
 
-
-    //public void SetStatic() => _bodyType = SnappableBodyType.Static;
-    //public bool IsStatic() => _bodyType == SnappableBodyType.Static;
-    //public void SetInteractive() => _bodyType = SnappableBodyType.Interactive;
-    //public bool IsInteractive() => _bodyType == SnappableBodyType.Interactive;
     public bool IsRegistered => _isRegistered;
 
     private Vector3 _initialPosition;
@@ -200,9 +191,6 @@ namespace GMTK {
     }
     public virtual void SetGlow(bool active) { if (HighlightModel != null) HighlightModel.SetActive(active); }
 
-    [Obsolete]
-    public virtual void SetRegistered(bool registered = true) => _isRegistered = registered;
-
     public void AddComponentListener(SnappableComponent component) => OnSnappableEvent += component.OnSnappableEvent;
 
     public void RemoveComponentListener(SnappableComponent component) => OnSnappableEvent -= component.OnSnappableEvent;
@@ -211,12 +199,28 @@ namespace GMTK {
 
     #region Transformation methods
 
+    /// <summary>
+    /// Updates the position on the Transform specified in SnapTransform
+    /// </summary>
     public void UpdatePosition(Vector3 newPos) => SnapTransform.position = newPos;
 
+    /// <summary>
+    /// Returns the rotation from the Transform specified in SnapTransform
+    /// </summary>
     public Quaternion GetRotation() => SnapTransform.rotation;
 
+    /// <summary>
+    /// Returns the position from the Transform specified in SnapTransform
+    /// </summary>
     public Vector3 GetPosition() => SnapTransform.position;
 
+    #endregion
+
+    #region Actions: rotate, flip
+
+    /// <summary>
+    /// Rotates the GridSnappable clockwise, if CanRotate is true
+    /// </summary>
     public void RotateClockwise() {
       if (CanRotate) {
         TryExecuteOrDelegateToComponents(SnappableComponentEventType.RotateCW,
@@ -226,6 +230,9 @@ namespace GMTK {
       }
     }
 
+    /// <summary>
+    /// Rotates the GridSnappable counter clockwise, if CanRotate is true
+    /// </summary>
     public void RotateCounterClockwise() {
       if (CanRotate) {
         TryExecuteOrDelegateToComponents(SnappableComponentEventType.RotateCCW,
@@ -235,6 +242,9 @@ namespace GMTK {
       }
     }
 
+    /// <summary>
+    /// Flips the GridSnappable on the X-axis (up-down), if Flippable is true
+    /// </summary>
     public void FlipX() {
       if (Flippable) {
         TryExecuteOrDelegateToComponents(SnappableComponentEventType.FlippedX,
@@ -246,6 +256,9 @@ namespace GMTK {
       }
     }
 
+    /// <summary>
+    /// Flips the GridSnappable on the Y-axis (left-right), if Flippable is true
+    /// </summary>
     public void FlipY() {
       if (Flippable) {
         TryExecuteOrDelegateToComponents(SnappableComponentEventType.FlippedY,
@@ -257,6 +270,10 @@ namespace GMTK {
       }
     }
 
+    /// <summary>
+    /// Internal method to resolve if the requested <c>Action<GridSnappable></c> (ex: flip, rotate), 
+    /// should be executed by the GridSnappable or delegated to its components
+    /// </summary>
     private void TryExecuteOrDelegateToComponents(SnappableComponentEventType eventType, Action<GridSnappable> callback) {
       switch (BehaviourDelegate) {
 
@@ -270,11 +287,13 @@ namespace GMTK {
       }
     }
 
-    public void ResetSnappable() {
+    /// <summary>
+    /// Resets the GridSnappable transform specified in SnapTransform to the initial position and rotation at the time of initialization of the component
+    /// </summary>
+    public virtual void ResetSnappable() {
       //Debug.Log($"ResetSnappable {name}");
       SnapTransform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
       SnapTransform.localScale = _initialScale;
-
       _components.ForEach(c => c.RunResetComponent());
     }
 
