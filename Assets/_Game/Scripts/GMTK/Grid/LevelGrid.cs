@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 #if UNITY_EDITOR
@@ -11,7 +12,7 @@ namespace GMTK {
 
     [Header("Grid Dimensions")]
     [Tooltip("The size in units for the cell. Recommended is 1")]
-    public float CellSize = 1f; // Matches your peg spacing
+    public float CellSize = 1f; // Matches the peg sprite spacing
     [Tooltip("World position of the center of the grid")]
     public Vector2 GridOrigin = Vector2.zero;
     [Tooltip("The number of cells in the grid. Only positive integer numbers")]
@@ -82,33 +83,36 @@ namespace GMTK {
 
     #endregion
 
-
     #region Initialization
 
     protected virtual void Initialize() {
-
       if (_inputHandler == null) {
         Debug.LogWarning($"LevelGrid: SnappableInputHandler is missing. LevelGrid will not be able to track player inputs on Elements");
         return;
       }
-
       InitializeGrid();
       InitializeAllEdgeColliderBounds();
       UpdateAllEdgeColliderBoundPoints();
     }
+    protected virtual void InitializeGrid() {
 
-    private void AddInputListeners() {
-      SnappableInputHandler.OnElementDropped += HandleElementDropped;
-      SnappableInputHandler.OnElementHovered += HandleElementHovered;
-      SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
-      SnappableInputHandler.OnElementSelected += HandleElementSelected;
-    }
+      //TODO (optional) make maxOccupantsPerCell and mode, parameters of the GridOccupancyMap
+      _occupancyMap = new GridOccupancyMap(CellSize, GridOrigin,
+        maxOccupantsPerCell: 3,
+        mode: CellLayeringOrder.LastToFirst);
 
-    private void RemoveInputListeners() {
-      SnappableInputHandler.OnElementDropped -= HandleElementDropped;
-      SnappableInputHandler.OnElementHovered -= HandleElementHovered;
-      SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
-      SnappableInputHandler.OnElementSelected -= HandleElementSelected;
+      var allSnappables = FindObjectsByType<GridSnappable>(FindObjectsSortMode.None);
+      //Snappables in the playing area at the time of initializing the grid
+      //are considered non-draggable -> player cannot move them
+      foreach (var snappable in allSnappables) {
+        if (IsInsidePlayableArea(snappable.transform.position)) {
+          snappable.transform.position = SnapToGrid(snappable.transform.position);
+          snappable.Draggable = false;
+          var gridOrigin = WorldToGrid(snappable.transform.position);
+          _occupancyMap.Register(snappable, gridOrigin);
+        }
+      }
+      _gridSprite = (_gridSprite == null) ? GetComponent<SpriteRenderer>() : _gridSprite;
     }
 
     protected virtual void InitializeAllEdgeColliderBounds() {
@@ -134,7 +138,6 @@ namespace GMTK {
 
       return boundCollider;
     }
-
     protected virtual void UpdateAllEdgeColliderBoundPoints() {
       UpdateEdgeColliderBoundPoints(GridTopBound, TOP_BOUND_TAG);
       UpdateEdgeColliderBoundPoints(GridBottomBound, BOTTOM_BOUND_TAG);
@@ -180,29 +183,46 @@ namespace GMTK {
       return boundCollider;
     }
 
-    protected virtual void InitializeGrid() {
+    #endregion
 
-      //TODO (optional) make maxOccupantsPerCell and mode, parameters of the GridOccupancyMap
-      _occupancyMap = new GridOccupancyMap(CellSize, GridOrigin,
-        maxOccupantsPerCell: 3,
-        mode: CellLayeringOrder.LastToFirst);
+    #region Event Listeners
 
-      var allSnappables = FindObjectsByType<GridSnappable>(FindObjectsSortMode.None);
-      //Snappables in the playing area at the time of initializing the grid
-      //are considered non-draggable -> player cannot move them
-      foreach (var snappable in allSnappables) {
-        if (IsInsidePlayableArea(snappable.transform.position)) {
-          snappable.transform.position = SnapToGrid(snappable.transform.position);
-          snappable.Draggable = false;
-          var gridOrigin = WorldToGrid(snappable.transform.position);
-          _occupancyMap.Register(snappable, gridOrigin);
-        }
-      }
-      _gridSprite = (_gridSprite == null) ? GetComponent<SpriteRenderer>() : _gridSprite;
+
+    private void AddInputListeners() {
+      // Input listeners TODO-> move them over to GameEventsChannel
+      //SnappableInputHandler.OnElementDropped += HandleElementDropped;
+      SnappableInputHandler.OnElementHovered += HandleElementHovered;
+      SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
+      SnappableInputHandler.OnElementSelected += HandleElementSelected;
+
+      Game.Context.EventsChannel.AddListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
+
+      // Add inventory event listeners with EventArgs wrappers
+      Game.Context.EventsChannel.AddListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
+      Game.Context.EventsChannel.AddListener(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
+      Game.Context.EventsChannel.AddListener(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
+      Game.Context.EventsChannel.AddListener(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
+    }
+
+    private void RemoveInputListeners() {
+      // Input listeners TODO-> move them over to GameEventsChannel
+      //SnappableInputHandler.OnElementDropped -= HandleElementDropped;
+      SnappableInputHandler.OnElementHovered -= HandleElementHovered;
+      SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
+      SnappableInputHandler.OnElementSelected -= HandleElementSelected;
+
+      Game.Context.EventsChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
+
+      if (Game.Context == null) return;
+      // Remove inventory event listeners
+      Game.Context.EventsChannel.RemoveListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
+      Game.Context.EventsChannel.RemoveListener(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
+      Game.Context.EventsChannel.RemoveListener(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
+      Game.Context.EventsChannel.RemoveListener(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
+
     }
 
     #endregion
-
 
     #region Track Element Movements
 
@@ -217,9 +237,10 @@ namespace GMTK {
         if (_currentSelected == null || _currentSelected != currentElement) {
           StopTrackingCurrentSelected();
           StartTrackingElement(currentElement);
-        } 
+        }
 
-      } else {
+      }
+      else {
         //inputhandler is not moving and we are tracking -> we need to stop tracking currentSelected
         if (_isTrackingMovement) {
           StopTrackingCurrentSelected();
@@ -274,7 +295,157 @@ namespace GMTK {
 
     #endregion
 
-    #region Event Handlers
+    #region Event Handler Wrappers (EventArgs -> InventoryEventData)
+    private void HandleElementDroppedWrapper(EventArgs args) {
+      if (args is GridSnappableEventArgs inventoryData) {
+        HandleElementDropped(inventoryData);
+      }
+    }
+
+    private void HandleInventoryElementAddedWrapper(EventArgs args) {
+      if (args is InventoryEventData inventoryData) {
+        HandleInventoryElementAdded(inventoryData);
+      }
+    }
+
+    private void HandleInventoryElementRetrievedWrapper(EventArgs args) {
+      if (args is InventoryEventData inventoryData) {
+        HandleInventoryElementRetrieved(inventoryData);
+      }
+    }
+
+    private void HandleInventoryOperationFailedWrapper(EventArgs args) {
+      if (args is InventoryEventData inventoryData) {
+        HandleInventoryOperationFailed(inventoryData);
+      }
+    }
+
+    private void HandleInventoryUpdatedWrapper(EventArgs args) {
+      if (args is InventoryEventData inventoryData) {
+        HandleInventoryUpdated(inventoryData);
+      }
+    }
+
+    #endregion
+
+    #region Enhanced Inventory Event Handlers
+
+    // Enhanced HandleElementReturnToInventory with richer context
+    protected virtual void HandleElementReturnToInventory(GridSnappable element) {
+
+      // Create rich event data with context
+      var eventData = InventoryEventData.CreateAddRequest(element, "LevelGrid")
+          .WithContext(
+              wasInGrid: _occupancyMap.ContainsSnappable(element),
+              wasInInventory: false  // We know it's coming from grid
+          );
+
+      // Request inventory to add this element
+      Game.Context.EventsChannel.Raise(GameEventType.InventoryAddRequest, eventData);
+      Debug.Log($"[LevelGrid] Requested inventory to add {element.name} with context");
+
+      //else {
+      //  // Fallback to old positioning system
+      //  HandleElementReturnToInventoryFallback(element);
+      //}
+    }
+
+    private void HandleElementReturnToInventoryFallback(GridSnappable element) {
+      var inventoryZone = GameObject.Find("InventoryZone");
+      if (inventoryZone != null) {
+        var bounds = new Bounds(inventoryZone.transform.position, Vector3.one);
+        if (inventoryZone.TryGetComponent<Collider2D>(out var collider)) {
+          bounds = collider.bounds;
+        }
+        var randomOffset = new Vector3(
+            UnityEngine.Random.Range(-bounds.size.x * 0.4f, bounds.size.x * 0.4f),
+            UnityEngine.Random.Range(-bounds.size.y * 0.4f, bounds.size.y * 0.4f),
+            0);
+        element.transform.position = bounds.center + randomOffset;
+        Debug.Log($"[LevelGrid] Used fallback positioning for {element.name}");
+      }
+      else {
+        element.transform.position = ELEMENT_DEFAULT_POSITION;
+      }
+    }
+
+    protected virtual void HandleInventoryElementAdded(InventoryEventData data) {
+      if (data.Success) {
+        Debug.Log($"[LevelGrid] Element successfully added to inventory: {data.ElementName} " +
+                 $"(Available: {data.AvailableQuantity}/{data.TotalQuantity}) from {data.SourceSystem}");
+
+        // Element was successfully added to inventory and destroyed by LevelInventory
+        // We can use the rich context for additional logic
+        if (data.WasInGrid) {
+          Debug.Log($"[LevelGrid] Element was moved from grid to inventory");
+        }
+      }
+      else {
+        Debug.LogWarning($"[LevelGrid] Failed to add element to inventory: {data.Message}");
+        // Fallback to old positioning if inventory add failed
+        if (data.Element != null) {
+          HandleElementReturnToInventoryFallback(data.Element);
+        }
+      }
+    }
+
+    protected virtual void HandleInventoryElementRetrieved(InventoryEventData data) {
+      if (data.Success && data.Element != null) {
+        Debug.Log($"[LevelGrid] Element retrieved from inventory: {data.ElementName} " +
+                 $"(Remaining: {data.AvailableQuantity}/{data.TotalQuantity}) by {data.SourceSystem}");
+
+        // Position the retrieved element based on context
+        PositionRetrievedElement(data.Element, data);
+      }
+      else {
+        Debug.LogWarning($"[LevelGrid] Failed to retrieve element from inventory: {data.Message}");
+      }
+    }
+
+    protected virtual void HandleInventoryOperationFailed(InventoryEventData data) {
+      Debug.LogWarning($"[LevelGrid] Inventory operation failed: {data.Operation} | {data.Message} | Source: {data.SourceSystem}");
+
+      // Handle specific failure cases
+      switch (data.Operation) {
+        case InventoryOperation.Add:
+          if (data.Element != null) {
+            HandleElementReturnToInventoryFallback(data.Element);
+          }
+          break;
+        case InventoryOperation.Retrieve:
+          // Maybe show UI feedback that element is not available
+          break;
+      }
+    }
+
+    protected virtual void HandleInventoryUpdated(InventoryEventData data) {
+      Debug.Log($"[LevelGrid] Inventory updated: {data.Message} | Source: {data.SourceSystem}");
+      // Could trigger UI updates or other systems that care about inventory state
+    }
+
+    protected virtual void PositionRetrievedElement(GridSnappable element, InventoryEventData context) {
+      // Use context to make intelligent positioning decisions
+      Vector3 targetPosition;
+
+      if (context.WorldPosition != Vector3.zero) {
+        // Use the original world position if available
+        targetPosition = context.WorldPosition;
+      }
+      else {
+        // Fallback to inventory zone position
+        var inventoryZone = GameObject.Find("InventoryZone");
+        targetPosition = inventoryZone != null ? inventoryZone.transform.position : ELEMENT_DEFAULT_POSITION;
+      }
+
+      element.transform.position = targetPosition;
+      element.Draggable = true;
+
+      Debug.Log($"[LevelGrid] Positioned retrieved element {element.name} at {targetPosition} " +
+               $"(Category: {context.CategoryId}, Source: {context.SourceSystem})");
+    }
+    #endregion
+
+    #region Element Movement Event Handlers
 
     protected virtual void HandleElementSelected(object sender, GridSnappableEventArgs e) {
       // This now just collects element initial world and grid positions - tracking starts in Update()
@@ -290,8 +461,7 @@ namespace GMTK {
         e.Element.OnPointerOver();
       }
     }
-
-    protected virtual void HandleElementDropped(object sender, GridSnappableEventArgs e) {
+    protected virtual void HandleElementDropped(GridSnappableEventArgs e) {
       var element = e.Element;
       var newGridOrigin = WorldToGrid(element.transform.position);
 
@@ -331,28 +501,6 @@ namespace GMTK {
       }
     }
 
-    //TODO refactor when Inventory is implemented
-    private void HandleElementReturnToInventory(GridSnappable element) {
-      // Find inventory zone or return to a default position
-      var inventoryZone = GameObject.Find("InventoryZone");
-      if (inventoryZone != null) {
-        // Position randomly within inventory zone to avoid overlap
-        var bounds = new Bounds(inventoryZone.transform.position, Vector3.one);
-        if (inventoryZone.TryGetComponent<Collider2D>(out var collider)) {
-          bounds = collider.bounds;
-        }
-        var randomOffset = new Vector3(
-            Random.Range(-bounds.size.x * 0.4f, bounds.size.x * 0.4f),
-            Random.Range(-bounds.size.y * 0.4f, bounds.size.y * 0.4f),
-            0);
-        element.transform.position = bounds.center + randomOffset;
-      }
-      else {
-        // Fallback: move to a default position
-        element.transform.position = ELEMENT_DEFAULT_POSITION;
-      }
-    }
-
     // To decouple GridSnappable behaviour from the grid, this method only notifies the GridSnappable to handle the 'unhover'
     //that way we prevent from polling the mouse position from snappables on Update
     private void HandleElementUnhovered(object sender, GridSnappableEventArgs e) {
@@ -364,9 +512,10 @@ namespace GMTK {
     protected virtual void HandleElementHovered(object sender, GridSnappableEventArgs e) {
       if (e.Element != null) e.Element.OnPointerOver();
     }
+
     #endregion
 
-    #region Grid Methods
+    #region Public API for Grid and Position 
 
     public virtual bool IsInsidePlayableArea(Vector2 position) {
 
@@ -393,7 +542,7 @@ namespace GMTK {
     /// </summary>
     /// <param name="position"></param>
     /// <returns>Vector2 with the world coordinates of the Grid coordinates assigned to 'position'</returns>
-    protected virtual Vector2 SnapToGrid(Vector2 position) {
+    public virtual Vector2 SnapToGrid(Vector2 position) {
       Vector2Int index = GetGridIndex(position);
       float x = index.x * CellSize + GridOrigin.x;
       float y = index.y * CellSize + GridOrigin.y;
@@ -409,7 +558,7 @@ namespace GMTK {
       return GetGridIndex(position);
     }
 
-    private Vector2 GridToWorld(Vector2Int cell) {
+    public Vector2 GridToWorld(Vector2Int cell) {
       float x = cell.x * CellSize + GridOrigin.x;
       float y = cell.y * CellSize + GridOrigin.y;
       return new Vector2(x, y);
@@ -418,7 +567,7 @@ namespace GMTK {
     /// <summary>
     /// Common World Coordinates to Grid Coordinates method
     /// </summary>
-    private Vector2Int GetGridIndex(Vector2 position) {
+    public Vector2Int GetGridIndex(Vector2 position) {
       int x = Mathf.RoundToInt((position.x - GridOrigin.x) / CellSize);
       int y = Mathf.RoundToInt((position.y - GridOrigin.y) / CellSize);
       return new Vector2Int(x, y);

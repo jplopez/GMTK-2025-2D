@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace GMTK {
-
   public class LevelManager : MonoBehaviour {
 
     private const string LEVEL_COMPLETE_SCENE_NAME = "LevelComplete";
@@ -49,13 +47,14 @@ namespace GMTK {
     protected bool _levelEnded = false;
     protected float _timeSinceLastMove = 0f;
     protected float _timeSinceLevelStart = 0f;
+    protected int _scoreAtLevelStart = 0;
     protected LevelSequence _levelSequence;
     protected GameEventChannel _eventChannel;
 
     private void Awake() {
       _eventChannel = Game.Context.EventsChannel;
       _levelSequence = Game.Context.LevelSequence;
-
+      _scoreAtLevelStart = Game.Context.MarbleScoreKeeper.GetScore();
       if (_eventChannel == null) {
         Debug.Log($"LevelManager: EventChannel is missing. LevelManager won't be able to handle game events");
         return;
@@ -120,7 +119,6 @@ namespace GMTK {
       if (_levelEnded) CompleteLevel();
       if (_levelStarted) {
         _timeSinceLevelStart += Time.deltaTime;
-        //UpdateTimers();
         //check if player is out of time 
         if (!InfitiniteTime && LevelMaxTime > 0f && _timeSinceLevelStart >= LevelMaxTime) {
           Debug.Log("[LevelManager] Level Time Expired! Restarting level.");
@@ -136,8 +134,6 @@ namespace GMTK {
         return;
       }
       if (PlayableMarble.IsMoving) {
-        //int deltaScore = CalculateDeltaScore(Time.deltaTime);
-        //Debug.Log($"Adding {deltaScore} to Marble's Score");
         _eventChannel.Raise(GameEventType.ScoreRaised, Time.deltaTime);
         _timeSinceLastMove += Time.deltaTime;
       }
@@ -156,6 +152,8 @@ namespace GMTK {
       }
       _levelStarted = true;
       _levelEnded = false;
+      StartLevelCheckpoint.enabled = false;
+      EndLevelCheckpoint.enabled = true;
       Debug.Log($"LevelStarted? {_levelStarted}");
     }
 
@@ -182,8 +180,10 @@ namespace GMTK {
       PlayableMarble.InitialForce = MarbleInitialForce;
       _levelStarted = false;
       _levelEnded = false;
+      StartLevelCheckpoint.enabled = true;
+      EndLevelCheckpoint.enabled = false;
       InitializeTimers();
-      _eventChannel.Raise(GameEventType.ScoreChanged, 0);
+      _eventChannel.Raise(GameEventType.ScoreChanged, _scoreAtLevelStart);
     }
 
     private void CompleteLevel() {

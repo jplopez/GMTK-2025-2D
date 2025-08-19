@@ -1,6 +1,9 @@
 using UnityEngine;
 
 namespace GMTK {
+  public enum FrictionLevel { Low, Mid, High }
+  public enum BouncinessLevel { Low, Mid, High }
+
   public static class SnappableMaterialStrategy {
 
     public const string MATERIALS_PATH = "Assets/_Game/Materials/Physics";

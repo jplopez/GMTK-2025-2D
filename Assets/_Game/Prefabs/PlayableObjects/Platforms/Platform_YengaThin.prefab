@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 7956316667899920837}
   - component: {fileID: 7926144506979983261}
   - component: {fileID: 8807545580737657185}
-  - component: {fileID: 4346465707993233227}
   - component: {fileID: 3708051782456796498}
+  - component: {fileID: 4346465707993233227}
+  - component: {fileID: 324596006050025253}
   m_Layer: 7
   m_Name: Platform_YengaThin
   m_TagString: Untagged
@@ -28,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 617128071334964795}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.7863628, y: 2.012984, z: 1}
   m_ConstrainProportionsScale: 0
@@ -79,7 +80,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
   m_SortingLayer: 5
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -5413146707310179428, guid: f78ded36128361d4d8e5bac292d9b87a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -118,44 +119,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 3
---- !u!114 &4346465707993233227
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 617128071334964795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da9b17e31f29c36419dc13260e2e8d90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AppliedTemplate: {fileID: 0}
-  SnapTransform: {fileID: 7956316667899920837}
-  Model: {fileID: 7956316667899920837}
-  HighlightModel: {fileID: 4057196616176214308}
-  _occupiedCells:
-  - {x: 0, y: 2}
-  - {x: 0, y: 1}
-  - {x: 0, y: 0}
-  - {x: 0, y: -1}
-  - {x: 0, y: -2}
-  - {x: 0, y: -3}
-  - {x: -1, y: 2}
-  - {x: -1, y: 1}
-  - {x: -1, y: 0}
-  - {x: -1, y: -1}
-  - {x: -1, y: -2}
-  - {x: -1, y: -3}
-  _rigidBody: {fileID: 8807545580737657185}
-  _collider: {fileID: 3708051782456796498}
-  Draggable: 1
-  CanRotate: 1
-  Flippable: 0
-  StaticBody: 1
-  OverrideBodySettings: 0
-  Mass: 15
-  AngularDamping: 0.5
 --- !u!60 &3708051782456796498
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -166,7 +129,7 @@ PolygonCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 3cce1f833340fe94aa573c3110f69237, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -207,6 +170,63 @@ PolygonCollider2D:
       - {x: -0.56, y: -1.49}
       - {x: 0.56, y: -1.49}
   m_UseDelaunayMesh: 0
+--- !u!114 &4346465707993233227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 617128071334964795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9b17e31f29c36419dc13260e2e8d90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SnapTransform: {fileID: 7956316667899920837}
+  Model: {fileID: 7956316667899920837}
+  HighlightModel: {fileID: 4057196616176214308}
+  Draggable: 1
+  _occupiedCells:
+  - {x: 0, y: 2}
+  - {x: 0, y: 1}
+  - {x: 0, y: 0}
+  - {x: 0, y: -1}
+  - {x: 0, y: -2}
+  - {x: 0, y: -3}
+  - {x: -1, y: 2}
+  - {x: -1, y: 1}
+  - {x: -1, y: 0}
+  - {x: -1, y: -1}
+  - {x: -1, y: -2}
+  - {x: -1, y: -3}
+  BehaviourDelegate: 1
+  Flippable: 0
+  CanRotate: 1
+  PointerOnFeedback: {fileID: 0}
+  PointerOutFeedback: {fileID: 0}
+--- !u!114 &324596006050025253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 617128071334964795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d099d47a97942243af506ddec5f1205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsActive: 1
+  DelayRun: 0
+  InitialDelay: 0.1
+  ValidDropColor: {r: 0, g: 1, b: 0, a: 1}
+  InvalidDropColor: {r: 1, g: 0, b: 0, a: 1}
+  DraggingColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  DragAlpha: 0.7
+  ColorTransitionSpeed: 5
+  EnablePulseEffect: 1
+  PulseSpeed: 2
+  PulseIntensity: 0.2
 --- !u!1 &4057196616176214308
 GameObject:
   m_ObjectHideFlags: 0
