@@ -34,6 +34,7 @@ namespace GMTK {
     private Vector3 _pointerWorldPos;
 
     protected bool DisableDragging = false;
+    protected GameEventChannel _eventsChannel;
 
     // Declare events using EventHadler<GridSnappableEventArgs>
     public static event EventHandler<GridSnappableEventArgs> OnElementHovered;
@@ -41,6 +42,15 @@ namespace GMTK {
     public static event EventHandler<GridSnappableEventArgs> OnElementSelected;
     public static event EventHandler<GridSnappableEventArgs> OnElementDropped;
     public static event EventHandler<GridSnappableEventArgs> OnElementSecondary;
+
+
+    protected override void Awake() {
+      base.Awake();
+      if(_eventsChannel == null) {
+        _eventsChannel = Game.Context.EventsChannel;
+      }
+    }
+
 
     //The element dragging is disabled during Playing, to prevent players
     //from moving elements while the level is running
@@ -76,7 +86,7 @@ namespace GMTK {
 
     [InputHandler("Select", InputActionPhase.Performed, InputActionPhase.Canceled)]
     public void HandleSelect(InputAction.CallbackContext context) {
-      Game.Context.EventsChannel.Raise(GameEventType.InputSelected);
+      _eventsChannel.Raise(GameEventType.InputSelected);
       switch (context.phase) {
         case InputActionPhase.Performed: BeginMovingElement(); break;
         case InputActionPhase.Canceled: EndMovingElement(); break;
@@ -86,30 +96,30 @@ namespace GMTK {
     [InputHandler("Secondary")]
     public void HandleSecondary(InputAction.CallbackContext context) {
       Debug.Log("SnappableInputHandler.HandleSecondary : Not implemented yet");
-      Game.Context.EventsChannel.Raise(GameEventType.InputSecondary);
+      _eventsChannel.Raise(GameEventType.InputSecondary);
     }
 
     [InputHandler("RotateCW", InputActionPhase.Started)]
     public void RotateCW(InputAction.CallbackContext context) {
-      Game.Context.EventsChannel.Raise(GameEventType.InputRotateCW);
+      _eventsChannel.Raise(GameEventType.InputRotateCW);
       TryExecuteOnCurrentElement(e => e.RotateClockwise());
     }
 
     [InputHandler("RotateCCW", InputActionPhase.Started)]
     public void RotateCCW(InputAction.CallbackContext context) {
-      Game.Context.EventsChannel.Raise(GameEventType.InputRotateCCW);
+      _eventsChannel.Raise(GameEventType.InputRotateCCW);
       TryExecuteOnCurrentElement(e => e.RotateCounterClockwise());
     }
 
     [InputHandler("FlipX", InputActionPhase.Started)]
     public void FlipX(InputAction.CallbackContext context) {
-      Game.Context.EventsChannel.Raise(GameEventType.InputFlippedX);
+      _eventsChannel.Raise(GameEventType.InputFlippedX);
       TryExecuteOnCurrentElement(e => e.FlipX());
     }
 
     [InputHandler("FlipY", InputActionPhase.Started)]
     public void FlipY(InputAction.CallbackContext context) {
-      Game.Context.EventsChannel.Raise(GameEventType.InputFlippedY);
+      _eventsChannel.Raise(GameEventType.InputFlippedY);
       TryExecuteOnCurrentElement(e => e.FlipY());
     }
 
@@ -135,7 +145,7 @@ namespace GMTK {
           _lastElementOver = element;
           _lastElementOver.OnPointerOver();
           RaiseEvent(OnElementHovered, _lastElementOver);
-          Game.Context.EventsChannel.Raise(GameEventType.ElementHovered, 
+          _eventsChannel.Raise(GameEventType.ElementHovered, 
               new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos));
           //Debug.Log($"OnElementHovered: {_lastElementOver.name}");
         }
@@ -148,7 +158,7 @@ namespace GMTK {
       if (_lastElementOver != null && IsOverElement) {
         _lastElementOver.OnPointerOut();
         RaiseEvent(OnElementUnhovered, _lastElementOver);
-        Game.Context.EventsChannel.Raise(GameEventType.ElementUnhovered, 
+        _eventsChannel.Raise(GameEventType.ElementUnhovered, 
             new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos));
         //Debug.Log($"OnElementUnhovered: {_lastElementOver.name}");
         _lastElementOver = null;
@@ -187,7 +197,7 @@ namespace GMTK {
           _currentElement = selectedElement;
           IsMoving = true;
           RaiseEvent(OnElementSelected, _currentElement);
-          Game.Context.EventsChannel.Raise(GameEventType.ElementSelected, 
+          _eventsChannel.Raise(GameEventType.ElementSelected, 
               new GridSnappableEventArgs(_currentElement, _pointerScreenPos));
         }
       }
@@ -195,8 +205,8 @@ namespace GMTK {
 
     private void EndMovingElement() {
       if (_currentElement != null) {
-        RaiseEvent(OnElementDropped, _currentElement);
-        Game.Context.EventsChannel.Raise(GameEventType.ElementDropped, 
+        //RaiseEvent(OnElementDropped, _currentElement);
+        _eventsChannel.Raise(GameEventType.ElementDropped, 
             new GridSnappableEventArgs(_currentElement, _pointerScreenPos));
         _currentElement = null;
         IsMoving = false;

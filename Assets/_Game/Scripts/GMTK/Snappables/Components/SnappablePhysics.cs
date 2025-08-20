@@ -1,9 +1,8 @@
 using UnityEngine;
 
 namespace GMTK {
+
   public class SnappablePhysics : SnappableComponent {
-    public enum FrictionLevel { Low, Mid, High }
-    public enum BouncinessLevel { Low, Mid, High }
     public enum RotationDirections { Clockwise, Counterclockwise }
 
     [Header("Position and Rotation Settings")]
@@ -92,11 +91,13 @@ namespace GMTK {
     }
 
     public override void OnSnappableEvent(GridSnappableEventArgs eventArgs) {
-      if(eventArgs.ComponentEventType == SnappableComponentEventType.RotateCW) {
-        RotateBy(RotationStep);
-      }
-      if(eventArgs.ComponentEventType == SnappableComponentEventType.RotateCW) {
-        RotateBy(-RotationStep);
+      switch(eventArgs.ComponentEventType) {
+        case SnappableComponentEventType.RotateCW:
+          RotateBy(-RotationStep); break;
+        case SnappableComponentEventType.RotateCCW:
+          RotateBy(RotationStep); break;
+        default:
+          break;
       }
     }
 
@@ -125,6 +126,13 @@ namespace GMTK {
     }
     private void ApplyRotationControl() {
       if (!AllowRotation) return;
+
+      //Apply auto rotation first, so LimitRotationAngles are respected
+      if (EnableAutoRotation) {
+        var speedAndDirection = (AutoRotationDirection == RotationDirections.Clockwise) ? 
+                                  -AutoRotationSpeed : AutoRotationSpeed;
+        RotateBy(Time.deltaTime * speedAndDirection);
+      }
 
       if (LimitRotationAngle) {
         if (_currentRotation < MinRotationAngle && _rigidbody2D.angularVelocity < 0f) {
@@ -163,7 +171,7 @@ namespace GMTK {
         _rigidbody2D.freezeRotation = !enabled;
     }
 
-    public void SetRotationSpeed(float speed) => AutoRotationSpeed = speed;
+    public void SetAutoRotationSpeed(float speed) => AutoRotationSpeed = speed;
     public void SetRotationRange(float minAngle, float maxAngle) {
       MinRotationAngle = minAngle;
       MaxRotationAngle = maxAngle;
@@ -182,16 +190,11 @@ namespace GMTK {
     private void UpdateMaterial() {
       if (OverrideMaterial != null) return;
 
-      _assignedMaterial = GetPredefinedMaterial(Friction, Bounciness);
+      _assignedMaterial = SnappableMaterialStrategy.GetMaterial(Friction, Bounciness);
       if (_collider2D != null)
         _collider2D.sharedMaterial = _assignedMaterial;
       if (_rigidbody2D != null)
         _rigidbody2D.sharedMaterial = _assignedMaterial;
-    }
-
-    private PhysicsMaterial2D GetPredefinedMaterial(FrictionLevel friction, BouncinessLevel bounce) {
-      string name = $"Physics/F{friction}_B{bounce}_Material"; // e.g., FLow_BHigh_Material
-      return Resources.Load<PhysicsMaterial2D>(name);
     }
 
     protected override void FinalizeComponent() {
@@ -201,7 +204,7 @@ namespace GMTK {
     protected override void HandleElementSelected(object sender, GridSnappableEventArgs evt) {
     }
 
-    protected override void HandleElementDropped(object sender, GridSnappableEventArgs evt) {
+    protected override void HandleElementDropped(GridSnappableEventArgs evt) {
     }
 
     protected override void HandleElementHovered(object sender, GridSnappableEventArgs evt) {

@@ -125,7 +125,7 @@ namespace GMTK {
       // We'll start visual feedback in the LevelGrid's Update when IsMoving becomes true
     }
 
-    protected override void HandleElementDropped(object sender, GridSnappableEventArgs evt) {
+    protected override void HandleElementDropped(GridSnappableEventArgs evt) {
       if (evt.Element != _snappable) return;
 
       StopDragFeedback();

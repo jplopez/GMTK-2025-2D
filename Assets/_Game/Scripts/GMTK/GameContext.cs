@@ -198,15 +198,6 @@ namespace GMTK {
           UnityEngine.SceneManagement.SceneManager.LoadScene(activeSceneName);
         }
       }
-
-      if (_levelSequence.HasNextLevel()) {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(_levelSequence.GetNextLevel());
-      }
-      else {
-        string activeSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        Debug.Log($"There's no next level for '{_levelSequence.CurrentScene}'. Reloading current scene: '{activeSceneName}'");
-        UnityEngine.SceneManagement.SceneManager.LoadScene(activeSceneName);
-      }
     }
 
     public void QuitGame() {
@@ -257,7 +248,7 @@ namespace GMTK {
       _eventsChannel.AddListener(GameEventType.LevelStart, _gameStateMachine.HandleLevelStart);
       _eventsChannel.AddListener(GameEventType.LevelPlay, _gameStateMachine.HandleLevelPlay);
       _eventsChannel.AddListener(GameEventType.LevelReset, _gameStateMachine.HandleLevelReset);
-      _eventsChannel.AddListener(GameEventType.LevelCompleted, _gameStateMachine.HandleLevelComplete);
+      _eventsChannel.AddListener(GameEventType.LevelObjectiveCompleted, _gameStateMachine.HandleLevelComplete);
       _eventsChannel.AddListener(GameEventType.GameOver, _gameStateMachine.HandleGameOver);
       _eventsChannel.AddListener(GameEventType.EnterOptions, _gameStateMachine.HandleEnterOptions);
       _eventsChannel.AddListener(GameEventType.ExitOptions, _gameStateMachine.HandleEnterOptions);
@@ -270,7 +261,6 @@ namespace GMTK {
       //Centralized Handler for GameState changes
       _gameStateMachine.RemoveListener(HandlerRegistry.HandleStateChange);
 
-      var eventChannel = Game.Context.EventsChannel;
       _eventsChannel.RemoveListener(GameEventType.GameStarted, _gameStateMachine.HandleStartGame);
       _eventsChannel.RemoveListener(GameEventType.LevelStart, _gameStateMachine.HandleLevelStart);
       _eventsChannel.RemoveListener(GameEventType.LevelPlay, _gameStateMachine.HandleLevelPlay);

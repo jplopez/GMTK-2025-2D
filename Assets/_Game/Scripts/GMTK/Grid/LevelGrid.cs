@@ -8,15 +8,18 @@ using UnityEngine;
 
 namespace GMTK {
 
+  public enum GridOriginSources { GameObject, Custom }
   public class LevelGrid : MonoBehaviour {
 
     [Header("Grid Dimensions")]
     [Tooltip("The size in units for the cell. Recommended is 1")]
     public float CellSize = 1f; // Matches the peg sprite spacing
-    [Tooltip("World position of the center of the grid")]
-    public Vector2 GridOrigin = Vector2.zero;
     [Tooltip("The number of cells in the grid. Only positive integer numbers")]
     public Vector2Int GridSize = new(50, 34);
+    [Tooltip("Whether the grid origin should be taken from the Grid's GameObject or a specific world position")]
+    public GridOriginSources OriginSource;
+    [Tooltip("If OriginSource is 'Custom', this field is the world position of the center of the grid")]
+    public Vector2 CustomGridOrigin = Vector2.zero;
 
     [Header("Bounds")]
     public EdgeCollider2D GridTopBound;
@@ -50,32 +53,41 @@ namespace GMTK {
     [SerializeField] private float gizmoSize = 0.9f;
     [SerializeField] private Vector2 occupancyOffset = new(0, 0);
 
-    protected GridOccupancyMap _occupancyMap;
+    public Vector2 GridOrigin => _gridOrigin;
 
+    protected Vector2 _gridOrigin = Vector2.zero;
+    protected GridOccupancyMap _occupancyMap;
     protected GridSnappable _currentSelected;
     protected Vector2 _elementOriginalWorldPosition;
     protected Vector2Int _elementOriginalGridPosition;
     protected bool _elementWasInGrid;
     protected bool _isTrackingMovement;
 
+    protected GameEventChannel _eventsChannel;
+
     const string TOP_BOUND_TAG = "TopBound";
     const string BOTTOM_BOUND_TAG = "BottomBound";
     const string LEFT_BOUND_TAG = "LeftBound";
     const string RIGHT_BOUND_TAG = "RightBound";
-
     const int MIN_GRID_SIZE = 4;
     const int MAX_GRID_SIZE = 100;
 
     public static Vector3 ELEMENT_DEFAULT_POSITION = new(-10, 0, 0);
 
     #region Monobehavior Methods
-    public virtual void Awake() => AddInputListeners();
+    public virtual void Awake() {
+      if (_eventsChannel == null) {
+        _eventsChannel = Game.Context.EventsChannel;
+      }
+      AddInputListeners();
+    }
     public virtual void OnDestroy() => RemoveInputListeners();
     public void Start() => Initialize();
     public void OnValidate() {
-      UpdateAllEdgeColliderBoundPoints();
       GridSize.x = Mathf.Clamp(GridSize.x, MIN_GRID_SIZE, MAX_GRID_SIZE);
       GridSize.y = Mathf.Clamp(GridSize.y, MIN_GRID_SIZE, MAX_GRID_SIZE);
+      //InitializeAllEdgeColliderBounds();
+      UpdateAllEdgeColliderBoundPoints();
     }
     private void Update() {
       TrackElementMovement();
@@ -90,6 +102,18 @@ namespace GMTK {
         Debug.LogWarning($"LevelGrid: SnappableInputHandler is missing. LevelGrid will not be able to track player inputs on Elements");
         return;
       }
+
+      if (OriginSource == GridOriginSources.GameObject) {
+        _gridOrigin = gameObject.transform.position;
+      }
+      else if (OriginSource == GridOriginSources.Custom) {
+        _gridOrigin = CustomGridOrigin;
+      }
+      else {
+        //safety measure
+        _gridOrigin = Vector2.zero;
+      }
+
       InitializeGrid();
       InitializeAllEdgeColliderBounds();
       UpdateAllEdgeColliderBoundPoints();
@@ -97,7 +121,7 @@ namespace GMTK {
     protected virtual void InitializeGrid() {
 
       //TODO (optional) make maxOccupantsPerCell and mode, parameters of the GridOccupancyMap
-      _occupancyMap = new GridOccupancyMap(CellSize, GridOrigin,
+      _occupancyMap = new GridOccupancyMap(CellSize, _gridOrigin,
         maxOccupantsPerCell: 3,
         mode: CellLayeringOrder.LastToFirst);
 
@@ -133,7 +157,7 @@ namespace GMTK {
           gameObject.AddComponent<EdgeCollider2D>() : boundCollider;
       boundCollider.transform.parent = gameObject.transform; //make the collider a child of the grid
       boundCollider.transform.position = Vector2.zero; //center the collider
-      boundCollider.gameObject.tag = tag; //assign the tag
+      //boundCollider.gameObject.tag = tag; //assign the tag
       boundCollider.gameObject.layer = LayerMask.NameToLayer("Level"); //this layer is by default collissioned.
 
       return boundCollider;
@@ -157,23 +181,24 @@ namespace GMTK {
 
       int halfWidth = GridSize.x / 2;
       int halfHeight = GridSize.y / 2;
-
+      float xPos = gameObject.transform.position.x;
+      float yPos = gameObject.transform.position.y;
       switch (tag) {
         case TOP_BOUND_TAG:
-          points.Add(new Vector2(GridOrigin.x - halfWidth, GridOrigin.y + halfHeight));
-          points.Add(new Vector2(GridOrigin.x + halfWidth, GridOrigin.y + halfHeight));
+          points.Add(new Vector2(xPos - halfWidth, yPos + halfHeight));
+          points.Add(new Vector2(xPos + halfWidth, yPos + halfHeight));
           break;
         case BOTTOM_BOUND_TAG:
-          points.Add(new Vector2(GridOrigin.x - halfWidth, GridOrigin.y - halfHeight));
-          points.Add(new Vector2(GridOrigin.x + halfWidth, GridOrigin.y - halfHeight));
+          points.Add(new Vector2(xPos - halfWidth, yPos - halfHeight));
+          points.Add(new Vector2(xPos + halfWidth, yPos - halfHeight));
           break;
         case LEFT_BOUND_TAG:
-          points.Add(new Vector2(GridOrigin.x - halfWidth, GridOrigin.y + halfHeight));
-          points.Add(new Vector2(GridOrigin.x - halfWidth, GridOrigin.y - halfHeight));
+          points.Add(new Vector2(xPos - halfWidth, yPos + halfHeight));
+          points.Add(new Vector2(xPos - halfWidth, yPos - halfHeight));
           break;
         case RIGHT_BOUND_TAG:
-          points.Add(new Vector2(GridOrigin.x + halfWidth, GridOrigin.y + halfHeight));
-          points.Add(new Vector2(GridOrigin.x + halfWidth, GridOrigin.y - halfHeight));
+          points.Add(new Vector2(xPos + halfWidth, yPos + halfHeight));
+          points.Add(new Vector2(xPos + halfWidth, yPos - halfHeight));
           break;
         default:
           Debug.LogWarning($"EdgeCollider '{boundCollider.name}' has an invalid tag: '{tag}'");
@@ -195,13 +220,13 @@ namespace GMTK {
       SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
       SnappableInputHandler.OnElementSelected += HandleElementSelected;
 
-      Game.Context.EventsChannel.AddListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
+      _eventsChannel.AddListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
 
       // Add inventory event listeners with EventArgs wrappers
-      Game.Context.EventsChannel.AddListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
-      Game.Context.EventsChannel.AddListener(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
-      Game.Context.EventsChannel.AddListener(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
-      Game.Context.EventsChannel.AddListener(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
+      _eventsChannel.AddListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
+      _eventsChannel.AddListener(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
+      _eventsChannel.AddListener(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
+      _eventsChannel.AddListener(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
     }
 
     private void RemoveInputListeners() {
@@ -211,14 +236,13 @@ namespace GMTK {
       SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
       SnappableInputHandler.OnElementSelected -= HandleElementSelected;
 
-      Game.Context.EventsChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
+      _eventsChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
 
-      if (Game.Context == null) return;
       // Remove inventory event listeners
-      Game.Context.EventsChannel.RemoveListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
-      Game.Context.EventsChannel.RemoveListener(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
-      Game.Context.EventsChannel.RemoveListener(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
-      Game.Context.EventsChannel.RemoveListener(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
+      _eventsChannel.RemoveListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
+      _eventsChannel.RemoveListener(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
+      _eventsChannel.RemoveListener(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
+      _eventsChannel.RemoveListener(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
 
     }
 
@@ -283,15 +307,6 @@ namespace GMTK {
       _isTrackingMovement = false;
       _elementWasInGrid = false;
     }
-
-    //private void UpdateMovementFeedback(GridSnappable element) {
-    //  // Optional: Add visual feedback while dragging
-    //  var currentGridPos = WorldToGrid(element.transform.position);
-    //  bool canPlaceHere = IsInsidePlayableArea(element.transform.position) && CanPlace(element, currentGridPos);
-    //  Debug.Log($"[LevelGrid] movement feedback for {element.name}");
-    //  // You could change the element's highlight color based on canPlaceHere
-    //  element.SetValidDropZone(canPlaceHere);
-    //}
 
     #endregion
 
@@ -477,6 +492,7 @@ namespace GMTK {
         else {
           // Failed to place - return to original position if it was in grid
           if (_elementWasInGrid) {
+
             element.transform.position = SnapToGrid(_elementOriginalGridPosition);
             _occupancyMap.Register(element, _elementOriginalGridPosition);
             Debug.Log($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
@@ -544,8 +560,8 @@ namespace GMTK {
     /// <returns>Vector2 with the world coordinates of the Grid coordinates assigned to 'position'</returns>
     public virtual Vector2 SnapToGrid(Vector2 position) {
       Vector2Int index = GetGridIndex(position);
-      float x = index.x * CellSize + GridOrigin.x;
-      float y = index.y * CellSize + GridOrigin.y;
+      float x = index.x * CellSize + _gridOrigin.x;
+      float y = index.y * CellSize + _gridOrigin.y;
       return new Vector2(x, y);
     }
 
@@ -559,8 +575,8 @@ namespace GMTK {
     }
 
     public Vector2 GridToWorld(Vector2Int cell) {
-      float x = cell.x * CellSize + GridOrigin.x;
-      float y = cell.y * CellSize + GridOrigin.y;
+      float x = cell.x * CellSize + _gridOrigin.x;
+      float y = cell.y * CellSize + _gridOrigin.y;
       return new Vector2(x, y);
     }
 
@@ -568,8 +584,8 @@ namespace GMTK {
     /// Common World Coordinates to Grid Coordinates method
     /// </summary>
     public Vector2Int GetGridIndex(Vector2 position) {
-      int x = Mathf.RoundToInt((position.x - GridOrigin.x) / CellSize);
-      int y = Mathf.RoundToInt((position.y - GridOrigin.y) / CellSize);
+      int x = Mathf.RoundToInt((position.x - _gridOrigin.x) / CellSize);
+      int y = Mathf.RoundToInt((position.y - _gridOrigin.y) / CellSize);
       return new Vector2Int(x, y);
     }
     #endregion
@@ -594,14 +610,14 @@ namespace GMTK {
       int halfHeight = gizmoGridSize.y / 2;
 
       for (int x = -halfWidth; x <= halfWidth; x++) {
-        Vector3 start = new(GridOrigin.x + x * gizmoCellSize, GridOrigin.y - halfHeight * gizmoCellSize, 0f);
-        Vector3 end = new(GridOrigin.x + x * gizmoCellSize, GridOrigin.y + halfHeight * gizmoCellSize, 0f);
+        Vector3 start = new(_gridOrigin.x + x * gizmoCellSize, _gridOrigin.y - halfHeight * gizmoCellSize, 0f);
+        Vector3 end = new(_gridOrigin.x + x * gizmoCellSize, _gridOrigin.y + halfHeight * gizmoCellSize, 0f);
         Gizmos.DrawLine(gameObject.transform.position + start, gameObject.transform.position + end);
       }
 
       for (int y = -halfHeight; y <= halfHeight; y++) {
-        Vector3 start = new(GridOrigin.x - halfWidth * gizmoCellSize, GridOrigin.y + y * gizmoCellSize, 0f);
-        Vector3 end = new(GridOrigin.x + halfWidth * gizmoCellSize, GridOrigin.y + y * gizmoCellSize, 0f);
+        Vector3 start = new(_gridOrigin.x - halfWidth * gizmoCellSize, _gridOrigin.y + y * gizmoCellSize, 0f);
+        Vector3 end = new(_gridOrigin.x + halfWidth * gizmoCellSize, _gridOrigin.y + y * gizmoCellSize, 0f);
         Gizmos.DrawLine(gameObject.transform.position + start, gameObject.transform.position + end);
       }
     }

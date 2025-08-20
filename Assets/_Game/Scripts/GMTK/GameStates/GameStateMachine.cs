@@ -11,7 +11,7 @@ namespace GMTK {
   public class GameStateMachine : StateMachine<GameStates> {
 
     //[Tooltip("Reference to the EventChannel to listen for event that trigger game state changes")]
-    //public GameEventChannel eventChannel;
+    //public GameEventChannel _eventChannel;
     [Tooltip("keeps history of recent status changes. Change the history length with HistoryLength. Keep in mind a longer history might impact performance")] 
     [SerializeField] protected LinkedList<GameStates> _history = new();
     [Tooltip("how many game states back the history contains")]
@@ -21,13 +21,9 @@ namespace GMTK {
       base.OnEnable();
       StartingState = GameStates.Start;
       AddDefaultTransitions();
-      //AddGameEventListeners();
     }
 
-    //protected override void OnDisable() {
-    //  base.OnDisable();
-    //  RemoveGameEventListeners();
-    //}
+
 
     /// <summary>
     /// Overrides the default method to add support of history of previous GameState changes.

@@ -60,7 +60,7 @@ namespace Ameba.Input {
 
     protected virtual void OnDisable() => DisableActionMap(_inputWrapper, Registry.ActionMapName);
 
-    void Awake() => Initialize();
+    protected virtual void Awake() => Initialize();
 
     public virtual void Initialize() {
       Registry.Initialize();

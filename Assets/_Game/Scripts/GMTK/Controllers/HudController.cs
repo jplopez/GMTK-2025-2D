@@ -38,6 +38,7 @@ namespace GMTK {
     public GameObject ResetFeedback;
 
     protected HUD _hud;
+    protected GameEventChannel _eventsChannel;
     
     private void Awake() {
 
@@ -48,6 +49,9 @@ namespace GMTK {
       _hud.MarbleScoreKeeper.SetStrategy(scoreStrategy, transform);
       UpdateScoreText(_hud.MarbleScoreKeeper.GetScore());
 
+      if(_eventsChannel == null) {
+        _eventsChannel = Game.Context.EventsChannel;
+      }
       PlayButton.onClick.AddListener(HandlePlayButtonClick);
       ResetButton.onClick.AddListener(HandleResetButtonClick);
     }
@@ -88,7 +92,7 @@ namespace GMTK {
           //and moves marble back to starting point. In the future, reset 
           //could trigger animations or other feedbacks.
 
-          Game.Context.EventsChannel.Raise(GameEventType.LevelStart);
+          _eventsChannel.Raise(GameEventType.LevelStart);
           break;
         case GameStates.Pause:
         case GameStates.Options:
@@ -103,7 +107,7 @@ namespace GMTK {
     private void HandlePlayButtonClick() {
       //ensure the button only triggers logic if in the correct state.
       if (Game.Context.CanTransitionTo(GameStates.Playing)) {
-        Game.Context.EventsChannel.Raise(GameEventType.LevelPlay);
+        _eventsChannel.Raise(GameEventType.LevelPlay);
         // Optional: local feedback
       }
     }
@@ -111,7 +115,7 @@ namespace GMTK {
     private void HandleResetButtonClick() {
       //ensure the button only triggers logic if in the correct state.
       if (Game.Context.CanTransitionTo(GameStates.Reset)) {
-        Game.Context.EventsChannel.Raise(GameEventType.LevelReset);
+        _eventsChannel.Raise(GameEventType.LevelReset);
         // Optional: local feedback
       }
     }

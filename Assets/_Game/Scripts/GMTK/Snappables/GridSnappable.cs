@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 namespace GMTK {
 
@@ -150,9 +151,15 @@ namespace GMTK {
     public List<Vector2Int> GetFootprint() => _occupiedCells;
 
     public IEnumerable<Vector2Int> GetWorldOccupiedCells(Vector2Int gridOrigin, bool flippedX = false, bool flippedY = false, int rotation = 0) {
-      foreach (var local in _occupiedCells) {
-        var transformed = TransformLocalCell(local, flippedX, flippedY, rotation);
-        yield return transformed + gridOrigin;
+      //Patch while we fill occupied cells for all snappables.
+      if (_occupiedCells.Count == 0) {
+        yield return TransformLocalCell(Vector2Int.zero, flippedX, flippedY, rotation) + gridOrigin;
+      }
+      else {
+        foreach (var local in _occupiedCells) {
+          var transformed = TransformLocalCell(local, flippedX, flippedY, rotation);
+          yield return transformed + gridOrigin;
+        }
       }
     }
 

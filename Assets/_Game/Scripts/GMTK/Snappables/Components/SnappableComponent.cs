@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -45,7 +46,8 @@ namespace GMTK {
     }
 
     private void AddInputListeners() {
-      SnappableInputHandler.OnElementDropped += HandleElementDropped;
+      //SnappableInputHandler.OnElementDropped += HandleElementDropped;
+      _gameEventChannel.AddListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
       SnappableInputHandler.OnElementHovered += HandleElementHovered;
       SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
       SnappableInputHandler.OnElementSelected += HandleElementSelected;
@@ -53,15 +55,22 @@ namespace GMTK {
     }
 
     private void RemoveInputListeners() {
-      SnappableInputHandler.OnElementDropped -= HandleElementDropped;
+      //SnappableInputHandler.OnElementDropped -= HandleElementDropped;
+      _gameEventChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
       SnappableInputHandler.OnElementHovered -= HandleElementHovered;
       SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
       SnappableInputHandler.OnElementSelected -= HandleElementSelected;
       if (_snappable != null) _snappable.RemoveComponentListener(this);
     }
 
+    private void HandleElementDroppedWrapper(EventArgs eventArgs) {
+      if (eventArgs is GridSnappableEventArgs snappableEventArgs) {
+        HandleElementDropped(snappableEventArgs);
+      }
+    }
+
     protected abstract void HandleElementSelected(object sender, GridSnappableEventArgs evt);
-    protected abstract void HandleElementDropped(object sender, GridSnappableEventArgs evt);
+    protected abstract void HandleElementDropped(GridSnappableEventArgs evt);
     protected abstract void HandleElementHovered(object sender, GridSnappableEventArgs evt);
     protected abstract void HandleElementUnhovered(object sender, GridSnappableEventArgs evt);
 

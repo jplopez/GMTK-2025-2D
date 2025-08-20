@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 617128071334964795}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.5181218, y: 2.40756, z: 1}
   m_ConstrainProportionsScale: 0
@@ -59,7 +59,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ba4adfaf3006baa4cb2e64a4f697241f, type: 2}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -78,7 +78,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 5
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: -5553993932830214367, guid: b81f1ba16c03bcf45bc1afcc5e057a10, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -185,20 +185,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da9b17e31f29c36419dc13260e2e8d90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AppliedTemplate: {fileID: 0}
   SnapTransform: {fileID: 7956316667899920837}
   Model: {fileID: 7956316667899920837}
   HighlightModel: {fileID: 1898513521503316484}
-  _occupiedCells: []
-  _rigidBody: {fileID: 8807545580737657185}
-  _collider: {fileID: -1967289433394306541}
   Draggable: 1
-  CanRotate: 1
+  _occupiedCells: []
+  BehaviourDelegate: 0
   Flippable: 0
-  StaticBody: 0
-  OverrideBodySettings: 1
-  Mass: 5
-  AngularDamping: 0.3
+  CanRotate: 1
+  PointerOnFeedback: {fileID: 0}
+  PointerOutFeedback: {fileID: 0}
 --- !u!1 &1898513521503316484
 GameObject:
   m_ObjectHideFlags: 0
@@ -273,7 +269,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 5
+  m_SortingLayer: 4
   m_SortingOrder: 1
   m_Sprite: {fileID: -5553993932830214367, guid: b81f1ba16c03bcf45bc1afcc5e057a10, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

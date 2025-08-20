@@ -1,4 +1,3 @@
-using Ameba;
 using UnityEngine;
 
 namespace GMTK {
@@ -12,8 +11,8 @@ namespace GMTK {
     public float GravityScale = 1f;
     public float AngularDamping = 0.05f;
     public Vector2 InitialForce = Vector2.zero;
-    [Tooltip("The minimum distance the marble's position has to change to consider is moving")]
-    [Min(0.01f)]
+    [Tooltip("The minimum distance the marble's position has to change between Update calls, to consider is moving")]
+    [Min(0.001f)]
     public float MinimalMovementThreshold = 0.01f;
 
     [Header("Spawn")]
@@ -22,7 +21,14 @@ namespace GMTK {
     [Tooltip("The LayerMask the marble should collide. Level and Interactables the most common")]
     public LayerMask GroundedMask;
 
+    /// <summary>
+    /// Whether the Marble is currently colliding with an object is considered ground (ex: wall, platform)
+    /// </summary>
     public bool Grounded { get => IsGrounded(); }
+
+    /// <summary>
+    /// Whether the marble has moved since the last Update call
+    /// </summary>
     public bool IsMoving => _timeSinceLastMove > 0f;
 
     protected Rigidbody2D _rb;
@@ -31,9 +37,7 @@ namespace GMTK {
     protected Vector2 _lastMarblePosition = Vector2.zero;
     protected float _timeSinceLastMove = 0f;
 
-    //private void Awake() {
-    //  Game.Context.AddStateChangeListener(HandleStateChange);
-    //}
+    #region MonoBehaviour methods
 
     void Start() {
 
@@ -55,9 +59,9 @@ namespace GMTK {
       if (!_rb.gravityScale.Equals(GravityScale)) _rb.gravityScale = GravityScale;
       if (!_rb.angularDamping.Equals(AngularDamping)) _rb.angularDamping = AngularDamping;
 
-
+      //calculate if marble has moved since last update
       Vector2 currentMarblePosition = Model.transform.position;
-      if (Vector2.Distance(currentMarblePosition, _lastMarblePosition) < MinimalMovementThreshold) {
+      if (Vector2.Distance(currentMarblePosition, _lastMarblePosition) <= MinimalMovementThreshold) {
         _timeSinceLastMove += Time.deltaTime;
       }
       else {
@@ -66,31 +70,27 @@ namespace GMTK {
     }
 
     private void LateUpdate() {
-      //last position is update end of the update, to prevent overridings
+      //last position is updated last to prevent overridings
       _lastMarblePosition = Model.transform.position;
     }
+
+    #endregion
+
+    protected virtual bool IsGrounded() {
+      RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, GroundedMask);
+      return hit.collider != null;
+    }
+
+    #region Public API
 
     public void Spawn() {
       if (SpawnTransform != null) {
         Model.transform.position = SpawnTransform.position;
       }
       else { Model.transform.position = Vector3.zero; }
+      Model.SetActive(true);
       StopMarble();
     }
-
-    //public void HandleStateChange(StateMachineEventArg<GameStates> eventArg) {
-    //  if (eventArg == null) return;
-    //  switch(eventArg.ToState) {
-    //    case GameStates.Reset:
-    //    case GameStates.Preparation:
-    //      Spawn();
-    //      Model.SetActive(false);
-    //      break;
-    //    case GameStates.Playing:
-    //      Model.SetActive(true);
-    //      break;
-    //  }
-    //}
 
     public void StopMarble() {
       GravityScale = 0f;
@@ -100,23 +100,22 @@ namespace GMTK {
     public void Launch() {
       ResetForces();
       GravityScale = 1f;
+      Model.SetActive(true);
       _rb.AddForce(InitialForce, ForceMode2D.Impulse);
     }
 
-    private void ResetForces() {
+    public void ResetForces() {
       if (_rb == null) return;
       _rb.linearVelocity = Vector2.zero;
       _rb.angularVelocity = 0f;
       _rb.rotation = 0f;
     }
-    private bool IsGrounded() {
-      RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, GroundedMask);
-      return hit.collider != null;
+
+    public void ApplyForce(Vector2 force) {
+      if(_rb != null) _rb.AddForce(force, ForceMode2D.Impulse);
     }
 
-    public void ApplyBoost(Vector2 boostForce) {
-      _rb.AddForce(boostForce, ForceMode2D.Impulse);
-    }
+    #endregion
 
   }
 }

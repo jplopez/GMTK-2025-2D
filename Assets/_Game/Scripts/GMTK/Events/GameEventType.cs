@@ -7,10 +7,25 @@ namespace GMTK {
     LevelStart,
     LevelPlay,
     LevelReset,
-    LevelCompleted,
     GameOver,
     EnterOptions, ExitOptions,
     EnterPause, ExitPause,
+
+
+    // Sequential Level Completion Events
+
+    LevelObjectiveCompleted,// When level objectives are met (triggers state change)
+    LevelCompleted,        // After state changes to LevelComplete (triggers UI, scoring, etc.)
+    LevelCompletionProcessed,// After completion processing (triggers scene loading)
+
+    // Scene events
+    SceneGoToNextLevel,
+    SceneGoToStart,
+    SceneGoToOptions, 
+    SceneGoToPause,
+    SceneGoToGameover,
+    SceneLoading,
+    SceneLoadingComplete,
 
     //int
     RaiseInt,

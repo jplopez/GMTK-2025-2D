@@ -52,8 +52,6 @@ namespace GMTK {
       //if foreach finishes, it means all cellsToRemove are available so we assign the snappable to them
       cells.ForEach(c => c.Add(snappable));
       _occupantFootprint.Add(snappable, snappable.GetFootprint());
-      //Debug.Log($"Snappable {snappable.name} registered:");
-      //cellsToRemove.ForEach(c => Debug.Log($"  {c}"));
       return true;
     }
 

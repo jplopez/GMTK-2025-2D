@@ -61,44 +61,48 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\UIStateHandler.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\GameplayStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GUI\ScoreTextAnimator.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Game.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Managers\LevelCompleteManager.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameplayStateHandler.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Events\GridSnappableEventArgs.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\GameStateEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateHandlerRegistry.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\OccupancyCell.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Managers\LevelExtensions\LevelExtension.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\UIStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\Components\SnappableComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridOccupancyMap.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\LevelInventoryItem.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Interfaces\Interfaces.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\InventoryCategory.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\GridSnappableEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayerInputController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\InventoryEventData.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\TurorialController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\Components\SnappablePhysics.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Attributes\DisplayWithoutEdit.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameStateEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Checkpoint.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\GameplayInputBase.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\PlayableMarbleController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameBaseMonoBehaviour.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\SnappableInputHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\SnappableMaterialStrategy.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\HudController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\LevelInventory.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameContext.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\InputStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\LevelGrid.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\GameStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameEventType.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Levels\LevelSequence.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateMachine.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\GameElement.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Booster.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\InputStateHandler.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\MarbleEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\PlayerControls.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Managers\LevelManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\GridSnappable.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\DelayedEventsChannelBroadcaster.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Managers\StartSceneManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\Components\DragFeedbackComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameEventChannel.cs" />
@@ -586,14 +590,6 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Sentry">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Sentry.System.Numerics.Vectors">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.System.Numerics.Vectors.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.VisualScripting.YamlDotNet">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
@@ -618,16 +614,8 @@
       <HintPath>Packages\com.bezi.sidekick\Plugins\System.Collections.Immutable.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Sentry.System.Memory">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.System.Memory.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="unityplastic">
       <HintPath>Library\PackageCache\com.unity.collab-proxy@c854d1f7d97f\Lib\Editor\unityplastic.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Sentry.System.Runtime.CompilerServices.Unsafe">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.System.Runtime.CompilerServices.Unsafe.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Plastic.Antlr3.Runtime">
@@ -658,10 +646,6 @@
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Sentry.System.Collections.Immutable">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.System.Collections.Immutable.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="bezi-websocket-sharp">
       <HintPath>Packages\com.bezi.sidekick\Plugins\bezi-websocket-sharp.dll</HintPath>
       <Private>False</Private>
@@ -682,14 +666,6 @@
       <HintPath>Packages\com.bezi.sidekick\Editor\BeziSidekickInternal.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Sentry.System.Buffers">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.System.Buffers.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Sentry.System.Reflection.Metadata">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.System.Reflection.Metadata.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
@@ -700,22 +676,6 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@d6f9955a5d5f\Mono.Cecil.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Sentry.System.Text.Json">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.System.Text.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Sentry.System.Text.Encodings.Web">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.System.Text.Encodings.Web.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Sentry.System.Threading.Tasks.Extensions">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.System.Threading.Tasks.Extensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Sentry.Microsoft.Bcl.AsyncInterfaces">
-      <HintPath>Packages\com.bezi.sidekick\Plugins\Sentry.Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
