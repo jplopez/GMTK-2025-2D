@@ -25,12 +25,12 @@ namespace GMTK {
 
     public string GetNextLevel() => GetNextLevel(CurrentScene);
 
-    public string GetNextLevel(string currentScene) {
+    public string GetNextLevel(string sceneName) {
       if (LevelSceneNames == null || LevelSceneNames.Length == 0) {
         Debug.LogWarning("_levelSequence has no levels defined.");
         return null;
       }
-      int index = Array.IndexOf(LevelSceneNames, currentScene);
+      int index = Array.IndexOf(LevelSceneNames, sceneName);
       if (index >= 0 && index < LevelSceneNames.Length - 1) {
         return LevelSceneNames[index + 1];
       }
@@ -38,6 +38,6 @@ namespace GMTK {
     }
 
     public bool HasNextLevel() => GetNextLevel(CurrentScene) != null;
-    public bool HasNextLevel(string currentScene) => GetNextLevel(currentScene) != null;
+    public bool HasNextLevel(string sceneName) => GetNextLevel(sceneName) != null;
   }
 }

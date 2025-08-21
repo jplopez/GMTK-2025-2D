@@ -20,6 +20,8 @@ namespace GMTK {
     [Header("Score")]
     [Tooltip("The TMP text field to display the score value")]
     [SerializeField] protected TMP_Text scoreText;
+    [Tooltip("If true, the score stops being updated")]
+    public bool PauseScore = false;
 
     [Header("Playback")]
     [Tooltip("if true, the playback buttons aren't displayed")]
@@ -39,7 +41,9 @@ namespace GMTK {
 
     protected HUD _hud;
     protected GameEventChannel _eventsChannel;
-    
+    protected int _scoreAtLevelStart;
+
+
     private void Awake() {
 
       if (_hud == null) {
@@ -49,7 +53,7 @@ namespace GMTK {
       _hud.MarbleScoreKeeper.SetStrategy(scoreStrategy, transform);
       UpdateScoreText(_hud.MarbleScoreKeeper.GetScore());
 
-      if(_eventsChannel == null) {
+      if (_eventsChannel == null) {
         _eventsChannel = Game.Context.EventsChannel;
       }
       PlayButton.onClick.AddListener(HandlePlayButtonClick);
@@ -62,17 +66,27 @@ namespace GMTK {
     }
 
     private void Update() {
-      UpdateScoreText(_hud.MarbleScoreKeeper.GetScore());
+      //Pause or Unpause score
+      _hud.MarbleScoreKeeper.PauseScore(PauseScore);
+      //update score text only if not paused
+      //to avoid pulling when there's no change
+      if (!PauseScore)
+        UpdateScoreText(_hud.MarbleScoreKeeper.GetScore());
     }
 
     public void UpdateUIFromGameState(GameStates gameState) {
       switch (gameState) {
         case GameStates.Preparation:
-          //ShowPlayback(true);
           PlayButton.enabled = true;
           PlayButton.interactable = true;
           ResetButton.enabled = false;
           ResetButton.interactable = false;
+
+          //Pause score counting and record current value
+          //as score at levelStart
+          PauseScore = true;
+          _scoreAtLevelStart = _hud.MarbleScoreKeeper.GetScore();
+          UpdateScoreText(_scoreAtLevelStart);
           break;
         case GameStates.Playing:
           //ShowPlayback(true);
@@ -80,13 +94,17 @@ namespace GMTK {
           PlayButton.interactable = false;
           ResetButton.enabled = true;
           ResetButton.interactable = true;
+          PauseScore = false;
           break;
         case GameStates.Reset:
           PlayButton.enabled = true;
           PlayButton.interactable = true;
           ResetButton.enabled = true;
           ResetButton.interactable = true;
-          
+          //Pause score counting and restore score value at levelStart 
+          PauseScore = true;
+          _hud.MarbleScoreKeeper.SetScore(_scoreAtLevelStart);
+          UpdateScoreText(_scoreAtLevelStart);
           //Uncomment the LevelStart event for testing only.
           //For now, reset only moves elements back to its initial place in the level
           //and moves marble back to starting point. In the future, reset 
@@ -100,6 +118,7 @@ namespace GMTK {
           PlayButton.interactable = false;
           ResetButton.enabled = false;
           ResetButton.interactable = false;
+          PauseScore = true;
           break;
       }
     }

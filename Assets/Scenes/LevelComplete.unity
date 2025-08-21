@@ -549,9 +549,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GMTK.LevelCompleteManager, GMTK
-        m_MethodName: NextLevel
+      - m_Target: {fileID: 1861360893}
+        m_TargetAssemblyTypeName: GMTK.GameContext, GMTK
+        m_MethodName: LoadNextScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -826,7 +826,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 3.4, y: 94.3}
+  m_AnchoredPosition: {x: 3.4, y: 94.29999}
   m_SizeDelta: {x: 83.2, y: 25.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &974136605
@@ -873,9 +873,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GMTK.LevelCompleteManager, GMTK
-        m_MethodName: RetryLevel
+      - m_Target: {fileID: 1861360893}
+        m_TargetAssemblyTypeName: GMTK.GameContext, GMTK
+        m_MethodName: LoadCurrentScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1390,7 +1390,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 914307986244139718, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
       propertyPath: m_Name
-      value: RollnSnapController
+      value: GameContext
       objectReference: {fileID: 0}
     - target: {fileID: 2205951209694358804, guid: e5a7ce40c7e5a6e4580427cd91b4855c, type: 3}
       propertyPath: m_LocalPosition.x

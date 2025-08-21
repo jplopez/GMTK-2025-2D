@@ -1182,6 +1182,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreText: {fileID: 467235712}
+  PauseScore: 0
   ShowPlaybackButtons: 1
   DisablePlaybackButtons: 0
   PlayButton: {fileID: 1239652868}
@@ -1477,8 +1478,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15c4af41d6a0aaa42916b9c29be3dfd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hudController: {fileID: 501334467}
-  tutorialController: {fileID: 1239652869}
+  HudController: {fileID: 0}
+  TutorialController: {fileID: 0}
 --- !u!114 &854602748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1992,7 +1993,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2377718697216487404, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3150182034196521630, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2012,7 +2013,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5294263334366068923, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5319597717334463005, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
       propertyPath: m_Name
@@ -2036,7 +2037,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6163749043290458280, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6508471270423944716, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
       propertyPath: m_Pivot.x
@@ -2121,6 +2122,17 @@ PrefabInstance:
     - target: {fileID: 6581371859915288343, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -15.004784
+      objectReference: {fileID: 0}
+    - target: {fileID: 6593899692556334446, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
+      propertyPath: m_text
+      value: "<size=120%><color=\"yellow\">How to Play</color></size>\nRun the marble
+        through the level using as much objects as possible before it reaches the
+        finishing point with the triangle mark.\nUse the objects in the left to build
+        the level. \nUse the Playback controls at the bottom to run or reset the
+        level \n<size=120%><color=\"yellow\">Controls</color></size>\nPress and hold
+        <sprite name=ml> to move objects\nPress <sprite name=w> or <sprite name=s>
+        to flip vertically\nPress <sprite name=a> or <sprite name=d> to flip horizontally\nPress
+        <sprite name=q> or <sprite name=e> to rotate the object.\n"
       objectReference: {fileID: 0}
     - target: {fileID: 7130242297324679060, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
       propertyPath: m_Pivot.x
@@ -2248,17 +2260,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1239652869 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8721171301217243703, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
-  m_PrefabInstance: {fileID: 1239652865}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e20c7385b267b14a82e421b815b2c4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1263036778

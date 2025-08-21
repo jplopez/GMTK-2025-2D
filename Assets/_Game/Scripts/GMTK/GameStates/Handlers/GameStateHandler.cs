@@ -22,6 +22,14 @@ namespace GMTK {
     public string HandlerName { get; set; } = nameof(GameStateHandler);
     public int Priority { get; set; } = 0;
 
+    protected GameEventChannel _eventsChannel;
+
+    protected virtual void Awake() {
+      if (_eventsChannel == null) {
+        _eventsChannel = Game.Context.EventsChannel;
+      }
+    }
+
     public virtual void HandleStateChange(StateMachineEventArg<GameStates> eventArg) {
       HandleFromState(eventArg.FromState);
       HandleToState(eventArg.ToState);

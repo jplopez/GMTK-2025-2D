@@ -19,7 +19,8 @@ namespace GMTK {
       HandlerName = nameof(GameplayStateHandler);
     }
 
-    public void Awake() {
+    protected override void Awake() {
+      base.Awake();
       Priority = (Priority == 0) ? 200 : Priority;
 
       if (marble == null) {
@@ -71,7 +72,7 @@ namespace GMTK {
       marble.Spawn();
       marble.Model.SetActive(false);
       levelManager.EndLevel();
-      ResetAllSnappables();
+      //ResetAllSnappables();
       //TODO: trigger effects of slowing down and victory music
       //TODO: fadeout 
       Game.Context.LoadNextScene();

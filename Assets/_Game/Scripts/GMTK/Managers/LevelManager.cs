@@ -48,7 +48,7 @@ namespace GMTK {
     protected bool _levelEnded = false;
     protected float _timeSinceLastMove = 0f;
     protected float _timeSinceLevelStart = 0f;
-    protected int _scoreAtLevelStart = 0;
+    //protected int _scoreAtLevelStart = 0;
     protected LevelSequence _levelSequence;
     protected GameEventChannel _eventChannel;
 
@@ -57,18 +57,16 @@ namespace GMTK {
     private void Awake() {
       _eventChannel = Game.Context.EventsChannel;
       _levelSequence = Game.Context.LevelSequence;
-      _scoreAtLevelStart = Game.Context.MarbleScoreKeeper.GetScore();
+      //_scoreAtLevelStart = Game.Context.MarbleScoreKeeper.GetScore();
       if (_eventChannel == null) {
         Debug.Log($"LevelManager: EventChannel is missing. LevelManager won't be able to handle game events");
         return;
       }
       _eventChannel.AddListener(GameEventType.EnterCheckpoint, HandleCheckPointEvent);
-      //_eventChannel.AddListener(GameEventType.ExitCheckpoint, HandleCheckPointEvent);
     }
 
     private void OnDestroy() {
       _eventChannel.RemoveListener(GameEventType.EnterCheckpoint, HandleCheckPointEvent);
-      //_eventChannel.RemoveListener(GameEventType.ExitCheckpoint, HandleCheckPointEvent);
     }
 
     public void Start() {
@@ -109,8 +107,11 @@ namespace GMTK {
 
     #endregion
 
-    #region Checkpoint Handler Wrapper EventArgs -> MarbleEventArgs
+    #region Checkpoint Events Handlers (Wrapper and actual)
 
+    /// <summary>
+    /// Wrapper to transfrom input from EventArgs -> MarbleEventArgs
+    /// </summary>
     private void HandleCheckPointEvent(EventArgs eventArgs) {
       if (eventArgs is MarbleEventArgs marbleEventArgs) {
         if (string.IsNullOrEmpty(marbleEventArgs.HitCheckpoint.ID)) {
@@ -123,46 +124,29 @@ namespace GMTK {
         }
         else if (marbleEventArgs.EventType == GameEventType.ExitCheckpoint) {
           Debug.Log("LevelManager doesn't handle ExitCheckpoint events"); return;
-          //HandleExitCheckpoint(marbleEventArgs.HitCheckpoint.ID);
         }
       }
     }
 
-    #endregion
-
-
-    #region Marble Event Handlers
-
+    /// <summary>
+    /// Actual Marble Event Handler
+    /// </summary>
     protected void HandleEnterCheckpoint(string checkpointID) {
       // mark level as complete when marble enters end checkpoint
       if (EndLevelCheckpoint.ID.Equals(checkpointID) && _levelStarted && !_levelEnded) {
         Debug.Log($"[LevelManager] Marble entered end checkpoint {EndLevelCheckpoint.ID}. Ending level.");
         _eventChannel.Raise(GameEventType.LevelObjectiveCompleted);
-        //EndLevel();
       }
     }
-
-    //protected void HandleExitCheckpoint(string checkpointID) {
-    //  // start level when marble exists start checkpoint
-    //  if (StartLevelCheckpoint.ID.Equals(checkpointID) && !_levelStarted) {
-    //    Debug.Log($"[LevelManager] Marble entered start checkpoint {StartLevelCheckpoint.ID}. Starting level.");
-    //    Game.Context.EventsChannel.Raise(GameEventType.LevelStart);
-    //    //StartLevel();
-    //  }
-    //}
 
     #endregion
 
     #region Public API for GameState changes
 
+    //public int GetScoreAtLevelStart() => _scoreAtLevelStart;
+
     public void StartLevel() {
       ResetTimers();
-      //if (PlayableMarble != null) {
-      //  PlayableMarble.Launch();
-      //}
-      //else {
-      //  Debug.LogWarning("[LevelManager] PlayableMarble is not assigned in LevelManager.");
-      //}
       _levelStarted = true;
       _levelEnded = false;
       StartLevelCheckpoint.enabled = false;
@@ -181,9 +165,6 @@ namespace GMTK {
       }
       _levelStarted = false;
       _levelEnded = true;
-      //if (PlayableMarble != null) {
-      //  PlayableMarble.StopMarble();
-      //}
       Debug.Log($"LevelEnded? {_levelEnded}");
     }
 
@@ -192,18 +173,17 @@ namespace GMTK {
     /// resets score to the value at the start of the level
     /// </summary>
     public void ResetLevel() {
-      //PlayableMarble.Model.transform.position = StartLevelCheckpoint.Position;
-      //PlayableMarble.Spawn();
-      //PlayableMarble.InitialForce = MarbleInitialForce;
       _levelStarted = false;
       _levelEnded = false;
       StartLevelCheckpoint.enabled = true;
       EndLevelCheckpoint.enabled = false;
       ResetTimers();
-      _eventChannel.Raise(GameEventType.ScoreChanged, _scoreAtLevelStart);
+      //_eventChannel.Raise(GameEventType.ScoreChanged, _scoreAtLevelStart);
     }
 
     #endregion
+
+    #region Utilities
 
     /// <summary>
     /// Checks if the marble is moving to inform the score.<br/>
@@ -237,6 +217,7 @@ namespace GMTK {
       _timeSinceLastMove = 0f;
     }
 
+    #endregion
   }
 
 }

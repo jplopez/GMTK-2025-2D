@@ -71,6 +71,9 @@ namespace GMTK {
       EnsureComponents();
       UpdateCurrentScene();
       AddGameEventListeners();
+    }
+
+    protected virtual void Start() {
       ChangeToOnStartGameState();
     }
 
@@ -167,18 +170,32 @@ namespace GMTK {
       }
     }
 
-    public virtual void LoadNextScene() {
+    public virtual void LoadCurrentScene() {
 
-      //If currentScene is null, LoadNextScene
+      var loadingScene = _levelSequence.CurrentScene;
+
+      //If loadingScene is null, LoadNextScene
       //goes for the first scene in the _levelSequence
-      if (_levelSequence.CurrentScene == null) {
-        string firstScene = _levelSequence.LevelSceneNames[0];
-        if (string.IsNullOrEmpty(firstScene)) {
+      if (string.IsNullOrEmpty(loadingScene)) {
+        loadingScene = _levelSequence.LevelSceneNames[0];
+        if (string.IsNullOrEmpty(loadingScene)) {
           Debug.LogError("LoadNextScene: First level scene name is empty in _levelSequence");
           return;
         }
-        else {
-          UnityEngine.SceneManagement.SceneManager.LoadScene(firstScene);
+      } 
+      UnityEngine.SceneManagement.SceneManager.LoadScene(loadingScene);
+    }
+
+    public virtual void LoadNextScene() {
+
+      var loadingScene = _levelSequence.CurrentScene;
+
+      //If loadingScene is null, LoadNextScene
+      //goes for the first scene in the _levelSequence
+      if (string.IsNullOrEmpty(loadingScene)) {
+        loadingScene = _levelSequence.LevelSceneNames[0];
+        if (string.IsNullOrEmpty(loadingScene)) {
+          Debug.LogError("LoadNextScene: First level scene name is empty in _levelSequence");
           return;
         }
       }
@@ -189,15 +206,16 @@ namespace GMTK {
       // TODO: define a 'default' scene for these cases or assume
       // the game is finished and go back to first scene.
       else {
-        if (_levelSequence.HasNextLevel()) {
-          UnityEngine.SceneManagement.SceneManager.LoadScene(_levelSequence.GetNextLevel());
+        if (_levelSequence.HasNextLevel(loadingScene)) {
+          loadingScene = _levelSequence.GetNextLevel(loadingScene);
         }
         else {
-          string activeSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-          Debug.Log($"There's no next level for '{_levelSequence.CurrentScene}'. Reloading current scene: '{activeSceneName}'");
-          UnityEngine.SceneManagement.SceneManager.LoadScene(activeSceneName);
+          loadingScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+          Debug.Log($"There's no next level for '{_levelSequence.CurrentScene}'. Reloading current scene: '{loadingScene}'");
         }
       }
+
+      UnityEngine.SceneManagement.SceneManager.LoadScene(loadingScene);
     }
 
     public void QuitGame() {

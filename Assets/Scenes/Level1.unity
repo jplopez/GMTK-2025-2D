@@ -261,6 +261,10 @@ PrefabInstance:
       propertyPath: Draggable
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2051605598249466836, guid: 6804650fd7e841d4f89da68693f53603, type: 3}
+      propertyPath: MaxRotationAngle
+      value: 150
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2856,8 +2860,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15c4af41d6a0aaa42916b9c29be3dfd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hudController: {fileID: 6495881767594849128}
-  tutorialController: {fileID: 619917904574406010}
+  HudController: {fileID: 0}
+  TutorialController: {fileID: 0}
 --- !u!114 &2098689671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3223,17 +3227,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6508471270423944716, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
   m_PrefabInstance: {fileID: 619917904574406008}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &619917904574406010 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8721171301217243703, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
-  m_PrefabInstance: {fileID: 619917904574406008}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e20c7385b267b14a82e421b815b2c4c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &1824715150102484977
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3762,6 +3755,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreText: {fileID: 2965871367719208391}
+  PauseScore: 0
   ShowPlaybackButtons: 1
   DisablePlaybackButtons: 0
   PlayButton: {fileID: 4243183588126997538}
