@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8962115518929029186}
   - component: {fileID: 8875153383517306038}
+  - component: {fileID: 3695790266787744221}
   m_Layer: 0
   m_Name: SnappableInputHandler
   m_TagString: GameController
@@ -44,6 +45,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 033d703a44b5db749a6387d1d1fdec66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Registry: {fileID: 11400000, guid: a4e654e7233c44f41b3024fab36c23a6, type: 2}
   _currentElement: {fileID: 0}
   _lastElementOver: {fileID: 0}
+--- !u!114 &3695790266787744221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9045615520726610499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f423f664d86fe3c44b7368989a9b12bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

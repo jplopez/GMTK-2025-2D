@@ -9,9 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9117495604232443ae579deefa9946a, type: 3}
-  m_Name: MarbleScoreKeeper
+  m_Script: {fileID: 11500000, guid: 39a1b1f901dd3e14eafda365d0989aea, type: 3}
+  m_Name: InputActionEventChannel
   m_EditorClassIdentifier: 
-  totalScore: 0
-  strategy: {fileID: 0}
-  pauseScore: 1

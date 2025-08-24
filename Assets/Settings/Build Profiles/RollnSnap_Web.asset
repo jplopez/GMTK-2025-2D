@@ -85,7 +85,8 @@ MonoBehaviour:
     m_path: Assets/Scenes/Level2.unity
   - m_enabled: 1
     m_path: Assets/Scenes/LevelComplete.unity
-  m_ScriptingDefines: []
+  m_ScriptingDefines:
+  - MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED
   m_PlayerSettingsYaml:
     m_Settings:
     - line: '| PlayerSettings:'
@@ -231,7 +232,7 @@ MonoBehaviour:
     - line: '|   loadStoreDebugModeEnabled: 0'
     - line: '|   visionOSBundleVersion: 1.0'
     - line: '|   tvOSBundleVersion: 1.0'
-    - line: '|   bundleVersion: 0.3-Alpha'
+    - line: '|   bundleVersion: 0.4-Alpha'
     - line: '|   preloadedAssets:'
     - line: '|   - {fileID: 11400000, guid: b781cce4cacc5e94c8b85a98fea9d99b, type:
         2}'

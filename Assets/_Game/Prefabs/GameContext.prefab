@@ -58,6 +58,7 @@ MonoBehaviour:
   DisableInputs: 0
   InputRegistryName: GameplayRegistry
   _inputRegistry: {fileID: 11400000, guid: a4e654e7233c44f41b3024fab36c23a6, type: 2}
+  _inputChannel: {fileID: 11400000, guid: ee65a35f480e46941b3298fb455eb57f, type: 2}
   _eventsChannel: {fileID: 11400000, guid: 95a9f7bb01a666548ba38fda71806925, type: 2}
   _hud: {fileID: 11400000, guid: 52f45e5037fea8e4a842a0b5a5a0b95b, type: 2}
   _marbleScoreKeeper: {fileID: 11400000, guid: 584c2a77812de864c8cc37435490bfef, type: 2}
