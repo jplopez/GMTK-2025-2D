@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\UIStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\GameplayStateHandler.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayerInputActionDispatcher.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GUI\ScoreTextAnimator.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Game.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Managers\LevelCompleteManager.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Levels\LevelSequence.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateMachine.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\GameElement.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\InputActionEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Booster.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\MarbleEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\PlayerControls.cs" />
@@ -1208,9 +1210,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Ameba.Input.csproj">
-      <Project>{67F7F933-C7A5-DBB3-1E41-F21F231A496A}</Project>
-      <Name>Ameba.Input</Name>
+    <ProjectReference Include="Ameba.csproj">
+      <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
+      <Name>Ameba</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

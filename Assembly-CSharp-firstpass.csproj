@@ -1387,9 +1387,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Ameba.Input.csproj">
-      <Project>{67F7F933-C7A5-DBB3-1E41-F21F231A496A}</Project>
-      <Name>Ameba.Input</Name>
+    <ProjectReference Include="Ameba.csproj">
+      <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
+      <Name>Ameba</Name>
     </ProjectReference>
     <ProjectReference Include="sc.utilities.screenshot.editor.csproj">
       <Project>{900D7AA2-01A0-3409-13A6-3DB57626FA0E}</Project>
@@ -1399,13 +1399,13 @@
       <Project>{2A12955F-9E65-5D83-9DC8-AC097340A6F3}</Project>
       <Name>CFXRDemo</Name>
     </ProjectReference>
-    <ProjectReference Include="Ameba.Input.Editor.csproj">
-      <Project>{4F51E72B-8226-B03A-1C1E-AC6727CF022F}</Project>
-      <Name>Ameba.Input.Editor</Name>
-    </ProjectReference>
     <ProjectReference Include="BetterHierarchyDemoScripts.csproj">
       <Project>{EFD32E90-DF1F-8347-B207-FC2375565E82}</Project>
       <Name>BetterHierarchyDemoScripts</Name>
+    </ProjectReference>
+    <ProjectReference Include="Ameba.Editor.csproj">
+      <Project>{9221C05C-856E-BDBC-9B62-082573738239}</Project>
+      <Name>Ameba.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="CFXR.WelcomeScreen.csproj">
       <Project>{B2D37327-AC46-32B8-7471-CB8F5EB9E91E}</Project>

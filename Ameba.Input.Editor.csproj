@@ -61,11 +61,13 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_Game\Scripts\Ameba\Editor\StateMachine\StateMachineEditor.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Editor\Runtime\RuntimeMapEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Editor\Input\InputActionRegistryEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_Game\Scripts\Ameba\Editor\Input\readme.txt" />
-    <None Include="Assets\_Game\Scripts\Ameba\Editor\Input\Ameba.Input.Editor.asmdef" />
+    <None Include="Assets\_Game\Scripts\Ameba\Editor\Ameba.Input.Editor.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
