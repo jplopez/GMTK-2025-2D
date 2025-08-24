@@ -2,8 +2,9 @@
     "name": "GMTK.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:6b599c20cee34f745bd7461ed1f35c25",
-        "GUID:7d25628ab3b8e30458a26b8697161b4b"
+        "GUID:7d25628ab3b8e30458a26b8697161b4b",
+        "GUID:55000211cfc6e2a4c880297a4a43dbe2",
+        "GUID:6b599c20cee34f745bd7461ed1f35c25"
     ],
     "includePlatforms": [
         "Editor"

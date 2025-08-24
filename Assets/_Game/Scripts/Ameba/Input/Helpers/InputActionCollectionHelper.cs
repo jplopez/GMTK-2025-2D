@@ -45,7 +45,7 @@ namespace Ameba.Input {
     ///
     ///    //assume 'controls' is the name of the auto-generated wrapper
     ///    //assume 'Gameplay' is the name of the action map and is enabled
-    ///    controls.Gameplay.Disable()
+    ///    controls.Gameplay.DisableActionMap()
     ///
     /// </code>
     /// </summary>
@@ -54,7 +54,7 @@ namespace Ameba.Input {
     /// <exception cref="InvalidOperationException"></exception>
     public void DisableActionMap(string mapName) {
       var mapInstance = GetOrCreateMapInstance(mapName); 
-      InvokeMapMethod(mapInstance, "Disable");
+      InvokeMapMethod(mapInstance, "DisableActionMap");
     }
 
     private PropertyInfo GetMapProp(string mapName) {

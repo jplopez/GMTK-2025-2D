@@ -1,7 +1,4 @@
-using Ameba;
-using Ameba.Input;
 using System;
-using Unity.Android.Gradle;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,7 +16,7 @@ namespace GMTK {
   ///   <item><b>OnElementSecondary</b>: Reserved for secondary interactions (e.g., right-click). Not yet implemented.</item>
   /// </list>
   /// </summary>
-  public class SnappableInputHandler : GameplayInputBase {
+  public class SnappableInputHandler : MonoBehaviour {
 
     public GridSnappable Current => _currentElement;
     public GridSnappable LastOnOver => _lastElementOver;
@@ -34,23 +31,102 @@ namespace GMTK {
     private Vector3 _pointerWorldPos;
 
     protected bool DisableDragging = false;
+
     protected GameEventChannel _eventsChannel;
+    protected PlayerInputActionDispatcher _inputDispatcher;
 
     // Declare events using EventHadler<GridSnappableEventArgs>
-    public static event EventHandler<GridSnappableEventArgs> OnElementHovered;
-    public static event EventHandler<GridSnappableEventArgs> OnElementUnhovered;
-    public static event EventHandler<GridSnappableEventArgs> OnElementSelected;
-    public static event EventHandler<GridSnappableEventArgs> OnElementDropped;
-    public static event EventHandler<GridSnappableEventArgs> OnElementSecondary;
+    //public static event EventHandler<GridSnappableEventArgs> OnElementHovered;
+    //public static event EventHandler<GridSnappableEventArgs> OnElementUnhovered;
+    //public static event EventHandler<GridSnappableEventArgs> OnElementSelected;
+    //public static event EventHandler<GridSnappableEventArgs> OnElementDropped;
+    //public static event EventHandler<GridSnappableEventArgs> OnElementSecondary;
 
+    #region MonoBehaviour methods
 
-    protected override void Awake() {
-      base.Awake();
-      if(_eventsChannel == null) {
+    protected void Awake() {
+      if (_eventsChannel == null) {
         _eventsChannel = Game.Context.EventsChannel;
+      }
+
+      if (_inputDispatcher == null && TryGetComponent(out _inputDispatcher)) {
+        Debug.Log($"SnappableInputHandler -> InputDispatcher obtained: {_inputDispatcher.name}");
       }
     }
 
+    private void Start() {
+
+      if (_inputDispatcher != null) {
+
+        _inputDispatcher.InputEvents.AddListener(InputActionType.Select, HandleSelect);
+        _inputDispatcher.InputEvents.AddListener(InputActionType.Secondary, HandleSecondary);
+        _inputDispatcher.InputEvents.AddListener(InputActionType.RotateCW, RotateCW);
+        _inputDispatcher.InputEvents.AddListener(InputActionType.RotateCCW, RotateCCW);
+        _inputDispatcher.InputEvents.AddListener(InputActionType.FlipX, FlipX);
+        _inputDispatcher.InputEvents.AddListener(InputActionType.FlipY, FlipY);
+      }
+      UpdatePointerPosition();
+    }
+
+    private void UpdatePointerPosition() {
+      if (_inputDispatcher != null) {
+        _pointerScreenPos = _inputDispatcher.PointerScreenPosition;
+        _pointerWorldPos = _inputDispatcher.PointerWorldPoition;
+      }
+    }
+
+    private void OnDestroy() {
+      if (_inputDispatcher != null) {
+        _inputDispatcher.InputEvents.RemoveListener(InputActionType.Select, HandleSelect);
+        _inputDispatcher.InputEvents.RemoveListener(InputActionType.Secondary, HandleSecondary);
+        _inputDispatcher.InputEvents.RemoveListener(InputActionType.RotateCW, RotateCW);
+        _inputDispatcher.InputEvents.RemoveListener(InputActionType.RotateCCW, RotateCCW);
+        _inputDispatcher.InputEvents.RemoveListener(InputActionType.FlipX, FlipX);
+        _inputDispatcher.InputEvents.RemoveListener(InputActionType.FlipY, FlipY);
+      }
+    }
+
+    protected virtual void Update() {
+
+      UpdatePointerPosition();
+
+      //TODO change this to snappable component that decides when to update position
+      if (IsMoving && _currentElement != null) {
+        _currentElement.UpdatePosition(_pointerWorldPos);
+      }
+
+      if (TryGetElementOnCurrentPointer(out GridSnappable element)) {
+        IsOverElement = true;
+        if (!element.Equals(_lastElementOver)) {
+
+          // moved over a different element
+          UnhoverLastElement();
+
+          _lastElementOver = element;
+          _lastElementOver.OnPointerOver();
+          //RaiseEvent(OnElementHovered, _lastElementOver);
+          _eventsChannel.Raise(GameEventType.ElementHovered,
+              new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos, _pointerWorldPos));
+          //Debug.Log($"OnElementHovered: {_lastElementOver.name}");
+        }
+      }
+      //no element, means we have unhover the lastElementOver
+      else { UnhoverLastElement(); }
+    }
+
+    private void UnhoverLastElement() {
+      if (_lastElementOver != null && IsOverElement) {
+        _lastElementOver.OnPointerOut();
+        //RaiseEvent(OnElementUnhovered, _lastElementOver);
+        _eventsChannel.Raise(GameEventType.ElementUnhovered,
+            new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos, _pointerWorldPos));
+        //Debug.Log($"OnElementUnhovered: {_lastElementOver.name}");
+        _lastElementOver = null;
+        IsOverElement = false;
+      }
+    }
+
+    #endregion
 
     //The element dragging is disabled during Playing, to prevent players
     //from moving elements while the level is running
@@ -67,150 +143,62 @@ namespace GMTK {
       }
     }
 
-    #region InputHandler methods
+    #region Gameplay InputAction methods
 
-    [InputHandler("PointerPosition")]
-    public void HandlePointer(InputAction.CallbackContext context) {
-      Vector2 pointerPos = context.ReadValue<Vector2>();
-      if (pointerPos != _pointerScreenPos) {
-        _pointerScreenPos = pointerPos;
-        if (Camera.main == null) {
-          _pointerWorldPos = Vector3.zero;
+    public void HandleSelect(EventArgs eventArgs) {
+      if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
+        var phase = inputArgs.Phase;
+        switch (phase) {
+          case InputActionPhase.Performed: BeginMovingElement(); break;
+          case InputActionPhase.Canceled: EndMovingElement(); break;
         }
-        else {
-          _pointerWorldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPos);
-        }
-        _pointerWorldPos.z = 0f;
       }
     }
 
-    [InputHandler("Select", InputActionPhase.Performed, InputActionPhase.Canceled)]
-    public void HandleSelect(InputAction.CallbackContext context) {
-      _eventsChannel.Raise(GameEventType.InputSelected);
-      switch (context.phase) {
-        case InputActionPhase.Performed: BeginMovingElement(); break;
-        case InputActionPhase.Canceled: EndMovingElement(); break;
-      }
-    }
-
-    [InputHandler("Secondary")]
-    public void HandleSecondary(InputAction.CallbackContext context) {
+    public void HandleSecondary(EventArgs eventArgs) {
       Debug.Log("SnappableInputHandler.HandleSecondary : Not implemented yet");
-      _eventsChannel.Raise(GameEventType.InputSecondary);
+      //_eventsChannel.Raise(GameEventType.InputSecondary);
     }
 
-    [InputHandler("RotateCW", InputActionPhase.Started)]
-    public void RotateCW(InputAction.CallbackContext context) {
-      _eventsChannel.Raise(GameEventType.InputRotateCW);
-      TryExecuteOnCurrentElement(e => e.RotateClockwise());
-    }
-
-    [InputHandler("RotateCCW", InputActionPhase.Started)]
-    public void RotateCCW(InputAction.CallbackContext context) {
-      _eventsChannel.Raise(GameEventType.InputRotateCCW);
-      TryExecuteOnCurrentElement(e => e.RotateCounterClockwise());
-    }
-
-    [InputHandler("FlipX", InputActionPhase.Started)]
-    public void FlipX(InputAction.CallbackContext context) {
-      _eventsChannel.Raise(GameEventType.InputFlippedX);
-      TryExecuteOnCurrentElement(e => e.FlipX());
-    }
-
-    [InputHandler("FlipY", InputActionPhase.Started)]
-    public void FlipY(InputAction.CallbackContext context) {
-      _eventsChannel.Raise(GameEventType.InputFlippedY);
-      TryExecuteOnCurrentElement(e => e.FlipY());
-    }
-
-    #endregion
-
-
-    #region MonoBehaviour methods
-
-    protected virtual void Update() {
-
-      //TODO change this to snappable component that decides when to update position
-      if (IsMoving && _currentElement != null) {
-        _currentElement.UpdatePosition(_pointerWorldPos);
-      }
-
-      if (TryGetElementOnCurrentPointer(out GridSnappable element)) {
-        IsOverElement = true;
-        if (!element.Equals(_lastElementOver)) {
-          
-          // moved over a different element
-          UnhoverLastElement();
-
-          _lastElementOver = element;
-          _lastElementOver.OnPointerOver();
-          RaiseEvent(OnElementHovered, _lastElementOver);
-          _eventsChannel.Raise(GameEventType.ElementHovered, 
-              new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos));
-          //Debug.Log($"OnElementHovered: {_lastElementOver.name}");
-        }
-      }
-      //no element, means we have unhover the lastElementOver
-      else { UnhoverLastElement(); }
-    }
-
-    private void UnhoverLastElement() {
-      if (_lastElementOver != null && IsOverElement) {
-        _lastElementOver.OnPointerOut();
-        RaiseEvent(OnElementUnhovered, _lastElementOver);
-        _eventsChannel.Raise(GameEventType.ElementUnhovered, 
-            new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos));
-        //Debug.Log($"OnElementUnhovered: {_lastElementOver.name}");
-        _lastElementOver = null;
-        IsOverElement = false;
-      }
-    }
-
-    private void RaiseEvent(EventHandler<GridSnappableEventArgs> evt, GridSnappable element) {
-      //Debug.Log($"SnappableInputHandler:RaiseEvent {nameof(evt)}. Element: {element.name;}");
-      var payload = new GridSnappableEventArgs(element, _pointerScreenPos);
-      evt?.Invoke(this, payload);
-      //Game.Context.EventsChannel.Raise(GameEventType.Input, payload);
-    }
-
-    private void RaiseEventOrException(EventHandler<GridSnappableEventArgs> evt, GridSnappable element) {
-      if (evt == null) throw new ArgumentNullException(nameof(evt));
-      if (element == null) throw new ArgumentNullException(nameof(element));
-      try {
-        RaiseEvent(evt, element);
-      }
-      catch (Exception ex) {
-        Debug.LogError($"Failed to raise event '{evt?.GetType().Name}': {ex.Message}");
-#if !UNITY_EDITOR
-        throw;
-#endif
-      }
-
-    }
-    #endregion
-
-    #region GridSnappable management
-
-    private void BeginMovingElement() {
-      if (TryGetElementOnCurrentPointer(out GridSnappable selectedElement)) {
-        if (!DisableDragging && selectedElement.Draggable) {
-          _currentElement = selectedElement;
-          IsMoving = true;
-          RaiseEvent(OnElementSelected, _currentElement);
-          _eventsChannel.Raise(GameEventType.ElementSelected, 
-              new GridSnappableEventArgs(_currentElement, _pointerScreenPos));
+    public void RotateCW(EventArgs eventArgs) {
+      if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
+        if (inputArgs.Phase == InputActionPhase.Performed) {
+          _eventsChannel.Raise(GameEventType.InputRotateCW);
+          TryExecuteOnCurrentElement(e => e.RotateClockwise());
         }
       }
     }
 
-    private void EndMovingElement() {
-      if (_currentElement != null) {
-        //RaiseEvent(OnElementDropped, _currentElement);
-        _eventsChannel.Raise(GameEventType.ElementDropped, 
-            new GridSnappableEventArgs(_currentElement, _pointerScreenPos));
-        _currentElement = null;
-        IsMoving = false;
+    public void RotateCCW(EventArgs eventArgs) {
+      if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
+        if (inputArgs.Phase == InputActionPhase.Performed) {
+          _eventsChannel.Raise(GameEventType.InputRotateCCW);
+          TryExecuteOnCurrentElement(e => e.RotateCounterClockwise());
+        }
       }
+    }
+
+    public void FlipX(EventArgs eventArgs) {
+      if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
+        if (inputArgs.Phase == InputActionPhase.Performed) {
+          _eventsChannel.Raise(GameEventType.InputFlippedX);
+          TryExecuteOnCurrentElement(e => e.FlipX());
+        }
+      }
+    }
+
+    public void FlipY(EventArgs eventArgs) {
+      if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
+        if (inputArgs.Phase == InputActionPhase.Performed) {
+          _eventsChannel.Raise(GameEventType.InputFlippedY);
+          TryExecuteOnCurrentElement(e => e.FlipY());
+        }
+      }
+    }
+
+    private void RaiseGameEvent(GameEventType eventType, GridSnappable snappable) {
+      _eventsChannel.Raise(eventType,
+              new GridSnappableEventArgs(snappable, _pointerScreenPos, _pointerWorldPos));
     }
 
     private void TryExecuteOnCurrentElement(Action<GridSnappable> action) {
@@ -233,19 +221,53 @@ namespace GMTK {
       return false;
     }
 
+    private bool TryHandleAsInputActionEventArgs(EventArgs args, out InputActionEventArgs inputArgs) {
+      inputArgs = default;
+      if (args is InputActionEventArgs validArgs) {
+        inputArgs = validArgs;
+        return true;
+      }
+      return false;
+    }
+
     #endregion
 
 
+    #region GridSnappable Movement Tracking
+
+    private void BeginMovingElement() {
+      if (TryGetElementOnCurrentPointer(out GridSnappable selectedElement)) {
+        if (!DisableDragging && selectedElement.Draggable) {
+          _currentElement = selectedElement;
+          IsMoving = true;
+          //RaiseEvent(OnElementSelected, _currentElement);
+          _eventsChannel.Raise(GameEventType.ElementSelected,
+              new GridSnappableEventArgs(_currentElement, _pointerScreenPos, _pointerWorldPos));
+        }
+      }
+    }
+
+    private void EndMovingElement() {
+      if (_currentElement != null) {
+        //RaiseEvent(OnElementDropped, _currentElement);
+        _eventsChannel.Raise(GameEventType.ElementDropped,
+            new GridSnappableEventArgs(_currentElement, _pointerScreenPos, _pointerWorldPos));
+        _currentElement = null;
+        IsMoving = false;
+      }
+    }
+
+    #endregion
+
 #if UNITY_EDITOR
-    public void TriggerHoveredEvent() => RaiseEventOrException(OnElementHovered, _currentElement);
+    public void TriggerHoveredEvent() => RaiseGameEvent(GameEventType.ElementHovered, _currentElement);
 
-    public void TriggerUnhoveredEvent() => RaiseEventOrException(OnElementUnhovered, _currentElement);
+    public void TriggerUnhoveredEvent() => RaiseGameEvent(GameEventType.ElementUnhovered, _currentElement);
 
-    public void TriggerSelectedEvent() => RaiseEventOrException(OnElementSelected, _currentElement);
+    public void TriggerSelectedEvent() => RaiseGameEvent(GameEventType.ElementSelected, _currentElement);
 
-    public void TriggerDroppedEvent() => RaiseEventOrException(OnElementDropped, _currentElement);
+    public void TriggerDroppedEvent() => RaiseGameEvent(GameEventType.ElementDropped, _currentElement);
 
-    public void TriggerSecondaryEvent() => RaiseEventOrException(OnElementSecondary, _currentElement);
 #endif
   }
 }

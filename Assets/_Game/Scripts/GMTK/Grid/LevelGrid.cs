@@ -212,15 +212,18 @@ namespace GMTK {
 
     #region Event Listeners
 
-
     private void AddInputListeners() {
       // Input listeners TODO-> move them over to GameEventsChannel
       //SnappableInputHandler.OnElementDropped += HandleElementDropped;
-      SnappableInputHandler.OnElementHovered += HandleElementHovered;
-      SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
-      SnappableInputHandler.OnElementSelected += HandleElementSelected;
+      //SnappableInputHandler.OnElementHovered += HandleElementHovered;
+      //SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
+      //SnappableInputHandler.OnElementSelected += HandleElementSelected;
 
-      _eventsChannel.AddListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
+      // Add Element moving and hovering events
+      _eventsChannel.AddListener(GameEventType.ElementDropped, HandleElementSelected);
+      _eventsChannel.AddListener(GameEventType.ElementDropped, HandleElementDropped);
+      _eventsChannel.AddListener(GameEventType.ElementHovered, HandleElementHovered);
+      _eventsChannel.AddListener(GameEventType.ElementUnhovered, HandleElementUnhovered);
 
       // Add inventory event listeners with EventArgs wrappers
       _eventsChannel.AddListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
@@ -230,13 +233,10 @@ namespace GMTK {
     }
 
     private void RemoveInputListeners() {
-      // Input listeners TODO-> move them over to GameEventsChannel
-      //SnappableInputHandler.OnElementDropped -= HandleElementDropped;
-      SnappableInputHandler.OnElementHovered -= HandleElementHovered;
-      SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
-      SnappableInputHandler.OnElementSelected -= HandleElementSelected;
-
-      _eventsChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
+      _eventsChannel.RemoveListener(GameEventType.ElementDropped, HandleElementSelected);
+      _eventsChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDropped);
+      _eventsChannel.RemoveListener(GameEventType.ElementHovered, HandleElementHovered);
+      _eventsChannel.RemoveListener(GameEventType.ElementUnhovered, HandleElementUnhovered);
 
       // Remove inventory event listeners
       _eventsChannel.RemoveListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
@@ -311,11 +311,6 @@ namespace GMTK {
     #endregion
 
     #region Event Handler Wrappers (EventArgs -> InventoryEventData)
-    private void HandleElementDroppedWrapper(EventArgs args) {
-      if (args is GridSnappableEventArgs inventoryData) {
-        HandleElementDropped(inventoryData);
-      }
-    }
 
     private void HandleInventoryElementAddedWrapper(EventArgs args) {
       if (args is InventoryEventData inventoryData) {
@@ -343,7 +338,7 @@ namespace GMTK {
 
     #endregion
 
-    #region Enhanced Inventory Event Handlers
+    #region Inventory Event Handlers
 
     // Enhanced HandleElementReturnToInventory with richer context
     protected virtual void HandleElementReturnToInventory(GridSnappable element) {
@@ -462,9 +457,9 @@ namespace GMTK {
 
     #region Element Movement Event Handlers
 
-    protected virtual void HandleElementSelected(object sender, GridSnappableEventArgs e) {
+    protected virtual void HandleElementSelected(EventArgs args) {
       // This now just collects element initial world and grid positions - tracking starts in Update()
-      if (e.Element != null) {
+      if (args is GridSnappableEventArgs e && e.Element != null) {
         //_currentSelected = e.Element;
         _elementOriginalWorldPosition = e.Element.transform.position;
         _elementWasInGrid = _occupancyMap.ContainsSnappable(e.Element);
@@ -476,57 +471,64 @@ namespace GMTK {
         e.Element.OnPointerOver();
       }
     }
-    protected virtual void HandleElementDropped(GridSnappableEventArgs e) {
-      var element = e.Element;
-      var newGridOrigin = WorldToGrid(element.transform.position);
+    protected virtual void HandleElementDropped(EventArgs args) {
 
-      // Try to place at new position
-      if (IsInsidePlayableArea(element.transform.position)) {
+      if (args is GridSnappableEventArgs e && e.Element != null) {
 
-        // Success - place at new position
-        if (CanPlace(element, newGridOrigin)) {
-          element.transform.position = SnapToGrid(newGridOrigin);
-          _occupancyMap.Register(element, newGridOrigin);
-          Debug.Log($"Placed {element.name} at {newGridOrigin}");
-        }
-        else {
-          // Failed to place - return to original position if it was in grid
-          if (_elementWasInGrid) {
 
-            element.transform.position = SnapToGrid(_elementOriginalGridPosition);
-            _occupancyMap.Register(element, _elementOriginalGridPosition);
-            Debug.Log($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
+        var element = e.Element;
+        var newGridOrigin = WorldToGrid(element.transform.position);
+
+        // Try to place at new position
+        if (IsInsidePlayableArea(element.transform.position)) {
+
+          // Success - place at new position
+          if (CanPlace(element, newGridOrigin)) {
+            element.transform.position = SnapToGrid(newGridOrigin);
+            _occupancyMap.Register(element, newGridOrigin);
+            Debug.Log($"Placed {element.name} at {newGridOrigin}");
           }
-          // Element came from outside grid - return to inventory
           else {
-            HandleElementReturnToInventory(element);
-            Debug.Log($"Returned {element.name} to inventory");
-          }
-        }
+            // Failed to place - return to original position if it was in grid
+            if (_elementWasInGrid) {
 
-        // Check if this was the element we were tracking
-        if (element == _currentSelected) {
-          Debug.Log($"Dropping tracked element '{element.name}' at {newGridOrigin}");
-          // Clean up tracking
-          StopTrackingCurrentSelected();
-        }
-        else {
-          // Element wasn't being tracked (probably just clicked)
-          Debug.Log($"Element '{element.name}' clicked but not moved");
+              element.transform.position = SnapToGrid(_elementOriginalGridPosition);
+              _occupancyMap.Register(element, _elementOriginalGridPosition);
+              Debug.Log($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
+            }
+            // Element came from outside grid - return to inventory
+            else {
+              HandleElementReturnToInventory(element);
+              Debug.Log($"Returned {element.name} to inventory");
+            }
+          }
+
+          // Check if this was the element we were tracking
+          if (element == _currentSelected) {
+            Debug.Log($"Dropping tracked element '{element.name}' at {newGridOrigin}");
+            // Clean up tracking
+            StopTrackingCurrentSelected();
+          }
+          else {
+            // Element wasn't being tracked (probably just clicked)
+            Debug.Log($"Element '{element.name}' clicked but not moved");
+          }
         }
       }
     }
 
     // To decouple GridSnappable behaviour from the grid, this method only notifies the GridSnappable to handle the 'unhover'
     //that way we prevent from polling the mouse position from snappables on Update
-    private void HandleElementUnhovered(object sender, GridSnappableEventArgs e) {
-      if (e.Element != null) e.Element.OnPointerOut();
+    private void HandleElementUnhovered(EventArgs args) {
+      if (args is GridSnappableEventArgs e && e.Element != null)
+        e.Element.OnPointerOut();
     }
 
     // This method only delegates to the GridSnappable to handle the 'hover'
     //that way we prevent from polling the mouse position from snappables on Update
-    protected virtual void HandleElementHovered(object sender, GridSnappableEventArgs e) {
-      if (e.Element != null) e.Element.OnPointerOver();
+    protected virtual void HandleElementHovered(EventArgs args) {
+      if (args is GridSnappableEventArgs e && e.Element != null)
+        e.Element.OnPointerOver();
     }
 
     #endregion

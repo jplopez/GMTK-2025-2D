@@ -118,7 +118,7 @@ namespace GMTK {
 
     #region Input Event Handlers
 
-    protected override void HandleElementSelected(object sender, GridSnappableEventArgs evt) {
+    protected override void HandleElementSelected(GridSnappableEventArgs evt) {
       if (evt.Element != _snappable) return;
 
       // Element is being picked up for potential dragging
@@ -131,7 +131,7 @@ namespace GMTK {
       StopDragFeedback();
     }
 
-    protected override void HandleElementHovered(object sender, GridSnappableEventArgs evt) {
+    protected override void HandleElementHovered( GridSnappableEventArgs evt) {
       if (evt.Element != _snappable || _isDragging) return;
 
       // Light highlight when hovering (not dragging)
@@ -139,7 +139,7 @@ namespace GMTK {
       _targetColor.a = 0.9f;
     }
 
-    protected override void HandleElementUnhovered(object sender, GridSnappableEventArgs evt) {
+    protected override void HandleElementUnhovered(GridSnappableEventArgs evt) {
       if (evt.Element != _snappable || _isDragging) return;
 
       // Return to original color when not hovering

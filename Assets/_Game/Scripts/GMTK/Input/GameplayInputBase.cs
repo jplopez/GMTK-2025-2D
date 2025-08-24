@@ -1,9 +1,11 @@
 using static GMTK.PlayerControls;
 using static UnityEngine.InputSystem.InputAction;
 using Ameba.Input;
+using System;
 
 namespace GMTK {
 
+  [Obsolete("Check InputActionEventChannel instead")]
   public abstract class GameplayInputBase : InputHandlerBase, IGameplayActions {
 
     void IGameplayActions.OnCancel(CallbackContext context) => Registry.Handle("Cancel", context);

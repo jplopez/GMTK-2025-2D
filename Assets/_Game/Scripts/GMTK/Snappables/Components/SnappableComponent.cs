@@ -47,32 +47,59 @@ namespace GMTK {
 
     private void AddInputListeners() {
       //SnappableInputHandler.OnElementDropped += HandleElementDropped;
-      _gameEventChannel.AddListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
-      SnappableInputHandler.OnElementHovered += HandleElementHovered;
-      SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
-      SnappableInputHandler.OnElementSelected += HandleElementSelected;
-      if(_snappable != null) _snappable.AddComponentListener(this);
+      //_gameEventChannel.AddListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
+      //SnappableInputHandler.OnElementHovered += HandleElementHovered;
+      //SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
+      //SnappableInputHandler.OnElementSelected += HandleElementSelected;
+
+      // Add Element moving and hovering events
+      _gameEventChannel.AddListener(GameEventType.ElementSelected, EventArgsHandlerAdapter);
+      _gameEventChannel.AddListener(GameEventType.ElementDropped, EventArgsHandlerAdapter);
+      _gameEventChannel.AddListener(GameEventType.ElementHovered, EventArgsHandlerAdapter);
+      _gameEventChannel.AddListener(GameEventType.ElementUnhovered, EventArgsHandlerAdapter);
+
+      if (_snappable != null) _snappable.AddComponentListener(this);
     }
 
     private void RemoveInputListeners() {
       //SnappableInputHandler.OnElementDropped -= HandleElementDropped;
-      _gameEventChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
-      SnappableInputHandler.OnElementHovered -= HandleElementHovered;
-      SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
-      SnappableInputHandler.OnElementSelected -= HandleElementSelected;
+      //_gameEventChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
+      //SnappableInputHandler.OnElementHovered -= HandleElementHovered;
+      //SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
+      //SnappableInputHandler.OnElementSelected -= HandleElementSelected;
+
+      // Add Element moving and hovering events
+      _gameEventChannel.RemoveListener(GameEventType.ElementSelected, EventArgsHandlerAdapter);
+      _gameEventChannel.RemoveListener(GameEventType.ElementDropped, EventArgsHandlerAdapter);
+      _gameEventChannel.RemoveListener(GameEventType.ElementHovered, EventArgsHandlerAdapter);
+      _gameEventChannel.RemoveListener(GameEventType.ElementUnhovered, EventArgsHandlerAdapter);
+
       if (_snappable != null) _snappable.RemoveComponentListener(this);
     }
 
-    private void HandleElementDroppedWrapper(EventArgs eventArgs) {
+    private void EventArgsHandlerAdapter(EventArgs eventArgs) {
       if (eventArgs is GridSnappableEventArgs snappableEventArgs) {
-        HandleElementDropped(snappableEventArgs);
+        switch (snappableEventArgs.GameEvent) {
+          case GameEventType.ElementSelected:
+            HandleElementSelected(snappableEventArgs); break;
+          case GameEventType.ElementDropped:
+            HandleElementDropped(snappableEventArgs); break;
+          case GameEventType.ElementUnhovered:
+            HandleElementUnhovered(snappableEventArgs); break;
+          case GameEventType.ElementHovered:
+            HandleElementHovered(snappableEventArgs); break;
+          default:
+            Debug.LogWarning($"SnappableComponent: received event not supported {snappableEventArgs.GameEvent}");
+            break;
+
+        }
       }
     }
 
-    protected abstract void HandleElementSelected(object sender, GridSnappableEventArgs evt);
+    protected abstract void HandleElementSelected(GridSnappableEventArgs evt);
     protected abstract void HandleElementDropped(GridSnappableEventArgs evt);
-    protected abstract void HandleElementHovered(object sender, GridSnappableEventArgs evt);
-    protected abstract void HandleElementUnhovered(object sender, GridSnappableEventArgs evt);
+    protected abstract void HandleElementHovered(GridSnappableEventArgs evt);
+    protected abstract void HandleElementUnhovered(GridSnappableEventArgs evt);
 
 
     public void RunBeforeUpdate() { if (IsActive && isInitialized) BeforeUpdate(); }
@@ -96,7 +123,7 @@ namespace GMTK {
       _delayedUpdateCoroutine = StartCoroutine(DelayedUpdateRoutine(InitialDelay));
     }
 
-    public void RunResetComponent() { if(IsActive) ResetComponent(); }
+    public void RunResetComponent() { if (IsActive) ResetComponent(); }
 
     protected virtual IEnumerator DelayedUpdateRoutine(float delay) {
       yield return new WaitForSeconds(delay);

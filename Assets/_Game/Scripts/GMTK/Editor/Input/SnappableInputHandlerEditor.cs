@@ -11,8 +11,8 @@ namespace GMTK {
     public override void OnInspectorGUI() {
       SnappableInputHandler handler = (SnappableInputHandler)target;
 
-      EditorGUILayout.Space();
-      DrawRegistrySection(handler);
+      //EditorGUILayout.Space();
+      //DrawRegistrySection(handler);
 
       EditorGUILayout.Space(10);
       EditorGUILayout.LabelField("Debug", EditorStyles.boldLabel);
@@ -30,18 +30,18 @@ namespace GMTK {
       EditorGUI.indentLevel--;
     }
 
-    private void DrawRegistrySection(SnappableInputHandler handler) {
+    //private void DrawRegistrySection(SnappableInputHandler handler) {
 
-      EditorGUILayout.LabelField("Input Registry", EditorStyles.boldLabel);
-      inputActionRegistry = serializedObject.FindProperty("Registry");
-      if (inputActionRegistry != null) {
-        EditorGUILayout.PropertyField(inputActionRegistry);
-        GUI.enabled = handler.Registry != null;
-        if (GUILayout.Button("Initialize Handler")) handler.Initialize();
-        GUI.enabled = true;
-      }
-      serializedObject.ApplyModifiedProperties();
-    }
+    //  EditorGUILayout.LabelField("Input Registry", EditorStyles.boldLabel);
+    //  inputActionRegistry = serializedObject.FindProperty("Registry");
+    //  if (inputActionRegistry != null) {
+    //    EditorGUILayout.PropertyField(inputActionRegistry);
+    //    GUI.enabled = handler.Registry != null;
+    //    if (GUILayout.Button("Initialize Handler")) handler.Initialize();
+    //    GUI.enabled = true;
+    //  }
+    //  serializedObject.ApplyModifiedProperties();
+    //}
 
     private void DrawMovingSection(SnappableInputHandler handler) {
       EditorGUILayout.LabelField("Moving Elements", EditorStyles.boldLabel);
@@ -98,8 +98,6 @@ namespace GMTK {
       if (GUILayout.Button("Trigger OnElementDropped"))
         handler.TriggerDroppedEvent();
 
-      if (GUILayout.Button("Trigger OnElementSecondary"))
-        handler.TriggerSecondaryEvent();
       GUI.enabled = true;
     }
 

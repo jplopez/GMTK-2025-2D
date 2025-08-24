@@ -40,12 +40,14 @@ namespace GMTK {
     [SerializeField] protected LevelSequence _levelSequence;
 
     [Header("Player Inputs")]
-    [Tooltip("Disable input controls for the scene. Useful for cinematics or UI specific scenes")]
+    [Tooltip("DisableActionMap input controls for the scene. Useful for cinematics or UI specific scenes")]
     public bool DisableInputs = false;
     [Tooltip("The Input Registry from where player Inputs will be resolved")]
     public string InputRegistryName = "GameplayRegistry";
     [Tooltip("Reference to the InputActionRegistry from where player inputs are resolved. If specified, the InputRegistryName will be ignored")]
     [SerializeField] protected InputActionRegistry _inputRegistry;
+    [Tooltip("Reference to the InputAction EventChannel to handle player input events")]
+    [SerializeField] protected InputActionEventChannel _inputChannel;
 
     [Header("Events")]
     [Tooltip("Reference to the EventChannel instance to handle game events like 'Play button pressed', 'level start', etc")]
@@ -61,12 +63,16 @@ namespace GMTK {
     [Tooltip("If true, this scene will reset the score to zero. Typically, the start scene is the only one needing this as true")]
     public bool ResetScoreOnLoad = false;
 
+
     public GameStateMachine StateMachine => _gameStateMachine;
     public HUD Hud => _hud;
     public LevelSequence LevelSequence => _levelSequence;
     public GameEventChannel EventsChannel => _eventsChannel;
     public ScoreGateKeeper MarbleScoreKeeper => _marbleScoreKeeper;
     public InputActionRegistry InputHandler => _inputRegistry;
+    public InputActionEventChannel InputEventsChannel => _inputChannel;
+
+
     protected virtual void Awake() {
       EnsureComponents();
       UpdateCurrentScene();
@@ -96,6 +102,8 @@ namespace GMTK {
 
       //If inputs aren't disable we check if InputActionRegistry was provided, if not, try with InputRegistryName.
       if (!DisableInputs) {
+        //TODO: deprecate registry in favor of input channel
+        //load input registry
         if (_inputRegistry == null) {
           if (string.IsNullOrEmpty(InputRegistryName)) {
             Debug.LogWarning($"There is no InputRegistryName in scene {sceneName}. The player controls might not respond");
@@ -111,6 +119,20 @@ namespace GMTK {
               throw e;
 #endif
             }
+          }
+        }
+
+        //load input events channel
+        if (_inputChannel == null) {
+          try {
+            _inputChannel = Resources.Load<InputActionEventChannel>("InputActionEventChannel");
+          }
+          catch (Exception e) {
+            Debug.LogError($"Failed to load InputActionEventChannel: {e.Message}");
+#if UNITY_EDITOR
+            Debug.LogWarning(e.StackTrace);
+            throw e;
+#endif
           }
         }
       }

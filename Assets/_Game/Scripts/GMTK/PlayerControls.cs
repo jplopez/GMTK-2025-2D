@@ -43,7 +43,7 @@ namespace GMTK
     ///
     ///     void OnDestroy()
     ///     {
-    ///         m_Actions.Dispose();                              // Destroy asset object.
+    ///         m_Actions.DisableActionMap();                              // Destroy asset object.
     ///     }
     ///
     ///     void OnEnable()
@@ -53,7 +53,7 @@ namespace GMTK
     ///
     ///     void OnDisable()
     ///     {
-    ///         m_Player.Disable();                               // Disable all actions within map.
+    ///         m_Player.DisableActionMap();                               // DisableActionMap all actions within map.
     ///     }
     ///
     ///     #region Interface implementation of MyActions.IPlayerActions
@@ -1481,9 +1481,9 @@ namespace GMTK
 
         ~@PlayerControls()
         {
-            UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, PlayerControls.Player.Disable() has not been called.");
-            UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, PlayerControls.UI.Disable() has not been called.");
-            UnityEngine.Debug.Assert(!m_Gameplay.enabled, "This will cause a leak and performance issues, PlayerControls.Gameplay.Disable() has not been called.");
+            UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, PlayerControls.Player.DisableActionMap() has not been called.");
+            UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, PlayerControls.UI.DisableActionMap() has not been called.");
+            UnityEngine.Debug.Assert(!m_Gameplay.enabled, "This will cause a leak and performance issues, PlayerControls.Gameplay.DisableActionMap() has not been called.");
         }
 
         /// <summary>

@@ -1,9 +1,9 @@
 {
-    "name": "Ameba.Input.Editor",
-    "rootNamespace": "Ameba.Input",
+    "name": "Ameba.Editor",
+    "rootNamespace": "Ameba",
     "references": [
-        "Unity.InputSystem",
-        "Ameba.Input"
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:7d25628ab3b8e30458a26b8697161b4b"
     ],
     "includePlatforms": [
         "Editor"

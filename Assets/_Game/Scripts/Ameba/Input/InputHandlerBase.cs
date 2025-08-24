@@ -45,6 +45,7 @@ namespace Ameba.Input {
   /// 
   /// </summary>
   /// 
+  [Obsolete("Check InputActionEventChannel instead")]
   public abstract class InputHandlerBase : MonoBehaviour {
 
     [Tooltip("The reference to the InputActionRegistry Scriptable Object")]
@@ -167,8 +168,8 @@ namespace Ameba.Input {
         );
       var mapInstance = mapProperty.GetValue(wrapper);
 
-      var disableMethod = mapInstance.GetType().GetMethod("Disable") ?? throw new InvalidOperationException(
-      $"Action Map '{mapName}' does not contain a Disable method. " +
+      var disableMethod = mapInstance.GetType().GetMethod("DisableActionMap") ?? throw new InvalidOperationException(
+      $"Action Map '{mapName}' does not contain a DisableActionMap method. " +
       $"This likely indicates a malformed input wrapper."
         );
       disableMethod.Invoke(mapInstance, null);

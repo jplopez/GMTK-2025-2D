@@ -8,7 +8,7 @@ public class DisplayWithoutEditDrawer : PropertyDrawer {
   }
 
   public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-    GUI.enabled = false; // Disable editing
+    GUI.enabled = false; // DisableActionMap editing
     EditorGUI.PropertyField(position, property, label, true);
     GUI.enabled = true;  // Re-enable GUI
   }

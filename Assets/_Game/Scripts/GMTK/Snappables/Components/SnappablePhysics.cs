@@ -201,16 +201,16 @@ namespace GMTK {
       // No cleanup needed for shared materials
     }
 
-    protected override void HandleElementSelected(object sender, GridSnappableEventArgs evt) {
+    protected override void HandleElementSelected(GridSnappableEventArgs evt) {
     }
 
     protected override void HandleElementDropped(GridSnappableEventArgs evt) {
     }
 
-    protected override void HandleElementHovered(object sender, GridSnappableEventArgs evt) {
+    protected override void HandleElementHovered(GridSnappableEventArgs evt) {
     }
 
-    protected override void HandleElementUnhovered(object sender, GridSnappableEventArgs evt) {
+    protected override void HandleElementUnhovered(GridSnappableEventArgs evt) {
     }
 
 

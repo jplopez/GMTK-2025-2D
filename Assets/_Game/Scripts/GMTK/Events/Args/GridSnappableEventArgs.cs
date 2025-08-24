@@ -8,6 +8,9 @@ namespace GMTK {
   }
 
   public class GridSnappableEventArgs : EventArgs {
+
+    public GameEventType GameEvent { get; set; }
+
     /// <summary>
     /// The GridSnappable element involved in the event.
     /// </summary>
@@ -17,6 +20,8 @@ namespace GMTK {
     /// The world Position of the pointer (if applicable).
     /// </summary>
     public Vector2 PointerPosition { get; }
+
+    public Vector3 WorldPosition { get; }
 
     public SnappableComponentEventType ComponentEventType { get; }
 
@@ -30,9 +35,17 @@ namespace GMTK {
     /// <summary>
     /// Constructor with explicit pointerPosition and rotation values.
     /// </summary>
-    public GridSnappableEventArgs(GridSnappable element, Vector2 pointerPosition) {
+    public GridSnappableEventArgs(GridSnappable element, Vector2 pointerPosition, Vector3 worldPosition) {
       Element = element;
       PointerPosition = pointerPosition;
+      WorldPosition = worldPosition;
+    }
+
+    public GridSnappableEventArgs(GridSnappable element, Vector2 pointerPosition, Vector3 worldPosition, SnappableComponentEventType eventType) {
+      Element = element;
+      PointerPosition = pointerPosition;
+      WorldPosition = worldPosition;
+      ComponentEventType = eventType;
     }
 
     public GridSnappableEventArgs(GridSnappable element, Vector2 pointerPosition, SnappableComponentEventType eventType) {
