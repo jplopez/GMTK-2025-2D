@@ -35,13 +35,6 @@ namespace GMTK {
     protected GameEventChannel _eventsChannel;
     protected PlayerInputActionDispatcher _inputDispatcher;
 
-    // Declare events using EventHadler<GridSnappableEventArgs>
-    //public static event EventHandler<GridSnappableEventArgs> OnElementHovered;
-    //public static event EventHandler<GridSnappableEventArgs> OnElementUnhovered;
-    //public static event EventHandler<GridSnappableEventArgs> OnElementSelected;
-    //public static event EventHandler<GridSnappableEventArgs> OnElementDropped;
-    //public static event EventHandler<GridSnappableEventArgs> OnElementSecondary;
-
     #region MonoBehaviour methods
 
     protected void Awake() {

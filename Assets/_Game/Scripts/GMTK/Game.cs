@@ -10,6 +10,10 @@ namespace GMTK {
     public static GameContext Context {
       get {
         if (_context == null) Init();
+        if (_context == null) _context = GameObject.FindAnyObjectByType<GameContext>();
+        if (_context == null) {
+          Debug.LogWarning("GameContext not found, will retry on next access request");
+        }
         return _context;
       }
       private set => _context = value;

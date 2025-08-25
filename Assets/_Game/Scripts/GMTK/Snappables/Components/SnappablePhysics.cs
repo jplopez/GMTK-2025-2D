@@ -80,15 +80,18 @@ namespace GMTK {
     protected override bool Validate() => _rigidbody2D != null && _collider2D != null;
 
     protected override void OnUpdate() {
-      //ApplyMovementControl();
-      //ApplyRotationControl();
-    }
-
-    private void FixedUpdate() {
       _currentRotation = _rigidbody2D.rotation; // In degrees
       ApplyMovementControl();
       ApplyRotationControl();
     }
+
+    //private void FixedUpdate() {
+    //  if (!isInitialized) {
+    //    TryInitialize();
+    //    return;
+    //  }
+    //  if (Validate()) RunOnUpdate();
+    //}
 
     public override void OnSnappableEvent(GridSnappableEventArgs eventArgs) {
       switch(eventArgs.ComponentEventType) {

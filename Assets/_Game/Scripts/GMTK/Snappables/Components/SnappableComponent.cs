@@ -22,10 +22,24 @@ namespace GMTK {
     protected LevelGrid _levelGrid;
     protected GameEventChannel _gameEventChannel;
 
-    private bool isInitialized = false;
+    protected bool isInitialized = false;
     private Coroutine _delayedUpdateCoroutine;
 
-    private void OnValidate() {
+    private void OnValidate() => InitDependencies();
+
+    private void Awake() => TryInitialize();
+
+    private void OnDestroy() => RemoveInputListeners();
+
+    public void TryInitialize() {
+      if (isInitialized) return;
+      InitDependencies();
+      AddInputListeners();
+      Initialize();
+      isInitialized = true;
+    }
+
+    private void InitDependencies() {
       _snappable = (_snappable == null) ? gameObject.GetComponent<GridSnappable>() : _snappable;
       if (_snappable == null) Debug.LogWarning($"SnappableComponent {name} is missing GridSnappable. This component will not function");
 
@@ -35,23 +49,7 @@ namespace GMTK {
       if (_gameEventChannel == null) Debug.LogWarning($"SnappableComponent {name} can't find GameEventChannel. This component won't listen or trigger game events");
     }
 
-    private void OnEnable() => AddInputListeners();
-
-    private void OnDisable() => RemoveInputListeners();
-
-    public void TryInitialize() {
-      if (isInitialized) return;
-      Initialize();
-      isInitialized = true;
-    }
-
     private void AddInputListeners() {
-      //SnappableInputHandler.OnElementDropped += HandleElementDropped;
-      //_gameEventChannel.AddListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
-      //SnappableInputHandler.OnElementHovered += HandleElementHovered;
-      //SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
-      //SnappableInputHandler.OnElementSelected += HandleElementSelected;
-
       // Add Element moving and hovering events
       _gameEventChannel.AddListener(GameEventType.ElementSelected, EventArgsHandlerAdapter);
       _gameEventChannel.AddListener(GameEventType.ElementDropped, EventArgsHandlerAdapter);
@@ -62,12 +60,6 @@ namespace GMTK {
     }
 
     private void RemoveInputListeners() {
-      //SnappableInputHandler.OnElementDropped -= HandleElementDropped;
-      //_gameEventChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDroppedWrapper);
-      //SnappableInputHandler.OnElementHovered -= HandleElementHovered;
-      //SnappableInputHandler.OnElementUnhovered -= HandleElementUnhovered;
-      //SnappableInputHandler.OnElementSelected -= HandleElementSelected;
-
       // Add Element moving and hovering events
       _gameEventChannel.RemoveListener(GameEventType.ElementSelected, EventArgsHandlerAdapter);
       _gameEventChannel.RemoveListener(GameEventType.ElementDropped, EventArgsHandlerAdapter);
@@ -88,10 +80,6 @@ namespace GMTK {
             HandleElementUnhovered(snappableEventArgs); break;
           case GameEventType.ElementHovered:
             HandleElementHovered(snappableEventArgs); break;
-          default:
-            Debug.LogWarning($"SnappableComponent: received event not supported {snappableEventArgs.GameEvent}");
-            break;
-
         }
       }
     }

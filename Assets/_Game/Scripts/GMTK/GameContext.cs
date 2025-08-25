@@ -17,10 +17,10 @@ namespace GMTK {
     [Header("GameState Settings")]
     [Tooltip("the GameStateMachine handles the game states")]
     [SerializeField] protected GameStateMachine _gameStateMachine;
-    [Tooltip("if true, the scene loading this manager changes the gamestate on Start. See 'StartingState' field")]
+    [Tooltip("if true, the scene loading this manager changes the gamestate on Start. See 'StartingGameState' field")]
     public bool ChangeGameStateOnStart = false;
     [Tooltip("If 'ChangeGameStateOnStart' is true, this is the GameState this scene will assign in the Always method.")]
-    public GameStates StartingState = GameStates.Start;
+    public GameStates StartingGameState = GameStates.Start;
     [Tooltip("if true, the gamestate is changed right before loading the next scene. See 'EndingState' field")]
     public bool ChangeGameStateOnEnd = false;
     [Tooltip("If 'ChangeGameStateOnEnd' is true, this is the GameState assigned before loading the next scene.")]
@@ -28,30 +28,22 @@ namespace GMTK {
     [Tooltip("The HandlerRegistry knows the changes needed in the game upon a game state change")]
     public GameStateHandlerRegistry HandlerRegistry;
 
-    public enum SetCurrentSceneMode { InitialScene, Always, Never }
+    public enum CurrentSceneSetMode { InitialScene, Always, Never }
 
     [Header("Scene Management")]
     public string StartSceneName = "Start";
     public string LoadingSceneName = "Loading";
     public string GameOverSceneName = "GameOver";
     [Tooltip("The default behaviour of scenes to set themselfs as the CurrentScene. InitialScene: means is the first scene of the game. Only one scene should have this value. Always: (default) the scene sets itself as the current scene at their OnStart method. Never: for transitional scenes who want to skip setting themselves as current scene. For example: victory screen, pause menu, etc.")]
-    public SetCurrentSceneMode DefaultCurrentSceneAssignment = SetCurrentSceneMode.Always;
+    public CurrentSceneSetMode CurrentSceneMode = CurrentSceneSetMode.Always;
     [Tooltip("Source of truth for level sequences. Can resolve the next scene based on the current one")]
     [SerializeField] protected LevelSequence _levelSequence;
 
     [Header("Player Inputs")]
     [Tooltip("DisableActionMap input controls for the scene. Useful for cinematics or UI specific scenes")]
     public bool DisableInputs = false;
-    [Tooltip("The Input Registry from where player Inputs will be resolved")]
-    public string InputRegistryName = "GameplayRegistry";
-    [Tooltip("Reference to the InputActionRegistry from where player inputs are resolved. If specified, the InputRegistryName will be ignored")]
-    [SerializeField] protected InputActionRegistry _inputRegistry;
-    [Tooltip("Reference to the InputAction EventChannel to handle player input events")]
+    [Tooltip("Reference to the EventChannel listening and raising Player InputAction events")]
     [SerializeField] protected InputActionEventChannel _inputChannel;
-
-    [Header("Events")]
-    [Tooltip("Reference to the EventChannel instance to handle game events like 'Play button pressed', 'level start', etc")]
-    [SerializeField] protected GameEventChannel _eventsChannel;
 
     [Header("Heads-Up Display (HUD)")]
     [Tooltip("Reference to the HUD scriptable object instance to manage score, playback buttons, help toggle and game menu button")]
@@ -62,16 +54,22 @@ namespace GMTK {
     [SerializeField] protected ScoreGateKeeper _marbleScoreKeeper;
     [Tooltip("If true, this scene will reset the score to zero. Typically, the start scene is the only one needing this as true")]
     public bool ResetScoreOnLoad = false;
+    
+    [Header("Event System")]
+    [Tooltip("Reference to the EventChannel listening and raising Game events (eg:'Play button pressed', 'level start', 'element rotated', etc.")]
+    [SerializeField] protected GameEventChannel _eventsChannel;
 
+
+    //Public Getters
 
     public GameStateMachine StateMachine => _gameStateMachine;
     public HUD Hud => _hud;
     public LevelSequence LevelSequence => _levelSequence;
     public GameEventChannel EventsChannel => _eventsChannel;
     public ScoreGateKeeper MarbleScoreKeeper => _marbleScoreKeeper;
-    public InputActionRegistry InputHandler => _inputRegistry;
     public InputActionEventChannel InputEventsChannel => _inputChannel;
 
+    #region MonoBehaviour methods 
 
     protected virtual void Awake() {
       EnsureComponents();
@@ -80,111 +78,25 @@ namespace GMTK {
     }
 
     protected virtual void Start() {
-      ChangeToOnStartGameState();
+      ApplyOnStartGameState();
     }
 
     private void OnDestroy() {
       RemoveGameEventListeners();
     }
 
-    private void EnsureComponents() {
-      string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+    #endregion
 
-      // GameStateMachine : if missing, scene won't be able to change gamestates
-      _gameStateMachine = LoadIfNull("GameStateMachine", _gameStateMachine,
-        $"There is no GameStateMachine in scene {sceneName}. The scene won't be able to change game states");
-
-      // _levelSequence: if missing, scene won't be able to resolve next levels
-      _levelSequence = Resources.Load<LevelSequence>("LevelSequence");
-      if (_levelSequence == null) {
-        Debug.LogWarning($"There is no LevelSequence in scene {sceneName}. The scene won't be able to resolve the next scene");
-      }
-
-      //If inputs aren't disable we check if InputActionRegistry was provided, if not, try with InputRegistryName.
-      if (!DisableInputs) {
-        //TODO: deprecate registry in favor of input channel
-        //load input registry
-        if (_inputRegistry == null) {
-          if (string.IsNullOrEmpty(InputRegistryName)) {
-            Debug.LogWarning($"There is no InputRegistryName in scene {sceneName}. The player controls might not respond");
-          }
-          else {
-            try {
-              _inputRegistry = (InputActionRegistry)Resources.Load(InputRegistryName);
-            }
-            catch (Exception e) {
-              Debug.LogError($"Failed to load InputActionRegistry '{InputRegistryName}': {e.Message}");
-#if UNITY_EDITOR
-              Debug.LogWarning(e.StackTrace);
-              throw e;
-#endif
-            }
-          }
-        }
-
-        //load input events channel
-        if (_inputChannel == null) {
-          try {
-            _inputChannel = Resources.Load<InputActionEventChannel>("InputActionEventChannel");
-          }
-          catch (Exception e) {
-            Debug.LogError($"Failed to load InputActionEventChannel: {e.Message}");
-#if UNITY_EDITOR
-            Debug.LogWarning(e.StackTrace);
-            throw e;
-#endif
-          }
-        }
-      }
-      else {
-        Debug.Log($"InputAction are disabled scene '{sceneName}'");
-      }
-
-      if (_eventsChannel == null) {
-        try {
-          _eventsChannel = Resources.Load<GameEventChannel>("GameEventChannel");
-        }
-        catch (Exception e) {
-          Debug.LogError($"Failed to load GameEventChannel: {e.Message}");
-#if UNITY_EDITOR
-          Debug.LogWarning(e.StackTrace);
-          throw e;
-#endif
-        }
-      }
-
-      _marbleScoreKeeper = Resources.Load<ScoreGateKeeper>("MarbleScoreKeeper");
-      if (_marbleScoreKeeper == null) {
-        Debug.LogWarning($"Failed to load ScoreGateKeeper. The player's score might not be updated");
-      }
-      var scoreStrategy = gameObject.AddComponent<TimeBasedScoreCalculator>();
-      scoreStrategy.PointsScoredInterval = 0.25f;
-      scoreStrategy.PointsPerInterval = 50;
-
-      _marbleScoreKeeper.SetStrategy(scoreStrategy, transform);
-      if (ResetScoreOnLoad) {
-        _marbleScoreKeeper.ResetScore();
-      }
-
-      HandlerRegistry = Resources.Load<GameStateHandlerRegistry>("GameStateHandlerRegistry");
-      if (HandlerRegistry == null) {
-        Debug.LogWarning($"There is no GameStateHandlerRegistry in scene {sceneName}. The scene won't be able to respond to GameState changes");
-
-      }
-      HandlerRegistry.Initialize();
-
-    }
-
-    #region Scene Management Methods
+    #region SceneManagement
 
     public virtual void UpdateCurrentScene() {
-      switch (DefaultCurrentSceneAssignment) {
-        case SetCurrentSceneMode.Never: break;
-        case SetCurrentSceneMode.InitialScene:
+      switch (CurrentSceneMode) {
+        case CurrentSceneSetMode.Never: break;
+        case CurrentSceneSetMode.InitialScene:
           //Initial scene keeps current as null, to force the loading of the
           //first scene in the sequence
           _levelSequence.CurrentScene = null; break;
-        case SetCurrentSceneMode.Always:
+        case CurrentSceneSetMode.Always:
           string activeSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
           if (_levelSequence.CurrentScene != activeSceneName)
             _levelSequence.SetCurrentScene(activeSceneName);
@@ -250,20 +162,17 @@ namespace GMTK {
 
     #endregion
 
-    #region GameState Changes
+    #region GameStates
 
     public GameStates CurrentGameState => _gameStateMachine.Current;
-
     public bool CanTransitionTo(GameStates gameStates) => _gameStateMachine.TestTransition(_gameStateMachine.Current, gameStates);
-
     public void AddStateChangeListener(Action<StateMachineEventArg<GameStates>> action) => _gameStateMachine.AddListener(action);
-
     public void RemoveStateChangeListener(Action<StateMachineEventArg<GameStates>> action) => _gameStateMachine.RemoveListener(action);
 
-    protected virtual void ChangeToOnStartGameState() {
+    protected virtual void ApplyOnStartGameState() {
       if (ChangeGameStateOnStart
-        && (_gameStateMachine.Current != StartingState)) {
-        _gameStateMachine.ChangeState(StartingState);
+        && (_gameStateMachine.Current != StartingGameState)) {
+        _gameStateMachine.ChangeState(StartingGameState);
       }
     }
 
@@ -279,7 +188,6 @@ namespace GMTK {
     #region GameState Change Events
 
     private void AddGameEventListeners() {
-
       //Centralized Handler for GameState changes
       _gameStateMachine.AddListener(HandlerRegistry.HandleStateChange);
 
@@ -297,7 +205,6 @@ namespace GMTK {
     }
 
     private void RemoveGameEventListeners() {
-
       //Centralized Handler for GameState changes
       _gameStateMachine.RemoveListener(HandlerRegistry.HandleStateChange);
 
@@ -313,8 +220,77 @@ namespace GMTK {
       _eventsChannel.RemoveListener(GameEventType.ExitPause, _gameStateMachine.HandleExitPause);
     }
 
-
     #endregion
+
+    #region Utility Methods
+    private void EnsureComponents() {
+      string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
+      // GameStateMachine : if missing, scene won't be able to change gamestates
+      _gameStateMachine = LoadIfNull("GameStateMachine", _gameStateMachine,
+        $"There is no GameStateMachine in scene {sceneName}. The scene won't be able to change game states");
+
+      // _levelSequence: if missing, scene won't be able to resolve next levels
+      _levelSequence = Resources.Load<LevelSequence>("LevelSequence");
+      if (_levelSequence == null) {
+        Debug.LogWarning($"There is no LevelSequence in scene {sceneName}. The scene won't be able to resolve the next scene");
+      }
+
+      //If inputs aren't disable we check if InputActionRegistry was provided, if not, try with InputRegistryName.
+      if (!DisableInputs) {
+        //load input events channel
+        if (_inputChannel == null) {
+          try {
+            _inputChannel = Resources.Load<InputActionEventChannel>("InputActionEventChannel");
+          }
+          catch (Exception e) {
+            Debug.LogError($"Failed to load InputActionEventChannel: {e.Message}");
+#if UNITY_EDITOR
+            Debug.LogWarning(e.StackTrace);
+            throw e;
+#endif
+          }
+        }
+      }
+      else {
+        Debug.Log($"InputAction are disabled scene '{sceneName}'");
+      }
+
+      if (_eventsChannel == null) {
+        try {
+          _eventsChannel = Resources.Load<GameEventChannel>("GameEventChannel");
+        }
+        catch (Exception e) {
+          Debug.LogError($"Failed to load GameEventChannel: {e.Message}");
+#if UNITY_EDITOR
+          Debug.LogWarning(e.StackTrace);
+          throw e;
+#endif
+        }
+      }
+
+      _marbleScoreKeeper = Resources.Load<ScoreGateKeeper>("MarbleScoreKeeper");
+      if (_marbleScoreKeeper == null) {
+        Debug.LogWarning($"Failed to load ScoreGateKeeper. The player's score might not be updated");
+      }
+      var scoreStrategy = gameObject.AddComponent<TimeBasedScoreCalculator>();
+      scoreStrategy.PointsScoredInterval = 0.25f;
+      scoreStrategy.PointsPerInterval = 50;
+
+      _marbleScoreKeeper.SetStrategy(scoreStrategy, transform);
+      if (ResetScoreOnLoad) {
+        _marbleScoreKeeper.ResetScore();
+      }
+
+      HandlerRegistry = Resources.Load<GameStateHandlerRegistry>("GameStateHandlerRegistry");
+      if (HandlerRegistry == null) {
+        Debug.LogWarning($"There is no GameStateHandlerRegistry in scene {sceneName}. The scene won't be able to respond to GameState changes");
+
+      }
+      HandlerRegistry.Initialize();
+
+    }
+
 
     private T LoadIfNull<T>(string resourceName, T resource, string messageIfNotFound = "Not Found") where T : ScriptableObject {
       if (resource != null) return resource;
@@ -344,5 +320,7 @@ namespace GMTK {
       _gameStateMachine.RemoveListener(HandlerRegistry.HandleStateChange);
       HandlerRegistry.Initialize();
     }
+
+    #endregion
   }
 }
