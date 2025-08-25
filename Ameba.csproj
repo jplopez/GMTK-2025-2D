@@ -61,19 +61,14 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_Game\Scripts\Ameba\Input\InputActionBinder.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\ScoreCalculationStrategy.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\AmebaController.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeVariableAttribute.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Events\EventChannel.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\Input\InputHandlerBase.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\IGameStateHandler.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\Input\Helpers\InputActionCollectionHelper.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RegistryPool.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\Input\InputBinding.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeVariableBinder.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeVariable.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\Input\InputActionRegistry.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeMap.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\Attributes\InputHandlerAttribute.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\ScoreGateKeeper.cs" />
@@ -81,7 +76,6 @@
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\StateMachine.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IPoolable.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeRegistry.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\Input\InputCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_Game\Scripts\Ameba\Core\readme.txt" />
