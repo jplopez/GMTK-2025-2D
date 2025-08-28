@@ -11,8 +11,7 @@ namespace GMTK {
       HandlerName = nameof(InputStateHandler);
     }
 
-    protected override void Awake() {
-      base.Awake();
+    protected override void Init() {
       if (snappableInput == null) {
         snappableInput = FindFirstObjectByType<SnappableInputHandler>();
       }

@@ -1,3 +1,4 @@
+using Ameba;
 using UnityEngine;
 
 namespace GMTK {
@@ -21,7 +22,11 @@ namespace GMTK {
     protected Collider2D _collider;
     private bool _isOnCooldown = false;
 
-    protected void Awake() {
+    private void Awake() {
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    protected void OnReady() {
       //Only when BoostWhileIn is true we find the GameObject's collider
       //because the force will be applied during the Update, not in response to collisions.
       if (BoostWhileIn) {

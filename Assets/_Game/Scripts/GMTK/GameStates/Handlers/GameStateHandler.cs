@@ -22,17 +22,81 @@ namespace GMTK {
     public string HandlerName { get; set; } = nameof(GameStateHandler);
     public int Priority { get; set; } = 0;
 
-    protected GameEventChannel _eventsChannel;
+    protected bool _isInitialized = false;
+    protected bool _inTransition = false;
+    protected StateMachineEventArg<GameStates> _currentArgs;
 
-    protected virtual void Awake() {
+    protected GameEventChannel _eventsChannel;
+    private void Awake() {
+      _isInitialized = false;
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    protected void OnReady() {
       if (_eventsChannel == null) {
-        _eventsChannel = Game.Context.EventsChannel;
+        _eventsChannel = Services.Get<GameEventChannel>();
+      }
+      Init();
+      _isInitialized = true;
+    }
+
+    /// <summary>
+    /// Override this method if you need to add specific logic to the Initialization of this handler.<br/>
+    /// Init is called once Resources are loaded, so is guaranteed you'll have SOs available.
+    /// </summary>
+    protected virtual void Init() { }
+
+    private void Update() {
+      if(!_isInitialized) OnReady();
+
+      if(_inTransition) {
+        //If Try method is successful we want inTransition to be false, signaling the transition was finalized successfully
+        //If Try fails, we keep inTransition true, and try again in the next frame
+        _inTransition = !TryGameStateTransition();
       }
     }
 
+    private bool TryGameStateTransition() {
+      if (_currentArgs == null) return false;
+      return TryHandleFromState(_currentArgs) && TryHandleToState(_currentArgs);
+    }
+
     public virtual void HandleStateChange(StateMachineEventArg<GameStates> eventArg) {
-      HandleFromState(eventArg.FromState);
-      HandleToState(eventArg.ToState);
+      if (!_isInitialized) OnReady();
+      if(eventArg != null) {
+        _currentArgs = eventArg;
+        //This flag tells the Update method to attempt the game state transition
+        _inTransition = true;
+      } else {
+        Debug.LogWarning($"GameStateHandler: '{name}': Can't resolve state change request because StateMachineEventArg is null");
+      }
+    }
+
+    private bool TryHandleFromState(StateMachineEventArg<GameStates> eventArg) {
+     try {
+        HandleFromState(eventArg.FromState);
+        return true;
+      } catch (Exception ex) {
+        Debug.LogError($"GameStateHandler: '{name}' could not transition from state {eventArg.FromState}: {ex.Message}");
+#if UNITY_EDITOR
+        Debug.LogException(ex);
+#endif
+      }
+      return false;
+    }
+
+    private bool TryHandleToState(StateMachineEventArg<GameStates> eventArg) {
+      try {
+        HandleToState(eventArg.ToState);
+        return true;
+      }
+      catch (Exception ex) {
+        Debug.LogError($"GameStateHandler: '{name}' could not transition to state {eventArg.ToState}: {ex.Message}");
+#if UNITY_EDITOR
+        Debug.LogException(ex);
+#endif
+      }
+      return false;
     }
 
     /// <summary>
@@ -107,7 +171,5 @@ namespace GMTK {
     protected virtual void ToReset() { }
     protected virtual void ToLevelComplete() { }
     protected virtual void ToGameOver() { }
-   
   }
-
 }

@@ -31,7 +31,7 @@ namespace GMTK {
 
     protected void Awake() {
       if (_eventChannel == null) {
-        _eventChannel = Game.Context.EventsChannel;
+        _eventChannel = Services.Get<GameEventChannel>();
       }
       AddAllListeners();
     }

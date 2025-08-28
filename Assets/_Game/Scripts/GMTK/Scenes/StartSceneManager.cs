@@ -1,3 +1,4 @@
+using Ameba;
 using UnityEngine;
 
 namespace GMTK {
@@ -6,12 +7,18 @@ namespace GMTK {
 
     public LevelSequence LevelSequence;
 
-    private void Start() {
+    private void Awake() {
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    private void OnReady() {
+      if (LevelSequence == null) {
+        LevelSequence = Game.LevelSequence;
+      }
       // Optionally, you could load the first level automatically here
       // Uncomment the line below to load the first level when the start scene loads
       // UnityEngine.SceneManagement.GameContext.LoadScene(FirstLevelSceneName);
       LevelSequence.CurrentScene = null; // ResetToStartingState current scene on start
-
 
     }
     public void StartGame() {

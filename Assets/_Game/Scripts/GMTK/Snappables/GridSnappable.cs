@@ -1,3 +1,4 @@
+using Ameba;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -62,7 +63,9 @@ namespace GMTK {
 
     #region MonoBehaviour Methods
 
-    void Awake() => Initialize();
+    private void Awake() {
+      InitializationManager.WaitForInitialization(this, Initialize);
+    }
 
     private void OnValidate() {
       gameObject.layer = LayerMask.NameToLayer("Interactives");

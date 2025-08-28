@@ -1,3 +1,4 @@
+using Ameba;
 using UnityEngine;
 
 namespace GMTK {
@@ -27,8 +28,13 @@ namespace GMTK {
     public string ID => checkpointID;
 
     protected GameEventChannel _eventsChannel;
+    protected GameStateMachine _stateMachine;
 
     private void Awake() {
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    private void OnReady() {
       if (!TryGetComponent<Collider2D>(out var col)) {
         Debug.LogError($"[Checkpoint] No Collider2D found on {gameObject.name}. Please add one and set it as Trigger.");
       }
@@ -37,7 +43,10 @@ namespace GMTK {
       }
 
       if(_eventsChannel == null) {
-        _eventsChannel = Game.Context.EventsChannel;
+        _eventsChannel = Services.Get<GameEventChannel>();
+      }
+      if (_stateMachine == null) {
+        _stateMachine = Services.Get<GameStateMachine>();
       }
     }
 
@@ -49,7 +58,7 @@ namespace GMTK {
 
     private void OnTriggerEnter2D(Collider2D other) {
       //ignore collision if the game isn't on playing state
-      if (Game.Context.CurrentGameState != GameStates.Playing) return;
+      if (_stateMachine.Current != GameStates.Playing) return;
 
       if (TryGetPlayableMarble(other, out PlayableMarbleController marble)) {
         var eventArgs = new MarbleEventArgs() {
@@ -66,7 +75,7 @@ namespace GMTK {
 
     private void OnTriggerExit2D(Collider2D other) {
       //ignore collision if the game isn't on playing state
-      if (Game.Context.CurrentGameState != GameStates.Playing) return;
+      if (_stateMachine.Current != GameStates.Playing) return;
 
       if (TryGetPlayableMarble(other, out PlayableMarbleController marble)) {
         var eventArgs = new MarbleEventArgs() {
@@ -91,7 +100,7 @@ namespace GMTK {
 
     public void UpdateUI() {
       //updates only if game is playing
-      if (Game.Context.CurrentGameState != GameStates.Playing) return;
+      if (_stateMachine.Current != GameStates.Playing) return;
       //this only updates for the permanent CueModes. OnEnter/BoostOnExit are handled on the OnTrigger* methods
       switch (CueMode) {
         case VisualCueMode.Always:

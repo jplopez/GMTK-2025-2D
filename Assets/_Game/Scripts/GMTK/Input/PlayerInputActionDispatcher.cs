@@ -1,3 +1,4 @@
+using Ameba;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,10 +22,15 @@ namespace GMTK {
     public PlayerInputActionDispatcher(InputActionEventChannel inputEvents) {
       InputEvents = inputEvents;
     }
-    public void Awake() {
+
+    private void Awake() {
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    public void OnReady() {
       //Getting the EventChannel with 2 fallbacks
       if (InputEvents == null) {
-        InputEvents = Game.Context.InputEventsChannel;
+        InputEvents = Game.InputEventChannel;
       }
       if (InputEvents == null) {
         InputEvents = Resources.Load<InputActionEventChannel>("InputActionEventChannel");

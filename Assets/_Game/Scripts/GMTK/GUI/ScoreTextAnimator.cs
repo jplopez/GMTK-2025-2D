@@ -16,9 +16,12 @@ namespace GMTK {
     protected int _tickCount = 0;
     protected int _currentDisplayedScore = 0;
     protected ScoreGateKeeper _scoreKeeper;
-
     private void Awake() {
-      _scoreKeeper = Resources.Load<ScoreGateKeeper>("MarbleScoreKeeper");
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    private void OnReady() {
+      _scoreKeeper = Game.ScoreKeeper;
       _currentDisplayedScore = 0;
     }
     public void Update() {

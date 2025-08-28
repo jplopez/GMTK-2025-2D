@@ -1,3 +1,4 @@
+using Ameba;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -27,7 +28,9 @@ namespace GMTK {
 
     private void OnValidate() => InitDependencies();
 
-    private void Awake() => TryInitialize();
+    private void Awake() {
+      InitializationManager.WaitForInitialization(this, TryInitialize);
+    }
 
     private void OnDestroy() => RemoveInputListeners();
 

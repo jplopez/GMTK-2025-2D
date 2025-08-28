@@ -1,25 +1,29 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Ameba;
 
 namespace GMTK {
   public class LevelCompleteManager : MonoBehaviour {
 
-    public GameContext Controller;
-
     public TMPro.TMP_Text ScoreText;
-
+    
     private Animator _animator;
-
+    
     protected int _currentScore = 0;
+    protected LevelSequence _sequence;
 
-    private void Start() {
-      if (Controller == null) {
-        Debug.LogError("RollnSnap Controller is not assigned in LevelCompleteManager.");
-      }
+    private void Awake() {
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    private void OnReady() {
       if (!TryGetComponent(out _animator)) {
         Debug.LogWarning("No Animator component found on LevelCompleteManager.");
       }
-      _currentScore = Controller.MarbleScoreKeeper.GetScore();
+      _currentScore = Services.Get<ScoreGateKeeper>().GetScore();
+      if (_sequence == null) {
+        _sequence = Services.Get<LevelSequence>();
+      }
     }
 
     public void OnIntroFinished() {
@@ -34,7 +38,7 @@ namespace GMTK {
     }
 
     public void RetryLevel() {
-      string currentScene = Controller.LevelSequence.CurrentScene;
+      string currentScene = _sequence.CurrentScene;
       if (string.IsNullOrEmpty(currentScene)) {
         Debug.LogError("Current scene is not set in _levelSequence.");
         return;
@@ -44,15 +48,15 @@ namespace GMTK {
     }
 
     public void NextLevel() {
-      string currentScene = Controller.LevelSequence.CurrentScene;
+      string currentScene = _sequence.CurrentScene;
       if (string.IsNullOrEmpty(currentScene)) {
         Debug.LogError("Current scene is not set in _levelSequence.");
         return;
       }
-      string nextLevel = Controller.LevelSequence.GetNextLevel(currentScene);
+      string nextLevel = _sequence.GetNextLevel(currentScene);
       if (!string.IsNullOrEmpty(nextLevel)) {
         Debug.Log($"Loading next level: {nextLevel}");
-        Controller.LevelSequence.SetCurrentScene(nextLevel);
+        _sequence.SetCurrentScene(nextLevel);
         SceneManager.LoadScene(nextLevel);
       }
       else {

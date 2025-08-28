@@ -1,3 +1,4 @@
+using Ameba;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -55,8 +56,12 @@ namespace GMTK {
     #region MonoBehaviour methods
 
     private void Awake() {
-      _eventChannel = Game.Context.EventsChannel;
-      _levelSequence = Game.Context.LevelSequence;
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    private void OnReady() {
+      _eventChannel = Services.Get<GameEventChannel>();
+      _levelSequence = Services.Get<LevelSequence>();
       //_scoreAtLevelStart = Game.Context.MarbleScoreKeeper.GetScore();
       if (_eventChannel == null) {
         Debug.Log($"LevelManager: EventChannel is missing. LevelManager won't be able to handle game events");
@@ -208,7 +213,7 @@ namespace GMTK {
     /// TODO: turn this into event-driven and async scene loading to measure percentage of progress.
     /// </summary>
     private void LoadCompleteLevelScene() {
-      var levelSequence = Game.Context.LevelSequence;
+      var levelSequence = Services.Get<LevelSequence>();
       levelSequence.SetCurrentScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
       UnityEngine.SceneManagement.SceneManager.LoadScene(LEVEL_COMPLETE_SCENE_NAME); // Load a generic level complete scene
     }

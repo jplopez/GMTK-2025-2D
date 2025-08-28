@@ -12,6 +12,8 @@ namespace GMTK {
     [SerializeField, DisplayWithoutEdit]
     private List<HandlerInfo> _registeredHandlers = new();
 
+    protected GameStateMachine _machine;
+
     [System.Serializable]
     private class HandlerInfo {
       public string name;
@@ -43,6 +45,8 @@ namespace GMTK {
       // Sort handlers by priority
       _activeHandlers = _activeHandlers.OrderBy(h => h.Priority).ToList();
 
+      if(_machine == null) _machine = Services.Get<GameStateMachine>();
+
       _isInitialized = true;
 
       LogDebug($"Scan complete! Found {_activeHandlers.Count} handlers");
@@ -61,7 +65,7 @@ namespace GMTK {
       }
 
       // Validate transition using GameStateMachine.TestTransition
-      if (!Game.Context.StateMachine.TestTransition(eventArg.FromState, eventArg.ToState)) {
+      if (!_machine.TestTransition(eventArg.FromState, eventArg.ToState)) {
         LogWarning($"State transition {eventArg.FromState} -> {eventArg.ToState} failed validation");
         return;
       }

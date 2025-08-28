@@ -1,3 +1,4 @@
+using Ameba;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -37,9 +38,13 @@ namespace GMTK {
 
     #region MonoBehaviour methods
 
-    protected void Awake() {
+    private void Awake() {
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    protected void OnReady() {
       if (_eventsChannel == null) {
-        _eventsChannel = Game.Context.EventsChannel;
+        _eventsChannel = Game.EventChannel;
       }
 
       if (_inputDispatcher == null && TryGetComponent(out _inputDispatcher)) {

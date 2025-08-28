@@ -9,18 +9,14 @@ namespace GMTK {
     public PlayableMarbleController marble;
     public LevelManager levelManager;
 
-    //protected List<GridSnappable> snappables = new();
-
     protected List<GridSnappable> _draggableSnappables = new();
     protected List<GridSnappable> _staticSnappables = new();
-
     private void OnEnable() {
       Priority = 200;
       HandlerName = nameof(GameplayStateHandler);
     }
 
-    protected override void Awake() {
-      base.Awake();
+    protected override void Init() {
       Priority = (Priority == 0) ? 200 : Priority;
 
       if (marble == null) {
@@ -45,7 +41,6 @@ namespace GMTK {
         marble.InitialForce = levelManager.MarbleInitialForce;
       }
     }
-
     protected override void ToPreparation() {
       //place marble in starting point
       marble.Spawn();
@@ -78,7 +73,6 @@ namespace GMTK {
       Game.Context.LoadNextScene();
     }
 
-
     private void SetDraggableSnappables(bool enabled) => _draggableSnappables.ForEach(s => s.Draggable = enabled);
 
     private void ResetAllSnappables() {
@@ -86,6 +80,4 @@ namespace GMTK {
       _staticSnappables.ForEach(s => s.ResetSnappable());
     }
   }
-
-
 }

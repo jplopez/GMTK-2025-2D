@@ -1,53 +1,46 @@
+using Ameba;
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace GMTK {
   /// <summary>
-  /// Convenient Lookup for GameContext
+  /// Static class that pre-loads all ScriptableObjects used in the game, to guarantee they're accessible when GameObjects begin loading
   /// </summary>
   public static class Game {
-    public static GameContext Context {
-      get {
-        if (_context == null) Init();
-        if (_context == null) _context = GameObject.FindAnyObjectByType<GameContext>();
-        if (_context == null) {
-          Debug.LogWarning("GameContext not found, will retry on next access request");
-        }
-        return _context;
-      }
-      private set => _context = value;
-    }
 
+    // Static references (initialized by InitializationManager)
+    private static GameStateMachine _gameStateMachine;
+    private static GameEventChannel _gameEventChannel;
+    private static InputActionEventChannel _inputEventChannel;
+    private static LevelSequence _levelSequence;
+    private static ScoreGateKeeper _scoreKeeper;
+    private static HUD _HUD;
+    private static GameStateHandlerRegistry _handlerRegistry;
+
+    // GameContext reference (set by active scene)
     private static GameContext _context;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void Init() {
-      if (_context != null) return;
+    // ScriptableObject access (always available)
+    public static GameStateMachine StateMachine => _gameStateMachine;
+    public static GameEventChannel EventChannel => _gameEventChannel;
+    public static InputActionEventChannel InputEventChannel => _inputEventChannel;
+    public static LevelSequence LevelSequence => _levelSequence;
+    public static ScoreGateKeeper ScoreKeeper => _scoreKeeper;
+    public static HUD HUD => _HUD;
+    public static GameStateHandlerRegistry HandlerRegistry => _handlerRegistry;
 
-      try {
-        _context = GameObject.FindAnyObjectByType<GameContext>();
-      }
-      catch (Exception ex) {
-        Debug.LogError($"GameContext failed to load in scene '{SceneManager.GetActiveScene().name}'.");
-        Debug.LogError("GameContext failed to load. Make sure a GameContext MonoBehaviour exists in the active scene or is loaded via addressables.");
-        Debug.LogException(ex);
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif      
-      }
+    // Scene management access (may be null between scenes)
+    public static GameContext Context => _context;
 
-      if (_context == null) {
-        Debug.LogError($"GameContext not found in scene '{SceneManager.GetActiveScene().name}'.");
-        Debug.LogError("GameContext is missing. Make sure a GameContext MonoBehaviour exists in the active scene or is loaded via addressables.");
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-      }
-    }
+    // Internal setters for initialization
+    internal static void SetGameStateMachine(GameStateMachine stateMachine) => _gameStateMachine = stateMachine;
+    internal static void SetGameEventChannel(GameEventChannel eventChannel) => _gameEventChannel = eventChannel;
+    internal static void SetInputEventChannel(InputActionEventChannel inputChannel) => _inputEventChannel = inputChannel;
+    internal static void SetLevelSequence(LevelSequence levelSequence) => _levelSequence = levelSequence;
+    internal static void SetScoreKeeper(ScoreGateKeeper scoreKeeper) => _scoreKeeper = scoreKeeper;
+    internal static void SetHUD(HUD hUD) => _HUD = hUD;
+    internal static void SetHandlerRegistry(GameStateHandlerRegistry registry) => _handlerRegistry = registry;
+    internal static void SetContext(GameContext context) => _context = context;
+
   }
 }

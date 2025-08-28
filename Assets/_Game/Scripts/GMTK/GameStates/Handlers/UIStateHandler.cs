@@ -17,8 +17,7 @@ namespace GMTK {
       HandlerName = nameof(UIStateHandler);
     }
 
-    protected override void Awake() {
-      base.Awake();
+    protected override void Init() {
       if (HudController == null) {
         HudController = FindFirstObjectByType<HudController>();
       }

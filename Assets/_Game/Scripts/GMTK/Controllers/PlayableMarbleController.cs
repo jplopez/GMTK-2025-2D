@@ -1,3 +1,4 @@
+using Ameba;
 using UnityEngine;
 
 namespace GMTK {
@@ -38,8 +39,11 @@ namespace GMTK {
     protected float _timeSinceLastMove = 0f;
 
     #region MonoBehaviour methods
+    private void Awake() {
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
 
-    void Start() {
+    void OnReady() {
 
       if (_eventChannel == null) {
         _eventChannel = Resources.Load<GameEventChannel>("GameEventChannel");
@@ -55,6 +59,8 @@ namespace GMTK {
     }
 
     void Update() {
+      //if rigidBody isn't loaded, we do nothing and wait until next frame
+      if (_rb == null) return;
       if (!_rb.mass.Equals(Mass)) _rb.mass = Mass;
       if (!_rb.gravityScale.Equals(GravityScale)) _rb.gravityScale = GravityScale;
       if (!_rb.angularDamping.Equals(AngularDamping)) _rb.angularDamping = AngularDamping;

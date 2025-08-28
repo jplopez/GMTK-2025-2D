@@ -1,3 +1,4 @@
+using Ameba;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace GMTK {
     private void InitializeInventory() {
       // Load GameInventory if not assigned
       if (GameInventory == null) {
-        GameInventory = Resources.Load<GameInventory>("GameInventory");
+        GameInventory = Services.Get<GameInventory>();
         if (GameInventory == null) {
           Debug.LogError("[LevelInventory] GameInventory not found in Resources!");
           return;
@@ -46,7 +47,7 @@ namespace GMTK {
 
       // Load EventChannel if not assigned
       if (EventChannel == null) {
-        EventChannel = Game.Context.EventsChannel;
+        EventChannel = Services.Get<GameEventChannel>();
       }
 
       BuildItemLookup();

@@ -1,3 +1,4 @@
+using Ameba;
 using System;
 using System.Collections.Generic;
 
@@ -75,9 +76,14 @@ namespace GMTK {
     public static Vector3 ELEMENT_DEFAULT_POSITION = new(-10, 0, 0);
 
     #region Monobehavior Methods
-    public virtual void Awake() {
+
+    private void Awake() {
+      InitializationManager.WaitForInitialization(this, OnReady);
+    }
+
+    public virtual void OnReady() {
       if (_eventsChannel == null) {
-        _eventsChannel = Game.Context.EventsChannel;
+        _eventsChannel = Services.Get<GameEventChannel>();
       }
       AddInputListeners();
     }
@@ -351,7 +357,7 @@ namespace GMTK {
           );
 
       // Request inventory to add this element
-      Game.Context.EventsChannel.Raise(GameEventType.InventoryAddRequest, eventData);
+      _eventsChannel.Raise(GameEventType.InventoryAddRequest, eventData);
       Debug.Log($"[LevelGrid] Requested inventory to add {element.name} with context");
 
       //else {
