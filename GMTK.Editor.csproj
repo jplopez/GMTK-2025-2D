@@ -62,8 +62,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\DisplayWithoutEditDrawer.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\LevelServiceEditor.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\SceneControllerEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateMachineEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateTransitionDrawer.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\LevelConfigDrawer.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Input\SnappableInputHandlerEditor.cs" />
   </ItemGroup>
   <ItemGroup>

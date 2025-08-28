@@ -72,6 +72,7 @@
     <Compile Include="Assets\Plugins\Demigiant\DOTween\Modules\DOTweenModuleEPOOutline.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Plugins\link.xml" />
     <None Include="Assets\Plugins\Demigiant\DOTween\DOTween.XML" />
     <None Include="Assets\Plugins\Demigiant\DOTween\DOTween.dll" />
     <None Include="Assets\Plugins\Demigiant\DOTween\readme.txt" />
@@ -1387,13 +1388,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Ameba.csproj">
-      <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
-      <Name>Ameba</Name>
-    </ProjectReference>
     <ProjectReference Include="sc.utilities.screenshot.editor.csproj">
       <Project>{900D7AA2-01A0-3409-13A6-3DB57626FA0E}</Project>
       <Name>sc.utilities.screenshot.editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Ameba.csproj">
+      <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
+      <Name>Ameba</Name>
     </ProjectReference>
     <ProjectReference Include="CFXRDemo.csproj">
       <Project>{2A12955F-9E65-5D83-9DC8-AC097340A6F3}</Project>

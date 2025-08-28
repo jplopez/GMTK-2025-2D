@@ -172,6 +172,7 @@
     <None Include="Assets\ThirdParty\VFX\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
+    <None Include="Assets\link.xml" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\Smoke.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\BlueExpSphere.shader" />
     <None Include="Assets\ThirdParty\VFX\MasterStylizedFX\Shaders\CommonParticleLoop.shader" />
@@ -1537,13 +1538,13 @@
       <Project>{AF4FC8D9-9462-8D9B-6065-9388C13DD207}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
     </ProjectReference>
-    <ProjectReference Include="Ameba.csproj">
-      <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
-      <Name>Ameba</Name>
-    </ProjectReference>
     <ProjectReference Include="sc.utilities.screenshot.editor.csproj">
       <Project>{900D7AA2-01A0-3409-13A6-3DB57626FA0E}</Project>
       <Name>sc.utilities.screenshot.editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Ameba.csproj">
+      <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
+      <Name>Ameba</Name>
     </ProjectReference>
     <ProjectReference Include="CFXRDemo.csproj">
       <Project>{2A12955F-9E65-5D83-9DC8-AC097340A6F3}</Project>
