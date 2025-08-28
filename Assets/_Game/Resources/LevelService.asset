@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 119b5e051878213409088236c7304cf7, type: 3}
+  m_Name: LevelService
+  m_EditorClassIdentifier: 
+  Levels:
+  - SceneName: Start
+    DisplayName: Start
+    Type: 0
+    InitialGameState: 0
+    SetStateOnLoad: 1
+    IsUnlocked: 1
+    CanRestart: 1
+    CanSkip: 0
+    UnlockConditions: []
+    NextSceneName: Level1
+    PreviousSceneName: 
+    LoadDelay: 0
+    UseCustomLoadMethod: 0
+    CustomLoadMethod: 
+  - SceneName: Level1
+    DisplayName: Level1
+    Type: 1
+    InitialGameState: 1
+    SetStateOnLoad: 1
+    IsUnlocked: 1
+    CanRestart: 0
+    CanSkip: 0
+    UnlockConditions: []
+    NextSceneName: Level2
+    PreviousSceneName: Start
+    LoadDelay: 0
+    UseCustomLoadMethod: 0
+    CustomLoadMethod: 
+  - SceneName: Level2
+    DisplayName: Level2
+    Type: 1
+    InitialGameState: 1
+    SetStateOnLoad: 1
+    IsUnlocked: 1
+    CanRestart: 0
+    CanSkip: 0
+    UnlockConditions: []
+    NextSceneName: Level2
+    PreviousSceneName: Level1
+    LoadDelay: 0
+    UseCustomLoadMethod: 0
+    CustomLoadMethod: 
+  - SceneName: LevelComplete
+    DisplayName: LevelComplete
+    Type: 2
+    InitialGameState: 4
+    SetStateOnLoad: 1
+    IsUnlocked: 1
+    CanRestart: 0
+    CanSkip: 0
+    UnlockConditions: []
+    NextSceneName: 
+    PreviousSceneName: 
+    LoadDelay: 0
+    UseCustomLoadMethod: 0
+    CustomLoadMethod: 
+  - SceneName: GameOver
+    DisplayName: GameOver
+    Type: 0
+    InitialGameState: 5
+    SetStateOnLoad: 1
+    IsUnlocked: 1
+    CanRestart: 0
+    CanSkip: 0
+    UnlockConditions: []
+    NextSceneName: Start
+    PreviousSceneName: 
+    LoadDelay: 0
+    UseCustomLoadMethod: 0
+    CustomLoadMethod: 
+  - SceneName: Loading
+    DisplayName: Loading
+    Type: 2
+    InitialGameState: 1
+    SetStateOnLoad: 1
+    IsUnlocked: 1
+    CanRestart: 1
+    CanSkip: 0
+    UnlockConditions: []
+    NextSceneName: 
+    PreviousSceneName: 
+    LoadDelay: 0
+    UseCustomLoadMethod: 0
+    CustomLoadMethod: 
+  _currentLevelIndex: -1
+  _currentSceneName: 

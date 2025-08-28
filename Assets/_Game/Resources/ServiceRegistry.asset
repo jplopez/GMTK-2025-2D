@@ -9,10 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72f72ef14ba88a148b98d40e512d2c2d, type: 3}
-  m_Name: LevelSequence
+  m_Script: {fileID: 11500000, guid: 3071d13f9a570704b9202b8d360ffd3d, type: 3}
+  m_Name: ServiceRegistry
   m_EditorClassIdentifier: 
-  LevelSceneNames:
-  - Level1
-  - Level2
-  CurrentScene: 
+  _serviceTypeNames:
+  - GameEventChannel
+  - GameStateHandlerRegistry
+  - GameStateMachine
+  - HUD
+  - LevelSequence
+  - ScoreGateKeeper
+  - InputActionEventChannel
+  - LevelService
