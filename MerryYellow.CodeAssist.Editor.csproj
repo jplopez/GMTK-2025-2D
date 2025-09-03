@@ -10,17 +10,17 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{EF04D81F-7401-B63E-15A9-8E615B7BBBF6}</ProjectGuid>
+    <ProjectGuid>{BED25233-62F8-5B11-0D5D-3A2E08501467}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>GMTK.Editor</AssemblyName>
+    <AssemblyName>MerryYellow.CodeAssist.Editor</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
   </PropertyGroup>
   <PropertyGroup>
     <NoWarn>0169;USG0001</NoWarn>
-    <DefineConstants>UNITY_6000_1_0;UNITY_6000_1;UNITY_6000;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_2019_3_OR_NEWER;UNITY_2019_4_OR_NEWER;UNITY_2020_1_OR_NEWER;UNITY_2020_2_OR_NEWER;UNITY_2020_3_OR_NEWER;UNITY_2021_1_OR_NEWER;UNITY_2021_2_OR_NEWER;UNITY_2021_3_OR_NEWER;UNITY_2022_1_OR_NEWER;UNITY_2022_2_OR_NEWER;UNITY_2022_3_OR_NEWER;UNITY_2023_1_OR_NEWER;UNITY_2023_2_OR_NEWER;UNITY_2023_3_OR_NEWER;UNITY_6000_0_OR_NEWER;UNITY_6000_1_OR_NEWER;UNITY_INCLUDE_TESTS;ENABLE_AUDIO;ENABLE_CLOTH;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_UNITYWEBREQUEST;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_EDITOR_GAME_SERVICES;ENABLE_UNITY_GAME_SERVICES_ANALYTICS_SUPPORT;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_ENGINE_CODE_STRIPPING;ENABLE_ONSCREEN_KEYBOARD;ENABLE_MANAGED_UNITYTLS;RENDER_SOFTWARE_CURSOR;ENABLE_MARSHALLING_TESTS;ENABLE_VIDEO;ENABLE_NAVIGATION_OFFMESHLINK_TO_NAVMESHLINK;ENABLE_ACCELERATOR_CLIENT_DEBUGGING;TEXTCORE_1_0_OR_NEWER;EDITOR_ONLY_NAVMESH_BUILDER_DEPRECATED;PLATFORM_WEBGL;UNITY_WEBGL;UNITY_WEBGL_API;UNITY_DISABLE_WEB_VERIFICATION;UNITY_GFX_USE_PLATFORM_VSYNC;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_SPATIALTRACKING;ENABLE_MONO;NET_4_6;NET_UNITY_4_8;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_INPUT_SYSTEM;TEXTCORE_FONT_ENGINE_1_5_OR_NEWER;TEXTCORE_TEXT_ENGINE_1_5_OR_NEWER;UNITY_POST_PROCESSING_STACK_V2;DOTWEEN;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER;UNITY_EDITOR_ONLY_COMPILATION</DefineConstants>
+    <DefineConstants>UNITY_6000_1_0;UNITY_6000_1;UNITY_6000;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_2019_3_OR_NEWER;UNITY_2019_4_OR_NEWER;UNITY_2020_1_OR_NEWER;UNITY_2020_2_OR_NEWER;UNITY_2020_3_OR_NEWER;UNITY_2021_1_OR_NEWER;UNITY_2021_2_OR_NEWER;UNITY_2021_3_OR_NEWER;UNITY_2022_1_OR_NEWER;UNITY_2022_2_OR_NEWER;UNITY_2022_3_OR_NEWER;UNITY_2023_1_OR_NEWER;UNITY_2023_2_OR_NEWER;UNITY_2023_3_OR_NEWER;UNITY_6000_0_OR_NEWER;UNITY_6000_1_OR_NEWER;UNITY_INCLUDE_TESTS;ENABLE_AUDIO;ENABLE_CLOTH;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_UNITYWEBREQUEST;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_EDITOR_GAME_SERVICES;ENABLE_UNITY_GAME_SERVICES_ANALYTICS_SUPPORT;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_ENGINE_CODE_STRIPPING;ENABLE_ONSCREEN_KEYBOARD;ENABLE_MANAGED_UNITYTLS;RENDER_SOFTWARE_CURSOR;ENABLE_MARSHALLING_TESTS;ENABLE_VIDEO;ENABLE_NAVIGATION_OFFMESHLINK_TO_NAVMESHLINK;ENABLE_ACCELERATOR_CLIENT_DEBUGGING;TEXTCORE_1_0_OR_NEWER;EDITOR_ONLY_NAVMESH_BUILDER_DEPRECATED;PLATFORM_WEBGL;UNITY_WEBGL;UNITY_WEBGL_API;UNITY_DISABLE_WEB_VERIFICATION;UNITY_GFX_USE_PLATFORM_VSYNC;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_SPATIALTRACKING;ENABLE_MONO;NET_4_6;NET_UNITY_4_8;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_INPUT_SYSTEM;TEXTCORE_FONT_ENGINE_1_5_OR_NEWER;TEXTCORE_TEXT_ENGINE_1_5_OR_NEWER;UNITY_POST_PROCESSING_STACK_V2;DOTWEEN;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER;UNITY_EDITOR_ONLY_COMPILATION;MERYEL_UCA_LITE_VERSION;MERYEL_UCA_VS_MARKETPLACE_BUILD</DefineConstants>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -61,18 +61,56 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\SceneControllerEditor.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\SceneTransitionConfigEditor.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\LevelServiceEditor.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\DisplayWithoutEditDrawer.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\LevelConfigDrawer.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateMachineEditor.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\RaiseGameEventConfigEditor.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateTransitionDrawer.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Input\SnappableInputHandlerEditor.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\LazyInitializer.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Input\Text2Yaml.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Cleanup.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\AnalyzerPostProcessor.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\ScriptFinder.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Input\UnityInputManager.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Updater.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Preferences\PreferenceStorageAccessor.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\MainThreadDispatcher.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Monitor.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\EditorCoroutines\EditorCoroutineUtility.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\MQTTnetInitializer.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Preferences\PreferenceEntryHolder.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\SetupManager.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Input\Binary2TextExec.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Logger\ELogger.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\EditorCoroutines\EditorCoroutine.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\FeedbackWindow.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Preferences\RegistryMonitor.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Logger\LoggerExtensions.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\UnityEditorShell.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Input\InputManagerMonitor.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\StatusWindow.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\AboutWindow.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Assister.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\MQTTnetPublisher.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Logger\UnitySink.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Preferences\PreferenceMonitor.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\EditorCoroutines\EditorWindowCoroutineExtension.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\UnityClassExtensions.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\EditorCoroutines\EditorWaitForSeconds.cs" />
+    <Compile Include="Packages\com.merry-yellow.code-assist\Editor\Logger\CommonTools.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\_Game\Scripts\GMTK\Editor\GMTK.Editor.asmdef" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\MerryYellow.CodeAssist.Editor.asmdef" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.SynchronizerModel.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.Synchronizer.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\csc.rsp" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.AnalyzersLite.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.CompletionInternals.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.YamlDotNet.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.Newtonsoft.Json.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.Logger.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.ProjectData.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.Common.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.VSIXLibrary.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.Completion.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.RoslynAnalyzerManager.dll" />
+    <None Include="Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.MQTTnet.dll" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1237,18 +1275,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Ameba.csproj">
-      <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
-      <Name>Ameba</Name>
-    </ProjectReference>
-    <ProjectReference Include="Ameba.Editor.csproj">
-      <Project>{9221C05C-856E-BDBC-9B62-082573738239}</Project>
-      <Name>Ameba.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="GMTK.csproj">
-      <Project>{F1EF9DBB-0766-2ED7-8397-D963BF4EB548}</Project>
-      <Name>GMTK</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

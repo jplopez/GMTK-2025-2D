@@ -18,8 +18,6 @@
     <!-- Preserve your game-specific types -->
     <type fullname="GMTK.GameStateMachine" preserve="all"/>
     <type fullname="GMTK.GameEventChannel" preserve="all"/>
-    <type fullname="GMTK.Game" preserve="all"/>
-    <type fullname="GMTK.GameContext" preserve="all"/>
     <type fullname="GMTK.HudController" preserve="all"/>
     <type fullname="GMTK.GameStates" preserve="all"/>
 
