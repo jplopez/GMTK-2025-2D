@@ -1,3 +1,4 @@
+using Ameba;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,6 +17,8 @@ namespace GMTK {
       HandlerName = nameof(GameplayStateHandler);
     }
 
+    protected LevelScene _levelController;
+
     protected override void Init() {
       Priority = (Priority == 0) ? 200 : Priority;
 
@@ -25,6 +28,10 @@ namespace GMTK {
       
       if (levelManager == null) {
         levelManager = FindFirstObjectByType<LevelManager>();
+      }
+
+      if (_levelController == null) {
+        _levelController = FindFirstObjectByType<LevelScene>();
       }
 
       //if (snappables == null || snappables.Count == 0) {
@@ -40,6 +47,7 @@ namespace GMTK {
       if (marble.InitialForce == null || marble.InitialForce == Vector2.zero) {
         marble.InitialForce = levelManager.MarbleInitialForce;
       }
+
     }
     protected override void ToPreparation() {
       //place marble in starting point
@@ -70,7 +78,7 @@ namespace GMTK {
       //ResetAllSnappables();
       //TODO: trigger effects of slowing down and victory music
       //TODO: fadeout 
-      Game.Context.LoadNextScene();
+      _levelController.LoadNextLevel();
     }
 
     private void SetDraggableSnappables(bool enabled) => _draggableSnappables.ForEach(s => s.Draggable = enabled);

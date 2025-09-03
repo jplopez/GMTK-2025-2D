@@ -78,10 +78,7 @@ namespace GMTK {
     #region Monobehavior Methods
 
     private void Awake() {
-      InitializationManager.WaitForInitialization(this, OnReady);
-    }
-
-    public virtual void OnReady() {
+     
       if (_eventsChannel == null) {
         _eventsChannel = Services.Get<GameEventChannel>();
       }
@@ -219,37 +216,33 @@ namespace GMTK {
     #region Event Listeners
 
     private void AddInputListeners() {
-      // Input listeners TODO-> move them over to GameEventsChannel
-      //SnappableInputHandler.OnElementDropped += HandleElementDropped;
-      //SnappableInputHandler.OnElementHovered += HandleElementHovered;
-      //SnappableInputHandler.OnElementUnhovered += HandleElementUnhovered;
-      //SnappableInputHandler.OnElementSelected += HandleElementSelected;
+      if (_eventsChannel == null) return;
+      
+      // Change from EventArgs to specific types
+      _eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
+      _eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
+      _eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
+      _eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
 
-      // Add Element moving and hovering events
-      _eventsChannel.AddListener(GameEventType.ElementDropped, HandleElementSelected);
-      _eventsChannel.AddListener(GameEventType.ElementDropped, HandleElementDropped);
-      _eventsChannel.AddListener(GameEventType.ElementHovered, HandleElementHovered);
-      _eventsChannel.AddListener(GameEventType.ElementUnhovered, HandleElementUnhovered);
-
-      // Add inventory event listeners with EventArgs wrappers
-      _eventsChannel.AddListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
-      _eventsChannel.AddListener(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
-      _eventsChannel.AddListener(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
-      _eventsChannel.AddListener(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
+      // Change from EventArgs to InventoryEventData
+      _eventsChannel.AddListener<InventoryEventData>(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
+      _eventsChannel.AddListener<InventoryEventData>(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
+      _eventsChannel.AddListener<InventoryEventData>(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
+      _eventsChannel.AddListener<InventoryEventData>(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
     }
 
     private void RemoveInputListeners() {
-      _eventsChannel.RemoveListener(GameEventType.ElementDropped, HandleElementSelected);
-      _eventsChannel.RemoveListener(GameEventType.ElementDropped, HandleElementDropped);
-      _eventsChannel.RemoveListener(GameEventType.ElementHovered, HandleElementHovered);
-      _eventsChannel.RemoveListener(GameEventType.ElementUnhovered, HandleElementUnhovered);
+      if (_eventsChannel == null) return;
+      
+      _eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
+      _eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
+      _eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
+      _eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
 
-      // Remove inventory event listeners
-      _eventsChannel.RemoveListener(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
-      _eventsChannel.RemoveListener(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
-      _eventsChannel.RemoveListener(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
-      _eventsChannel.RemoveListener(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
-
+      _eventsChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
+      _eventsChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
+      _eventsChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
+      _eventsChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
     }
 
     #endregion
@@ -463,7 +456,7 @@ namespace GMTK {
 
     #region Element Movement Event Handlers
 
-    protected virtual void HandleElementSelected(EventArgs args) {
+    protected virtual void HandleElementSelected(GridSnappableEventArgs args) {
       // This now just collects element initial world and grid positions - tracking starts in Update()
       if (args is GridSnappableEventArgs e && e.Element != null) {
         //_currentSelected = e.Element;
@@ -477,7 +470,7 @@ namespace GMTK {
         e.Element.OnPointerOver();
       }
     }
-    protected virtual void HandleElementDropped(EventArgs args) {
+    protected virtual void HandleElementDropped(GridSnappableEventArgs args) {
 
       if (args is GridSnappableEventArgs e && e.Element != null) {
 

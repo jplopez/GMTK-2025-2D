@@ -5,7 +5,7 @@ using UnityEngine;
 namespace GMTK {
   /// <summary>
   /// Handles the display and update of the HUD elements (score, playback buttons)
-  /// Listens to ScoreRaised and ScoreChanged from EventChannel
+  /// Listens to RaiseScore and SetScoreValue from EventChannel
   /// </summary>
   [CreateAssetMenu(menuName = "GMTK/HUD")]
   public class HUD : ScriptableObject {
@@ -22,27 +22,32 @@ namespace GMTK {
 
     protected GameEventChannel eventChannel;
 
-    private void OnEnable() {
-
+    private void Awake() {
       if (eventChannel == null) {
-        eventChannel = Resources.Load<GameEventChannel>("GameEventChannel");
+        eventChannel = Services.Get<GameEventChannel>();
       }
       if (MarbleScoreKeeper == null) {
-        MarbleScoreKeeper = Resources.Load<ScoreGateKeeper>("MarbleScoreKeeper");
+        MarbleScoreKeeper = Services.Get<ScoreGateKeeper>();
       }
-      eventChannel.AddListener(GameEventType.ScoreRaised,
-          (float amount) => HandleScoreAdded(amount));
-      eventChannel.AddListener(GameEventType.ScoreChanged, HandleScoreSet);
+      
+      // Add explicit type parameters
+      eventChannel.AddListener<float>(GameEventType.RaiseScore, HandleScoreAdded);
+      eventChannel.AddListener<int>(GameEventType.SetScoreValue, HandleScoreSet);
+      eventChannel.AddListener(GameEventType.ResetScore, HandleResetScore); // void - no change needed
     }
 
     private void OnDisable() {
-      eventChannel.RemoveListener(GameEventType.ScoreRaised,
-        (float amount) => HandleScoreAdded(amount));
-      eventChannel.RemoveListener(GameEventType.ScoreChanged, HandleScoreSet);
+      if (eventChannel == null) return;
+      
+      eventChannel.RemoveListener<float>(GameEventType.RaiseScore, HandleScoreAdded);
+      eventChannel.RemoveListener<int>(GameEventType.SetScoreValue, HandleScoreSet);
+      eventChannel.RemoveListener(GameEventType.ResetScore, HandleResetScore); // void - no change needed
     }
 
+    // Update method signatures to match expected types
     private void HandleScoreAdded(float amount) => MarbleScoreKeeper.Tick(amount);
     private void HandleScoreSet(int amount) => MarbleScoreKeeper.SetScore(amount);
+    private void HandleResetScore() => MarbleScoreKeeper.ResetScore();
 
 #if UNITY_EDITOR
 

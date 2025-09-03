@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Ameba {
 
-  public class EventChannel<Tenum> : ScriptableObject where Tenum : Enum {
     public enum PayloadType {
       Void,
       Int,
@@ -14,98 +13,83 @@ namespace Ameba {
       EventArg
     }
 
-    private Dictionary<Tenum, Action> voidEvents = new();
-    private Dictionary<Tenum, Action<int>> intEvents = new();
-    private Dictionary<Tenum, Action<bool>> boolEvents = new();
-    private Dictionary<Tenum, Action<float>> floatEvents = new();
-    private Dictionary<Tenum, Action<string>> stringEvents = new();
-    private Dictionary<Tenum, Action<EventArgs>> eventArgsEvents = new();
+  /// <summary>
+  /// Type-safe event channel using generics and interfaces.
+  /// </summary>
+  /// <typeparam name="Tenum"></typeparam>
+  public class EventChannel<Tenum> : ScriptableObject where Tenum : Enum {
 
-    // Add Listener
+    private Dictionary<Tenum, List<IEventCallback>> callbacks = new();
+
+    // Interface for type-safe callbacks
+    private interface IEventCallback {
+      void Invoke(object payload);
+      Type PayloadType { get; }
+    }
+
+    private class EventCallback<T> : IEventCallback {
+      public Action<T> Action { get; }
+      public Type PayloadType => typeof(T);
+      
+      public EventCallback(Action<T> action) => Action = action;
+      public void Invoke(object payload) => Action?.Invoke((T)payload);
+    }
+
+    private class VoidEventCallback : IEventCallback {
+      public Action Action { get; }
+      public Type PayloadType => typeof(void);
+      
+      public VoidEventCallback(Action action) => Action = action;
+      public void Invoke(object payload) => Action?.Invoke();
+    }
+
+    // Unified Add/Remove methods
+    public void AddListener<T>(Tenum type, Action<T> callback) {
+      if (!callbacks.ContainsKey(type)) callbacks[type] = new();
+      callbacks[type].Add(new EventCallback<T>(callback));
+    }
+
     public void AddListener(Tenum type, Action callback) {
-      if (!voidEvents.ContainsKey(type)) voidEvents[type] = null;
-      voidEvents[type] += callback;
+      if (!callbacks.ContainsKey(type)) callbacks[type] = new();
+      callbacks[type].Add(new VoidEventCallback(callback));
     }
 
-    public void AddListener(Tenum type, Action<int> callback) {
-      if (!intEvents.ContainsKey(type)) intEvents[type] = null;
-      intEvents[type] += callback;
+    public void RemoveListener<T>(Tenum type, Action<T> callback) {
+      if (!callbacks.TryGetValue(type, out var callbackList)) return;
+      callbackList.RemoveAll(c => c is EventCallback<T> ec && ec.Action == callback);
+      if (callbackList.Count == 0) callbacks.Remove(type);
     }
 
-    public void AddListener(Tenum type, Action<bool> callback) {
-      if (!boolEvents.ContainsKey(type)) boolEvents[type] = null;
-      boolEvents[type] += callback;
-    }
-
-    public void AddListener(Tenum type, Action<float> callback) {
-      if (!floatEvents.ContainsKey(type)) floatEvents[type] = null;
-      floatEvents[type] += callback;
-    }
-
-    public void AddListener(Tenum type, Action<string> callback) {
-      if (!stringEvents.ContainsKey(type)) stringEvents[type] = null;
-      stringEvents[type] += callback;
-    }
-
-    public void AddListener(Tenum type, Action<EventArgs> callback) {
-      if (!eventArgsEvents.ContainsKey(type)) eventArgsEvents[type] = null;
-      eventArgsEvents[type] += callback;
-    }
-
-    // Remove Listener
     public void RemoveListener(Tenum type, Action callback) {
-      if (voidEvents.ContainsKey(type)) voidEvents[type] -= callback;
+      if (!callbacks.TryGetValue(type, out var callbackList)) return;
+      callbackList.RemoveAll(c => c is VoidEventCallback vc && vc.Action == callback);
+      if (callbackList.Count == 0) callbacks.Remove(type);
     }
 
-    public void RemoveListener(Tenum type, Action<int> callback) {
-      if (intEvents.ContainsKey(type)) intEvents[type] -= callback;
-    }
-
-    public void RemoveListener(Tenum type, Action<bool> callback) {
-      if (boolEvents.ContainsKey(type)) boolEvents[type] -= callback;
-    }
-
-    public void RemoveListener(Tenum type, Action<float> callback) {
-      if (floatEvents.ContainsKey(type)) floatEvents[type] -= callback;
-    }
-
-    public void RemoveListener(Tenum type, Action<string> callback) {
-      if (stringEvents.ContainsKey(type)) stringEvents[type] -= callback;
-    }
-
-    public void RemoveListener(Tenum type, Action<EventArgs> callback) {
-      if (eventArgsEvents.ContainsKey(type)) eventArgsEvents[type] -= callback;
-    }
-    // Raise Event
     public void Raise(Tenum type) {
-      voidEvents.TryGetValue(type, out var callback);
-      callback?.Invoke();
+      if (!callbacks.TryGetValue(type, out var callbackList)) return;
+
+      foreach (var callback in callbackList) {
+        if (callback.PayloadType == typeof(void)) {
+          callback.Invoke(null);
+        }
+      }
     }
 
-    public void Raise(Tenum type, int value) {
-      intEvents.TryGetValue(type, out var callback);
-      callback?.Invoke(value);
+    // Unified Raise method
+    public void Raise<T>(Tenum type, T payload = default) {
+      if (!callbacks.TryGetValue(type, out var callbackList)) return;
+      
+      foreach (var callback in callbackList) {
+        if (typeof(T) == typeof(void) && callback.PayloadType == typeof(void)) {
+          callback.Invoke(null);
+        }
+        else if (callback.PayloadType == typeof(T)) {
+          callback.Invoke(payload);
+        }
+      }
     }
 
-    public void Raise(Tenum type, bool value) {
-      boolEvents.TryGetValue(type, out var callback);
-      callback?.Invoke(value);
-    }
-
-    public void Raise(Tenum type, float value) {
-      floatEvents.TryGetValue(type, out var callback);
-      callback?.Invoke(value);
-    }
-
-    public void Raise(Tenum type, string value) {
-      stringEvents.TryGetValue(type, out var callback);
-      callback?.Invoke(value);
-    }
-
-    public void Raise(Tenum type, EventArgs value) {
-      eventArgsEvents.TryGetValue(type, out var callback);
-      callback?.Invoke(value);
-    }
-  
+    public void RemoveAllListeners() => callbacks?.Clear();
   }
 }

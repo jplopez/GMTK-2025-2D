@@ -29,10 +29,7 @@ namespace GMTK {
     protected GameEventChannel _eventsChannel;
     private void Awake() {
       _isInitialized = false;
-      InitializationManager.WaitForInitialization(this, OnReady);
-    }
-
-    protected void OnReady() {
+     
       if (_eventsChannel == null) {
         _eventsChannel = Services.Get<GameEventChannel>();
       }
@@ -47,7 +44,7 @@ namespace GMTK {
     protected virtual void Init() { }
 
     private void Update() {
-      if(!_isInitialized) OnReady();
+      if(!_isInitialized) Init();
 
       if(_inTransition) {
         //If Try method is successful we want inTransition to be false, signaling the transition was finalized successfully
@@ -62,7 +59,7 @@ namespace GMTK {
     }
 
     public virtual void HandleStateChange(StateMachineEventArg<GameStates> eventArg) {
-      if (!_isInitialized) OnReady();
+      if (!_isInitialized) Init();
       if(eventArg != null) {
         _currentArgs = eventArg;
         //This flag tells the Update method to attempt the game state transition

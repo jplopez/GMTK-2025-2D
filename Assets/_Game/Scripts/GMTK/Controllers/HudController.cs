@@ -30,6 +30,7 @@ namespace GMTK {
 
     // WebGL safety flags
     private bool _isInitialized = false;
+    private bool _isScoreInitialized = false;
     private bool _webglSafeMode = false;
 
     private void Awake() {
@@ -39,10 +40,7 @@ namespace GMTK {
             if (EnableWebGLDebug) Debug.Log("[HudController] WebGL safe mode enabled");
 #endif
 
-      InitializationManager.WaitForInitialization(this, OnReady);
-    }
-
-    private void OnReady() {
+      
       try {
         if (_hud == null) _hud = Services.Get<HUD>();
         if (_marbleScoreKeeper == null) _marbleScoreKeeper = Services.Get<ScoreGateKeeper>();
@@ -76,11 +74,6 @@ namespace GMTK {
         isValid = false;
       }
 
-      //if (Game.Context == null) {
-      //  Debug.LogError("[HudController] Game.Context is null");
-      //  isValid = false;
-      //}
-
       if (PlayButton == null || ResetButton == null) {
         Debug.LogError("[HudController] Play or Reset button is null");
         isValid = false;
@@ -90,10 +83,18 @@ namespace GMTK {
     }
 
     private void SetupScoreSystem() {
+      if (_isScoreInitialized) return;
       if (_marbleScoreKeeper != null) {
+        if (_marbleScoreKeeper.HasStrategy()) {
+          _isScoreInitialized = true;
+          return;
+        }
         var scoreStrategy = gameObject.AddComponent<TimeBasedScoreCalculator>();
         _marbleScoreKeeper.SetStrategy(scoreStrategy, transform);
+        _isScoreInitialized = true;
         UpdateScoreText(_marbleScoreKeeper.GetScore());
+      } else {
+        Debug.LogWarning($"HudController: Score keeper could not initialized. Will try again in next frame");
       }
     }
 
@@ -120,7 +121,10 @@ namespace GMTK {
         if (EnableWebGLDebug) Debug.Log("HudController: failed to initialize. Will retry on next frame");
         return;
       }
-      
+
+      //try to setup score system if it wasn't done during start
+      //this might happen on WebGL builds
+      if (!_isScoreInitialized) SetupScoreSystem();
       if (_marbleScoreKeeper != null) {
         _marbleScoreKeeper.PauseScore(PauseScore);
         if (!PauseScore) {
@@ -185,20 +189,6 @@ namespace GMTK {
       else {
         Debug.LogError("[HudController] EventsChannel is null - cannot raise LevelPlay");
       }
-      //try {
-      //  // WebGL-safe transition checking
-      //  if (CanTransitionToPlayingSafely()) {
-
-      //  }
-      //  else {
-      //    if (EnableWebGLDebug) Debug.Log("[HudController] Cannot transition to Playing state");
-      //  }
-      //}
-      //catch (System.Exception ex) {
-      //  Debug.LogError($"[HudController] Play button click failed: {ex.Message}");
-      //  // Fallback: try to raise event directly
-      //  TryRaiseEventDirectly(GameEventType.LevelPlay);
-      //}
     }
 
     private void HandleResetButtonClick() {
@@ -210,80 +200,7 @@ namespace GMTK {
       else {
         Debug.LogError("[HudController] EventsChannel is null - cannot raise LevelReset");
       }
-      //try {
-      //  // WebGL-safe transition checking
-      //  if (CanTransitionToResetSafely()) {
-
-      //  }
-      //  else {
-      //    if (EnableWebGLDebug) Debug.Log("[HudController] Cannot transition to Reset state");
-      //  }
-      //}
-      //catch (System.Exception ex) {
-      //  Debug.LogError($"[HudController] Reset button click failed: {ex.Message}");
-      //  // Fallback: try to raise event directly
-      //  TryRaiseEventDirectly(GameEventType.LevelReset);
-      //}
     }
-
-    /// <summary>
-    /// WebGL-safe method to check if we can transition to Playing state
-    /// </summary>
-    //private bool CanTransitionToPlayingSafely() {
-    //  try {
-    //    // Direct null checks first
-    //    if (Game.Context == null) {
-    //      if (EnableWebGLDebug) Debug.Log("[HudController] Game.Context is null");
-    //      return _webglSafeMode; // In WebGL safe mode, allow transitions
-    //    }
-
-    //    if (Game.StateMachine == null) {
-    //      if (EnableWebGLDebug) Debug.Log("[HudController] Game.StateMachine is null");
-    //      return _webglSafeMode;
-    //    }
-
-    //    // Try the normal transition check
-    //    return Game.Context.CanTransitionTo(GameStates.Playing);
-    //  }
-    //  catch (System.Exception ex) {
-    //    if (EnableWebGLDebug) Debug.LogWarning($"[HudController] Transition check failed: {ex.Message}");
-    //    return _webglSafeMode; // In WebGL, allow transition if we're in safe mode
-    //  }
-    //}
-
-    ///// <summary>
-    ///// WebGL-safe method to check if we can transition to Reset state
-    ///// </summary>
-    //private bool CanTransitionToResetSafely() {
-    //  try {
-    //    if (Game.Context == null || Game.StateMachine == null) {
-    //      return _webglSafeMode;
-    //    }
-    //    return Game.Context.CanTransitionTo(GameStates.Reset);
-    //  }
-    //  catch (System.Exception ex) {
-    //    if (EnableWebGLDebug) Debug.LogWarning($"[HudController] Reset transition check failed: {ex.Message}");
-    //    return _webglSafeMode;
-    //  }
-    //}
-
-    ///// <summary>
-    ///// Fallback method to raise events directly when interface calls fail
-    ///// </summary>
-    //private void TryRaiseEventDirectly(GameEventType eventType) {
-    //  try {
-    //    if (_eventsChannel != null) {
-    //      _eventsChannel.Raise(eventType);
-    //      Debug.Log($"[HudController] Direct event raise successful: {eventType}");
-    //    }
-    //    else {
-    //      Debug.LogError("[HudController] Cannot raise event - EventsChannel is null");
-    //    }
-    //  }
-    //  catch (System.Exception ex) {
-    //    Debug.LogError($"[HudController] Direct event raise failed: {ex.Message}");
-    //  }
-    //}
 
     private void UpdateScoreText(int newScore) {
       if (scoreText != null) {

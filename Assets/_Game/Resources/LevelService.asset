@@ -16,8 +16,8 @@ MonoBehaviour:
   - SceneName: Start
     DisplayName: Start
     Type: 0
-    InitialGameState: 0
     SetStateOnLoad: 1
+    InitialGameState: 0
     IsUnlocked: 1
     CanRestart: 1
     CanSkip: 0
@@ -29,9 +29,9 @@ MonoBehaviour:
     CustomLoadMethod: 
   - SceneName: Level1
     DisplayName: Level1
-    Type: 1
-    InitialGameState: 1
+    Type: 2
     SetStateOnLoad: 1
+    InitialGameState: 1
     IsUnlocked: 1
     CanRestart: 0
     CanSkip: 0
@@ -43,9 +43,9 @@ MonoBehaviour:
     CustomLoadMethod: 
   - SceneName: Level2
     DisplayName: Level2
-    Type: 1
-    InitialGameState: 1
+    Type: 2
     SetStateOnLoad: 1
+    InitialGameState: 1
     IsUnlocked: 1
     CanRestart: 0
     CanSkip: 0
@@ -57,23 +57,23 @@ MonoBehaviour:
     CustomLoadMethod: 
   - SceneName: LevelComplete
     DisplayName: LevelComplete
-    Type: 2
-    InitialGameState: 4
+    Type: 3
     SetStateOnLoad: 1
+    InitialGameState: 4
     IsUnlocked: 1
     CanRestart: 0
     CanSkip: 0
     UnlockConditions: []
     NextSceneName: 
     PreviousSceneName: 
-    LoadDelay: 0
+    LoadDelay: 0.2
     UseCustomLoadMethod: 0
     CustomLoadMethod: 
   - SceneName: GameOver
     DisplayName: GameOver
-    Type: 0
-    InitialGameState: 5
+    Type: 1
     SetStateOnLoad: 1
+    InitialGameState: 5
     IsUnlocked: 1
     CanRestart: 0
     CanSkip: 0
@@ -85,9 +85,9 @@ MonoBehaviour:
     CustomLoadMethod: 
   - SceneName: Loading
     DisplayName: Loading
-    Type: 2
-    InitialGameState: 1
+    Type: 3
     SetStateOnLoad: 1
+    InitialGameState: 1
     IsUnlocked: 1
     CanRestart: 1
     CanSkip: 0
@@ -97,5 +97,39 @@ MonoBehaviour:
     LoadDelay: 0
     UseCustomLoadMethod: 0
     CustomLoadMethod: 
-  _currentLevelIndex: -1
-  _currentSceneName: 
+  _currentLevelIndex: 0
+  _currentSceneName: Start
+  startLevelType: 0
+  _startSceneName: Start
+  _startLevelConfig:
+    SceneName: 
+    DisplayName: 
+    Type: 2
+    SetStateOnLoad: 1
+    InitialGameState: 1
+    IsUnlocked: 1
+    CanRestart: 1
+    CanSkip: 0
+    UnlockConditions: []
+    NextSceneName: 
+    PreviousSceneName: 
+    LoadDelay: 0
+    UseCustomLoadMethod: 0
+    CustomLoadMethod: 
+  endLevelType: 0
+  _endSceneName: GameOver
+  _endLevelConfig:
+    SceneName: 
+    DisplayName: 
+    Type: 2
+    SetStateOnLoad: 1
+    InitialGameState: 1
+    IsUnlocked: 1
+    CanRestart: 1
+    CanSkip: 0
+    UnlockConditions: []
+    NextSceneName: 
+    PreviousSceneName: 
+    LoadDelay: 0
+    UseCustomLoadMethod: 0
+    CustomLoadMethod: 

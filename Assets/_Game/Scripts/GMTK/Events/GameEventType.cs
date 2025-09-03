@@ -30,9 +30,9 @@ namespace GMTK {
     //int
     RaiseInt,
     SetInt,
-    ScoreRaised,
-    ScoreChanged,
-
+    RaiseScore,
+    SetScoreValue,
+    ResetScore,
     //float
 
     //bool

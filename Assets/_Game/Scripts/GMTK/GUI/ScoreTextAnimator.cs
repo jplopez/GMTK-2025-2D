@@ -17,11 +17,8 @@ namespace GMTK {
     protected int _currentDisplayedScore = 0;
     protected ScoreGateKeeper _scoreKeeper;
     private void Awake() {
-      InitializationManager.WaitForInitialization(this, OnReady);
-    }
-
-    private void OnReady() {
-      _scoreKeeper = Game.ScoreKeeper;
+    
+      _scoreKeeper = Services.Get<ScoreGateKeeper>();
       _currentDisplayedScore = 0;
     }
     public void Update() {

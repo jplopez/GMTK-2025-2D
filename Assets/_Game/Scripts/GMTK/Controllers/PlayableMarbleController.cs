@@ -40,10 +40,6 @@ namespace GMTK {
 
     #region MonoBehaviour methods
     private void Awake() {
-      InitializationManager.WaitForInitialization(this, OnReady);
-    }
-
-    void OnReady() {
 
       if (_eventChannel == null) {
         _eventChannel = Resources.Load<GameEventChannel>("GameEventChannel");

@@ -13,11 +13,10 @@ MonoBehaviour:
   m_Name: ServiceRegistry
   m_EditorClassIdentifier: 
   _serviceTypeNames:
-  - GameEventChannel
-  - GameStateHandlerRegistry
-  - GameStateMachine
-  - HUD
-  - LevelSequence
-  - ScoreGateKeeper
-  - InputActionEventChannel
   - LevelService
+  - GameEventChannel
+  - GameStateMachine
+  - GameStateHandlerRegistry
+  - InputActionEventChannel
+  - ScoreGateKeeper
+  - HUD

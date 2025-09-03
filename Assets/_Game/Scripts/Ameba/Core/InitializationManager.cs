@@ -14,13 +14,13 @@ namespace Ameba {
     public static bool IsInitialized { get; private set; } = false;
     public static event Action OnInitializationComplete;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics() {
       IsInitialized = false;
       OnInitializationComplete = null;
     }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    //[RuntimeInitializeOnLoadMethod  (RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void InitializeBeforeScene() {
       Debug.Log("InitializationManager: Starting pre-scene initialization");
 

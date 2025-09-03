@@ -50,28 +50,27 @@ namespace GMTK {
     protected float _timeSinceLastMove = 0f;
     protected float _timeSinceLevelStart = 0f;
     //protected int _scoreAtLevelStart = 0;
-    protected LevelSequence _levelSequence;
+    //protected LevelSequence _levelSequence;
+    protected LevelService _levelService;
     protected GameEventChannel _eventChannel;
 
     #region MonoBehaviour methods
 
     private void Awake() {
-      InitializationManager.WaitForInitialization(this, OnReady);
-    }
-
-    private void OnReady() {
+     
       _eventChannel = Services.Get<GameEventChannel>();
-      _levelSequence = Services.Get<LevelSequence>();
+      //_levelSequence = Services.Get<LevelSequence>();
+      _levelService = Services.Get<LevelService>();
       //_scoreAtLevelStart = Game.Context.MarbleScoreKeeper.GetScore();
       if (_eventChannel == null) {
         Debug.Log($"LevelManager: EventChannel is missing. LevelManager won't be able to handle game events");
         return;
       }
-      _eventChannel.AddListener(GameEventType.EnterCheckpoint, HandleCheckPointEvent);
+      _eventChannel.AddListener<EventArgs>(GameEventType.EnterCheckpoint, HandleCheckPointEvent);
     }
 
     private void OnDestroy() {
-      _eventChannel.RemoveListener(GameEventType.EnterCheckpoint, HandleCheckPointEvent);
+      _eventChannel.RemoveListener<EventArgs>(GameEventType.EnterCheckpoint, HandleCheckPointEvent);
     }
 
     public void Start() {
@@ -183,7 +182,7 @@ namespace GMTK {
       StartLevelCheckpoint.enabled = true;
       EndLevelCheckpoint.enabled = false;
       ResetTimers();
-      //_eventChannel.Raise(GameEventType.ScoreChanged, _scoreAtLevelStart);
+      //_eventChannel.Raise(GameEventType.SetScoreValue, _scoreAtLevelStart);
     }
 
     #endregion
@@ -200,7 +199,7 @@ namespace GMTK {
         return;
       }
       if (PlayableMarble.IsMoving) {
-        _eventChannel.Raise(GameEventType.ScoreRaised, Time.deltaTime);
+        _eventChannel.Raise(GameEventType.RaiseScore, Time.deltaTime);
         _timeSinceLastMove += Time.deltaTime;
       }
       else {
@@ -213,8 +212,9 @@ namespace GMTK {
     /// TODO: turn this into event-driven and async scene loading to measure percentage of progress.
     /// </summary>
     private void LoadCompleteLevelScene() {
-      var levelSequence = Services.Get<LevelSequence>();
-      levelSequence.SetCurrentScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+      //var levelSequence = Services.Get<LevelSequence>();
+      //levelSequence.SetCurrentScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+      _levelService.SetCurrentLevel(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
       UnityEngine.SceneManagement.SceneManager.LoadScene(LEVEL_COMPLETE_SCENE_NAME); // Load a generic level complete scene
     }
     private void ResetTimers() {

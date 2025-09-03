@@ -31,10 +31,7 @@ namespace GMTK {
     protected GameStateMachine _stateMachine;
 
     private void Awake() {
-      InitializationManager.WaitForInitialization(this, OnReady);
-    }
-
-    private void OnReady() {
+      
       if (!TryGetComponent<Collider2D>(out var col)) {
         Debug.LogError($"[Checkpoint] No Collider2D found on {gameObject.name}. Please add one and set it as Trigger.");
       }

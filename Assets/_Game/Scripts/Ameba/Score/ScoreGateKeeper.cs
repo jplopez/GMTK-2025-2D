@@ -21,7 +21,7 @@ namespace Ameba {
     public void ResetScore() => totalScore = 0;
 
     public void Tick(float deltaTime) {
-      if (strategy == null && !pauseScore) return;
+      if (strategy == null || pauseScore) return;
       totalScore += strategy.CalculateScore(deltaTime);
     }
     public void SetScore(int amount) => totalScore = amount;
@@ -31,6 +31,7 @@ namespace Ameba {
     public void PauseScore(bool pause=true) => pauseScore = pause; 
     public bool IsPaused() => pauseScore;
 
+    public bool HasStrategy() => strategy != null;
 #if UNITY_EDITOR
     public void Pause() => PauseScore(true);
     public void Unpause() => PauseScore(false);

@@ -22,15 +22,11 @@ namespace GMTK {
     public PlayerInputActionDispatcher(InputActionEventChannel inputEvents) {
       InputEvents = inputEvents;
     }
-
     private void Awake() {
-      InitializationManager.WaitForInitialization(this, OnReady);
-    }
-
-    public void OnReady() {
+     
       //Getting the EventChannel with 2 fallbacks
       if (InputEvents == null) {
-        InputEvents = Game.InputEventChannel;
+        InputEvents = Services.Get<InputActionEventChannel>();
       }
       if (InputEvents == null) {
         InputEvents = Resources.Load<InputActionEventChannel>("InputActionEventChannel");

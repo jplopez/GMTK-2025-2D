@@ -836,6 +836,88 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2505816175688301443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9161413105727191728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1ffef80e2bf95744ad80fc95f87140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConfigurationSource: 0
+  SceneName: Loading
+  _manualConfig:
+    SceneName: 
+    DisplayName: 
+    Type: 2
+    SetStateOnLoad: 1
+    InitialGameState: 1
+    CanRestart: 1
+    CanSkip: 0
+    PreviousSceneName: 
+    NextSceneName: 
+    LoadDelay: 0
+  _presetConfig:
+    SceneName: 
+    DisplayName: 
+    Type: 2
+    SetStateOnLoad: 1
+    InitialGameState: 1
+    CanRestart: 1
+    CanSkip: 0
+    PreviousSceneName: 
+    NextSceneName: 
+    LoadDelay: 0
+  _effectiveConfig:
+    SceneName: Loading
+    DisplayName: Loading
+    Type: 3
+    SetStateOnLoad: 0
+    InitialGameState: 1
+    CanRestart: 0
+    CanSkip: 0
+    PreviousSceneName: 
+    NextSceneName: 
+    LoadDelay: 0.3
+  AutoScanForHandlers: 0
+  OnSceneLoadEvents: 
+  EnableDebugLogging: 1
+--- !u!4 &7315526984850293983
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9161413105727191728}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &9161413105727191728
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7315526984850293983}
+  - component: {fileID: 2505816175688301443}
+  m_Layer: 0
+  m_Name: TransitionSceneController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -843,3 +925,4 @@ SceneRoots:
   - {fileID: 399218917}
   - {fileID: 924498505}
   - {fileID: 367911226}
+  - {fileID: 7315526984850293983}

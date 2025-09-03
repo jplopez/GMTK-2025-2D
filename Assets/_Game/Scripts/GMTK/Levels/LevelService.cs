@@ -1,9 +1,28 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using Ameba;
+using System.Linq;
 
 namespace GMTK {
+
+  public enum SceneType {
+    Start,      // First scene. Splash screen or intro movie.
+    End,        //  GameOver, Credits, etc.
+    Level,      // Actual gameplay levels  
+    Transition, // Loading, LevelComplete
+    Special     // LevelDesigner, etc.
+  }
+
+  public enum StartLevelTypes {
+    SceneName,   // Specify the level by the scene name (default)
+    FirstLevel,  // The first level in the Levels array
+    Config       // A preset configuration
+  }
+
+  public enum EndLevelTypes {
+    SceneName,   // Specify the level by the scene name (default)
+    LastLevel,   // The last level in the Levels array 
+    Config       // A preset configuration
+  }
 
   [CreateAssetMenu(menuName = "GMTK/Level Service", fileName = "LevelService")]
   public class LevelService : ScriptableObject {
@@ -12,44 +31,20 @@ namespace GMTK {
     [Tooltip("All level configurations in the game")]
     public LevelConfig[] Levels;
 
-    [Header("Runtime State")]
+    [Header("Current Level")]
     [SerializeField] private int _currentLevelIndex = -1;
     [SerializeField] private string _currentSceneName;
 
-    [System.Serializable]
-    public class LevelConfig {
-      [Header("Basic Info")]
-      public string SceneName;
-      public string DisplayName;
-      public SceneType Type = SceneType.Level;
+    [Header("Start Level")]
+    public StartLevelTypes startLevelType = StartLevelTypes.SceneName;
+    [SerializeField] protected string _startSceneName;
+    [SerializeField] protected LevelConfig _startLevelConfig;
 
-      [Header("Game State")]
-      public GameStates InitialGameState = GameStates.Preparation;
-      public bool SetStateOnLoad = true;
+    [Header("End Level")]
+    public EndLevelTypes endLevelType = EndLevelTypes.SceneName;
+    [SerializeField] protected string _endSceneName;
+    [SerializeField] protected LevelConfig _endLevelConfig;
 
-      [Header("Scene Management")]
-      public bool IsUnlocked = true;
-      public bool CanRestart = true;
-      public bool CanSkip = false;
-
-      [Header("Progression")]
-      public string[] UnlockConditions;
-      public string NextSceneName;
-      public string PreviousSceneName;
-
-      //[Header("Optional Overrides")]
-      public float LoadDelay = 0f;
-      public bool UseCustomLoadMethod = false;
-      public string CustomLoadMethod;
-    }
-
-    public enum SceneType {
-      Start,      // First scene. Splash screen or intro movie.
-      End,        //  GameOver, Credits, etc.
-      Level,      // Actual gameplay levels  
-      Transition, // Loading, LevelComplete
-      Special     // LevelDesigner, etc.
-    }
 
     // Current level properties
     public LevelConfig CurrentLevel => _currentLevelIndex >= 0 && _currentLevelIndex < Levels.Length
@@ -57,6 +52,49 @@ namespace GMTK {
 
     public string CurrentSceneName => _currentSceneName;
     public int CurrentLevelIndex => _currentLevelIndex;
+
+    // Start Level properties
+    public LevelConfig StartLevel {
+      get {
+        return startLevelType switch {
+          StartLevelTypes.SceneName => GetLevelConfig(_startSceneName),
+          StartLevelTypes.FirstLevel => Levels.Length > 0 ? Levels[0] : null,
+          StartLevelTypes.Config => _startLevelConfig,
+          _ => null,
+        };
+      }
+    }
+
+    public void SetStartLevel(string sceneName) {
+      _startSceneName = sceneName;
+      startLevelType = StartLevelTypes.SceneName;
+    }
+    public void SetStartLevel(LevelConfig config) {
+      _startLevelConfig = config;
+      startLevelType = StartLevelTypes.Config;
+    }
+
+    // End Level properties
+
+    public LevelConfig EndLevel {
+      get {
+        return endLevelType switch {
+          EndLevelTypes.LastLevel => Levels.Length > 0 ? Levels[^1] : null,
+          EndLevelTypes.SceneName => GetLevelConfig(_endSceneName),
+          EndLevelTypes.Config => _endLevelConfig,
+          _ => null,
+        };
+      }
+    }
+
+    public void SetEndLevel(string sceneName) {
+      _endSceneName = sceneName;
+      endLevelType = EndLevelTypes.SceneName;
+    }
+    public void SetEndLevel(LevelConfig config) {
+      _endLevelConfig = config;
+      endLevelType = EndLevelTypes.Config;
+    }
 
     /// <summary>
     /// Get level configuration by scene name
@@ -154,24 +192,12 @@ namespace GMTK {
       return prevLevelConfig != null;
     }
 
-    /// <summary>
-    /// Check if level is unlocked
-    /// </summary>
-    public bool IsLevelUnlocked(string sceneName) {
-      var config = GetLevelConfig(sceneName);
-      return config?.IsUnlocked ?? false;
-    }
+    public LevelConfig FirstStartConfig() => Levels.First(l => l.Type == SceneType.Start);
 
-    /// <summary>
-    /// Unlock a level
-    /// </summary>
-    public void UnlockLevel(string sceneName) {
-      var config = GetLevelConfig(sceneName);
-      if (config != null) {
-        config.IsUnlocked = true;
-        Debug.Log($"[LevelService] Level unlocked: {sceneName}");
-      }
-    }
+    public LevelConfig FirstEndConfig() => Levels.First(l => l.Type == SceneType.End);
+
+    public LevelConfig[] GetConfigsByType(SceneType type) =>
+          Levels.Where(l => l.Type.Equals(type)).ToArray();
 
     // Navigation helpers
     public bool HasNextLevel() => GetNextLevel() != null;

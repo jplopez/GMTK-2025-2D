@@ -39,12 +39,9 @@ namespace GMTK {
     #region MonoBehaviour methods
 
     private void Awake() {
-      InitializationManager.WaitForInitialization(this, OnReady);
-    }
-
-    protected void OnReady() {
+     
       if (_eventsChannel == null) {
-        _eventsChannel = Game.EventChannel;
+        _eventsChannel = Services.Get<GameEventChannel>();
       }
 
       if (_inputDispatcher == null && TryGetComponent(out _inputDispatcher)) {
@@ -56,12 +53,12 @@ namespace GMTK {
 
       if (_inputDispatcher != null) {
 
-        _inputDispatcher.InputEvents.AddListener(InputActionType.Select, HandleSelect);
-        _inputDispatcher.InputEvents.AddListener(InputActionType.Secondary, HandleSecondary);
-        _inputDispatcher.InputEvents.AddListener(InputActionType.RotateCW, RotateCW);
-        _inputDispatcher.InputEvents.AddListener(InputActionType.RotateCCW, RotateCCW);
-        _inputDispatcher.InputEvents.AddListener(InputActionType.FlipX, FlipX);
-        _inputDispatcher.InputEvents.AddListener(InputActionType.FlipY, FlipY);
+        _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.Select, HandleSelect);
+        _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.Secondary, HandleSecondary);
+        _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.RotateCW, RotateCW);
+        _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.RotateCCW, RotateCCW);
+        _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.FlipX, FlipX);
+        _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.FlipY, FlipY);
       }
       UpdatePointerPosition();
     }
@@ -75,12 +72,12 @@ namespace GMTK {
 
     private void OnDestroy() {
       if (_inputDispatcher != null) {
-        _inputDispatcher.InputEvents.RemoveListener(InputActionType.Select, HandleSelect);
-        _inputDispatcher.InputEvents.RemoveListener(InputActionType.Secondary, HandleSecondary);
-        _inputDispatcher.InputEvents.RemoveListener(InputActionType.RotateCW, RotateCW);
-        _inputDispatcher.InputEvents.RemoveListener(InputActionType.RotateCCW, RotateCCW);
-        _inputDispatcher.InputEvents.RemoveListener(InputActionType.FlipX, FlipX);
-        _inputDispatcher.InputEvents.RemoveListener(InputActionType.FlipY, FlipY);
+        _inputDispatcher.InputEvents.RemoveListener<EventArgs>(InputActionType.Select, HandleSelect);
+        _inputDispatcher.InputEvents.RemoveListener<EventArgs>(InputActionType.Secondary, HandleSecondary);
+        _inputDispatcher.InputEvents.RemoveListener<EventArgs>(InputActionType.RotateCW, RotateCW);
+        _inputDispatcher.InputEvents.RemoveListener<EventArgs>(InputActionType.RotateCCW, RotateCCW);
+        _inputDispatcher.InputEvents.RemoveListener<EventArgs>(InputActionType.FlipX, FlipX);
+        _inputDispatcher.InputEvents.RemoveListener<EventArgs>(InputActionType.FlipY, FlipY);
       }
     }
 

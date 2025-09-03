@@ -58,17 +58,20 @@ namespace GMTK {
       if (EventChannel == null) return;
 
       // Use EventArgs as the parameter type, then cast inside the methods
-      EventChannel.AddListener(GameEventType.InventoryAddRequest, HandleAddElementRequestWrapper);
-      EventChannel.AddListener(GameEventType.InventoryRetrieveRequest, HandleRetrieveElementRequestWrapper);
-      EventChannel.AddListener(GameEventType.InventoryQueryRequest, HandleQueryElementRequestWrapper);
+      EventChannel.AddListener<InventoryEventData>(GameEventType.InventoryAddRequest, HandleAddElementRequestWrapper);
+      EventChannel.AddListener<InventoryEventData>(GameEventType.InventoryRetrieveRequest, HandleRetrieveElementRequestWrapper);
+      EventChannel.AddListener<InventoryEventData>(GameEventType.InventoryQueryRequest, HandleQueryElementRequestWrapper);
+      EventChannel.AddListener<InventoryEventData>(GameEventType.InventoryAddRequest, HandleAddElementRequestWrapper);
+      EventChannel.AddListener<InventoryEventData>(GameEventType.InventoryRetrieveRequest, HandleRetrieveElementRequestWrapper);
+      EventChannel.AddListener<InventoryEventData>(GameEventType.InventoryQueryRequest, HandleQueryElementRequestWrapper);
     }
 
     private void RemoveEventListeners() {
       if (EventChannel == null) return;
 
-      EventChannel.RemoveListener(GameEventType.InventoryAddRequest, HandleAddElementRequestWrapper);
-      EventChannel.RemoveListener(GameEventType.InventoryRetrieveRequest, HandleRetrieveElementRequestWrapper);
-      EventChannel.RemoveListener(GameEventType.InventoryQueryRequest, HandleQueryElementRequestWrapper);
+      EventChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryAddRequest, HandleAddElementRequestWrapper);
+      EventChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryRetrieveRequest, HandleRetrieveElementRequestWrapper);
+      EventChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryQueryRequest, HandleQueryElementRequestWrapper);
     }
 
     private void BuildItemLookup() {

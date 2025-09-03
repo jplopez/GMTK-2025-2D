@@ -29,7 +29,7 @@ namespace GMTK {
     private void OnValidate() => InitDependencies();
 
     private void Awake() {
-      InitializationManager.WaitForInitialization(this, TryInitialize);
+      TryInitialize();
     }
 
     private void OnDestroy() => RemoveInputListeners();
@@ -53,37 +53,39 @@ namespace GMTK {
     }
 
     private void AddInputListeners() {
-      // Add Element moving and hovering events
-      _gameEventChannel.AddListener(GameEventType.ElementSelected, EventArgsHandlerAdapter);
-      _gameEventChannel.AddListener(GameEventType.ElementDropped, EventArgsHandlerAdapter);
-      _gameEventChannel.AddListener(GameEventType.ElementHovered, EventArgsHandlerAdapter);
-      _gameEventChannel.AddListener(GameEventType.ElementUnhovered, EventArgsHandlerAdapter);
+      if (_gameEventChannel == null) return;
+      
+      // Change these to explicitly specify GridSnappableEventArgs
+      _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementSelected, EventArgsHandlerAdapter);
+      _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementDropped, EventArgsHandlerAdapter);
+      _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementHovered, EventArgsHandlerAdapter);
+      _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, EventArgsHandlerAdapter);
 
       if (_snappable != null) _snappable.AddComponentListener(this);
     }
 
     private void RemoveInputListeners() {
-      // Add Element moving and hovering events
-      _gameEventChannel.RemoveListener(GameEventType.ElementSelected, EventArgsHandlerAdapter);
-      _gameEventChannel.RemoveListener(GameEventType.ElementDropped, EventArgsHandlerAdapter);
-      _gameEventChannel.RemoveListener(GameEventType.ElementHovered, EventArgsHandlerAdapter);
-      _gameEventChannel.RemoveListener(GameEventType.ElementUnhovered, EventArgsHandlerAdapter);
+      if (_gameEventChannel == null) return;
+      
+      _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementSelected, EventArgsHandlerAdapter);
+      _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementDropped, EventArgsHandlerAdapter);
+      _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementHovered, EventArgsHandlerAdapter);
+      _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, EventArgsHandlerAdapter);
 
       if (_snappable != null) _snappable.RemoveComponentListener(this);
     }
 
-    private void EventArgsHandlerAdapter(EventArgs eventArgs) {
-      if (eventArgs is GridSnappableEventArgs snappableEventArgs) {
-        switch (snappableEventArgs.GameEvent) {
-          case GameEventType.ElementSelected:
-            HandleElementSelected(snappableEventArgs); break;
-          case GameEventType.ElementDropped:
-            HandleElementDropped(snappableEventArgs); break;
-          case GameEventType.ElementUnhovered:
-            HandleElementUnhovered(snappableEventArgs); break;
-          case GameEventType.ElementHovered:
-            HandleElementHovered(snappableEventArgs); break;
-        }
+    // Update the method signature to be type-specific
+    private void EventArgsHandlerAdapter(GridSnappableEventArgs eventArgs) {
+      switch (eventArgs.GameEvent) {
+        case GameEventType.ElementSelected:
+          HandleElementSelected(eventArgs); break;
+        case GameEventType.ElementDropped:
+          HandleElementDropped(eventArgs); break;
+        case GameEventType.ElementUnhovered:
+          HandleElementUnhovered(eventArgs); break;
+        case GameEventType.ElementHovered:
+          HandleElementHovered(eventArgs); break;
       }
     }
 

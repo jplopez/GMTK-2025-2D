@@ -1,9 +1,9 @@
 #if UNITY_EDITOR
-using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
-using System.Linq;
-using System.Collections.Generic;
+using UnityEngine;
 
 namespace GMTK {
 
@@ -36,7 +36,7 @@ namespace GMTK {
       _gameEventTypeNames = System.Enum.GetNames(typeof(GameEventType));
 
       // Get SceneType from LevelService
-      _sceneTypeNames = System.Enum.GetNames(typeof(LevelService.SceneType));
+      _sceneTypeNames = System.Enum.GetNames(typeof(SceneType));
     }
 
     private void SetupReorderableList() {
@@ -56,6 +56,10 @@ namespace GMTK {
       DrawServiceInfo();
 
       EditorGUILayout.Space();
+      DrawStartEndInfo();
+
+
+      EditorGUILayout.Space();
       DrawLevelManagement();
 
       EditorGUILayout.Space();
@@ -68,7 +72,7 @@ namespace GMTK {
     }
 
     private void DrawServiceInfo() {
-      EditorGUILayout.LabelField("Level Service Configuration", EditorStyles.boldLabel);
+      EditorGUILayout.LabelField("Level Service", EditorStyles.boldLabel);
 
       var levelService = target as LevelService;
       var levelCount = levelService.Levels?.Length ?? 0;
@@ -78,12 +82,88 @@ namespace GMTK {
         EditorGUILayout.IntField("Total Levels", levelCount);
         EditorGUILayout.TextField("Current Scene", levelService.CurrentSceneName ?? "None");
         EditorGUILayout.IntField("Current Index", levelService.CurrentLevelIndex);
-
+      }
+        EditorGUILayout.LabelField("Current Level Configuration", EditorStyles.boldLabel);
+      using (new EditorGUI.DisabledScope(true)) {
         if (currentLevel != null) {
-          EditorGUILayout.TextField("Current Level Type", currentLevel.Type.ToString());
-          EditorGUILayout.TextField("Current Initial State", currentLevel.InitialGameState.ToString());
+          EditorGUILayout.TextField("Type", currentLevel.Type.ToString());
+          EditorGUILayout.TextField("Initial State", currentLevel.InitialGameState.ToString());
         }
       }
+    }
+
+    private void DrawStartEndInfo() {
+      var levelService = target as LevelService;
+      var startLevelType = levelService.startLevelType;
+      var startLevelProp = serializedObject.FindProperty("startLevelType");
+      //EditorGUILayout.LabelField("Start Level", EditorStyles.boldLabel);
+      EditorGUILayout.PropertyField(startLevelProp, new GUIContent("Source"));
+      //start config
+      switch (startLevelType) {
+        case StartLevelTypes.SceneName:
+          var startSceneNameProp = serializedObject.FindProperty("_startSceneName");
+          EditorGUILayout.PropertyField(startSceneNameProp, new GUIContent("Scene Name"));
+          break;
+        case StartLevelTypes.FirstLevel:
+          EditorGUILayout.LabelField("Scene Name", levelService.GetLevelConfig(0).SceneName);
+          break;
+        case StartLevelTypes.Config:
+          var startLevelConfigProp = serializedObject.FindProperty("_startLevelconfig");
+          EditorGUILayout.PropertyField(startLevelConfigProp, new GUIContent("LevelConfig"));
+          var startLevelConfig = levelService.StartLevel;
+          startLevelConfig = DrawLevelsDropDown("Level Config", SceneType.Start, startLevelConfig?.SceneName);
+          if (startLevelConfig != null)
+            levelService.SetStartLevel(startLevelConfig);
+          break;      
+      }
+
+      var endLevelType = levelService.endLevelType;
+      var endLevelProp = serializedObject.FindProperty("endLevelType");
+      //EditorGUILayout.LabelField("Start Level", EditorStyles.boldLabel);
+      EditorGUILayout.PropertyField(endLevelProp, new GUIContent("Source"));
+      //start config
+      switch (endLevelType) {
+        case EndLevelTypes.SceneName:
+          var endSceneNameProp = serializedObject.FindProperty("_endSceneName");
+          EditorGUILayout.PropertyField(endSceneNameProp, new GUIContent("Scene Name"));
+          break;
+        case EndLevelTypes.LastLevel:
+          int lastIndex = levelService.Levels.Length - 1;
+          EditorGUILayout.LabelField("Scene Name", levelService.GetLevelConfig(lastIndex).SceneName);
+          break;
+        case EndLevelTypes.Config:
+          var endLevelConfig = levelService.EndLevel;
+          endLevelConfig = DrawLevelsDropDown("Level Config",SceneType.End, endLevelConfig?.SceneName);
+          if(endLevelConfig != null)
+            levelService.SetEndLevel(endLevelConfig);
+          break;
+      }
+    }
+
+    private LevelConfig DrawLevelsDropDown(string label, SceneType type, string currentSelection=null) {
+      var levelService = target as LevelService;
+      var levelConfigs = levelService.Levels ?? new LevelConfig[0];
+      var configNames = levelConfigs.Where(l => l.Type == type).Select(l => $"{l.DisplayName} ({l.SceneName})").ToArray();
+      var currentIndex = 0;
+      if(!string.IsNullOrEmpty(currentSelection))
+        currentIndex = System.Array.FindIndex(levelConfigs, c => c.SceneName == currentSelection);
+
+      EditorGUI.BeginChangeCheck();
+      label = string.IsNullOrEmpty(label) ? "Select Configuration" : label;
+      var newIndex = EditorGUILayout.Popup(label, currentIndex, configNames);
+      if (EditorGUI.EndChangeCheck() && newIndex >= 0 && newIndex < levelConfigs.Length) {
+        currentSelection = levelConfigs[newIndex].SceneName;
+        return RefreshSelectedConfig(levelService, currentSelection);
+      }
+      return levelService.GetLevelConfig(currentSelection);
+
+    }
+
+    private LevelConfig RefreshSelectedConfig(LevelService levelService, string currentSelection) {
+      if (levelService != null && !string.IsNullOrEmpty(currentSelection)) {
+       return levelService.GetLevelConfig(currentSelection);
+      }
+      return null;
     }
 
     private void DrawLevelManagement() {
@@ -212,7 +292,7 @@ namespace GMTK {
       var levelService = target as LevelService;
       var scenes = GetAllSceneNames().Where(s => s != "None").ToArray();
 
-      var newLevels = new List<LevelService.LevelConfig>();
+      var newLevels = new List<LevelConfig>();
 
       // Keep existing configurations
       if (levelService.Levels != null) {
@@ -222,13 +302,12 @@ namespace GMTK {
       // Add new scenes
       foreach (var sceneName in scenes) {
         if (!newLevels.Any(l => l.SceneName == sceneName)) {
-          newLevels.Add(new LevelService.LevelConfig {
+          newLevels.Add(new LevelConfig {
             SceneName = sceneName,
             DisplayName = sceneName,
-            Type = LevelService.SceneType.Level,
+            Type = SceneType.Level,
             InitialGameState = GameStates.Preparation,
             SetStateOnLoad = true,
-            IsUnlocked = true,
             CanRestart = true,
             CanSkip = false
           });
@@ -303,12 +382,9 @@ namespace GMTK {
         foreach (var level in levelService.Levels) {
           level.InitialGameState = GameStates.Preparation;
           level.SetStateOnLoad = true;
-          level.IsUnlocked = true;
           level.CanRestart = true;
           level.CanSkip = false;
           level.LoadDelay = 0f;
-          level.UseCustomLoadMethod = false;
-          level.CustomLoadMethod = "";
         }
         EditorUtility.SetDirty(target);
         Debug.Log("[LevelServiceEditor] All levels reset to defaults");

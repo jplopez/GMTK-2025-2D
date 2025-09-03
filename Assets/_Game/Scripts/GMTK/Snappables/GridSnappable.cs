@@ -64,7 +64,7 @@ namespace GMTK {
     #region MonoBehaviour Methods
 
     private void Awake() {
-      InitializationManager.WaitForInitialization(this, Initialize);
+      Initialize();
     }
 
     private void OnValidate() {

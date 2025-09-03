@@ -63,13 +63,15 @@ namespace Ameba {
 
     public void AddListener(Action<StateMachineEventArg<T>> action) {
       if (action == null) return;
-      OnStateChanged?.AddListener(new UnityAction<StateMachineEventArg<T>>(action));
+      OnStateChanged.AddListener(new UnityAction<StateMachineEventArg<T>>(action));
     }
 
     public void RemoveListener(Action<StateMachineEventArg<T>> action) {
       if (action == null) return;
-      OnStateChanged?.RemoveListener(new UnityAction<StateMachineEventArg<T>>(action));
+      OnStateChanged.RemoveListener(new UnityAction<StateMachineEventArg<T>>(action));
     }
+
+    public void RemoveAllListeners() => OnStateChanged?.RemoveAllListeners();
 
     #endregion
 

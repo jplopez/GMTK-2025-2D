@@ -42,7 +42,8 @@ namespace GMTK {
         List<BroadcasterListener> listeners = _broadcasters.Where(b => b.EventType == eventType).ToList();
         listeners.ForEach(bListener => {
           if (bListener.Callback != null)
-            _eventChannel.AddListener(bListener.EventType, bListener.Callback);
+            // Add explicit type parameter
+            _eventChannel.AddListener<EventArgs>(bListener.EventType, bListener.Callback);
         });
       }
     }
