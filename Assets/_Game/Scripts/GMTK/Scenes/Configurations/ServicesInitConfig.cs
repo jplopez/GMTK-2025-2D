@@ -16,14 +16,13 @@ namespace GMTK {
 
     public bool EnableDebugLogging = true;
 
-    private SceneController controller;
-    private bool eventListenersInitialized = false;
+    //private SceneController controller;
+    //private bool eventListenersInitialized = false;
 
     private void Awake() => InitializeAllServices();
 
     public void ApplyConfig(SceneController controller) {
-      this.controller = controller;
-      WireDefaultEventListeners();
+      InitializeGameStates();
     }
 
     public bool CanApplyOnType(SceneType sceneType) => true;
@@ -41,58 +40,80 @@ namespace GMTK {
       }
     }
 
-    private void WireDefaultEventListeners() {
-      LogDebug($"Wiring default event listeners for Scene {controller.SceneName}");
-      if (eventListenersInitialized || !ForceReinitialize) return;
+    /// <summary>
+    /// Initializes the GameStateMachine and wires the default event listeners.
+    /// GameStateMachine depends on GameEventChannel, so this method needs to run after all services have been loaded. 
+    /// </summary>
+    private void InitializeGameStates() {
 
-      var eventChannel = Services.Get<GameEventChannel>();
-      var stateMachine = Services.Get<GameStateMachine>();
-      var handlerRegistry = Services.Get<GameStateHandlerRegistry>();
+      if (!Services.IsInitialized) return;
 
-      if (eventChannel == null || stateMachine == null) {
-        LogError($"Cannot wire listeners - missing core services for Scene {controller.SceneName}");
-        return;
+      if(Services.TryGet<GameEventChannel>(out var eventChannel)) {
+        LogDebug("GameEventChannel service found");
+        if (Services.TryGet<GameStateMachine>(out var stateMachine)) {
+          stateMachine.SetEventChannelAndInitialize(eventChannel);
+          LogDebug("GameStateMachine initialized successfully");
+        } else {
+          LogError("GameStateMachine service not found");
+        }
+      }
+      else {
+        LogError("GameEventChannel service not found");
       }
 
-      //Centralized Handler for GameState changes
-      stateMachine.RemoveListener(handlerRegistry.HandleStateChange);
-      stateMachine.AddListener(handlerRegistry.HandleStateChange);
+    }
+    //private void WireDefaultEventListeners() {
+    //  LogDebug($"Wiring default event listeners for Scene {controller.SceneName}");
+    //  if (eventListenersInitialized || !ForceReinitialize) return;
+
+    //  var _eventChannel = Services.Get<GameEventChannel>();
+    //  var stateMachine = Services.Get<GameStateMachine>();
+    //  var handlerRegistry = Services.Get<GameStateHandlerRegistry>();
+
+    //  if (_eventChannel == null || stateMachine == null) {
+    //    LogError($"Cannot wire listeners - missing core services for Scene {controller.SceneName}");
+    //    return;
+    //  }
+
+    //  //Centralized Handler for GameState changes
+    //  stateMachine.RemoveListener(handlerRegistry.HandleStateChange);
+    //  stateMachine.AddListener(handlerRegistry.HandleStateChange);
       
-      // remove the GameState listener to ensure there are no duplicates
-      CleanGameStateListeners(eventChannel, stateMachine);
-      AddGameStateListeners(eventChannel, stateMachine);
+    //  // remove the GameState listener to ensure there are no duplicates
+    //  CleanGameStateListeners(_eventChannel, stateMachine);
+    //  AddGameStateListeners(_eventChannel, stateMachine);
 
-      eventListenersInitialized = true;
-      LogDebug("Default event listeners wired successfully");
-    }
+    //  eventListenersInitialized = true;
+    //  LogDebug("Default event listeners wired successfully");
+    //}
 
-    private void AddGameStateListeners(GameEventChannel eventChannel, GameStateMachine stateMachine) {
-      //Add here any GameEvent that should trigger a GameStateChange
-      eventChannel.AddListener(GameEventType.GameStarted, stateMachine.HandleStartGame);
-      eventChannel.AddListener(GameEventType.LevelStart, stateMachine.HandleLevelStart);
-      eventChannel.AddListener(GameEventType.LevelPlay, stateMachine.HandleLevelPlay);
-      eventChannel.AddListener(GameEventType.LevelReset, stateMachine.HandleLevelReset);
-      eventChannel.AddListener(GameEventType.LevelObjectiveCompleted, stateMachine.HandleLevelComplete);
-      eventChannel.AddListener(GameEventType.GameOver, stateMachine.HandleGameOver);
-      eventChannel.AddListener(GameEventType.EnterOptions, stateMachine.HandleEnterOptions);
-      eventChannel.AddListener(GameEventType.ExitOptions, stateMachine.HandleEnterOptions);
-      eventChannel.AddListener(GameEventType.EnterPause, stateMachine.HandleEnterPause);
-      eventChannel.AddListener(GameEventType.ExitPause, stateMachine.HandleExitPause);
-    }
+    //private void AddGameStateListeners(GameEventChannel _eventChannel, GameStateMachine stateMachine) {
+    //  //Add here any GameEvent that should trigger a GameStateChange
+    //  _eventChannel.AddListener(GameEventType.GameStarted, stateMachine.HandleStartGame);
+    //  _eventChannel.AddListener(GameEventType.LevelStart, stateMachine.HandleLevelStart);
+    //  _eventChannel.AddListener(GameEventType.LevelPlay, stateMachine.HandleLevelPlay);
+    //  _eventChannel.AddListener(GameEventType.LevelReset, stateMachine.HandleLevelReset);
+    //  _eventChannel.AddListener(GameEventType.LevelObjectiveCompleted, stateMachine.HandleLevelComplete);
+    //  _eventChannel.AddListener(GameEventType.GameOver, stateMachine.HandleGameOver);
+    //  _eventChannel.AddListener(GameEventType.EnterOptions, stateMachine.HandleEnterOptions);
+    //  _eventChannel.AddListener(GameEventType.ExitOptions, stateMachine.HandleEnterOptions);
+    //  _eventChannel.AddListener(GameEventType.EnterPause, stateMachine.HandleEnterPause);
+    //  _eventChannel.AddListener(GameEventType.ExitPause, stateMachine.HandleExitPause);
+    //}
 
-    private void CleanGameStateListeners(GameEventChannel eventChannel, GameStateMachine stateMachine) {
+    //private void CleanGameStateListeners(GameEventChannel _eventChannel, GameStateMachine stateMachine) {
 
-      eventChannel.RemoveListener(GameEventType.GameStarted, stateMachine.HandleStartGame);
-      eventChannel.RemoveListener(GameEventType.LevelStart, stateMachine.HandleLevelStart);
-      eventChannel.RemoveListener(GameEventType.LevelPlay, stateMachine.HandleLevelPlay);
-      eventChannel.RemoveListener(GameEventType.LevelReset, stateMachine.HandleLevelReset);
-      eventChannel.RemoveListener(GameEventType.LevelObjectiveCompleted, stateMachine.HandleLevelComplete);
-      eventChannel.RemoveListener(GameEventType.GameOver, stateMachine.HandleGameOver);
-      eventChannel.RemoveListener(GameEventType.EnterOptions, stateMachine.HandleEnterOptions);
-      eventChannel.RemoveListener(GameEventType.ExitOptions, stateMachine.HandleEnterOptions);
-      eventChannel.RemoveListener(GameEventType.EnterPause, stateMachine.HandleEnterPause);
-      eventChannel.RemoveListener(GameEventType.ExitPause, stateMachine.HandleExitPause);
-    }
+    //  _eventChannel.RemoveListener(GameEventType.GameStarted, stateMachine.HandleStartGame);
+    //  _eventChannel.RemoveListener(GameEventType.LevelStart, stateMachine.HandleLevelStart);
+    //  _eventChannel.RemoveListener(GameEventType.LevelPlay, stateMachine.HandleLevelPlay);
+    //  _eventChannel.RemoveListener(GameEventType.LevelReset, stateMachine.HandleLevelReset);
+    //  _eventChannel.RemoveListener(GameEventType.LevelObjectiveCompleted, stateMachine.HandleLevelComplete);
+    //  _eventChannel.RemoveListener(GameEventType.GameOver, stateMachine.HandleGameOver);
+    //  _eventChannel.RemoveListener(GameEventType.EnterOptions, stateMachine.HandleEnterOptions);
+    //  _eventChannel.RemoveListener(GameEventType.ExitOptions, stateMachine.HandleEnterOptions);
+    //  _eventChannel.RemoveListener(GameEventType.EnterPause, stateMachine.HandleEnterPause);
+    //  _eventChannel.RemoveListener(GameEventType.ExitPause, stateMachine.HandleExitPause);
+    //}
 
 
     private void LogDebug(string message) {

@@ -16,7 +16,6 @@ MonoBehaviour:
   - LevelService
   - GameEventChannel
   - GameStateMachine
-  - GameStateHandlerRegistry
   - InputActionEventChannel
   - ScoreGateKeeper
   - HUD

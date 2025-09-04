@@ -576,7 +576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05c17ee877776e94f906c5f8fdd24e2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ForceReinitialize: 1
+  ForceReinitialize: 0
   EnableDebugLogging: 1
 --- !u!114 &548320765
 MonoBehaviour:

@@ -20,28 +20,28 @@ namespace GMTK {
     [Tooltip("if true, the playback buttons are shown as disabled")]
     public bool DisablePlaybackButtons = false;
 
-    protected GameEventChannel eventChannel;
+    protected GameEventChannel _eventChannel;
 
     private void Awake() {
-      if (eventChannel == null) {
-        eventChannel = Services.Get<GameEventChannel>();
+      if (_eventChannel == null && Services.TryGet<GameEventChannel>(out var channel)) {
+        _eventChannel = channel;
       }
-      if (MarbleScoreKeeper == null) {
-        MarbleScoreKeeper = Services.Get<ScoreGateKeeper>();
+      if (MarbleScoreKeeper == null && Services.TryGet<ScoreGateKeeper>(out var scoreKeeper)) {
+        MarbleScoreKeeper = scoreKeeper;
       }
       
       // Add explicit type parameters
-      eventChannel.AddListener<float>(GameEventType.RaiseScore, HandleScoreAdded);
-      eventChannel.AddListener<int>(GameEventType.SetScoreValue, HandleScoreSet);
-      eventChannel.AddListener(GameEventType.ResetScore, HandleResetScore); // void - no change needed
+      _eventChannel.AddListener<float>(GameEventType.RaiseScore, HandleScoreAdded);
+      _eventChannel.AddListener<int>(GameEventType.SetScoreValue, HandleScoreSet);
+      _eventChannel.AddListener(GameEventType.ResetScore, HandleResetScore); // void - no change needed
     }
 
     private void OnDisable() {
-      if (eventChannel == null) return;
+      if (_eventChannel == null) return;
       
-      eventChannel.RemoveListener<float>(GameEventType.RaiseScore, HandleScoreAdded);
-      eventChannel.RemoveListener<int>(GameEventType.SetScoreValue, HandleScoreSet);
-      eventChannel.RemoveListener(GameEventType.ResetScore, HandleResetScore); // void - no change needed
+      _eventChannel.RemoveListener<float>(GameEventType.RaiseScore, HandleScoreAdded);
+      _eventChannel.RemoveListener<int>(GameEventType.SetScoreValue, HandleScoreSet);
+      _eventChannel.RemoveListener(GameEventType.ResetScore, HandleResetScore); // void - no change needed
     }
 
     // Update method signatures to match expected types

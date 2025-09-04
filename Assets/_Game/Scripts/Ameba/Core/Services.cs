@@ -51,6 +51,15 @@ namespace Ameba {
       return service as T;
     }
 
+    public static bool TryGet<T>(out T service) where T : class {
+      if (_services.TryGetValue(typeof(T), out var obj) && obj is T typedService) {
+        service = typedService;
+        return true;
+      }
+      service = null;
+      return false;
+    }
+
     public static Type[] GetRegisteredTypes() => new List<Type>(_services.Keys).ToArray();
 
     public static void Clear() {

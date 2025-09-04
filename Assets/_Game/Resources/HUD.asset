@@ -7,19 +7,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 57a4daaf25aff41458e1d7b2dd0f42fe, type: 3}
   m_Name: HUD
   m_EditorClassIdentifier: 
-  HUDPrefab: {fileID: 489882531038795218, guid: c05c42c45c436ce41a4b78a2cb402bad, type: 3}
-  scoreData: {fileID: 11400000, guid: 6d978f2d8c8b771468bc1d88099644ae, type: 2}
-  scoreEvents: {fileID: 11400000, guid: 5520788bcef8ee5429763a216dd7995f, type: 2}
-  scoreText: {fileID: 0}
+  MarbleScoreKeeper: {fileID: 11400000, guid: 584c2a77812de864c8cc37435490bfef, type: 2}
   ShowPlaybackButtons: 1
   DisablePlaybackButtons: 0
-  PlayButton: {fileID: 0}
-  ResetButton: {fileID: 0}
-  PlayFeedback: {fileID: 0}
-  ResetFeedback: {fileID: 0}
-  gameStateMachine: {fileID: 11400000, guid: 01ebcf23e4e596d4394da7e6ebf4e9f1, type: 2}

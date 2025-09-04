@@ -37,10 +37,10 @@ namespace GMTK {
     [SerializeField] protected LevelConfig _effectiveConfig;
 
     [Header("On Scene Load")]
-    [Tooltip("Automatically scan for GameStateHandlers on scene load. Default: true")]
-    public bool AutoScanForHandlers = true;
     [Tooltip("Events to raise when scene loads")]
     public GameEventType[] OnSceneLoadEvents;
+    [Tooltip("if true, the GameStateMachine scans for StateHandlers in the scene")]
+    public bool AutoScanForHandlers = true;
 
     [Header("Debug")]
     public bool EnableDebugLogging = false;
@@ -65,7 +65,7 @@ namespace GMTK {
     private void Awake() => Initialize();
 
     protected virtual void Initialize() {
-      if(_isInitialized) return;
+      if (_isInitialized) return;
       // Auto-detect scene name if not set
       if (string.IsNullOrEmpty(SceneName)) {
         SceneName = gameObject.scene.name;
@@ -87,10 +87,12 @@ namespace GMTK {
       // Load Config extensions (ISceneConfigExtension) 
       LoadConfigExtensions();
 
-      if(AutoScanForHandlers) {
-        var handlerRegistry = Services.Get<GameStateHandlerRegistry>();
-        if (handlerRegistry != null) handlerRegistry.ScanForHandlers();
-        LogDebug($"GameStateHandlers scanned {handlerRegistry.HandlerCount} handlers ");
+      if (AutoScanForHandlers) {
+        if (Services.TryGet<GameStateMachine>(out var handler)) {
+          handler.AutoScanOnSceneLoad = AutoScanForHandlers;
+          handler.DiscoverHandlers();
+          LogDebug($"GameStateHandlers scanned {handler.HandlerCount} handlers ");
+        }
       }
       _isInitialized = true;
     }
