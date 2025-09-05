@@ -75,7 +75,7 @@ namespace Ameba {
       Debug.Log("[ServiceRegistry] Cleared all service types");
     }
 
-    [ContextMenu("Validate Services")]
+    [ContextMenu("Validate ServiceLocator")]
     private void ValidateServices() {
       Debug.Log("[ServiceRegistry] Validating services...");
 

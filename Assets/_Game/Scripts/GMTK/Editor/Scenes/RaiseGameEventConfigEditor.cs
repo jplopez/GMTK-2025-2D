@@ -34,7 +34,7 @@ namespace GMTK {
     private void DrawTestButton(PayloadType payload, GameEventType gameEventType) {
       //Test button to try event type with selected payload.
       if (GUILayout.Button("Test Event")) {
-        var eventChannel = serializedObject.FindProperty("_eventChannel").objectReferenceValue as GameEventChannel;
+        var eventChannel = serializedObject.FindProperty("_externalEventChannel").objectReferenceValue as GameEventChannel;
         if (eventChannel == null) {
           Debug.LogError("[RaiseGameEventConfigEditor] No EventChannel assigned.");
           return;

@@ -18,7 +18,7 @@ namespace GMTK {
     protected ScoreGateKeeper _scoreKeeper;
     private void Awake() {
     
-      _scoreKeeper = Services.Get<ScoreGateKeeper>();
+      _scoreKeeper = ServiceLocator.Get<ScoreGateKeeper>();
       _currentDisplayedScore = 0;
     }
     public void Update() {

@@ -38,7 +38,7 @@ namespace GMTK {
     private void InitializeInventory() {
       // Load GameInventory if not assigned
       if (GameInventory == null) {
-        GameInventory = Services.Get<GameInventory>();
+        GameInventory = ServiceLocator.Get<GameInventory>();
         if (GameInventory == null) {
           Debug.LogError("[LevelInventory] GameInventory not found in Resources!");
           return;
@@ -47,7 +47,7 @@ namespace GMTK {
 
       // Load EventChannel if not assigned
       if (EventChannel == null) {
-        EventChannel = Services.Get<GameEventChannel>();
+        EventChannel = ServiceLocator.Get<GameEventChannel>();
       }
 
       BuildItemLookup();

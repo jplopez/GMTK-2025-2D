@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &9161413106561426056
+--- !u!1 &7313048824216027666
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,48 +8,49 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7315526985751518439}
-  - component: {fileID: 2505816176993346491}
+  - component: {fileID: 4928104335500647536}
+  - component: {fileID: 7042607826818083894}
+  - component: {fileID: 3803149864976346578}
   m_Layer: 0
-  m_Name: StartSceneController
+  m_Name: LevelCompleteController
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7315526985751518439
+--- !u!4 &4928104335500647536
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9161413106561426056}
+  m_GameObject: {fileID: 7313048824216027666}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 7.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2505816176993346491
+--- !u!114 &7042607826818083894
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9161413106561426056}
+  m_GameObject: {fileID: 7313048824216027666}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1ffef80e2bf95744ad80fc95f87140f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConfigurationSource: 0
-  SceneName: Start
+  ConfigurationSource: 1
+  SceneName: LevelComplete
   _manualConfig:
     SceneName: 
     DisplayName: 
-    Type: 2
+    Type: 3
     SetStateOnLoad: 1
     InitialGameState: 1
     CanRestart: 1
@@ -69,6 +70,32 @@ MonoBehaviour:
     NextSceneName: 
     LoadDelay: 0
   _effectiveConfig:
+    SceneName: LevelComplete
+    DisplayName: LevelComplete
+    Type: 3
+    SetStateOnLoad: 1
+    InitialGameState: 4
+    CanRestart: 0
+    CanSkip: 1
+    PreviousSceneName: 
+    NextSceneName: 
+    LoadDelay: 0
+  OnSceneLoadEvents: 
+  EnableDebugLogging: 1
+--- !u!114 &3803149864976346578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7313048824216027666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 658e8dcb1c39ee641b0236fa7dc6928c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransitionSceneName: LevelComplete
+  Config:
     SceneName: 
     DisplayName: 
     Type: 2
@@ -79,5 +106,3 @@ MonoBehaviour:
     PreviousSceneName: 
     NextSceneName: 
     LoadDelay: 0
-  OnSceneLoadEvents: 17000000
-  EnableDebugLogging: 1

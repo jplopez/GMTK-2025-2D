@@ -22,7 +22,6 @@ namespace GMTK {
     Escape,
   }
 
-
   /// <summary>
   /// Event arguments wrapper to include as payload on events raised by the InputActionEventChannel.
   /// </summary>
@@ -32,7 +31,6 @@ namespace GMTK {
     public InputAction.CallbackContext Context { get; }
     public Vector2 ScreenPos { get;}
     public Vector3 WorldPos { get;}
-
 
     public InputActionEventArgs(InputActionType actionType, InputActionPhase phase, InputAction.CallbackContext context) {
       ActionType = actionType;
@@ -50,23 +48,9 @@ namespace GMTK {
 
   }
 
-  
   /// <summary>
   /// EventChannel for InputAction events. This channel works with the PlayerControl class to simplify the detection of player inputs across the game
   /// </summary>
   [CreateAssetMenu(fileName = "InputActionEventChannel" , menuName = "GMTK/InputAction Event Channel")]
-  public class InputActionEventChannel : EventChannel<InputActionType> {
-
-    public virtual void Raise(InputActionType action, InputActionPhase phase, InputAction.CallbackContext context) {
-      var args = new InputActionEventArgs(action, phase, context);
-      Raise(action, args);
-    }
-
-    public virtual void Raise(InputActionType action, InputActionPhase phase, InputAction.CallbackContext context, Vector2 screenPos, Vector3 worldPos) {
-      var args = new InputActionEventArgs(action, phase, context, screenPos, worldPos);
-      Raise(action, args);
-
-    }
-
-  }
+  public class InputActionEventChannel : EventChannel<InputActionType> {  }
 }

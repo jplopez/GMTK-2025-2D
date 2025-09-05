@@ -1,7 +1,7 @@
+using Ameba;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using Ameba;
 
 namespace GMTK {
 
@@ -19,11 +19,10 @@ namespace GMTK {
     public GameObject PlayFeedback;
     public GameObject ResetFeedback;
 
-    [Header("WebGL Debug")]
-    [Tooltip("Enable WebGL-specific logging")]
-    public bool EnableWebGLDebug = false;
+    [Header("Debug")]
+    [Tooltip("Enable logging")]
+    public bool EnableDebugLogging = false;
 
-    protected HUD _hud;
     protected ScoreGateKeeper _marbleScoreKeeper;
     protected GameEventChannel _eventsChannel;
     protected int _scoreAtLevelStart;
@@ -31,25 +30,22 @@ namespace GMTK {
     // WebGL safety flags
     private bool _isInitialized = false;
     private bool _isScoreInitialized = false;
-    private bool _webglSafeMode = false;
 
+    //Public API for State Handlers
+    public int ScoreAtLevelStart => _scoreAtLevelStart;
+    public bool IsInitialized => _isInitialized;
+    public bool IsScoreInitialized => _isScoreInitialized;
+
+    #region Initialization
     private void Awake() {
-      // Detect WebGL and enable safe mode
-#if UNITY_WEBGL && !UNITY_EDITOR
-            _webglSafeMode = true;
-            if (EnableWebGLDebug) Debug.Log("[HudController] WebGL safe mode enabled");
-#endif
 
-      
       try {
-        if (_hud == null) _hud = Services.Get<HUD>();
-        if (_marbleScoreKeeper == null) _marbleScoreKeeper = Services.Get<ScoreGateKeeper>();
-        if (_eventsChannel == null) _eventsChannel = Services.Get<GameEventChannel>();
+        if (_marbleScoreKeeper == null) _marbleScoreKeeper = ServiceLocator.Get<ScoreGateKeeper>();
+        if (_eventsChannel == null) _eventsChannel = ServiceLocator.Get<GameEventChannel>();
 
         // Validate critical components
         if (!ValidateComponents()) {
-          Debug.LogError("[HudController] Critical components missing - falling back to safe mode");
-          _webglSafeMode = true;
+          Debug.LogError("[Hud] Critical components missing - falling back to safe mode");
           return;
         }
 
@@ -57,25 +53,24 @@ namespace GMTK {
         SetupButtons();
         _isInitialized = true;
 
-        if (EnableWebGLDebug) Debug.Log("[HudController] Initialization complete");
+        if (EnableDebugLogging) Debug.Log("[Hud] Initialization complete");
       }
       catch (System.Exception ex) {
-        Debug.LogError($"[HudController] Initialization failed: {ex.Message}");
-        _webglSafeMode = true;
+        Debug.LogError($"[Hud] Initialization failed: {ex.Message}");
       }
-      Debug.Log($"HudController: OnReady {this}");
+      Debug.Log($"Hud: OnReady {this}");
     }
 
     private bool ValidateComponents() {
       bool isValid = true;
 
       if (_eventsChannel == null) {
-        Debug.LogError("[HudController] GameEventChannel is null");
+        LogError("GameEventChannel is null");
         isValid = false;
       }
 
       if (PlayButton == null || ResetButton == null) {
-        Debug.LogError("[HudController] Play or Reset button is null");
+        LogError("Play or Reset button is null");
         isValid = false;
       }
 
@@ -93,8 +88,9 @@ namespace GMTK {
         _marbleScoreKeeper.SetStrategy(scoreStrategy, transform);
         _isScoreInitialized = true;
         UpdateScoreText(_marbleScoreKeeper.GetScore());
-      } else {
-        Debug.LogWarning($"HudController: Score keeper could not initialized. Will try again in next frame");
+      }
+      else {
+        LogWarning($"Score keeper could not initialized. Will try again in next frame");
       }
     }
 
@@ -107,18 +103,46 @@ namespace GMTK {
       }
     }
 
-    private void OnDestroy() {
-      if (PlayButton != null) {
-        PlayButton.onClick.RemoveListener(HandlePlayButtonClick);
+    #endregion
+
+    #region Events Handling
+
+    private void HandlePlayButtonClick() {
+      Debug.Log(this);
+      LogDebug("Play button clicked");
+      if (_eventsChannel != null) {
+        _eventsChannel.Raise(GameEventType.LevelPlay);
+        LogDebug("LevelPlay event raised");
       }
-      if (ResetButton != null) {
-        ResetButton.onClick.RemoveListener(HandleResetButtonClick);
+      else {
+        LogError("EventsChannel is null - cannot raise LevelPlay");
       }
     }
 
+    private void HandleResetButtonClick() {
+      LogDebug("Reset button clicked");
+      if (_eventsChannel != null) {
+        _eventsChannel.Raise(GameEventType.LevelReset);
+        LogDebug("LevelReset event raised");
+      }
+      else {
+        LogError("EventsChannel is null - cannot raise LevelReset");
+      }
+    }
+
+    private void UpdateScoreText(int newScore) {
+      if (scoreText != null) {
+        scoreText.text = $"{newScore:D5}";
+      }
+    }
+
+    #endregion
+
+    #region Update loop and UI
+
     private void Update() {
-      if (!_isInitialized || _webglSafeMode) {
-        if (EnableWebGLDebug) Debug.Log("HudController: failed to initialize. Will retry on next frame");
+      if (!_isInitialized) {
+        LogDebug("failed to initialize. Will retry on next frame");
         return;
       }
 
@@ -134,7 +158,7 @@ namespace GMTK {
     }
 
     public void UpdateUIFromGameState(GameStates gameState) {
-      // Implementation remains the same
+
       switch (gameState) {
         case GameStates.Preparation:
           PlayButton.enabled = true;
@@ -142,11 +166,14 @@ namespace GMTK {
           ResetButton.enabled = false;
           ResetButton.interactable = false;
           PauseScore = true;
+          // cache the score at level loading to restore in case of reset
           if (_marbleScoreKeeper != null) {
             _scoreAtLevelStart = _marbleScoreKeeper.GetScore();
           }
+          // update score to level start, just for safety
           UpdateScoreText(_scoreAtLevelStart);
           break;
+
         case GameStates.Playing:
           PlayButton.enabled = false;
           PlayButton.interactable = false;
@@ -154,16 +181,21 @@ namespace GMTK {
           ResetButton.interactable = true;
           PauseScore = false;
           break;
+
         case GameStates.Reset:
           PlayButton.enabled = true;
           PlayButton.interactable = true;
           ResetButton.enabled = true;
           ResetButton.interactable = true;
           PauseScore = true;
+
+          // reseting makes player loose any score obtained during the run.
+          // player score is set to value when level was loaded.
           if (_marbleScoreKeeper != null) {
             _marbleScoreKeeper.SetScore(_scoreAtLevelStart);
             UpdateScoreText(_scoreAtLevelStart);
           }
+          //after updating UI for reset we signal we're ready to start the level again
           if (_eventsChannel != null) {
             _eventsChannel.Raise(GameEventType.LevelStart);
           }
@@ -179,33 +211,30 @@ namespace GMTK {
       }
     }
 
-    private void HandlePlayButtonClick() {
-      Debug.Log(this);
-      if (EnableWebGLDebug) Debug.Log("[HudController] Play button clicked");
-      if (_eventsChannel != null) {
-        _eventsChannel.Raise(GameEventType.LevelPlay);
-        if (EnableWebGLDebug) Debug.Log("[HudController] LevelPlay event raised");
+    #endregion
+
+    #region Feedbacks API (not implemented yet)
+
+    public void PlayLevelPlayFeedback() { }
+
+    public void PlayLevelResetFeedback() { }
+
+    #endregion
+
+
+    private void OnDestroy() {
+      if (PlayButton != null) {
+        PlayButton.onClick.RemoveListener(HandlePlayButtonClick);
       }
-      else {
-        Debug.LogError("[HudController] EventsChannel is null - cannot raise LevelPlay");
+      if (ResetButton != null) {
+        ResetButton.onClick.RemoveListener(HandleResetButtonClick);
       }
     }
 
-    private void HandleResetButtonClick() {
-      if (EnableWebGLDebug) Debug.Log("[HudController] Reset button clicked");
-      if (_eventsChannel != null) {
-        _eventsChannel.Raise(GameEventType.LevelReset);
-        if (EnableWebGLDebug) Debug.Log("[HudController] LevelReset event raised");
-      }
-      else {
-        Debug.LogError("[HudController] EventsChannel is null - cannot raise LevelReset");
-      }
-    }
+    private void LogDebug(string message) { if (EnableDebugLogging) Debug.Log($"[Hud] {message}"); }
+    private void LogError(string message) { if (EnableDebugLogging) Debug.LogError($"[Hud] {message}"); }
+    private void LogWarning(string message) { if (EnableDebugLogging) Debug.LogWarning($"[Hud] {message}"); }
 
-    private void UpdateScoreText(int newScore) {
-      if (scoreText != null) {
-        scoreText.text = $"{newScore:D5}";
-      }
-    }
+
   }
 }

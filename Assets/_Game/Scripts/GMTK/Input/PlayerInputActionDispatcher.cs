@@ -6,9 +6,9 @@ using UnityEngine.InputSystem;
 namespace GMTK {
 
   /// <summary>
-  /// Partial class extending the Unity-generated <see cref="PlayerControls"/>
-  /// and implementing the <see cref="IGameplayActions"/> interface
-  /// to act as an Event dispatcher using the <see cref="InputActionEventChannel"/> 
+  /// This class translates the InputAction (button pressed, pointer position) into game events (move element, rotate, etc) and determine 
+  /// the Screen and World position of the pointer (mouse cursor).
+  /// The events are raised through <see cref="InputActionEventChannel"/>.
   /// </summary>
   public class PlayerInputActionDispatcher : MonoBehaviour, PlayerControls.IGameplayActions {
 
@@ -26,7 +26,7 @@ namespace GMTK {
      
       //Getting the EventChannel with 2 fallbacks
       if (InputEvents == null) {
-        InputEvents = Services.Get<InputActionEventChannel>();
+        InputEvents = ServiceLocator.Get<InputActionEventChannel>();
       }
       if (InputEvents == null) {
         InputEvents = Resources.Load<InputActionEventChannel>("InputActionEventChannel");
@@ -74,7 +74,7 @@ namespace GMTK {
           //obtain world position from Camera, forzing z to zero to maintaing the 2d restrictions
           var camWorldPos = Camera.main.ScreenToWorldPoint(PointerScreenPosition);
           PointerWorldPoition = new(camWorldPos.x, camWorldPos.y, 0f);
-          InputEvents.Raise(InputActionType.PointerPosition, context.phase, context, PointerScreenPosition, PointerWorldPoition);
+          InputEvents.Raise(InputActionType.PointerPosition, BuildEventArgs(InputActionType.PointerPosition, context));
         }
       }
     }
@@ -86,39 +86,20 @@ namespace GMTK {
     /// element's position.
     /// </summary>
     /// <param name="context"></param>
-    public void OnSelect(InputAction.CallbackContext context) {
-      InputEvents.Raise(InputActionType.Select, context.phase, context, PointerScreenPosition, PointerWorldPoition);
-    }
+    public void OnSelect(InputAction.CallbackContext context) => InputEvents.Raise(InputActionType.Select, BuildEventArgs(InputActionType.Select, context));
 
-    /// <summary>
-    /// Not implemented yet
-    /// </summary>
-    /// <param name="context"></param>
-    public void OnSecondary(InputAction.CallbackContext context) {
-      Debug.Log("SnappableInputHandler.HandleSecondary : Not implemented yet");
-      //InputEvents.Raise(InputActionType.Secondary, context.phase, context, PointerScreenPosition, PointerWorldPoition);
-    }
+    public void OnSecondary(InputAction.CallbackContext context) => InputEvents.Raise(InputActionType.Secondary, BuildEventArgs(InputActionType.Secondary, context));
 
-    public void OnCancel(InputAction.CallbackContext context) {
-      Debug.Log("SnappableInputHandler.HandleSecondary : Not implemented yet");
-      InputEvents.Raise(InputActionType.Cancel, context.phase, context, PointerScreenPosition, PointerWorldPoition);
-    }
+    public void OnCancel(InputAction.CallbackContext context) => InputEvents.Raise(InputActionType.Cancel, BuildEventArgs(InputActionType.Cancel, context));
 
-    public void OnRotateCW(InputAction.CallbackContext context) {
-      InputEvents.Raise(InputActionType.RotateCW, context.phase, context, PointerScreenPosition, PointerWorldPoition);
-    }
+    public void OnRotateCW(InputAction.CallbackContext context) => InputEvents.Raise(InputActionType.RotateCW, BuildEventArgs(InputActionType.RotateCW, context));
 
-    public void OnRotateCCW(InputAction.CallbackContext context) {
-      InputEvents.Raise(InputActionType.RotateCCW, context.phase, context, PointerScreenPosition, PointerWorldPoition);
-    }
+    public void OnRotateCCW(InputAction.CallbackContext context) => InputEvents.Raise(InputActionType.RotateCCW, BuildEventArgs(InputActionType.RotateCCW, context));
 
-    public void OnFlipX(InputAction.CallbackContext context) {
-      InputEvents.Raise(InputActionType.FlipX, context.phase, context, PointerScreenPosition, PointerWorldPoition);
-    }
+    public void OnFlipX(InputAction.CallbackContext context) => InputEvents.Raise(InputActionType.FlipX, BuildEventArgs(InputActionType.FlipX, context));
 
-    public void OnFlipY(InputAction.CallbackContext context) {
-      InputEvents.Raise(InputActionType.FlipY, context.phase, context, PointerScreenPosition, PointerWorldPoition);
-    }
+    public void OnFlipY(InputAction.CallbackContext context) => InputEvents.Raise(InputActionType.FlipY, BuildEventArgs(InputActionType.FlipY, context));
 
+    private EventArgs BuildEventArgs(InputActionType actionType, InputAction.CallbackContext context) => new InputActionEventArgs(actionType, context.phase, context, PointerScreenPosition, PointerWorldPoition);
   }
 }

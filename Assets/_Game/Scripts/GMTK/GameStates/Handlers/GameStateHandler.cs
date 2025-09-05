@@ -31,7 +31,7 @@ namespace GMTK {
       _isInitialized = false;
      
       if (_eventsChannel == null) {
-        _eventsChannel = Services.Get<GameEventChannel>();
+        _eventsChannel = ServiceLocator.Get<GameEventChannel>();
       }
       Init();
       _isInitialized = true;

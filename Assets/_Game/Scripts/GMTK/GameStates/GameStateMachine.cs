@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Ameba;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Ameba;
+using UnityEngine.SceneManagement;
+using static GMTK.GameStateMachine;
 
 namespace GMTK {
 
@@ -10,18 +12,24 @@ namespace GMTK {
   [CreateAssetMenu(menuName = "GMTK/Game State Machine")]
   public class GameStateMachine : StateMachine<GameStates> {
 
-    [Header("Event Integration")]
-    [Tooltip("Reference to the GameEventChannel")]
-    [SerializeField] protected GameEventChannel _eventChannel;
-    [Tooltip("Events that automatically trigger state changes")]
-    [SerializeField] private List<EventToStateMapping> _eventMappings = new();
+    public enum InitializationModes { Clean, Incremental, Once }
 
-    [Header("Handler Management")]
-    [Tooltip("Automatically scan for handlers on Scene load")]
-    public bool AutoScanOnSceneLoad = true;
-    [Tooltip("Handler discovery settings")]
+    public enum HandlerDiscoveryModes { AfterSceneLoad, Lazy }
+
+    [Header("Initialization")]
+    [Tooltip("The strategy to initialize the internal systems. Incremental (defaults): adds system founds on the scene that aren't already added. Clean: clears all internal systems before scanning the scene. Once: initializes all systems only once and keeps them for the lifetime of the game.")]
+    public InitializationModes InitializationMode = InitializationModes.Incremental;
+
+    [Tooltip("The strategy to discover GameStateHandlers. AfterSceneLoad (default and recommended): automatically after scene load. Lazy: when the first GameState change occurs.")]
+    public HandlerDiscoveryModes HandlerDiscoveryMode = HandlerDiscoveryModes.AfterSceneLoad;
+    [Tooltip("GameState Handlers discovery settings")]
     public string[] IncludeTags = new string[0];
     public string[] ExcludeTags = new string[0];
+
+    [Header("Events Integration")]
+    [Tooltip("Events that automatically trigger state changes")]
+    [SerializeField] protected List<EventToStateMapping> _eventMappings = new();
+
 
     [Header("History & Debug")]
     [Tooltip("keeps history of recent status changes. Change the history length with HistoryLength. Keep in mind a longer history might impact performance")]
@@ -29,27 +37,24 @@ namespace GMTK {
     [Tooltip("how many game states back the history contains")]
     public int HistoryLength = 3;
 
-    /* 
-     * These flags control the initialization behavior of the state machine.
-     * Enabling 'Clean' flags is useful during development to ensure a fresh setup each time.
-     * In production, only the start scene should have them enabled, to avoid unnecessary overhead.
-     */
-    [Header("Initialization")]
-    [Tooltip("If true, the state machine will clear all transitions and re-add default ones on OnEnable. If false, default transitions are added only if they are missing")]
-    public bool CleanTransitions = false;
-    [Tooltip("if true, the state machine will clear all event-to-state mappings and re-add default ones on OnEnable. If false, default mappings are added only if they are missing")]
-    public bool CleanEventToState = false;
-    [Tooltip("if true, the state machine will clear all discovered handlers and re-scan for them on OnEnable. If false, handlers are scanned only if none were found")]
-    public bool CleanHandlersDiscovery = false;
+    [Header("Internal Event Channel")]
+    [Tooltip("Internal event channel used by the state machine to manage state changes. This channel is created automatically if not assigned")]
+    [SerializeField] protected GameStateMachineEventChannel _internalEventChannel;
 
     [Header("Debugging")]
     public bool EnableDebugLogging = false;
 
+    // Public API to access internal fields (read-only)
     public bool IsInitialized => _isInitialized;
+    public bool IsSubscribedToExternalEvents => _isSubcribedToExternalEvents;
+    public bool IsSubscribedToInternalEvents => _isSubcribedToInternalEvents;
+    public bool AreHandlersDiscovered => _areHandlersDiscovered;
+    public GameStateMachineEventChannel EventChannel => _internalEventChannel;
 
     // Self-contained collections
     private List<GameStateHandler> _handlers = new();
     private Dictionary<GameEventType, GameStates> _eventToStateMap = new();
+    private GameEventChannel _externalEventChannel;
 
     // Initialization flags
     // If you change the initialization logic, make sure these flags are set correctly
@@ -57,33 +62,84 @@ namespace GMTK {
     private bool _isInitialized = false;
     private bool _areDefaultTransitionsAdded = false;
     private bool _areMappingsBuilt = false;
-    private bool _isSubcribedToEvents = false;
+    private bool _isSubcribedToExternalEvents = false;
+    private bool _isSubcribedToInternalEvents = false;
     private bool _areHandlersDiscovered = false;
 
-    #region Initialization
+    #region Initialization and Cleanup
     protected override void OnEnable() {
       base.OnEnable();
       StartingState = (StartingState == default) ? GameStates.Start : StartingState;
       AddDefaultTransitions();
+      InitializeInternalSystems();
+
+      // Subscribe to scene loaded events for automatic handler discovery
+      if (HandlerDiscoveryMode == HandlerDiscoveryModes.AfterSceneLoad) {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        LogDebug("Subscribed to SceneManager.sceneLoaded for automatic handler discovery");
+      }
     }
 
     protected override void OnDisable() {
       base.OnDisable();
+      //event to state mapping arent reseted because they are built in the editor
+      ResetInitializationFlags(mappingsBuilt:true);
+      ClearAll(eventToStateMap:false);
+    }
+
+    /// <summary>
+    /// Called automatically when a scene is loaded
+    /// </summary>
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+      LogDebug($"Scene loaded: {scene.name} (mode: {mode})");
+
+      // Only discover handlers if mode is set to AfterSceneLoad
+      if (HandlerDiscoveryMode == HandlerDiscoveryModes.AfterSceneLoad) {
+        LogDebug("Starting automatic handler discovery after scene load");
+        DiscoverHandlers();
+      }
+    }
+
+    private void ResetInitializationFlags(bool defaultTransitions=false, bool mappingsBuilt=false,bool internalEvents=false, bool externalEvents=false,bool handlersDiscovered=false) {
       _isInitialized = false;
-      _areDefaultTransitionsAdded = false;
-      _areMappingsBuilt = false;
-      _isSubcribedToEvents = false;
-      _areHandlersDiscovered = false;
+      _areDefaultTransitionsAdded = defaultTransitions;
+      _areMappingsBuilt = mappingsBuilt;
+      _isSubcribedToInternalEvents = internalEvents;
+      _isSubcribedToExternalEvents = externalEvents;
+      _areHandlersDiscovered = handlersDiscovered;
+    }
+
+    private void ClearAll(bool eventToStateMap=true, bool history=true, bool handlers=true, bool internalEvent=true, bool externalEvents=true) {
+      ClearAllTransitions();
+      if(eventToStateMap) _eventToStateMap.Clear();
+      if (handlers) {
+        _handlers.Clear();
+        if(_handlers.Count > 0) {
+          _handlers = new();
+        }
+      }
+      if(history) _history.Clear();
+      if (_internalEventChannel != null && internalEvent) {
+        _internalEventChannel.RemoveAllListeners();
+      }
+      if (_externalEventChannel != null && externalEvents) {
+        _externalEventChannel.RemoveAllListeners();
+      }
     }
 
     protected virtual void AddDefaultTransitions() {
-      if (_isInitialized && _areDefaultTransitionsAdded) return;
-
-      if (CleanTransitions) {
+      // nothing to do here
+      if (InitializationMode == InitializationModes.Once
+          && _isInitialized && _areDefaultTransitionsAdded) return;
+      // clean and re-add
+      if (InitializationMode == InitializationModes.Clean) {
         ClearAllTransitions();
         _areDefaultTransitionsAdded = false;
       }
-      //Add here any transition between states the game should consider valid
+
+      //These are default transitions for a typical game flow
+      //'AddTransition' ensures no duplicates are added,
+      //so it's safe to call multiple times (ie: InitializationMode = Incremental)
       AddTransition(GameStates.Start, GameStates.Preparation);
       AddTransition(GameStates.Start, GameStates.Options);
       AddTransition(GameStates.Preparation, GameStates.Playing);
@@ -111,94 +167,228 @@ namespace GMTK {
       AddTransition(GameStates.Playing, GameStates.Gameover);
       AddTransition(GameStates.Reset, GameStates.Gameover);
       AddTransition(GameStates.LevelComplete, GameStates.Gameover);
+
       LogDebug($"{name} Default transitions added");
       _areDefaultTransitionsAdded = true;
     }
 
-    public void SetEventChannelAndInitialize(GameEventChannel eventChannel) {
-      LogDebug($"{name} Setting EventChannel and initializing GameStateMachine...");
-      if (eventChannel == null) {
-        LogWarning($"{name} Cannot initialize GameStateMachine: provided GameEventChannel is null");
-        return;
-      }
-      // Avoid re-initialization if the channel is the same
-      if (_isInitialized && eventChannel.Equals(_eventChannel)) return;
-      _isInitialized = false;
-      _eventChannel = eventChannel;
-      InitializeEventDrivenSystem();
-      LogDebug($"{name} GameStateMachine initialized with provided EventChannel");
-      _isInitialized = true;
-    }
-
-
-    private void InitializeEventDrivenSystem() {
-
-      // Get event channel from Services if not set
-      if (_eventChannel == null) {
-        if (Services.TryGet<GameEventChannel>(out var channel)) {
-          _eventChannel = channel;
-        }
-        else {
-          LogWarning($"{name} GameEventChannel not found in Services");
-          return;
-        }
+    private void InitializeInternalSystems() {
+      // Create internal event channel if it doesn't exist
+      if (_internalEventChannel == null) {
+        _internalEventChannel = CreateInstance<GameStateMachineEventChannel>();
+        _internalEventChannel.name = "GameStateMachine_InternalEvents";
       }
 
       // Build event-to-state mapping
       BuildEventMappings();
-
-      // Subscribe to GameStateevents
-      SubscribeToEvents();
-
+      // Subscribe to internal events
+      SubscribeToInternalEvents();
       // Discover and register handlers
-      if (AutoScanOnSceneLoad) {
-        DiscoverHandlers();
+      if(HandlerDiscoveryMode == HandlerDiscoveryModes.AfterSceneLoad) {
+        if(SceneManager.GetActiveScene().isLoaded) {
+          DiscoverHandlers();
+        }
       }
+      //DiscoverHandlers();
+      //// Try to connect to external event channel (optional)
+      TryConnectToExternalEvents();
 
-      LogDebug($"{name} Event-driven system initialized");
+      _isInitialized = true;
+      LogDebug("Internal event system initialized");
     }
 
     protected virtual void BuildEventMappings() {
-      if (_isInitialized && _areMappingsBuilt) return;
+      if (InitializationMode == InitializationModes.Once
+          && _isInitialized && _areMappingsBuilt) return;
 
-      if (CleanEventToState) {
+      if (InitializationMode == InitializationModes.Clean) {
         _eventToStateMap.Clear();
         _areMappingsBuilt = false;
       }
+
       // Build from serialized mappings
       foreach (var mapping in _eventMappings) {
         AddUniqueEventToStateMap(mapping.EventType, mapping.TargetState);
       }
 
-      // Add default mappings if not overridden
+      // Add default mappings
       AddUniqueEventToStateMap(GameEventType.GameStarted, GameStates.Start);
       AddUniqueEventToStateMap(GameEventType.LevelStart, GameStates.Preparation);
       AddUniqueEventToStateMap(GameEventType.LevelPlay, GameStates.Playing);
       AddUniqueEventToStateMap(GameEventType.LevelReset, GameStates.Reset);
-      // ... etc
+      AddUniqueEventToStateMap(GameEventType.LevelObjectiveCompleted, GameStates.LevelComplete);
+      AddUniqueEventToStateMap(GameEventType.GameOver, GameStates.Gameover);
+      AddUniqueEventToStateMap(GameEventType.EnterOptions, GameStates.Options);
+      AddUniqueEventToStateMap(GameEventType.EnterPause, GameStates.Pause);
 
+      LogDebug($"BuildEventMappings - Added {_eventMappings.Count} custom event-to-state mappings");
       _areMappingsBuilt = true;
     }
 
     private void AddUniqueEventToStateMap(GameEventType eventType, GameStates targetState) {
-      if (!_eventToStateMap.ContainsKey(eventType)) {
-        _eventToStateMap[eventType] = targetState;
+      if (!_eventToStateMap.ContainsKey(eventType)) _eventToStateMap[eventType] = targetState;
+    }
+
+    #endregion
+
+    #region GameStateHandler Discovery 
+
+    /// <summary>
+    /// Discovers handlers in the current scene. Called automatically after scene initialization.
+    /// Strategy is controlled by InitializationMode.
+    /// </summary>
+    public virtual void DiscoverHandlers() {
+      LogDebug($"=== DiscoverHandlers START ===");
+      LogDebug($"InitializationMode: {InitializationMode}");
+      LogDebug($"HandlerDiscoveryMode: {HandlerDiscoveryMode}");
+      LogDebug($"_areHandlersDiscovered: {_areHandlersDiscovered}");
+
+      if (InitializationMode == InitializationModes.Once && _areHandlersDiscovered) {
+        LogDebug("Skipping handler discovery - Once mode and already discovered");
+        return;
       }
+
+      if (InitializationMode == InitializationModes.Clean) {
+        LogDebug("Clean mode: clearing existing handlers");
+        _handlers.Clear();
+        _areHandlersDiscovered = false;
+      }
+
+      // Apply tag filtering
+      var filteredHandlers = FindAllStateHandlersFilteredByTag();
+      LogDebug($"After tag filtering: {filteredHandlers.Length} handlers");
+
+
+      // Register handlers
+      int registeredCount = 0;
+      foreach (var handler in filteredHandlers) {
+        if (handler != null && RegisterHandler(handler)) {
+          registeredCount++;
+          LogDebug($"Registered: {handler.GetType().Name} (Priority: {handler.Priority})");
+        }
+      }
+
+      // Sort by priority
+      SortHandlers();
+
+      LogDebug($"Handler discovery complete: {registeredCount} new handlers, {_handlers.Count} total");
+      LogDebug($"=== DiscoverHandlers END ===");
+
+      _areHandlersDiscovered = true;
+    }
+
+    /// <summary>
+    /// Registers a handler if not already present (for Incremental mode)
+    /// </summary>
+    private bool RegisterHandler(GameStateHandler handler) {
+      if (handler == null) return false;
+
+      // In Incremental mode, check for duplicates
+      if (InitializationMode == InitializationModes.Incremental && _handlers.Contains(handler)) {
+        LogDebug($"Handler {handler.GetType().Name} already registered, skipping");
+        return false;
+      }
+
+      _handlers.Add(handler);
+      return true;
+    }
+
+    private void SortHandlers() {
+      _handlers = _handlers.OrderBy(h => h.Priority).ToList();
+      LogDebug($"Handlers sorted by priority");
+    }
+
+    public virtual void UnregisterHandler(GameStateHandler handler) {
+      _handlers.Remove(handler);
+      //_registeredHandlers.RemoveAll(h => h.Handler == handler);
+      LogDebug($"Unregistered handler: {handler.HandlerName}");
+    }
+
+    private GameStateHandler[] FindAllStateHandlersFilteredByTag() {
+
+      // Find all GameStateHandler components in the scene
+      var allStateHandlers = FindObjectsByType<GameStateHandler>(FindObjectsSortMode.None);
+      LogDebug($"Found {allStateHandlers.Length} GameStateHandler components in scene");
+      if (IncludeTags.Length == 0 && ExcludeTags.Length == 0) return allStateHandlers;
+
+      // Filter by tags
+      LogDebug($"Applying tag filters - Include: [{string.Join(", ", IncludeTags)}], Exclude: [{string.Join(", ", ExcludeTags)}]");
+      return allStateHandlers.Where(h => {
+        if (ExcludeTags.Length > 0 && ExcludeTags.Contains(h.gameObject.tag)) { return false; }
+        if (IncludeTags.Length > 0 && !IncludeTags.Contains(h.gameObject.tag)) { return false; }
+        return true;
+      }).ToArray();
+
     }
 
     #endregion
 
     #region Event Subscription
 
-    /// <summary>
-    /// Subscribe the GameStateMachine as listener to the GameEvents that should trigger Game State changes
-    /// </summary>
-    protected virtual void SubscribeToEvents() {
-      if (_isInitialized && _isSubcribedToEvents) return;
-      foreach (var eventType in _eventToStateMap.Keys) {
-        _eventChannel.AddListener(eventType, () => HandleGameEvent(eventType));
+    public void ConnectToExternalEvents(GameEventChannel eventChannel) {
+      LogDebug($"ConnectToExternalEvents - Setting external GameEventChannel");
+      _externalEventChannel = eventChannel;
+      TryConnectToExternalEvents();
+      string message = (_isSubcribedToExternalEvents) ? "connected" : "not connected";
+      LogDebug($"ConnectToExternalEvents - External GameEventChannel {message}");
+    }
+
+    private void SubscribeToInternalEvents() {
+
+      if (InitializationMode == InitializationModes.Once
+         && _isInitialized && _isSubcribedToInternalEvents) return;
+      if (InitializationMode == InitializationModes.Clean) {
+        // Unsubscribe all existing listeners
+        _internalEventChannel.RemoveAllListeners();
+        _isSubcribedToInternalEvents = false;
       }
-      _isSubcribedToEvents = true;
+      //AddListener ensures no duplicates are added, so it's safe to call multiple times
+      foreach (var eventType in _eventToStateMap.Keys) {
+        _internalEventChannel.AddListener(eventType, () => HandleGameEvent(eventType));
+      }
+      LogDebug($"SubscribeToInternalEvents - {_eventToStateMap.Count} internal GameEventChannel events");
+      // Special handlers for context-dependent events
+      _internalEventChannel.AddListener(GameEventType.ExitOptions, HandleExitOptions);
+      _internalEventChannel.AddListener(GameEventType.ExitPause, HandleExitPause);
+      LogDebug($"SubscribeToInternalEvents - Added Exit Options and Pause internal GameEventChannel events");
+      _isSubcribedToInternalEvents = true;
+    }
+
+    private void TryConnectToExternalEvents() {
+
+      if (InitializationMode == InitializationModes.Once
+          && _isInitialized && _isSubcribedToExternalEvents) return;
+
+      // Optional: Connect to external event channel if available
+      // This allows other systems to trigger state changes through the global event channel
+      if (ServiceLocator.TryGet<GameEventChannel>(out var channel)) {
+
+        _externalEventChannel = channel;
+
+        if (InitializationMode == InitializationModes.Clean) {
+          _externalEventChannel.RemoveAllListeners();
+          _isSubcribedToExternalEvents = false;
+        }
+
+        // Subscribe to external events and forward them to internal channel
+        foreach (var eventType in _eventToStateMap.Keys) {
+          _externalEventChannel.AddListener(eventType, () => {
+            LogDebug($"TryConnectToExternalEvents - External event {eventType} forwarded to internal channel");
+            HandleGameEvent(eventType);
+          });
+        }
+        LogDebug($"TryConnectToExternalEvents - Subscribed to {_eventToStateMap.Count} external GameEventChannel events");
+
+        _externalEventChannel.AddListener(GameEventType.ExitOptions, HandleExitOptions);
+        _externalEventChannel.AddListener(GameEventType.ExitPause, HandleExitPause);
+        LogDebug($"TryConnectToExternalEvents - Subscribed to Exit Options and Pause external GameEventChannel events");
+        _isSubcribedToExternalEvents = true;
+      }
+      else {
+        LogDebug("TryConnectToExternalEvents - No external GameEventChannel found - using internal events only");
+        _isSubcribedToExternalEvents = false;
+        return;
+      }
     }
 
     /// <summary>
@@ -212,56 +402,19 @@ namespace GMTK {
       }
     }
 
-    #endregion
-
-    #region State Handlers
-
-    /// <summary>
-    /// Searches for all GameStateHandler present in the current scene. 
-    /// If CleanHandlersDiscovery is true, clears existing handlers before scanning.
-    /// If AutoScanOnSceneLoad is true, scans automatically when the scene is loaded.
-    /// </summary>
-    public virtual void DiscoverHandlers() {
-      if (_isInitialized && _areHandlersDiscovered && !AutoScanOnSceneLoad) return;
-      LogDebug($"{name} Discovering state handlers...");
-
-      if (CleanHandlersDiscovery) {
-        _handlers.Clear();
-        _areHandlersDiscovered = false;
-      }
-
-      var allGameObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
-      var filteredObjects = FilterGameObjectsByTags(allGameObjects);
-
-      foreach (var go in filteredObjects) {
-        var handlers = go.GetComponents<GameStateHandler>();
-        foreach (var handler in handlers) {
-          RegisterHandler(handler);
-        }
-      }
-      // Sort by priority
-      _handlers = _handlers.OrderBy(h => h.Priority).ToList();
-      LogDebug($"{name} Discovered {_handlers.Count} handlers");
-
-      _areHandlersDiscovered = true;
+    // Public API for external systems to trigger events
+    public void TriggerEvent(GameEventType eventType) {
+      _internalEventChannel.Raise(eventType);
     }
 
-    public virtual void RegisterHandler(GameStateHandler handler) {
-      if (!_handlers.Contains(handler)) {
-        _handlers.Add(handler);
-        _handlers = _handlers.OrderBy(h => h.Priority).ToList();
-        LogDebug($"{name} Registered handler: {handler.HandlerName}");
-      }
-    }
-
-    public virtual void UnregisterHandler(GameStateHandler handler) {
-      _handlers.Remove(handler);
-      LogDebug($"{name} Unregistered handler: {handler.HandlerName}");
+    public void TriggerEvent<T>(GameEventType eventType, T payload) {
+      _internalEventChannel.Raise(eventType, payload);
     }
 
     #endregion
 
-    #region Change State 
+    #region State Changes
+
     public override bool ChangeState(GameStates newState) {
       var fromState = Current;
 
@@ -274,17 +427,29 @@ namespace GMTK {
     }
 
     private void NotifyHandlers(GameStates fromState, GameStates toState) {
+      // Ensure handlers are discovered before notifying
+      if (!_areHandlersDiscovered) {
+        LogDebug("Handlers not discovered yet, discovering now...");
+        DiscoverHandlers();
+      }
+
       var eventArg = new StateMachineEventArg<GameStates>(fromState, toState);
+      LogDebug($"Notifying {_handlers.Count} handlers of state change: {fromState} -> {toState}");
 
       foreach (var handler in _handlers) {
+        if (handler == null) {
+          LogWarning("Found null handler in list");
+          continue;
+        }
+
         if (!handler.IsEnabled) continue;
 
         try {
           handler.HandleStateChange(eventArg);
-          LogDebug($"{name} ✓ {handler.HandlerName} handled state change");
+          LogDebug($"✓ {handler.HandlerName} handled state change");
         }
         catch (System.Exception ex) {
-          LogError($"{name} ✗ Handler '{handler.HandlerName}' failed: {ex.Message}");
+          LogError($"✗ Handler '{handler.HandlerName}' failed: {ex.Message}");
           Debug.LogException(ex);
         }
       }
@@ -292,27 +457,7 @@ namespace GMTK {
 
     #endregion
 
-    #region Utilities
-
-    private GameObject[] FilterGameObjectsByTags(GameObject[] allObjects) {
-      if (IncludeTags.Length == 0 && ExcludeTags.Length == 0) {
-        return allObjects;
-      }
-
-      return allObjects.Where(go => {
-        if (ExcludeTags.Length > 0 && ExcludeTags.Contains(go.tag)) {
-          return false;
-        }
-        if (IncludeTags.Length > 0 && !IncludeTags.Contains(go.tag)) {
-          return false;
-        }
-        return true;
-      }).ToArray();
-    }
-
-    #endregion
-
-    #region State Change history
+    #region History
 
     /// <summary>
     /// The count of state changes currently in history
@@ -386,6 +531,43 @@ namespace GMTK {
 
     [ContextMenu("Force Scan Handlers")]
     private void ForceScan() => DiscoverHandlers();
+
+    [ContextMenu("Print Handlers")]
+    private void PrintHandlers() {
+      Debug.Log($"=== Registered Handlers ({HandlerCount}) ===");
+      foreach (var handler in _handlers) {
+        Debug.Log($"- {handler.HandlerName} (Priority: {handler.Priority}, Enabled: {handler.IsEnabled})");
+      }
+      Debug.Log("=== End of Handlers ===");
+    }
+
+    [ContextMenu("Clear Handlers")]
+    private void ClearHandlers() {
+      _handlers.Clear();
+      _areHandlersDiscovered = false;
+      LogDebug("Cleared all registered handlers");
+    }
+
+    [ContextMenu("Clear Event Mappings")]
+    private void ClearEventMappings() {
+      _eventToStateMap.Clear();
+      _areMappingsBuilt = false;
+      LogDebug("Cleared all event-to-state mappings");
+    }
+
+    [ContextMenu("Clear Internal Events")]
+    private void RemoveAllInternalListeners() {
+      _internalEventChannel.RemoveAllListeners();
+      _isSubcribedToInternalEvents = false;
+      LogDebug("Cleared all internal event handlers");
+    }
+
+    [ContextMenu("Clear External Events")]
+    private void RemoveAllExternalListeners() {
+      _externalEventChannel.RemoveAllListeners();
+      _isSubcribedToExternalEvents = false;
+      LogDebug("Cleared all external event handlers");
+    }
 
     #endregion
   }

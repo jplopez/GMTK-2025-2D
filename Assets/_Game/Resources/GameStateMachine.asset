@@ -14,8 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StartingState: 0
   NoRestrictions: 0
-  _serializedTransitions: []
-  _eventChannel: {fileID: 11400000, guid: 95a9f7bb01a666548ba38fda71806925, type: 2}
+  _serializedTransitions:
+  - From: 0
+    To: 010000000700000005000000
+  - From: 1
+    To: 0200000003000000060000000700000005000000
+  - From: 2
+    To: 0300000004000000060000000700000005000000
+  - From: 3
+    To: 01000000060000000700000005000000
+  - From: 4
+    To: 0100000005000000
+  - From: 6
+    To: 010000000200000003000000
+  - From: 7
+    To: 00000000010000000200000003000000
+  InitializationMode: 0
+  HandlerDiscoveryMode: 0
+  IncludeTags: []
+  ExcludeTags: []
   _eventMappings:
   - EventType: 0
     TargetState: 0
@@ -25,19 +42,12 @@ MonoBehaviour:
     TargetState: 2
   - EventType: 3
     TargetState: 3
-  - EventType: 9
-    TargetState: 4
+  - EventType: 4
+    TargetState: 5
   - EventType: 5
     TargetState: 7
   - EventType: 7
     TargetState: 6
-  - EventType: 4
-    TargetState: 5
-  AutoScanOnSceneLoad: 1
-  IncludeTags: []
-  ExcludeTags: []
   HistoryLength: 3
-  CleanTransitions: 0
-  CleanEventToState: 0
-  CleanHandlersDiscovery: 1
+  _internalEventChannel: {fileID: 0}
   EnableDebugLogging: 1

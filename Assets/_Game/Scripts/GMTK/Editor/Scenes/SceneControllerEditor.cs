@@ -17,7 +17,7 @@ namespace GMTK {
     private SerializedProperty _effectiveConfigProp;
     private SerializedProperty _onSceneLoadEventsProp;
     private SerializedProperty _enableDebugLoggingProp;
-    private SerializedProperty _autoScanProp;
+    //private SerializedProperty _autoScanProp;
 
     private LevelService _levelService;
     private string[] _presetNames;
@@ -30,9 +30,9 @@ namespace GMTK {
       _effectiveConfigProp = serializedObject.FindProperty("_effectiveConfig");
       _onSceneLoadEventsProp = serializedObject.FindProperty("OnSceneLoadEvents");
       _enableDebugLoggingProp = serializedObject.FindProperty("EnableDebugLogging");
-      _autoScanProp = serializedObject.FindProperty("AutoScanForHandlers");
+      //_autoScanProp = serializedObject.FindProperty("AutoScanForHandlers");
 
-      _levelService = Services.Get<LevelService>();
+      _levelService = GetLevelService();
       if (_levelService != null && _levelService.Levels != null) {
         _presetNames = new string[_levelService.Levels.Length];
         for (int i = 0; i < _levelService.Levels.Length; i++) {
@@ -40,6 +40,11 @@ namespace GMTK {
           _presetNames[i] = $"{cfg.DisplayName} ({cfg.SceneName})";
         }
       }
+    }
+
+    private LevelService GetLevelService() {
+      if (ServiceLocator.IsInitialized) return ServiceLocator.Get<LevelService>();
+      return Resources.Load<LevelService>("LevelService");
     }
 
     public override void OnInspectorGUI() {
@@ -58,7 +63,7 @@ namespace GMTK {
       EditorGUILayout.PropertyField(_effectiveConfigProp, new GUIContent("Config"), true);
       EditorGUILayout.Space();
 
-      EditorGUILayout.PropertyField(_autoScanProp, new GUIContent("Scan for GameStateHandlers"), true);
+      //EditorGUILayout.PropertyField(_autoScanProp, new GUIContent("Scan for GameStateHandlers"), true);
       EditorGUILayout.PropertyField(_onSceneLoadEventsProp, new GUIContent("Raise GameEvent"), true);
       EditorGUILayout.Space();
 

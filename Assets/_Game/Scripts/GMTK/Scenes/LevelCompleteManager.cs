@@ -17,9 +17,9 @@ namespace GMTK {
       if (!TryGetComponent(out _animator)) {
         Debug.LogWarning("No Animator component found on LevelCompleteManager.");
       }
-      _currentScore = Services.Get<ScoreGateKeeper>().GetScore();
+      _currentScore = ServiceLocator.Get<ScoreGateKeeper>().GetScore();
       if (_levelService == null) {
-        _levelService = Services.Get<LevelService>();
+        _levelService = ServiceLocator.Get<LevelService>();
       }
     }
 

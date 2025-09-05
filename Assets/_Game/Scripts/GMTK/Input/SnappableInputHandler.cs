@@ -41,7 +41,7 @@ namespace GMTK {
     private void Awake() {
      
       if (_eventsChannel == null) {
-        _eventsChannel = Services.Get<GameEventChannel>();
+        _eventsChannel = ServiceLocator.Get<GameEventChannel>();
       }
 
       if (_inputDispatcher == null && TryGetComponent(out _inputDispatcher)) {

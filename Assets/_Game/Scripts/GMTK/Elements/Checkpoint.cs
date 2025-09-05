@@ -1,4 +1,5 @@
 using Ameba;
+using System;
 using UnityEngine;
 
 namespace GMTK {
@@ -40,10 +41,10 @@ namespace GMTK {
       }
 
       if(_eventsChannel == null) {
-        _eventsChannel = Services.Get<GameEventChannel>();
+        _eventsChannel = ServiceLocator.Get<GameEventChannel>();
       }
       if (_stateMachine == null) {
-        _stateMachine = Services.Get<GameStateMachine>();
+        _stateMachine = ServiceLocator.Get<GameStateMachine>();
       }
     }
 
@@ -64,7 +65,7 @@ namespace GMTK {
           Marble = marble,
           HitCheckpoint = this
         };
-        _eventsChannel.Raise(GameEventType.EnterCheckpoint, eventArgs);
+        _eventsChannel.Raise<EventArgs>(GameEventType.EnterCheckpoint, eventArgs);
 
       }
       ActivateVisualCue(CueMode == VisualCueMode.Always || CueMode == VisualCueMode.OnEnter);
@@ -81,7 +82,7 @@ namespace GMTK {
           Marble = marble,
           HitCheckpoint = this
         };
-        _eventsChannel.Raise(GameEventType.ExitCheckpoint, eventArgs);
+        _eventsChannel.Raise<EventArgs>(GameEventType.ExitCheckpoint, eventArgs);
       }
 
       ActivateVisualCue(CueMode == VisualCueMode.Always || CueMode == VisualCueMode.OnExit);

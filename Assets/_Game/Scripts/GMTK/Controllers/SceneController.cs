@@ -21,7 +21,6 @@ namespace GMTK {
     [Header("Scene Identification")]
     [Tooltip("Source of configuration for this scene")]
     public ConfigSource ConfigurationSource = ConfigSource.Preset;
-
     [Tooltip("Scene name to use for level lookup (auto-detected if empty)")]
     public string SceneName;
 
@@ -30,39 +29,50 @@ namespace GMTK {
     [SerializeField] private LevelConfig _manualConfig = new();
 
     // Cached config
-    [HideInInspector]
-    [SerializeField] protected LevelConfig _presetConfig;
-
-    [HideInInspector]
-    [SerializeField] protected LevelConfig _effectiveConfig;
+    [HideInInspector] [SerializeField] protected LevelConfig _presetConfig;
+    [HideInInspector] [SerializeField] protected LevelConfig _effectiveConfig;
 
     [Header("On Scene Load")]
     [Tooltip("Events to raise when scene loads")]
     public GameEventType[] OnSceneLoadEvents;
-    [Tooltip("if true, the GameStateMachine scans for StateHandlers in the scene")]
-    public bool AutoScanForHandlers = true;
-
+    
     [Header("Debug")]
     public bool EnableDebugLogging = false;
 
-    // Services
+    // ServiceLocator
     protected LevelService _levelService;
     protected GameEventChannel _eventChannel;
     protected GameStateMachine _stateMachine;
     protected bool _isInitialized = false;
     protected List<ISceneConfigExtension> _configExtensions = new();
 
+    /// <summary>
+    /// Whether the GameStateMachine will change state when the scene loads
+    /// </summary>
     public bool ChangesGameStateOnLoad {
-      get {
-        return _effectiveConfig != null && _effectiveConfig.SetStateOnLoad;
+      get { return _effectiveConfig != null && _effectiveConfig.SetStateOnLoad; }
+    }
+
+    /// <summary>
+    /// The GameState to set when the scene loads, if ChangesGameStateOnLoad is true.
+    /// If false, it will return current GameState or GameStates.Preparation if no state is set.
+    /// </summary>
+    /// <returns></returns>
+    public GameStates GetGameStateOnLoad() {
+      if (_effectiveConfig != null) return _effectiveConfig.InitialGameState;
+      if (_stateMachine != null) {
+        return _stateMachine.Current;
+      } else {
+        return GameStates.Preparation;
       }
     }
 
-    public GameStates GetGameStateOnLoad() {
-      return _effectiveConfig != null ? _effectiveConfig.InitialGameState : GameStates.Preparation;
-    }
-
     private void Awake() => Initialize();
+
+    private void Start() {
+      // Initialize scene after all Awake calls are complete
+      InitializeScene();
+    }
 
     protected virtual void Initialize() {
       if (_isInitialized) return;
@@ -72,9 +82,9 @@ namespace GMTK {
       }
 
       // Get services
-      _levelService = Services.Get<LevelService>();
-      _eventChannel = Services.Get<GameEventChannel>();
-      _stateMachine = Services.Get<GameStateMachine>();
+      _levelService = ServiceLocator.Get<LevelService>();
+      _eventChannel = ServiceLocator.Get<GameEventChannel>();
+      _stateMachine = ServiceLocator.Get<GameStateMachine>();
 
       // Validate services
       if (!ValidateServices()) {
@@ -86,21 +96,9 @@ namespace GMTK {
       LoadLevelConfig();
       // Load Config extensions (ISceneConfigExtension) 
       LoadConfigExtensions();
-
-      if (AutoScanForHandlers) {
-        if (Services.TryGet<GameStateMachine>(out var handler)) {
-          handler.AutoScanOnSceneLoad = AutoScanForHandlers;
-          handler.DiscoverHandlers();
-          LogDebug($"GameStateHandlers scanned {handler.HandlerCount} handlers ");
-        }
-      }
       _isInitialized = true;
     }
 
-    private void Start() {
-      // Initialize scene after all Awake calls are complete
-      InitializeScene();
-    }
 
     /// <summary>
     /// Load level configuration from LevelService

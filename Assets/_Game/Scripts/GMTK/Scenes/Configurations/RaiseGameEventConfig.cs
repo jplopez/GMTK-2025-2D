@@ -23,9 +23,9 @@ namespace GMTK {
     [SerializeField] protected string stringParam;
 
     private void Awake() {
-      if (eventChannel == null) eventChannel = Services.Get<GameEventChannel>();
+      if (eventChannel == null) eventChannel = ServiceLocator.Get<GameEventChannel>();
       if (eventChannel == null) {
-        Debug.LogError("[RaiseGameEventConfig] No EventChannel found in Services. Please ensure a GameEventChannel is registered.");
+        Debug.LogError("[RaiseGameEventConfig] No EventChannel found in ServiceLocator. Please ensure a GameEventChannel is registered.");
       }
     }
     public void ApplyConfig(SceneController controller) {

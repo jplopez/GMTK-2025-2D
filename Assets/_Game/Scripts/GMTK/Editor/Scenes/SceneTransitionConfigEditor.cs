@@ -22,7 +22,7 @@ namespace GMTK {
       _transitionConfigProp = serializedObject.FindProperty("TransitionConfig");
       _transitionSceneNameProp = serializedObject.FindProperty("TransitionSceneName");
 
-      _levelService = Services.Get<LevelService>();
+      _levelService = GetLevelService();
       if (_levelService != null && _levelService.Levels != null) {
         _presetNames = new string[_levelService.Levels.Length];
         for (int i = 0; i < _levelService.Levels.Length; i++) {
@@ -31,6 +31,12 @@ namespace GMTK {
         }
       }
     }
+
+    private LevelService GetLevelService() {
+      if (ServiceLocator.IsInitialized) return ServiceLocator.Get<LevelService>();
+      return Resources.Load<LevelService>("LevelService");
+    }
+
     public override void OnInspectorGUI() {
       serializedObject.Update();
 
@@ -56,8 +62,10 @@ namespace GMTK {
         EditorGUILayout.HelpBox("No LevelService or LevelConfigs found.", MessageType.Warning);
       }
 
-      using (new EditorGUI.IndentLevelScope()) {
-        EditorGUILayout.PropertyField(_transitionConfigProp, true);
+      if (_transitionConfigProp != null) {
+        using (new EditorGUI.IndentLevelScope()) {
+          EditorGUILayout.PropertyField(_transitionConfigProp, true);
+        }
       }
 
       serializedObject.ApplyModifiedProperties();

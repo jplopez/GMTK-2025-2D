@@ -1,7 +1,6 @@
-using Ameba;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
+using Ameba;
 
 namespace GMTK {
   public class LevelManager : MonoBehaviour {
@@ -39,8 +38,8 @@ namespace GMTK {
     [Tooltip("Number of checkpoints reached so far. Currently not implemented.")]
     public int CheckpointsReached = 0;
 
-    [Tooltip("LevelExtensions to encapsulate specific behaviours, that might not be needed everywhere")]
-    public List<LevelExtension> Extensions = new();
+    //[Tooltip("LevelExtensions to encapsulate specific behaviours, that might not be needed everywhere")]
+    //public List<LevelExtension> Extensions = new();
 
     public bool IsLevelStarted => _levelStarted;
     public bool IsLevelStale => _timeSinceLastMove >= StaleTimeThreshold;
@@ -49,8 +48,7 @@ namespace GMTK {
     protected bool _levelEnded = false;
     protected float _timeSinceLastMove = 0f;
     protected float _timeSinceLevelStart = 0f;
-    //protected int _scoreAtLevelStart = 0;
-    //protected LevelSequence _levelSequence;
+
     protected LevelService _levelService;
     protected GameEventChannel _eventChannel;
 
@@ -58,10 +56,8 @@ namespace GMTK {
 
     private void Awake() {
      
-      _eventChannel = Services.Get<GameEventChannel>();
-      //_levelSequence = Services.Get<LevelSequence>();
-      _levelService = Services.Get<LevelService>();
-      //_scoreAtLevelStart = Game.Context.MarbleScoreKeeper.GetScore();
+      _eventChannel = ServiceLocator.Get<GameEventChannel>();
+      _levelService = ServiceLocator.Get<LevelService>();
       if (_eventChannel == null) {
         Debug.Log($"LevelManager: EventChannel is missing. LevelManager won't be able to handle game events");
         return;

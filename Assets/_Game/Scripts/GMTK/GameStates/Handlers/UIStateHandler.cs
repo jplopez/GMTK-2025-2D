@@ -9,8 +9,8 @@ namespace GMTK {
   public class UIStateHandler : GameStateHandler {
 
     [Header("UI References")]
-    public HudController HudController;
-    public TurorialController TutorialController;
+    public HudController Hud;
+    public TutorialController Tutorial;
 
     private void OnEnable() {
       Priority = 100;
@@ -18,27 +18,29 @@ namespace GMTK {
     }
 
     protected override void Init() {
-      if (HudController == null) {
-        HudController = FindFirstObjectByType<HudController>();
+      if (Hud == null) {
+        Hud = FindFirstObjectByType<HudController>();
       }
 
-      if (TutorialController == null) {
-        TutorialController = FindFirstObjectByType<TurorialController>();
+      if (Tutorial == null) {
+        Tutorial = FindFirstObjectByType<TutorialController>();
       }
     }
 
     protected override void ToPreparation() {
-      HudController.UpdateUIFromGameState(GameStates.Preparation);
-      TutorialController.ToggleTutorialBoxes(false);
+      Hud.UpdateUIFromGameState(GameStates.Preparation);
+      // Show tutorial boxes if enabled on component
+      Tutorial.ToggleTutorialBoxes(Tutorial.ShowOnStart);
     }
 
     protected override void ToReset() {
-      HudController.UpdateUIFromGameState(GameStates.Reset);
+      Hud.UpdateUIFromGameState(GameStates.Reset);
+      Tutorial.ToggleTutorialBoxes(false);
     }
 
     protected override void ToPlaying() {
-      HudController.UpdateUIFromGameState(GameStates.Playing);
-      TutorialController.ToggleTutorialBoxes(false);
+      Hud.UpdateUIFromGameState(GameStates.Playing);
+      Tutorial.ToggleTutorialBoxes(false);
     }
   }
 

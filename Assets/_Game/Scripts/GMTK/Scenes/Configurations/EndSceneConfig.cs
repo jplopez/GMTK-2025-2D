@@ -41,9 +41,8 @@ namespace GMTK {
     private void CleanupAllEventListeners() {
       LogDebug("Cleaning up event listeners...");
 
-      var eventChannel = Services.Get<GameEventChannel>();
-      var stateMachine = Services.Get<GameStateMachine>();
-      var handlerRegistry = Services.Get<GameStateHandlerRegistry>();
+      var eventChannel = ServiceLocator.Get<GameEventChannel>();
+      var stateMachine = ServiceLocator.Get<GameStateMachine>();
 
       // Clear event channel listeners
       if (eventChannel != null) {
@@ -56,25 +55,19 @@ namespace GMTK {
         stateMachine.RemoveAllListeners();
         LogDebug("✓ StateMachine event handlers cleared");
       }
-
-      // Clear handler registry
-      if (handlerRegistry != null) {
-        handlerRegistry.ClearAllHandlers();
-        LogDebug("✓ HandlerRegistry cleared");
-      }
     }
 
     private void ClearTransientGameData() {
       LogDebug("Clearing transient game data...");
 
-      var scoreKeeper = Services.Get<ScoreGateKeeper>();
+      var scoreKeeper = ServiceLocator.Get<ScoreGateKeeper>();
       if (scoreKeeper != null) {
         // Reset score if needed
         scoreKeeper.ResetScore();
         LogDebug("✓ Score data cleared");
       }
 
-      var levelService = Services.Get<LevelService>();
+      var levelService = ServiceLocator.Get<LevelService>();
       if (levelService != null) {
         //return levelService to the Scene marked as Start
         levelService.SetCurrentLevel(levelService.FirstStartConfig().SceneName);
@@ -84,8 +77,8 @@ namespace GMTK {
 
     private void ResetAllServices() {
       LogDebug("Resetting services...");
-      Services.Clear();
-      LogDebug("✓ Services reset");
+      ServiceLocator.Clear();
+      LogDebug("✓ ServiceLocator reset");
     }
 
     private void LogDebug(string message) {

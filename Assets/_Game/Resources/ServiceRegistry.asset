@@ -18,4 +18,3 @@ MonoBehaviour:
   - GameStateMachine
   - InputActionEventChannel
   - ScoreGateKeeper
-  - HUD

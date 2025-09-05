@@ -4,44 +4,23 @@ using UnityEngine;
 
 namespace Ameba {
 
-    public enum PayloadType {
-      Void,
-      Int,
-      Bool,
-      Float,
-      String,
-      EventArg
-    }
+  public enum PayloadType {
+    Void,
+    Int,
+    Bool,
+    Float,
+    String,
+    EventArg
+  }
 
   /// <summary>
   /// Type-safe event channel using generics and interfaces.
   /// </summary>
   /// <typeparam name="Tenum"></typeparam>
-  public class EventChannel<Tenum> : ScriptableObject where Tenum : Enum {
+  public partial class EventChannel<Tenum> : ScriptableObject where Tenum : Enum {
 
     private Dictionary<Tenum, List<IEventCallback>> callbacks = new();
 
-    // Interface for type-safe callbacks
-    private interface IEventCallback {
-      void Invoke(object payload);
-      Type PayloadType { get; }
-    }
-
-    private class EventCallback<T> : IEventCallback {
-      public Action<T> Action { get; }
-      public Type PayloadType => typeof(T);
-      
-      public EventCallback(Action<T> action) => Action = action;
-      public void Invoke(object payload) => Action?.Invoke((T)payload);
-    }
-
-    private class VoidEventCallback : IEventCallback {
-      public Action Action { get; }
-      public Type PayloadType => typeof(void);
-      
-      public VoidEventCallback(Action action) => Action = action;
-      public void Invoke(object payload) => Action?.Invoke();
-    }
 
     // Unified Add/Remove methods
     public void AddListener<T>(Tenum type, Action<T> callback) {
@@ -79,7 +58,7 @@ namespace Ameba {
     // Unified Raise method
     public void Raise<T>(Tenum type, T payload = default) {
       if (!callbacks.TryGetValue(type, out var callbackList)) return;
-      
+
       foreach (var callback in callbackList) {
         if (typeof(T) == typeof(void) && callback.PayloadType == typeof(void)) {
           callback.Invoke(null);
