@@ -61,6 +61,7 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IServiceLocalable.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\InitializationComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\ScoreCalculationStrategy.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\AmebaController.cs" />
@@ -76,9 +77,12 @@
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\Attributes\InputHandlerAttribute.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\ScoreGateKeeper.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\HandlerRegistry.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Core\ServiceLocator.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Events\EventCallback.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Events\IEventCallback.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\StateMachine.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IEventChannelListener.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IPoolable.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\Core\Services.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
