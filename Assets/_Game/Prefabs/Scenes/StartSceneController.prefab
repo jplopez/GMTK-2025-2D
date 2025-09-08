@@ -69,15 +69,15 @@ MonoBehaviour:
     NextSceneName: 
     LoadDelay: 0
   _effectiveConfig:
-    SceneName: 
-    DisplayName: 
-    Type: 2
+    SceneName: Start
+    DisplayName: Start
+    Type: 0
     SetStateOnLoad: 1
-    InitialGameState: 1
+    InitialGameState: 0
     CanRestart: 1
     CanSkip: 0
     PreviousSceneName: 
-    NextSceneName: 
+    NextSceneName: Level1
     LoadDelay: 0
   OnSceneLoadEvents: 17000000
   EnableDebugLogging: 1

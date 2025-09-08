@@ -1,6 +1,9 @@
-﻿using System;
-using UnityEngine;
+﻿using Ameba;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+
 
 namespace GMTK {
 
@@ -12,16 +15,9 @@ namespace GMTK {
     Special     // LevelDesigner, etc.
   }
 
-  public enum StartLevelTypes {
-    SceneName,   // Specify the level by the scene name (default)
-    FirstLevel,  // The first level in the Levels array
-    Config       // A preset configuration
-  }
-
-  public enum EndLevelTypes {
-    SceneName,   // Specify the level by the scene name (default)
-    LastLevel,   // The last level in the Levels array 
-    Config       // A preset configuration
+  public enum SceneConfigSource {
+    ConfigName,   // Specify the level by the scene name (default)
+    Manual,       // Manually set the level (not recommended)
   }
 
   [CreateAssetMenu(menuName = "GMTK/Level Service", fileName = "LevelService")]
@@ -29,87 +25,147 @@ namespace GMTK {
 
     [Header("Level Configurations")]
     [Tooltip("All level configurations in the game")]
-    public LevelConfig[] Levels;
+    public LevelConfig[] Configurations;
 
-    [Header("Current Level")]
-    [SerializeField] private int _currentLevelIndex = -1;
-    [SerializeField] private string _currentSceneName;
-
-    [Header("Start Level")]
-    public StartLevelTypes startLevelType = StartLevelTypes.SceneName;
+    [Header("Start Scene")]
+    public SceneConfigSource startSceneConfigSource = SceneConfigSource.ConfigName;
     [SerializeField] protected string _startSceneName;
-    [SerializeField] protected LevelConfig _startLevelConfig;
+    [SerializeField] protected LevelConfig _startSceneConfig;
 
-    [Header("End Level")]
-    public EndLevelTypes endLevelType = EndLevelTypes.SceneName;
+    [Header("End Scene")]
+    public SceneConfigSource endSceneConfigSource = SceneConfigSource.ConfigName;
     [SerializeField] protected string _endSceneName;
-    [SerializeField] protected LevelConfig _endLevelConfig;
+    [SerializeField] protected LevelConfig _endSceneConfig;
 
+    [Header("Game Levels")]
+    [Tooltip("Ordered List of scene names that are considered game levels")]
+    [SerializeField] List<string> _gameLevelSceneNames = new();
+    [Tooltip("The index of the current game level")]
+    [SerializeField] protected int _currentLevelIndex = -1;
 
-    // Current level properties
-    public LevelConfig CurrentLevel => _currentLevelIndex >= 0 && _currentLevelIndex < Levels.Length
-        ? Levels[_currentLevelIndex] : null;
+    #region Current level
 
-    public string CurrentSceneName => _currentSceneName;
+    public string CurrentLevelSceneName {
+      get {
+        return (_currentLevelIndex >= 0 && _currentLevelIndex < _gameLevelSceneNames.Count)
+        ? _gameLevelSceneNames[_currentLevelIndex] : null;
+      }
+    }
+
+    public LevelConfig CurrentLevelConfig {
+      get {
+        return string.IsNullOrEmpty(CurrentLevelSceneName) ? null : Configurations.FirstOrDefault(level => level.SceneName == CurrentLevelSceneName);
+      }
+    }
+
     public int CurrentLevelIndex => _currentLevelIndex;
 
-    // Start Level properties
-    public LevelConfig StartLevel {
+    #endregion
+
+    #region Start/End Scenes
+    public LevelConfig StartSceneConfig {
       get {
-        return startLevelType switch {
-          StartLevelTypes.SceneName => GetLevelConfig(_startSceneName),
-          StartLevelTypes.FirstLevel => Levels.Length > 0 ? Levels[0] : null,
-          StartLevelTypes.Config => _startLevelConfig,
+        return startSceneConfigSource switch {
+          SceneConfigSource.ConfigName => GetConfigBySceneName(_startSceneName),
+          SceneConfigSource.Manual => _startSceneConfig,
           _ => null,
         };
       }
     }
 
-    public void SetStartLevel(string sceneName) {
-      _startSceneName = sceneName;
-      startLevelType = StartLevelTypes.SceneName;
-    }
-    public void SetStartLevel(LevelConfig config) {
-      _startLevelConfig = config;
-      startLevelType = StartLevelTypes.Config;
+    public void SetStartSceneWithSceneName(string sceneName) {
+      if (string.IsNullOrEmpty(sceneName)) {
+        Debug.LogWarning("[LevelService] Start scene name cannot be null or empty. Keeping previous start scene.");
+        return;
+      }
+
+      if (TryGetConfigBySceneName(sceneName, out var config)) {
+        _startSceneConfig = config;
+        _startSceneName = sceneName;
+      }
+      else {
+        Debug.LogWarning($"[LevelService] No LevelConfig found for scene name '{sceneName}'. Keeping previous start scene.");
+        return;
+      }
     }
 
-    // End Level properties
+    public void SetStartSceneWithConfigName(string configName) {
+      if (string.IsNullOrEmpty(configName)) {
+        Debug.LogWarning("[LevelService] Start scene config name cannot be null or empty. Keeping previous start scene.");
+        return;
+      }
 
-    public LevelConfig EndLevel {
+      if (TryGetConfigByName(configName, out var config)) {
+        _startSceneConfig = config;
+        _startSceneName = config.SceneName;
+      }
+      else {
+        Debug.LogWarning($"[LevelService] No LevelConfig found for config name '{configName}'. Keeping previous start scene.");
+        return;
+      }
+    }
+
+    // End Scene properties
+
+    public LevelConfig EndSceneConfig {
       get {
-        return endLevelType switch {
-          EndLevelTypes.LastLevel => Levels.Length > 0 ? Levels[^1] : null,
-          EndLevelTypes.SceneName => GetLevelConfig(_endSceneName),
-          EndLevelTypes.Config => _endLevelConfig,
+        return endSceneConfigSource switch {
+          SceneConfigSource.ConfigName => GetConfigBySceneName(_endSceneName),
+          SceneConfigSource.Manual => _endSceneConfig,
           _ => null,
         };
       }
     }
 
-    public void SetEndLevel(string sceneName) {
-      _endSceneName = sceneName;
-      endLevelType = EndLevelTypes.SceneName;
+    public void SetEndSceneWithSceneName(string sceneName) {
+      if (string.IsNullOrEmpty(sceneName)) {
+        Debug.LogWarning("[LevelService] End scene name cannot be null or empty. Keeping previous end scene.");
+        return;
+      }
+
+      if (TryGetConfigBySceneName(sceneName, out var config)) {
+        _endSceneConfig = config;
+        _endSceneName = sceneName;
+      }
+      else {
+        Debug.LogWarning($"[LevelService] No LevelConfig found for scene name '{sceneName}'. Keeping previous end scene.");
+        return;
+      }
+
     }
-    public void SetEndLevel(LevelConfig config) {
-      _endLevelConfig = config;
-      endLevelType = EndLevelTypes.Config;
+    public void SetEndSceneWithConfigName(string configName) {
+      if (string.IsNullOrEmpty(configName)) {
+        Debug.LogWarning("[LevelService] End scene config name cannot be null or empty. Keeping previous end scene.");
+        return;
+      }
+
+      if (TryGetConfigByName(configName, out var config)) {
+        _endSceneConfig = config;
+        _endSceneName = config.SceneName;
+      }
+      else {
+        Debug.LogWarning($"[LevelService] No LevelConfig found for config name '{configName}'. Keeping previous end scene.");
+        return;
+      }
     }
+
+    #endregion
+
+    #region LevelConfig Management
 
     /// <summary>
     /// Get level configuration by scene name
     /// </summary>
-    public LevelConfig GetLevelConfig(string sceneName) {
-      foreach (var level in Levels) {
-        if (level.SceneName == sceneName) {
-          return level;
-        }
-      }
-      return null;
-    }
+    public LevelConfig GetConfigBySceneName(string sceneName) => Configurations.FirstOrDefault(level => level.SceneName == sceneName);
 
-    public bool TryGetLevelConfig(string sceneName, out LevelConfig levelConfig) {
-      levelConfig = GetLevelConfig(sceneName);
+    public bool TryGetConfigBySceneName(string sceneName, out LevelConfig levelConfig) {
+      levelConfig = GetConfigBySceneName(sceneName);
+      return levelConfig != null;
+    }
+    public LevelConfig GetConfigByName(string configName) => Configurations.FirstOrDefault(level => level.ConfigName == configName);
+
+    public bool TryGetConfigByName(string configName, out LevelConfig levelConfig) {
+      levelConfig = GetConfigByName(configName);
       return levelConfig != null;
     }
 
@@ -117,8 +173,8 @@ namespace GMTK {
     /// Get level configuration by index
     /// </summary>
     public LevelConfig GetLevelConfig(int index) {
-      if (index >= 0 && index < Levels.Length) {
-        return Levels[index];
+      if (index >= 0 && index < Configurations.Length) {
+        return Configurations[index];
       }
       return null;
     }
@@ -128,86 +184,158 @@ namespace GMTK {
       return levelConfig != null;
     }
 
-    /// <summary>
-    /// Set current level and update runtime state
-    /// </summary>
-    public void SetCurrentLevel(string sceneName) {
-      _currentSceneName = sceneName;
-      _currentLevelIndex = GetLevelIndex(sceneName);
+    public int GetLevelIndex(string sceneName) => string.IsNullOrEmpty(sceneName) ? -1 : _gameLevelSceneNames.IndexOf(sceneName);
 
-      Debug.Log($"[LevelService] Current level set to: {sceneName} (index {_currentLevelIndex})");
+    public bool TryGetLevelIndex(string sceneName, out int index) {
+      index = GetLevelIndex(sceneName);
+      return index >= 0;
     }
 
-    /// <summary>
-    /// Get the index of a level by scene name
-    /// </summary>
-    public int GetLevelIndex(string sceneName) {
-      for (int i = 0; i < Levels.Length; i++) {
-        if (Levels[i].SceneName == sceneName) {
-          return i;
-        }
+    public string GetLevelSceneName(int index) {
+      if (index >= 0 && index < _gameLevelSceneNames.Count) {
+        return _gameLevelSceneNames[index];
       }
-      return -1;
+      return null;
+    }
+    public bool TryGetLevelSceneName(int index, out string sceneName) {
+      sceneName = GetLevelSceneName(index);
+      return !string.IsNullOrEmpty(sceneName);
+    }
+
+    #endregion
+
+    #region Level Navigation
+
+    public IReadOnlyList<string> GameLevelSceneNames => _gameLevelSceneNames.AsReadOnly();
+
+    public int GameLevelCount => _gameLevelSceneNames.Count;
+
+    public bool IsFirstLevel() => _currentLevelIndex == 0;
+
+    public bool IsLastLevel() => _currentLevelIndex == _gameLevelSceneNames.Count - 1;
+
+    public bool IsCurrentSceneCurrentLevel() => IsSceneCurrentLevel(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+
+    public bool IsSceneCurrentLevel(string sceneName) => sceneName == CurrentLevelSceneName;
+
+    public void MoveToStartScene() => _currentLevelIndex = _gameLevelSceneNames.Count > 0 ? 0 : -1;
+
+    public void MoveToEndScene() => _currentLevelIndex = _gameLevelSceneNames.Count - 1;
+
+    public void AdvanceToNextLevel() {
+
+      if (HasNextLevel()) {
+        _currentLevelIndex++;
+      }
+      else {
+        Debug.LogWarning("[LevelService] Cannot advance to next level. Already at the last level.");
+      }
     }
 
     /// <summary>
     /// Get next level configuration
     /// </summary>
-    public LevelConfig GetNextLevel() {
-      if (CurrentLevel != null && !string.IsNullOrEmpty(CurrentLevel.NextSceneName)) {
-        return GetLevelConfig(CurrentLevel.NextSceneName);
+    public LevelConfig GetNextLevelConfig() {
+      if (CurrentLevelConfig != null && !IsLastLevel()) {
+        var nextLevelSceneName = _gameLevelSceneNames[_currentLevelIndex + 1];
+        if (TryGetConfigBySceneName(nextLevelSceneName, out var nextLevelConfig)) {
+          return nextLevelConfig;
+        }
+        else {
+          Debug.LogWarning($"[LevelService] Next level scene name '{nextLevelSceneName}' not found in configurations.");
+          return null;
+        }
       }
-
-      // Fallback to index-based progression
-      if (_currentLevelIndex >= 0 && _currentLevelIndex < Levels.Length - 1) {
-        return Levels[_currentLevelIndex + 1];
+      else {
+        Debug.LogWarning("[LevelService] No current level or already at last level.");
+        return null;
       }
-
-      return null;
     }
 
-    public bool TryGetNextLevel(out LevelConfig nextLevelConfig) {
-      nextLevelConfig = GetNextLevel();
+    public bool TryGetNextLevelConfig(out LevelConfig nextLevelConfig) {
+      nextLevelConfig = GetNextLevelConfig();
       return nextLevelConfig != null;
     }
 
-    /// <summary>
-    /// Get previous level configuration
-    /// </summary>
-    public LevelConfig GetPreviousLevel() {
-      if (CurrentLevel != null && !string.IsNullOrEmpty(CurrentLevel.PreviousSceneName)) {
-        return GetLevelConfig(CurrentLevel.PreviousSceneName);
-      }
+    public string GetNextLevelSceneName() => GetNextLevelConfig()?.SceneName;
 
-      // Fallback to index-based progression
-      if (_currentLevelIndex > 0) {
-        return Levels[_currentLevelIndex - 1];
-      }
-
-      return null;
+    public bool TryGetNextLevelSceneName(out string sceneName) {
+      sceneName = GetNextLevelSceneName();
+      return !string.IsNullOrEmpty(sceneName);
     }
-
-    public bool TryGetPreviousLevel(out LevelConfig prevLevelConfig) {
-      prevLevelConfig = GetPreviousLevel();
-      return prevLevelConfig != null;
-    }
-
-    public LevelConfig FirstStartConfig() => Levels.First(l => l.Type == SceneType.Start);
-
-    public LevelConfig FirstEndConfig() => Levels.First(l => l.Type == SceneType.End);
-
-    public LevelConfig[] GetConfigsByType(SceneType type) =>
-          Levels.Where(l => l.Type.Equals(type)).ToArray();
 
     // Navigation helpers
-    public bool HasNextLevel() => GetNextLevel() != null;
-    public bool HasPreviousLevel() => GetPreviousLevel() != null;
+    public bool HasNextLevel() => GetNextLevelConfig() != null;
+    public bool HasPreviousLevel() {
+      if (CurrentLevelConfig != null && !IsFirstLevel()) {
+        var prevLevelSceneName = _gameLevelSceneNames[_currentLevelIndex - 1];
+        return TryGetConfigBySceneName(prevLevelSceneName, out _);
+      }
+      return false;
+    }
+
+    #endregion
+
+    #region Current/Next Scene calculation
+
+    /// <summary>
+    /// Determines the name of the next scene to load based on the current game state and active scene.
+    /// </summary>
+    /// <remarks>The next scene is determined by the current game state, as managed by the <see
+    /// cref="GameStateMachine"/>, and the active scene. Special cases include transitioning between levels, handling
+    /// level completion, and ensuring the active scene aligns with the expected game state. If the game state or scene
+    /// configuration is inconsistent, a warning is logged, and the current level is loaded as a fallback.</remarks>
+    /// <returns>The name of the next scene to load. This may be the current scene, a level-specific scene, or a scene associated
+    /// with the next game state, depending on the game's state and configuration.</returns>
+    public string ComputeNextSceneName() {
+      var activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+      // By default, stay in the current scene
+      var nextScene = activeScene;
+      if (ServiceLocator.TryGet(out GameStateMachine stateMachine)) {
+        switch (stateMachine.Current) {
+          case GameStates.Start:
+            nextScene = StartSceneConfig.SceneName; break;
+          case GameStates.Gameover:
+            nextScene = EndSceneConfig.SceneName; break;
+          case GameStates.Preparation:
+          case GameStates.Playing:
+          case GameStates.Pause:
+            // If we are playing a level, next scene depends if we are in the current level or not, and if the current level has a level complete scene.
+            if (IsSceneCurrentLevel(activeScene)) {
+              nextScene = CurrentLevelConfig.HasLevelCompleteScene ? CurrentLevelConfig.LevelCompleteSceneName : GetNextLevelSceneName();
+            }
+            else {
+              // Otherwise, is a bug because we we shouldn't be playing a level that isnt the current level
+              Debug.LogWarning("[LevelService] Current game state is in-level but active scene is not the current level. Loading current level."); break;
+            }
+            break;
+          case GameStates.LevelComplete:
+            // If current level has a dedicated level complete scene, go there
+            if (_gameLevelSceneNames.Contains(CurrentLevelConfig.SceneName)) {
+              nextScene = CurrentLevelConfig.LevelCompleteSceneName; break;
+            }
+            // If we are already in the level complete scene, go to next level
+            if (activeScene == CurrentLevelConfig.LevelCompleteSceneName) {
+              nextScene = GetNextLevelSceneName(); break;
+            }
+            break;
+        }
+      }
+      return nextScene;
+    }
+
+    public bool TryComputeNextSceneName(out string sceneName) {
+      sceneName = ComputeNextSceneName();
+      return !string.IsNullOrEmpty(sceneName);
+    }
+
+    #endregion
 
     // Editor utilities
-    [ContextMenu("Sort Levels by Scene Name")]
+    [ContextMenu("Sort Configurations by Scene Name")]
     private void SortLevelsBySceneName() {
-      Array.Sort(Levels, (a, b) => string.Compare(a.SceneName, b.SceneName));
-      Debug.Log("[LevelService] Levels sorted by scene name");
+      Array.Sort(Configurations, (a, b) => string.Compare(a.SceneName, b.SceneName));
+      Debug.Log("[LevelService] Configurations sorted by scene name");
     }
 
     [ContextMenu("Auto-Detect Scenes")]

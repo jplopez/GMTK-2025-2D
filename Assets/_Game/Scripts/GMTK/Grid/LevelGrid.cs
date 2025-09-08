@@ -102,7 +102,7 @@ namespace GMTK {
 
     protected virtual void Initialize() {
       if (_inputHandler == null) {
-        Debug.LogWarning($"LevelGrid: SnappableInputHandler is missing. LevelGrid will not be able to track player inputs on Elements");
+        this.LogWarning($"SnappableInputHandler is missing. LevelGrid will not be able to track player inputs on Elements");
         return;
       }
 
@@ -144,7 +144,7 @@ namespace GMTK {
 
     protected virtual void InitializeAllEdgeColliderBounds() {
       if (GridSize.x <= 0 || GridSize.y <= 0) {
-        Debug.LogError($"GridSize must be a positive number: {GridSize}");
+        this.LogError($"GridSize must be a positive number: {GridSize}");
         return;
       }
       //the EdgeColliders are positioned to the edges of the grid
@@ -283,10 +283,10 @@ namespace GMTK {
         _elementOriginalGridPosition = WorldToGrid(currentPosition);
         // Unregister from grid while moving to avoid conflicts
         _occupancyMap.Unregister(element, _elementOriginalGridPosition);
-        Debug.Log($"[LevelGrid] Started tracking '{element.name}' - unregistered from ({_elementOriginalGridPosition})");
+        this.Log($"Started tracking '{element.name}' - unregistered from ({_elementOriginalGridPosition})");
       }
       else {
-        Debug.Log($"[LevelGrid] Started tracking '{element.name}' - was not in grid");
+        this.Log($"Started tracking '{element.name}' - was not in grid");
       }
 
       // Notify DragFeedbackComponent to start visual feedback
@@ -351,7 +351,7 @@ namespace GMTK {
 
       // Request inventory to add this element
       _eventsChannel.Raise(GameEventType.InventoryAddRequest, eventData);
-      Debug.Log($"[LevelGrid] Requested inventory to add {element.name} with context");
+      this.Log($"Requested inventory to add {element.name} with context");
 
       //else {
       //  // Fallback to old positioning system
@@ -371,7 +371,7 @@ namespace GMTK {
             UnityEngine.Random.Range(-bounds.size.y * 0.4f, bounds.size.y * 0.4f),
             0);
         element.transform.position = bounds.center + randomOffset;
-        Debug.Log($"[LevelGrid] Used fallback positioning for {element.name}");
+        this.Log($"Used fallback positioning for {element.name}");
       }
       else {
         element.transform.position = ELEMENT_DEFAULT_POSITION;
@@ -380,17 +380,17 @@ namespace GMTK {
 
     protected virtual void HandleInventoryElementAdded(InventoryEventData data) {
       if (data.Success) {
-        Debug.Log($"[LevelGrid] Element successfully added to inventory: {data.ElementName} " +
+        this.Log($"Element successfully added to inventory: {data.ElementName} " +
                  $"(Available: {data.AvailableQuantity}/{data.TotalQuantity}) from {data.SourceSystem}");
 
         // Element was successfully added to inventory and destroyed by LevelInventory
         // We can use the rich context for additional logic
         if (data.WasInGrid) {
-          Debug.Log($"[LevelGrid] Element was moved from grid to inventory");
+          this.Log($"Element was moved from grid to inventory");
         }
       }
       else {
-        Debug.LogWarning($"[LevelGrid] Failed to add element to inventory: {data.Message}");
+        this.LogWarning($"Failed to add element to inventory: {data.Message}");
         // Fallback to old positioning if inventory add failed
         if (data.Element != null) {
           HandleElementReturnToInventoryFallback(data.Element);
@@ -400,19 +400,19 @@ namespace GMTK {
 
     protected virtual void HandleInventoryElementRetrieved(InventoryEventData data) {
       if (data.Success && data.Element != null) {
-        Debug.Log($"[LevelGrid] Element retrieved from inventory: {data.ElementName} " +
+        this.Log($"Element retrieved from inventory: {data.ElementName} " +
                  $"(Remaining: {data.AvailableQuantity}/{data.TotalQuantity}) by {data.SourceSystem}");
 
         // Position the retrieved element based on context
         PositionRetrievedElement(data.Element, data);
       }
       else {
-        Debug.LogWarning($"[LevelGrid] Failed to retrieve element from inventory: {data.Message}");
+        this.LogWarning($"Failed to retrieve element from inventory: {data.Message}");
       }
     }
 
     protected virtual void HandleInventoryOperationFailed(InventoryEventData data) {
-      Debug.LogWarning($"[LevelGrid] Inventory operation failed: {data.Operation} | {data.Message} | Source: {data.SourceSystem}");
+      this.LogWarning($"Inventory operation failed: {data.Operation} | {data.Message} | Source: {data.SourceSystem}");
 
       // Handle specific failure cases
       switch (data.Operation) {
@@ -428,7 +428,7 @@ namespace GMTK {
     }
 
     protected virtual void HandleInventoryUpdated(InventoryEventData data) {
-      Debug.Log($"[LevelGrid] Inventory updated: {data.Message} | Source: {data.SourceSystem}");
+      this.Log($"Inventory updated: {data.Message} | Source: {data.SourceSystem}");
       // Could trigger UI updates or other systems that care about inventory state
     }
 
@@ -449,7 +449,7 @@ namespace GMTK {
       element.transform.position = targetPosition;
       element.Draggable = true;
 
-      Debug.Log($"[LevelGrid] Positioned retrieved element {element.name} at {targetPosition} " +
+      this.Log($"Positioned retrieved element {element.name} at {targetPosition} " +
                $"(Category: {context.CategoryId}, Source: {context.SourceSystem})");
     }
     #endregion
@@ -465,8 +465,8 @@ namespace GMTK {
         if (_elementWasInGrid) {
           _elementOriginalGridPosition = WorldToGrid(_elementOriginalWorldPosition);
         }
-        Debug.Log($"Element '{e.Element.name}' selected at {_elementOriginalWorldPosition}");
-        if (_elementWasInGrid) Debug.Log($"Element '{e.Element.name}' at grid {_elementOriginalGridPosition}");
+        this.Log($"Element '{e.Element.name}' selected at {_elementOriginalWorldPosition}");
+        if (_elementWasInGrid) this.Log($"Element '{e.Element.name}' at grid {_elementOriginalGridPosition}");
         e.Element.OnPointerOver();
       }
     }
@@ -485,7 +485,7 @@ namespace GMTK {
           if (CanPlace(element, newGridOrigin)) {
             element.transform.position = SnapToGrid(newGridOrigin);
             _occupancyMap.Register(element, newGridOrigin);
-            Debug.Log($"Placed {element.name} at {newGridOrigin}");
+            this.Log($"Placed {element.name} at {newGridOrigin}");
           }
           else {
             // Failed to place - return to original position if it was in grid
@@ -493,24 +493,24 @@ namespace GMTK {
 
               element.transform.position = SnapToGrid(_elementOriginalGridPosition);
               _occupancyMap.Register(element, _elementOriginalGridPosition);
-              Debug.Log($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
+              this.Log($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
             }
             // Element came from outside grid - return to inventory
             else {
               HandleElementReturnToInventory(element);
-              Debug.Log($"Returned {element.name} to inventory");
+              this.Log($"Returned {element.name} to inventory");
             }
           }
 
           // Check if this was the element we were tracking
           if (element == _currentSelected) {
-            Debug.Log($"Dropping tracked element '{element.name}' at {newGridOrigin}");
+            this.Log($"Dropping tracked element '{element.name}' at {newGridOrigin}");
             // Clean up tracking
             StopTrackingCurrentSelected();
           }
           else {
             // Element wasn't being tracked (probably just clicked)
-            Debug.Log($"Element '{element.name}' clicked but not moved");
+            this.Log($"Element '{element.name}' clicked but not moved");
           }
         }
       }
@@ -537,7 +537,7 @@ namespace GMTK {
     public virtual bool IsInsidePlayableArea(Vector2 position) {
 
       if (GridTopBound == null || GridBottomBound == null || GridLeftBound == null || GridRightBound == null) {
-        Debug.LogWarning("[GridManager] One or more grid boundary colliders are not assigned.");
+        this.LogWarning("One or more grid boundary colliders are not assigned.");
         return false;
       }
       return (position.y <= GridTopBound.bounds.max.y) &&

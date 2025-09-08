@@ -12,124 +12,84 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 119b5e051878213409088236c7304cf7, type: 3}
   m_Name: LevelService
   m_EditorClassIdentifier: 
-  Levels:
-  - SceneName: Start
-    DisplayName: Start
-    Type: 0
+  Configurations:
+  - ConfigName: Start Scene
+    SceneName: Start
     SetStateOnLoad: 1
     InitialGameState: 0
-    IsUnlocked: 1
     CanRestart: 1
     CanSkip: 0
-    UnlockConditions: []
-    NextSceneName: Level1
-    PreviousSceneName: 
-    LoadDelay: 0
-    UseCustomLoadMethod: 0
-    CustomLoadMethod: 
-  - SceneName: Level1
-    DisplayName: Level1
-    Type: 2
+    LoadDelay: 0.5
+    HasLevelCompleteScene: 0
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
+  - ConfigName: Level1
+    SceneName: Level1
     SetStateOnLoad: 1
     InitialGameState: 1
-    IsUnlocked: 1
-    CanRestart: 0
+    CanRestart: 1
     CanSkip: 0
-    UnlockConditions: []
-    NextSceneName: Level2
-    PreviousSceneName: Start
-    LoadDelay: 0
-    UseCustomLoadMethod: 0
-    CustomLoadMethod: 
-  - SceneName: Level2
-    DisplayName: Level2
-    Type: 2
+    LoadDelay: 0.2
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
+  - ConfigName: Level2
+    SceneName: Level2
     SetStateOnLoad: 1
     InitialGameState: 1
-    IsUnlocked: 1
     CanRestart: 0
     CanSkip: 0
-    UnlockConditions: []
-    NextSceneName: Level2
-    PreviousSceneName: Level1
-    LoadDelay: 0
-    UseCustomLoadMethod: 0
-    CustomLoadMethod: 
-  - SceneName: LevelComplete
-    DisplayName: LevelComplete
-    Type: 3
+    LoadDelay: 0.5
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
+  - ConfigName: Level Complete
+    SceneName: LevelComplete
     SetStateOnLoad: 1
     InitialGameState: 4
-    IsUnlocked: 1
     CanRestart: 0
-    CanSkip: 0
-    UnlockConditions: []
-    NextSceneName: 
-    PreviousSceneName: 
-    LoadDelay: 0.2
-    UseCustomLoadMethod: 0
-    CustomLoadMethod: 
-  - SceneName: GameOver
-    DisplayName: GameOver
-    Type: 1
+    CanSkip: 1
+    LoadDelay: 0.5
+    HasLevelCompleteScene: 0
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
+  - ConfigName: End Scene
+    SceneName: End
     SetStateOnLoad: 1
     InitialGameState: 5
-    IsUnlocked: 1
     CanRestart: 0
     CanSkip: 0
-    UnlockConditions: []
-    NextSceneName: Start
-    PreviousSceneName: 
-    LoadDelay: 0
-    UseCustomLoadMethod: 0
-    CustomLoadMethod: 
-  - SceneName: Loading
-    DisplayName: Loading
-    Type: 3
-    SetStateOnLoad: 1
-    InitialGameState: 1
-    IsUnlocked: 1
-    CanRestart: 1
-    CanSkip: 0
-    UnlockConditions: []
-    NextSceneName: 
-    PreviousSceneName: 
-    LoadDelay: 0
-    UseCustomLoadMethod: 0
-    CustomLoadMethod: 
-  _currentLevelIndex: 0
-  _currentSceneName: Start
-  startLevelType: 0
+    LoadDelay: 0.5
+    HasLevelCompleteScene: 0
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
+  startSceneConfigSource: 0
   _startSceneName: Start
-  _startLevelConfig:
+  _startSceneConfig:
+    ConfigName: 
     SceneName: 
-    DisplayName: 
-    Type: 2
     SetStateOnLoad: 1
     InitialGameState: 1
-    IsUnlocked: 1
     CanRestart: 1
     CanSkip: 0
-    UnlockConditions: []
-    NextSceneName: 
-    PreviousSceneName: 
     LoadDelay: 0
-    UseCustomLoadMethod: 0
-    CustomLoadMethod: 
-  endLevelType: 0
-  _endSceneName: GameOver
-  _endLevelConfig:
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
+  endSceneConfigSource: 0
+  _endSceneName: End
+  _endSceneConfig:
+    ConfigName: 
     SceneName: 
-    DisplayName: 
-    Type: 2
     SetStateOnLoad: 1
     InitialGameState: 1
-    IsUnlocked: 1
     CanRestart: 1
     CanSkip: 0
-    UnlockConditions: []
-    NextSceneName: 
-    PreviousSceneName: 
     LoadDelay: 0
-    UseCustomLoadMethod: 0
-    CustomLoadMethod: 
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
+  _gameLevelSceneNames:
+  - Level1
+  - Level2
+  _currentLevelIndex: 0

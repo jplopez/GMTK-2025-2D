@@ -45,7 +45,7 @@ namespace GMTK {
       }
 
       if (_inputDispatcher == null && TryGetComponent(out _inputDispatcher)) {
-        Debug.Log($"SnappableInputHandler -> InputDispatcher obtained: {_inputDispatcher.name}");
+        this.Log($"InputDispatcher obtained: {_inputDispatcher.name}");
       }
     }
 
@@ -151,7 +151,7 @@ namespace GMTK {
     }
 
     public void HandleSecondary(EventArgs eventArgs) {
-      Debug.Log("SnappableInputHandler.HandleSecondary : Not implemented yet");
+      this.Log("HandleSecondary : Not implemented yet");
       //_eventsChannel.Raise(GameEventType.InputSecondary);
     }
 

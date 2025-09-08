@@ -81,7 +81,7 @@ namespace GMTK {
       //ResetAllSnappables();
       //TODO: trigger effects of slowing down and victory music
       //TODO: fadeout 
-      CurrentSceneController.LoadNextLevel();
+      CurrentSceneController.LoadNextScene();
     }
 
     private void SetDraggableSnappables(bool enabled) => _draggableSnappables.ForEach(s => s.Draggable = enabled);

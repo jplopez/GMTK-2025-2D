@@ -65,7 +65,7 @@ namespace GMTK {
         //This flag tells the Update method to attempt the game state transition
         _inTransition = true;
       } else {
-        Debug.LogWarning($"GameStateHandler: '{name}': Can't resolve state change request because StateMachineEventArg is null");
+        this.LogWarning($"Can't resolve state change request because StateMachineEventArg is null");
       }
     }
 
@@ -74,9 +74,9 @@ namespace GMTK {
         HandleFromState(eventArg.FromState);
         return true;
       } catch (Exception ex) {
-        Debug.LogError($"GameStateHandler: '{name}' could not transition from state {eventArg.FromState}: {ex.Message}");
+        this.LogError($"could not transition from state {eventArg.FromState}: {ex.Message}");
 #if UNITY_EDITOR
-        Debug.LogException(ex);
+        this.LogException(ex);
 #endif
       }
       return false;
@@ -88,9 +88,9 @@ namespace GMTK {
         return true;
       }
       catch (Exception ex) {
-        Debug.LogError($"GameStateHandler: '{name}' could not transition to state {eventArg.ToState}: {ex.Message}");
+        this.LogError($"could not transition to state {eventArg.ToState}: {ex.Message}");
 #if UNITY_EDITOR
-        Debug.LogException(ex);
+        this.LogException(ex);
 #endif
       }
       return false;

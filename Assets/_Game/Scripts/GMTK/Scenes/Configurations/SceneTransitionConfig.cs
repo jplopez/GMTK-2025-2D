@@ -28,25 +28,25 @@ namespace GMTK {
       //clone the current config to restore later
       _originalConfig = new LevelConfig() {
         SceneName = currentConfig.SceneName,
-        DisplayName = currentConfig.DisplayName,
-        Type = currentConfig.Type,
+        ConfigName = currentConfig.ConfigName,
+        //Type = currentConfig.Type,
         SetStateOnLoad = currentConfig.SetStateOnLoad,
         InitialGameState = currentConfig.InitialGameState,
         CanRestart = currentConfig.CanRestart,
         CanSkip = currentConfig.CanSkip,
-        NextSceneName = currentConfig.NextSceneName,
-        PreviousSceneName = currentConfig.PreviousSceneName,
+        //ComputeNextSceneName = currentConfig.ComputeNextSceneName,
+        //PreviousSceneName = currentConfig.PreviousSceneName,
         LoadDelay = currentConfig.LoadDelay,
         //UseCustomLoadMethod = currentConfig.UseCustomLoadMethod,
         //CustomLoadMethod = currentConfig.CustomLoadMethod
       };
       //set the next scene to be the transition scene
-      currentConfig.NextSceneName = Config.SceneName;
+      //currentConfig.ComputeNextSceneName = Config.SceneName;
       currentConfig.LoadDelay = Config.LoadDelay;
       controller.SetLevelConfig(currentConfig);
 
-      Config.NextSceneName = _originalConfig.NextSceneName;
-      Config.PreviousSceneName = Config.SceneName;
+      //Config.ComputeNextSceneName = _originalConfig.ComputeNextSceneName;
+      //Config.PreviousSceneName = Config.SceneName;
       Config.LoadDelay = _originalConfig.LoadDelay;
     }
 

@@ -32,7 +32,7 @@ namespace GMTK {
         InputEvents = Resources.Load<InputActionEventChannel>("InputActionEventChannel");
       }
       if (InputEvents == null) {
-        Debug.LogError($"PlayerInputActionDispatcher: InputActionEventChannel instance could not be found. The EventDispatcher will not work");
+        this.LogError($"InputActionEventChannel instance could not be found. The EventDispatcher will not work");
         return;
       }
       try {
@@ -42,20 +42,20 @@ namespace GMTK {
         gameplayActions.AddCallbacks(this);
       }
       catch (Exception e) {
-        Debug.LogError($"PlayerInputActionDispatcher: Enabling ActionMap threw an exception: {e.Message}");
+        this.LogError($"Enabling ActionMap threw an exception: {e.Message}");
 #if UNITY_EDITOR
-        Debug.LogException(e);
+        this.LogException(e);
 #endif
         throw;
       }
-      Debug.Log($"PlayerInputActionDispatcher: EventDispatcher initialized");
+      this.Log($"EventDispatcher initialized");
     }
 
     public void OnDestroy() {
       try {
         gameplayActions.Disable();
       } catch (Exception e) {
-        Debug.LogWarning($"PlayerInputActionDispatcher: Disabling ActionMap ended in exceptionv {e.Message}");
+        this.LogWarning($"Disabling ActionMap ended in exception: {e.Message}");
       }
     }
 

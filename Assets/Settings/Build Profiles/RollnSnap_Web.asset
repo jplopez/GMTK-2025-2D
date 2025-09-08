@@ -85,6 +85,8 @@ MonoBehaviour:
     m_path: Assets/Scenes/Level2.unity
   - m_enabled: 1
     m_path: Assets/Scenes/LevelComplete.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/End.unity
   m_ScriptingDefines:
   - MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED
   m_PlayerSettingsYaml:

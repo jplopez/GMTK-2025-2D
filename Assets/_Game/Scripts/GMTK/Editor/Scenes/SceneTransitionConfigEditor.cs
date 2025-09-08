@@ -23,11 +23,11 @@ namespace GMTK {
       _transitionSceneNameProp = serializedObject.FindProperty("TransitionSceneName");
 
       _levelService = GetLevelService();
-      if (_levelService != null && _levelService.Levels != null) {
-        _presetNames = new string[_levelService.Levels.Length];
-        for (int i = 0; i < _levelService.Levels.Length; i++) {
-          var cfg = _levelService.Levels[i];
-          _presetNames[i] = $"{cfg.DisplayName} ({cfg.SceneName})";
+      if (_levelService != null && _levelService.Configurations != null) {
+        _presetNames = new string[_levelService.Configurations.Length];
+        for (int i = 0; i < _levelService.Configurations.Length; i++) {
+          var cfg = _levelService.Configurations[i];
+          _presetNames[i] = $"{cfg.ConfigName} ({cfg.SceneName})";
         }
       }
     }
@@ -46,12 +46,12 @@ namespace GMTK {
         int currentIndex = ResolveCurrentConfigIndex();
         _selectedPresetIndex = EditorGUILayout.Popup("Preset", currentIndex, _presetNames);
 
-        if (_selectedPresetIndex >= 0 && _selectedPresetIndex < _levelService.Levels.Length) {
+        if (_selectedPresetIndex >= 0 && _selectedPresetIndex < _levelService.Configurations.Length) {
           // Obtain selected preset as SerializedProperty to draw in editor
-          var selectedConfig = _levelService.Levels[_selectedPresetIndex];
+          var selectedConfig = _levelService.Configurations[_selectedPresetIndex];
           _transitionSceneNameProp.stringValue = selectedConfig.SceneName;
           var so = new SerializedObject(_levelService);
-          var levelsProp = so.FindProperty("Levels");
+          var levelsProp = so.FindProperty("Configurations");
 
           if (levelsProp != null && levelsProp.arraySize > _selectedPresetIndex) {
             _transitionConfigProp = levelsProp.GetArrayElementAtIndex(_selectedPresetIndex);
@@ -72,11 +72,11 @@ namespace GMTK {
     }
 
     private bool EnsureLevelService() {
-      return _levelService != null && _levelService.Levels != null && _levelService.Levels.Length > 0;
+      return _levelService != null && _levelService.Configurations != null && _levelService.Configurations.Length > 0;
     }
 
     private int ResolveCurrentConfigIndex() {
-      return Mathf.Max(0, System.Array.FindIndex(_levelService.Levels, l => l.SceneName == _transitionSceneNameProp.stringValue));
+      return Mathf.Max(0, System.Array.FindIndex(_levelService.Configurations, l => l.SceneName == _transitionSceneNameProp.stringValue));
     }
   }
 

@@ -1,13 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 using Ameba;
 
-
 namespace GMTK {
-
 
   /// <summary>
   /// Scene-specific controller that configures the scene using LevelService data
@@ -21,48 +19,60 @@ namespace GMTK {
     [Header("Scene Identification")]
     [Tooltip("Source of configuration for this scene")]
     public ConfigSource ConfigurationSource = ConfigSource.Preset;
-    [Tooltip("Scene name to use for level lookup (auto-detected if empty)")]
-    public string SceneName;
 
     [Header("Level Configuration")]
     [Tooltip("Manual configuration for this scene (used if ConfigSource is Manual)")]
     [SerializeField] private LevelConfig _manualConfig = new();
 
     // Cached config
-    [HideInInspector] [SerializeField] protected LevelConfig _presetConfig;
-    [HideInInspector] [SerializeField] protected LevelConfig _effectiveConfig;
+    [HideInInspector][SerializeField] protected LevelConfig _presetConfig;
+    [HideInInspector][SerializeField] protected LevelConfig _effectiveConfig;
 
     [Header("On Scene Load")]
     [Tooltip("Events to raise when scene loads")]
     public GameEventType[] OnSceneLoadEvents;
-    
+
+    [Header("Loading")]
+    [Tooltip("Optional loading screen prefab to instantiate during scene load delay")]
+    public GameObject LoadingPrefab;
+    [Tooltip("Parent transform for loading screen instance (defaults to this GameObject)")]
+    public Transform LoadingParent;
+    [Tooltip("Delay after scene load before hiding the loading screen (if any)")]
+    public float LoadingHideDelay = 0.5f;
+
     [Header("Debug")]
     public bool EnableDebugLogging = false;
 
+    //cached active scene name
+    protected string _sceneName;
+
     // ServiceLocator
     protected LevelService _levelService;
+    //protected LevelOrderManager _levelOrderManager;
     protected GameEventChannel _eventChannel;
     protected GameStateMachine _stateMachine;
     protected bool _isInitialized = false;
     protected List<ISceneConfigExtension> _configExtensions = new();
 
+    //Loading prefab instance and showing status
+    private GameObject _loadingInstance;
+    public bool IsLoadingShowing => _loadingInstance != null && _loadingInstance.activeSelf;
+
     /// <summary>
     /// Whether the GameStateMachine will change state when the scene loads
     /// </summary>
-    public bool ChangesGameStateOnLoad {
-      get { return _effectiveConfig != null && _effectiveConfig.SetStateOnLoad; }
-    }
+    public bool ChangesGameStateOnLoad => _effectiveConfig != null && _effectiveConfig.SetStateOnLoad;
 
     /// <summary>
     /// The GameState to set when the scene loads, if ChangesGameStateOnLoad is true.
     /// If false, it will return current GameState or GameStates.Preparation if no state is set.
     /// </summary>
-    /// <returns></returns>
     public GameStates GetGameStateOnLoad() {
       if (_effectiveConfig != null) return _effectiveConfig.InitialGameState;
       if (_stateMachine != null) {
         return _stateMachine.Current;
-      } else {
+      }
+      else {
         return GameStates.Preparation;
       }
     }
@@ -74,12 +84,12 @@ namespace GMTK {
       InitializeScene();
     }
 
+    #region Initialization
+
     protected virtual void Initialize() {
       if (_isInitialized) return;
       // Auto-detect scene name if not set
-      if (string.IsNullOrEmpty(SceneName)) {
-        SceneName = gameObject.scene.name;
-      }
+      _sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
       // Get services
       _levelService = ServiceLocator.Get<LevelService>();
@@ -88,7 +98,7 @@ namespace GMTK {
 
       // Validate services
       if (!ValidateServices()) {
-        Debug.LogError($"[SceneController] Failed to get required services for {SceneName}");
+        this.LogError($"[SceneController] Failed to get required services for {_sceneName}");
         return;
       }
 
@@ -96,24 +106,41 @@ namespace GMTK {
       LoadLevelConfig();
       // Load Config extensions (ISceneConfigExtension) 
       LoadConfigExtensions();
+
+      InitializeLoading();
+
       _isInitialized = true;
     }
 
+    /// <summary>
+    /// Validate that all required services are available
+    /// </summary>
+    protected virtual bool ValidateServices() {
+      return _levelService != null
+              && _eventChannel != null
+              && _stateMachine != null
+              //&& _levelOrderManager != null
+              ;
+    }
 
     /// <summary>
     /// Load level configuration from LevelService
     /// </summary>
     protected virtual void LoadLevelConfig() {
-      _presetConfig = _levelService.GetLevelConfig(SceneName);
+      _presetConfig = _levelService.GetConfigBySceneName(_sceneName);
 
       if (_presetConfig == null) {
-        LogWarning($"No level configuration found for scene: {SceneName}");
-        _presetConfig = new LevelConfig {
-          SceneName = SceneName,
-          DisplayName = SceneName,
-          Type = SceneType.Level,
-          InitialGameState = GameStates.Preparation,
+        this.LogWarning($"No level configuration found for scene: {_sceneName}. Creating empty config");
+        _presetConfig = new LevelConfig() {
+          SceneName = _sceneName,
+          ConfigName = _sceneName,
           SetStateOnLoad = true,
+          InitialGameState = GameStates.Preparation,
+          CanRestart = false,
+          CanSkip = false,
+          LoadDelay = 0f,
+          HasLevelCompleteScene = false,
+          LevelCompleteSceneName = "LevelComplete"
         };
       }
       UpdateEffectiveConfig();
@@ -128,17 +155,27 @@ namespace GMTK {
 
     protected void LoadConfigExtensions() {
       _configExtensions = GetComponents<MonoBehaviour>().OfType<ISceneConfigExtension>().ToList();
-      LogDebug($"Found {_configExtensions.Count} ISceneConfigExtension components");
+      this.Log($"Found {_configExtensions.Count} ISceneConfigExtension components");
+    }
+
+    protected void InitializeLoading() {
+      if (_loadingInstance != null) return;
+
+      if (LoadingPrefab != null) {
+        Transform parent = LoadingParent != null ? LoadingParent : this.transform;
+        _loadingInstance = Instantiate(LoadingPrefab, parent);
+        _loadingInstance.SetActive(false);
+      }
     }
 
     /// <summary>
     /// Initialize the scene with loaded configuration
     /// </summary>
     protected virtual void InitializeScene() {
-      LogDebug($"Initializing scene: {SceneName}");
+      this.Log($"Initializing scene: {_sceneName}");
       if (!_isInitialized) Initialize(); //try to initialize if Awake failed
       if (!_isInitialized) {
-        Debug.LogError("Cant initialize scene due to missing services");
+        this.LogError("Cant initialize scene due to missing services");
         QuitGame();
       }
 
@@ -151,10 +188,7 @@ namespace GMTK {
       // Raise scene load events
       RaiseSceneLoadEvents();
 
-      // Custom scene initialization
-      OnSceneInitialized();
-
-      LogDebug($"Scene initialization complete: {SceneName}");
+      this.Log($"Scene initialization complete: {_sceneName}");
     }
 
     /// <summary>
@@ -163,54 +197,16 @@ namespace GMTK {
     protected virtual void ApplyLevelConfiguration() {
       if (_effectiveConfig == null) return;
 
-      LogDebug($"Applying configuration: InitialState={_effectiveConfig.InitialGameState}, Type={_effectiveConfig.Type}");
-
-      SetCurrentLevelBySceneType();
-
-      ApplyConfigExtensions();
-    }
-
-    private void SetCurrentLevelBySceneType() {
-      // Setting up the current level based on the config type
-      switch (_effectiveConfig.Type) {
-        //Start scene always points to the first level
-        case SceneType.Start:
-          var firstLevel = _levelService.GetLevelConfig(0).SceneName;
-          _levelService.SetCurrentLevel(firstLevel);
-          break;
-        //End scene always points to the Scene marks as Start
-        //This assumes there is one Start scene 
-        case SceneType.End:
-          foreach (var level in _levelService.Levels) {
-            if (level.Type == SceneType.Start) {
-              _levelService.SetCurrentLevel(level.SceneName);
-              break;
-            }
-          }
-          break;
-        // Actual gameplay levels and special levels set themselves as current
-        // this is the most common behaviour
-        case SceneType.Level: //actual gameplay levels
-        case SceneType.Special: //LevelDesigner
-          _levelService.SetCurrentLevel(SceneName); break;
-        // Transition levels ignore the next level, they 
-        // always assume the next level is who called them.
-        case SceneType.Transition:
-          _levelService.SetCurrentLevel(_effectiveConfig.PreviousSceneName); break;
-      }
-    }
-
-    private void ApplyConfigExtensions() {
       foreach (var extension in _configExtensions) {
-        if (extension as ISceneConfigExtension is not null && extension.CanApplyOnType(GetSceneType())) {
+        if (extension as ISceneConfigExtension is not null) {
           try {
             extension.ApplyConfig(this);
-            LogDebug($"Applied configuration extension: {extension.GetType().Name}");
+            this.Log($"Applied configuration extension: {extension.GetType().Name}");
           }
           catch (Exception ex) {
             //errors are only logged, to avoid breaking the scene
-            LogError($"Error applying configuration extension: {extension.GetType().Name}");
-            LogError($"Exception: {ex}");
+            this.LogError($"Error applying configuration extension: {extension.GetType().Name}");
+            this.LogError($"Exception: {ex}");
           }
         }
       }
@@ -239,37 +235,26 @@ namespace GMTK {
     private IEnumerator SetInitialGameStateDelayed(GameStates state, float delay) {
       yield return new WaitForSeconds(delay);
       _stateMachine.ChangeState(state);
-      LogDebug($"Set delayed initial state: {state}");
+      this.Log($"Set delayed initial state: {state}");
     }
 
+    #endregion
+
     /// <summary>
-    /// Raise configured scene load events
+    /// Raise configured scene load events throug <see cref="GameEventChannel"/>
     /// </summary>
     protected virtual void RaiseSceneLoadEvents() {
       if (_effectiveConfig == null) return;
 
       foreach (var eventType in OnSceneLoadEvents) {
         _eventChannel.Raise(eventType);
-        LogDebug($"Raised scene load event: {eventType}");
+        this.Log($"Raised scene load event: {eventType}");
       }
     }
 
-    /// <summary>
-    /// Called after scene initialization is complete
-    /// Override in derived classes for custom behavior
-    /// </summary>
-    protected virtual void OnSceneInitialized() {
-      // Override in derived classes
-    }
-
-    /// <summary>
-    /// Validate that all required services are available
-    /// </summary>
-    protected virtual bool ValidateServices() {
-      return _levelService != null && _eventChannel != null && _stateMachine != null;
-    }
-
     // Public API for scene management
+    #region Public API
+
     public LevelConfig GetLevelConfig() => _effectiveConfig;
 
     public void SetLevelConfig(LevelConfig config) {
@@ -277,67 +262,125 @@ namespace GMTK {
         _effectiveConfig = config;
       }
     }
-    public string GetSceneName() => SceneName;
-    public SceneType GetSceneType() => _effectiveConfig?.Type ?? SceneType.Level;
-
+ 
     /// <summary>
-    /// Reload the scene specified in the SceneName field.
-    /// If SceneName is null or empty, this method resolves to load the scene specified in <seealso cref="UnityEngine.SceneManagement.SceneManager.GetActiveScene()"/>.
+    /// Reloads the scene specified in <seealso cref="UnityEngine.SceneManagement.SceneManager.GetActiveScene()"/>.<br/>
+    /// This is a safe operation that will always reload the current scene, regardless of LevelService state or LevelConfig settings. Useful for unity editor.
     /// </summary>
+    [ContextMenu("Reload Current Scene")]
     public virtual void ReloadCurrentScene() {
-      if (string.IsNullOrEmpty(SceneName)) {
-        SceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        LogError($"[SceneController] SceneName is empty or null. Resolving to SceneManager's active scene: {SceneName} ");
-      }
-      UnityEngine.SceneManagement.SceneManager.LoadScene(SceneName);
+      var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+      this.Log($"ReloadCurrentScene: Reloading scene '{scene}'");
+      UnityEngine.SceneManagement.SceneManager.LoadScene(scene);
     }
 
     /// <summary>
-    /// Reloads the Level specified in the Scene's LevelConfig.
-    /// If LevelConfig is unavailable, this method resolves to <seealso cref="ReloadCurrentScene"/>
+    /// Reloads the current playable Level, if the LevelConfig has 'CanRestart' true. 
+    /// Current Level is looked up on <see cref="LevelService"/>.<br/>
+    /// As fallback, this will call <see cref="ReloadCurrentScene"/>.
     /// </summary>
+    [ContextMenu("Reload Current Level")]
     public virtual void ReloadCurrentLevel() {
+      var currentPlayableLevel = _levelService.CurrentLevelSceneName;
+      if (string.IsNullOrEmpty(currentPlayableLevel)) {
+        this.Log($"ReloadCurrentLevel: current level is missing from LevelService. Falling back to 'ReloadCurrentScene'");
+        ReloadCurrentScene();
+      }
+      // Load the determined playable level
+      this.Log($"ReloadCurrentLevel: Reloading level '{currentPlayableLevel}'");
+      UnityEngine.SceneManagement.SceneManager.LoadScene(currentPlayableLevel);
+    }
+
+    /// <summary>
+    /// Loads the next Scene, considering the rules defined on the LevelConfig and LevelService
+    /// </summary>
+    [ContextMenu("Load Next Scene")]
+    public virtual void LoadNextScene() {
       if (_effectiveConfig == null) {
         LoadLevelConfig();
       }
       if (_effectiveConfig == null) {
-        LogError($"[SceneController:ReloadCurrentLevel] Can't read LevelConfig. Resolving to reload active Scene");
+        this.LogError($"LoadNextScene Can't obtain LevelConfig. Resolving to reload active Scene");
         ReloadCurrentScene();
         return;
       }
+      //default to current scene, for safety
+      string nextSceneToLoad = _sceneName;
+
+      // If the current scene is a Level and has a dedicated completion scene, load that first
+      if (_effectiveConfig.HasLevelCompleteScene) {
+        nextSceneToLoad = _effectiveConfig.LevelCompleteSceneName;
+        this.Log($"LoadNextScene: dedicated completion scene '{nextSceneToLoad}'");
+      }
+      // Otherwise, try to get the next level scene directly
+      else if (_levelService.TryComputeNextSceneName(out var next) && !string.IsNullOrEmpty(next)) {
+        nextSceneToLoad = next;
+        this.Log($"LoadNextScene: '{nextSceneToLoad}'");
+      }
+      // If no next scene is found, fallback to Start scene
       else {
-        if (_effectiveConfig.CanRestart) {
-          UnityEngine.SceneManagement.SceneManager.LoadScene(_effectiveConfig.SceneName);
-        }
-        else {
-          LogDebug($"[SceneController:ReloadCurrentLevel] LevelConfig for '{_effectiveConfig.SceneName}' does not allow this operation. Set CanRestart to 'true' to enable it");
-          return;
-        }
+        this.LogWarning($"LoadNextScene: Next Level is not accessible or not found. Will Load to Start Scene");
+        LoadStartScene();
+      }
+
+      // Load the determined scene
+      if (string.IsNullOrEmpty(nextSceneToLoad)) {
+        this.LogWarning($"LoadNextScene: Default Start scene is null or empty. Falling back to reload active Scene");
+        ReloadCurrentScene();
+      }
+      else {
+        this.Log($"LoadNextScene: Loading scene '{nextSceneToLoad}'");
+        UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneToLoad);
       }
     }
 
-    public virtual void LoadNextLevel() {
-      if (_effectiveConfig == null) {
-        LoadLevelConfig();
-      }
-      if (_effectiveConfig == null) {
-        LogError($"[SceneController:LoadNextLevel] Can't obtain LevelConfig. Resolving to reload active Scene");
-        ReloadCurrentScene();
+    /// <summary>
+    /// Signals the SceneController to advance to the next level in the LevelService.<br/>
+    /// This method will call <see cref="LevelService.AdvanceToNextLevel"/> if there is a next level available.<br/>
+    /// This method DOES NOT load the next level scene, it only updates the LevelService current level state.<br/> See <see cref="LoadNextScene"/> to load the next scene.
+    /// </summary>
+    [ContextMenu("Advance to Next Level")]
+    public virtual void AdvanceToNextLevel() {
+      if (_levelService == null) {
+        this.LogError("LevelService is not available, cannot advance to next level");
         return;
       }
 
-      // Try get next level and load if is unlocked
-      var nextLevel = _levelService.GetLevelConfig(_effectiveConfig.NextSceneName);
-      if (nextLevel != null) {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(nextLevel.SceneName);
+      if (_levelService.HasNextLevel()) {
+        _levelService.AdvanceToNextLevel();
       }
       else {
-        LogError($"[SceneController:LoadNextLevel] Next Level is not accessible or not found. Will Reload to Start ");
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Start");
+        this.LogWarning("No next level available, Setting next level to Start");
+        _levelService.MoveToStartScene();
       }
     }
 
-    protected virtual bool TryGetNextLevelConfig(out LevelConfig nextLevel) => _levelService.TryGetNextLevel(out nextLevel);
+    [ContextMenu("Load Start Scene")]
+    public virtual void LoadStartScene() {
+
+      if (_levelService == null) {
+        this.LogError("LevelService is not available, cannot load Start scene");
+        return;
+      }
+      string startSceneName = "Start";
+      var startLevel = _levelService.StartSceneConfig;
+      if (startLevel != null && !string.IsNullOrEmpty(startLevel.SceneName)) {
+        startSceneName = startLevel.SceneName;
+      }
+      this.Log($"Loading Start scene: '{startSceneName}'");
+      UnityEngine.SceneManagement.SceneManager.LoadScene(startSceneName);
+    }
+    /// <summary>
+    /// Check if there is a next level available
+    /// </summary>
+    public virtual bool HasNextLevel() {
+      if (_levelService != null) {
+        return _levelService.HasNextLevel();
+      }
+      return false;
+    }
+
+    protected virtual bool TryGetNextLevelConfig(out LevelConfig nextLevel) => _levelService.TryGetConfigByName(_sceneName, out nextLevel);
 
     public void QuitGame() {
 #if UNITY_EDITOR
@@ -347,10 +390,7 @@ namespace GMTK {
 #endif
     }
 
-    // Logging helpers
-    protected void LogDebug(string message) { if (EnableDebugLogging) Debug.Log($"[SceneController:{SceneName}] {message}"); }
-    protected void LogWarning(string message) => Debug.LogWarning($"[SceneController:{SceneName}] {message}");
-    protected void LogError(string message) => Debug.LogError($"[SceneController:{SceneName}] {message}");
+    #endregion
 
   }
 }

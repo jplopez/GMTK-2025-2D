@@ -34,10 +34,10 @@ namespace GMTK {
     private void Awake() {
       
       if (!TryGetComponent<Collider2D>(out var col)) {
-        Debug.LogError($"[Checkpoint] No Collider2D found on {gameObject.name}. Please add one and set it as Trigger.");
+        this.LogError($"No Collider2D found on {gameObject.name}. Please add one and set it as Trigger.");
       }
       else if (!col.isTrigger) {
-        Debug.LogWarning($"[Checkpoint] Collider2D on {gameObject.name} is not set as Trigger. Trigger events may not fire.");
+        this.LogWarning($"Collider2D on {gameObject.name} is not set as Trigger. Trigger events may not fire.");
       }
 
       if(_eventsChannel == null) {

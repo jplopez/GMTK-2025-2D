@@ -2,6 +2,7 @@
 using Ameba;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement; // Add this import
 
 namespace GMTK {
 
@@ -12,12 +13,10 @@ namespace GMTK {
   public class SceneControllerEditor : Editor {
 
     private SerializedProperty _configSourceProp;
-    private SerializedProperty _sceneNameProp;
     private SerializedProperty _manualConfigProp;
     private SerializedProperty _effectiveConfigProp;
     private SerializedProperty _onSceneLoadEventsProp;
     private SerializedProperty _enableDebugLoggingProp;
-    //private SerializedProperty _autoScanProp;
 
     private LevelService _levelService;
     private string[] _presetNames;
@@ -25,19 +24,17 @@ namespace GMTK {
 
     private void OnEnable() {
       _configSourceProp = serializedObject.FindProperty("ConfigurationSource");
-      _sceneNameProp = serializedObject.FindProperty("SceneName");
       _manualConfigProp = serializedObject.FindProperty("_manualConfig");
       _effectiveConfigProp = serializedObject.FindProperty("_effectiveConfig");
       _onSceneLoadEventsProp = serializedObject.FindProperty("OnSceneLoadEvents");
       _enableDebugLoggingProp = serializedObject.FindProperty("EnableDebugLogging");
-      //_autoScanProp = serializedObject.FindProperty("AutoScanForHandlers");
 
       _levelService = GetLevelService();
-      if (_levelService != null && _levelService.Levels != null) {
-        _presetNames = new string[_levelService.Levels.Length];
-        for (int i = 0; i < _levelService.Levels.Length; i++) {
-          var cfg = _levelService.Levels[i];
-          _presetNames[i] = $"{cfg.DisplayName} ({cfg.SceneName})";
+      if (_levelService != null && _levelService.Configurations != null) {
+        _presetNames = new string[_levelService.Configurations.Length];
+        for (int i = 0; i < _levelService.Configurations.Length; i++) {
+          var cfg = _levelService.Configurations[i];
+          _presetNames[i] = $"{cfg.ConfigName} ({cfg.SceneName})";
         }
       }
     }
@@ -50,12 +47,12 @@ namespace GMTK {
     public override void OnInspectorGUI() {
       serializedObject.Update();
 
+      // Display current scene info
+      DrawCurrentSceneInfo();
+
       EditorGUILayout.PropertyField(_configSourceProp, new GUIContent("Configuration Source"));
-      EditorGUILayout.PropertyField(_sceneNameProp, new GUIContent("Scene Name"));
 
       var controller = (SceneController)target;
-      // detect if config is manual or preset. By default, if scene name matches a preset, it's preset
-      //var onGUIConfig = _manualConfigProp;
 
       //draws the popup with available preset LevelConfigs, and updates the editor fields if changed
       DrawLevelConfigPreset();
@@ -63,7 +60,6 @@ namespace GMTK {
       EditorGUILayout.PropertyField(_effectiveConfigProp, new GUIContent("Config"), true);
       EditorGUILayout.Space();
 
-      //EditorGUILayout.PropertyField(_autoScanProp, new GUIContent("Scan for GameStateHandlers"), true);
       EditorGUILayout.PropertyField(_onSceneLoadEventsProp, new GUIContent("Raise GameEvent"), true);
       EditorGUILayout.Space();
 
@@ -72,11 +68,55 @@ namespace GMTK {
       serializedObject.ApplyModifiedProperties();
     }
 
+    private void DrawCurrentSceneInfo() {
+      // Get the active scene name
+      string activeSceneName = SceneManager.GetActiveScene().name;
+
+      EditorGUILayout.BeginHorizontal();
+      EditorGUILayout.LabelField("Current Scene:", EditorStyles.boldLabel, GUILayout.Width(100));
+      EditorGUILayout.LabelField(activeSceneName);
+
+      // Button to auto-select config for current scene
+      if (GUILayout.Button("Auto-Select", GUILayout.Width(80))) {
+        AutoSelectConfigForCurrentScene(activeSceneName);
+      }
+      EditorGUILayout.EndHorizontal();
+
+      // Show if there's a matching configuration
+      var matchingConfig = _levelService?.GetConfigBySceneName(activeSceneName);
+      if (matchingConfig != null) {
+        EditorGUILayout.HelpBox($"Found configuration: {matchingConfig.ConfigName}", MessageType.Info);
+      }
+      else {
+        EditorGUILayout.HelpBox("No configuration found for current scene", MessageType.Warning);
+      }
+
+      EditorGUILayout.Space();
+    }
+
+    private void AutoSelectConfigForCurrentScene(string sceneName) {
+      if (_levelService?.Configurations != null) {
+        for (int i = 0; i < _levelService.Configurations.Length; i++) {
+          if (_levelService.Configurations[i].SceneName == sceneName) {
+            _selectedPresetIndex = i;
+            _configSourceProp.enumValueIndex = (int)SceneController.ConfigSource.Preset;
+            UpdateSelectedConfig(i);
+            serializedObject.ApplyModifiedProperties();
+            break;
+          }
+        }
+      }
+    }
+
     private void DrawLevelConfigPreset() {
       if ((SceneController.ConfigSource)_configSourceProp.enumValueIndex == SceneController.ConfigSource.Preset) {
         // Preset selection
-        if (_levelService != null && _levelService.Levels != null && _levelService.Levels.Length > 0) {
-          int currentIndex = Mathf.Max(0, System.Array.FindIndex(_levelService.Levels, l => l.SceneName == _sceneNameProp.stringValue));
+        if (_levelService != null && _levelService.Configurations != null && _levelService.Configurations.Length > 0) {
+          // Get current scene name to find the matching config
+          string activeSceneName = SceneManager.GetActiveScene().name;
+          int currentIndex = System.Array.FindIndex(_levelService.Configurations, l => l.SceneName == activeSceneName);
+          if (currentIndex < 0) currentIndex = 0;
+
           _selectedPresetIndex = EditorGUILayout.Popup("Preset", currentIndex, _presetNames);
           if (currentIndex != _selectedPresetIndex) {
             UpdateSelectedConfig(_selectedPresetIndex);
@@ -88,22 +128,19 @@ namespace GMTK {
       }
     }
 
-    private void UpdateSelectedConfig(int _selectedIndex) {
-      if (_selectedIndex >= 0 && _selectedIndex < _levelService.Levels.Length) {
-        var selectedConfig = _levelService.Levels[_selectedIndex];
-        if (selectedConfig.SceneName != _sceneNameProp.stringValue) {
-          _sceneNameProp.stringValue = selectedConfig.SceneName;
+    private void UpdateSelectedConfig(int selectedIndex) {
+      if (selectedIndex >= 0 && selectedIndex < _levelService.Configurations.Length) {
+        var selectedConfig = _levelService.Configurations[selectedIndex];
 
-          var so = new SerializedObject(_levelService);
-          var levelsProp = so.FindProperty("Levels");
-          if (levelsProp != null && levelsProp.arraySize > _selectedIndex) {
-            var selectedConfigProp = levelsProp.GetArrayElementAtIndex(_selectedIndex);
-            _effectiveConfigProp.boxedValue = selectedConfigProp.boxedValue;
-          }
+        // Update the effective config
+        var so = new SerializedObject(_levelService);
+        var levelsProp = so.FindProperty("Configurations");
+        if (levelsProp != null && levelsProp.arraySize > selectedIndex) {
+          var selectedConfigProp = levelsProp.GetArrayElementAtIndex(selectedIndex);
+          _effectiveConfigProp.boxedValue = selectedConfigProp.boxedValue;
         }
       }
     }
-
   }
 }
 #endif

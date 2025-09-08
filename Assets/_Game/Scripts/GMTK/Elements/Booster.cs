@@ -28,7 +28,7 @@ namespace GMTK {
       //because the force will be applied during the Update, not in response to collisions.
       if (BoostWhileIn) {
         if (!TryGetComponent(out _collider)) {
-          Debug.LogWarning($"[Booster] Collider2D missing on Booster {name}. BoostWhileIn will not work");
+          this.LogWarning($"Collider2D missing on Booster {name}. BoostWhileIn will not work");
         }
       }
     }

@@ -533,7 +533,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 3088978449455377498}
         m_TargetAssemblyTypeName: GMTK.SceneController, GMTK
-        m_MethodName: LoadNextLevel
+        m_MethodName: LoadNextScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1127,8 +1127,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: StartSceneController
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 5133171877887125773, guid: eb87fbc323a51fe478edb9cc319d58b7, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1138,7 +1137,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 3637194273615739780}
+  - {fileID: 4852907063887277012}
   - {fileID: 399218917}
   - {fileID: 924498505}
   - {fileID: 367911226}
-  - {fileID: 4852907063887277012}

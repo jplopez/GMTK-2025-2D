@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -10,42 +10,51 @@ namespace GMTK {
   [CustomEditor(typeof(LevelService))]
   public class LevelServiceEditor : Editor {
 
-    private SerializedProperty _levelsProperty;
-    private ReorderableList _levelsList;
+    private SerializedProperty _configurationsProperty;
+    private SerializedProperty _startSceneConfigSourceProp;
+    private SerializedProperty _startSceneNameProp;
+    private SerializedProperty _startSceneConfigProp;
+    private SerializedProperty _endSceneConfigSourceProp;
+    private SerializedProperty _endSceneNameProp;
+    private SerializedProperty _endSceneConfigProp;
+    private SerializedProperty _gameLevelSceneNamesProp;
+    private SerializedProperty _currentLevelIndexProp;
+
+    private ReorderableList _configurationsList;
+    private ReorderableList _gameLevelsList;
     private readonly Dictionary<string, bool> _foldoutStates = new();
 
-    // Cached enums from services
-    private string[] _gameStateNames;
-    private string[] _gameEventTypeNames;
-    private string[] _sceneTypeNames;
-
     private void OnEnable() {
-      _levelsProperty = serializedObject.FindProperty("Levels");
+      _configurationsProperty = serializedObject.FindProperty("Configurations");
+      _startSceneConfigSourceProp = serializedObject.FindProperty("startSceneConfigSource");
+      _startSceneNameProp = serializedObject.FindProperty("_startSceneName");
+      _startSceneConfigProp = serializedObject.FindProperty("_startSceneConfig");
+      _endSceneConfigSourceProp = serializedObject.FindProperty("endSceneConfigSource");
+      _endSceneNameProp = serializedObject.FindProperty("_endSceneName");
+      _endSceneConfigProp = serializedObject.FindProperty("_endSceneConfig");
+      _gameLevelSceneNamesProp = serializedObject.FindProperty("_gameLevelSceneNames");
+      _currentLevelIndexProp = serializedObject.FindProperty("_currentLevelIndex");
 
-      // Cache enum values
-      CacheEnumValues();
-
-      SetupReorderableList();
+      SetupReorderableLists();
     }
 
-    private void CacheEnumValues() {
-      // Get GameStates from enum
-      _gameStateNames = System.Enum.GetNames(typeof(GameStates));
+    private void SetupReorderableLists() {
+      // Configurations list
+      _configurationsList = new ReorderableList(serializedObject, _configurationsProperty, true, true, true, true) {
+        drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, "Level Configurations", EditorStyles.boldLabel),
+        drawElementCallback = DrawConfigurationElement,
+        elementHeightCallback = GetConfigurationElementHeight,
+        onAddCallback = OnAddConfiguration,
+        onRemoveCallback = OnRemoveConfiguration
+      };
 
-      // Get GameEventType from enum  
-      _gameEventTypeNames = System.Enum.GetNames(typeof(GameEventType));
-
-      // Get SceneType from LevelService
-      _sceneTypeNames = System.Enum.GetNames(typeof(SceneType));
-    }
-
-    private void SetupReorderableList() {
-      _levelsList = new ReorderableList(serializedObject, _levelsProperty, true, true, true, true) {
-        drawHeaderCallback = DrawListHeader,
-        drawElementCallback = DrawListElement,
-        elementHeightCallback = GetElementHeight,
-        onAddCallback = OnAddElement,
-        onRemoveCallback = OnRemoveElement
+      // Game levels list
+      _gameLevelsList = new ReorderableList(serializedObject, _gameLevelSceneNamesProp, true, true, true, true) {
+        drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, "Game Level Order", EditorStyles.boldLabel),
+        drawElementCallback = DrawGameLevelElement,
+        elementHeightCallback = (index) => EditorGUIUtility.singleLineHeight + 4,
+        onAddCallback = OnAddGameLevel,
+        onRemoveCallback = OnRemoveGameLevel
       };
     }
 
@@ -56,14 +65,16 @@ namespace GMTK {
       DrawServiceInfo();
 
       EditorGUILayout.Space();
-      DrawStartEndInfo();
-
-
-      EditorGUILayout.Space();
-      DrawLevelManagement();
+      DrawStartEndScenes();
 
       EditorGUILayout.Space();
-      _levelsList.DoLayoutList();
+      DrawCurrentLevelInfo();
+
+      EditorGUILayout.Space();
+      _configurationsList.DoLayoutList();
+
+      EditorGUILayout.Space();
+      _gameLevelsList.DoLayoutList();
 
       EditorGUILayout.Space();
       DrawUtilityButtons();
@@ -72,146 +83,135 @@ namespace GMTK {
     }
 
     private void DrawServiceInfo() {
-      EditorGUILayout.LabelField("Level Service", EditorStyles.boldLabel);
+      EditorGUILayout.LabelField("Level Service Overview", EditorStyles.boldLabel);
 
       var levelService = target as LevelService;
-      var levelCount = levelService.Levels?.Length ?? 0;
-      var currentLevel = levelService.CurrentLevel;
+      var configCount = levelService.Configurations?.Length ?? 0;
+      var gameLevelCount = _gameLevelSceneNamesProp.arraySize;
 
       using (new EditorGUI.DisabledScope(true)) {
-        EditorGUILayout.IntField("Total Levels", levelCount);
-        EditorGUILayout.TextField("Current Scene", levelService.CurrentSceneName ?? "None");
-        EditorGUILayout.IntField("Current Index", levelService.CurrentLevelIndex);
+        EditorGUILayout.IntField("Total Configurations", configCount);
+        EditorGUILayout.IntField("Game Levels Count", gameLevelCount);
       }
-        EditorGUILayout.LabelField("Current Level Configuration", EditorStyles.boldLabel);
+    }
+
+    private void DrawStartEndScenes() {
+      EditorGUILayout.LabelField("Start & End Scenes", EditorStyles.boldLabel);
+
+      // Start Scene
+      EditorGUILayout.LabelField("Start Scene", EditorStyles.miniBoldLabel);
+      using (new EditorGUI.IndentLevelScope()) {
+        EditorGUILayout.PropertyField(_startSceneConfigSourceProp, new GUIContent("Source"));
+
+        switch ((SceneConfigSource)_startSceneConfigSourceProp.enumValueIndex) {
+          case SceneConfigSource.ConfigName:
+            DrawSceneNameField(_startSceneNameProp, "Scene Name");
+            break;
+          case SceneConfigSource.Manual:
+            EditorGUILayout.PropertyField(_startSceneConfigProp, new GUIContent("Config"));
+            break;
+        }
+      }
+
+      EditorGUILayout.Space();
+
+      // End Scene
+      EditorGUILayout.LabelField("End Scene", EditorStyles.miniBoldLabel);
+      using (new EditorGUI.IndentLevelScope()) {
+        EditorGUILayout.PropertyField(_endSceneConfigSourceProp, new GUIContent("Source"));
+
+        switch ((SceneConfigSource)_endSceneConfigSourceProp.enumValueIndex) {
+          case SceneConfigSource.ConfigName:
+            DrawSceneNameField(_endSceneNameProp, "Scene Name");
+            break;
+          case SceneConfigSource.Manual:
+            EditorGUILayout.PropertyField(_endSceneConfigProp, new GUIContent("Config"));
+            break;
+        }
+      }
+    }
+
+    private void DrawCurrentLevelInfo() {
+      EditorGUILayout.LabelField("Current Level State", EditorStyles.boldLabel);
+
+      var levelService = target as LevelService;
+
+      EditorGUILayout.PropertyField(_currentLevelIndexProp, new GUIContent("Current Level Index"));
+
       using (new EditorGUI.DisabledScope(true)) {
-        if (currentLevel != null) {
-          EditorGUILayout.TextField("Type", currentLevel.Type.ToString());
-          EditorGUILayout.TextField("Initial State", currentLevel.InitialGameState.ToString());
+        EditorGUILayout.TextField("Current Scene", levelService.CurrentLevelSceneName ?? "None");
+
+        var currentConfig = levelService.CurrentLevelConfig;
+        if (currentConfig != null) {
+          EditorGUILayout.TextField("Config Name", currentConfig.ConfigName);
+          EditorGUILayout.EnumPopup("Initial State", currentConfig.InitialGameState);
         }
       }
     }
 
-    private void DrawStartEndInfo() {
-      var levelService = target as LevelService;
-      var startLevelType = levelService.startLevelType;
-      var startLevelProp = serializedObject.FindProperty("startLevelType");
-      //EditorGUILayout.LabelField("Start Level", EditorStyles.boldLabel);
-      EditorGUILayout.PropertyField(startLevelProp, new GUIContent("Source"));
-      //start config
-      switch (startLevelType) {
-        case StartLevelTypes.SceneName:
-          var startSceneNameProp = serializedObject.FindProperty("_startSceneName");
-          EditorGUILayout.PropertyField(startSceneNameProp, new GUIContent("Scene Name"));
-          break;
-        case StartLevelTypes.FirstLevel:
-          EditorGUILayout.LabelField("Scene Name", levelService.GetLevelConfig(0).SceneName);
-          break;
-        case StartLevelTypes.Config:
-          var startLevelConfigProp = serializedObject.FindProperty("_startLevelconfig");
-          EditorGUILayout.PropertyField(startLevelConfigProp, new GUIContent("LevelConfig"));
-          var startLevelConfig = levelService.StartLevel;
-          startLevelConfig = DrawLevelsDropDown("Level Config", SceneType.Start, startLevelConfig?.SceneName);
-          if (startLevelConfig != null)
-            levelService.SetStartLevel(startLevelConfig);
-          break;      
-      }
+    private void DrawConfigurationElement(Rect rect, int index, bool isActive, bool isFocused) {
+      var element = _configurationsProperty.GetArrayElementAtIndex(index);
 
-      var endLevelType = levelService.endLevelType;
-      var endLevelProp = serializedObject.FindProperty("endLevelType");
-      //EditorGUILayout.LabelField("Start Level", EditorStyles.boldLabel);
-      EditorGUILayout.PropertyField(endLevelProp, new GUIContent("Source"));
-      //start config
-      switch (endLevelType) {
-        case EndLevelTypes.SceneName:
-          var endSceneNameProp = serializedObject.FindProperty("_endSceneName");
-          EditorGUILayout.PropertyField(endSceneNameProp, new GUIContent("Scene Name"));
-          break;
-        case EndLevelTypes.LastLevel:
-          int lastIndex = levelService.Levels.Length - 1;
-          EditorGUILayout.LabelField("Scene Name", levelService.GetLevelConfig(lastIndex).SceneName);
-          break;
-        case EndLevelTypes.Config:
-          var endLevelConfig = levelService.EndLevel;
-          endLevelConfig = DrawLevelsDropDown("Level Config",SceneType.End, endLevelConfig?.SceneName);
-          if(endLevelConfig != null)
-            levelService.SetEndLevel(endLevelConfig);
-          break;
-      }
-    }
-
-    private LevelConfig DrawLevelsDropDown(string label, SceneType type, string currentSelection=null) {
-      var levelService = target as LevelService;
-      var levelConfigs = levelService.Levels ?? new LevelConfig[0];
-      var configNames = levelConfigs.Where(l => l.Type == type).Select(l => $"{l.DisplayName} ({l.SceneName})").ToArray();
-      var currentIndex = 0;
-      if(!string.IsNullOrEmpty(currentSelection))
-        currentIndex = System.Array.FindIndex(levelConfigs, c => c.SceneName == currentSelection);
-
-      EditorGUI.BeginChangeCheck();
-      label = string.IsNullOrEmpty(label) ? "Select Configuration" : label;
-      var newIndex = EditorGUILayout.Popup(label, currentIndex, configNames);
-      if (EditorGUI.EndChangeCheck() && newIndex >= 0 && newIndex < levelConfigs.Length) {
-        currentSelection = levelConfigs[newIndex].SceneName;
-        return RefreshSelectedConfig(levelService, currentSelection);
-      }
-      return levelService.GetLevelConfig(currentSelection);
-
-    }
-
-    private LevelConfig RefreshSelectedConfig(LevelService levelService, string currentSelection) {
-      if (levelService != null && !string.IsNullOrEmpty(currentSelection)) {
-       return levelService.GetLevelConfig(currentSelection);
-      }
-      return null;
-    }
-
-    private void DrawLevelManagement() {
-      EditorGUILayout.LabelField("Quick Actions", EditorStyles.boldLabel);
-
-      using (new EditorGUILayout.HorizontalScope()) {
-        if (GUILayout.Button("Auto-Detect Scenes", GUILayout.Height(25))) {
-          AutoDetectScenes();
-        }
-
-        if (GUILayout.Button("Sort by Scene Name", GUILayout.Height(25))) {
-          SortLevelsBySceneName();
-        }
-
-        if (GUILayout.Button("Validate All", GUILayout.Height(25))) {
-          ValidateAllLevels();
-        }
-      }
-    }
-
-    private void DrawListHeader(Rect rect) {
-      EditorGUI.LabelField(rect, "Level Configurations", EditorStyles.boldLabel);
-    }
-
-    private void DrawListElement(Rect rect, int index, bool isActive, bool isFocused) {
-      var element = _levelsProperty.GetArrayElementAtIndex(index);
-      var foldoutKey = $"level_{index}";
-
-      if (!_foldoutStates.ContainsKey(foldoutKey)) {
-        _foldoutStates[foldoutKey] = false;
-      }
-
-      //padding the rectangle to avoid overlapping with reorder icon
       rect.x += 10;
-      rect.y += 2;
-      var headerRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+      rect.y -= 4;
 
       // Header with foldout
+      var configName = element.FindPropertyRelative("ConfigName").stringValue;
       var sceneName = element.FindPropertyRelative("SceneName").stringValue;
-      var displayName = element.FindPropertyRelative("DisplayName").stringValue;
-      var headerText = string.IsNullOrEmpty(displayName) ? $"Level {index}: {sceneName}" : $"Level {index}: {displayName}";
+      var headerText = string.IsNullOrEmpty(configName) ? $"Config {index}: {sceneName}" : $"{configName} ({sceneName})";
+      EditorGUI.PropertyField(rect, element, new GUIContent(headerText), true);
+    }
 
-      _foldoutStates[foldoutKey] = EditorGUI.Foldout(headerRect, _foldoutStates[foldoutKey], headerText, true);
+    private float GetConfigurationElementHeight(int index) {
+      var element = _configurationsProperty.GetArrayElementAtIndex(index);
+      var isExpandedProp = element.FindPropertyRelative("isExpanded");
+      if (isExpandedProp != null && isExpandedProp.boolValue) {
+        // If using the isExpanded property from LevelConfig
+        var baseHeight = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Header
+        var fieldsHeight = 14 * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing); // Estimated fields + spacing
+        return baseHeight + fieldsHeight;
+      }
+      else {
+        return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+      }
+    }
 
-      if (_foldoutStates[foldoutKey]) {
-        rect.y += EditorGUIUtility.singleLineHeight + 4;
-        //DrawLevelConfigFields(rect, element, index);
-        EditorGUI.PropertyField(rect, element, GUIContent.none);
+    private void DrawGameLevelElement(Rect rect, int index, bool isActive, bool isFocused) {
+      rect.x += 10;
+      rect.y += 2;
+      rect.height = EditorGUIUtility.singleLineHeight;
+
+      var element = _gameLevelSceneNamesProp.GetArrayElementAtIndex(index);
+      var levelService = target as LevelService;
+
+      using (new EditorGUILayout.HorizontalScope()) {
+        EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width - 80, rect.height), element, GUIContent.none);
+
+        // Show if this scene has a configuration
+        var hasConfig = levelService.Configurations?.Any(c => c.SceneName == element.stringValue) ?? false;
+        var configStatus = hasConfig ? "✓" : "✗";
+        var configColor = hasConfig ? Color.green : Color.red;
+
+        var oldColor = GUI.color;
+        GUI.color = configColor;
+        EditorGUI.LabelField(new Rect(rect.x + rect.width - 75, rect.y, 20, rect.height), configStatus);
+        GUI.color = oldColor;
+
+        EditorGUI.LabelField(new Rect(rect.x + rect.width - 55, rect.y, 55, rect.height), "Config", EditorStyles.miniLabel);
+      }
+    }
+
+    private void DrawSceneNameField(SerializedProperty sceneNameProp, string label) {
+      var scenes = GetAllSceneNames();
+      var currentIndex = System.Array.IndexOf(scenes, sceneNameProp.stringValue);
+      if (currentIndex < 0) currentIndex = 0;
+
+      var newIndex = EditorGUILayout.Popup(label, currentIndex, scenes);
+      if (newIndex > 0 && newIndex < scenes.Length) {
+        sceneNameProp.stringValue = scenes[newIndex];
+      }
+      else {
+        sceneNameProp.stringValue = "";
       }
     }
 
@@ -227,63 +227,58 @@ namespace GMTK {
       return sceneNames.ToArray();
     }
 
-    private float GetElementHeight(int index) {
-      var foldoutKey = $"level_{index}";
-      if (_foldoutStates.TryGetValue(foldoutKey, out var isExpanded) && isExpanded) {
-        // Calculate height based on all fields
-        var baseHeight = EditorGUIUtility.singleLineHeight + 4; // Header
-        var fieldsHeight = 16 * EditorGUIUtility.singleLineHeight + 32; // All fields + spacing
-        var sectionsHeight = 4 * EditorGUIUtility.singleLineHeight + 8; // Section headers
-        return baseHeight + fieldsHeight + sectionsHeight;
-      }
-      return EditorGUIUtility.singleLineHeight + 4;
-    }
-
-    private void OnAddElement(ReorderableList list) {
+    private void OnAddConfiguration(ReorderableList list) {
       var index = list.serializedProperty.arraySize;
       list.serializedProperty.arraySize++;
       var element = list.serializedProperty.GetArrayElementAtIndex(index);
 
       // Set default values
+      element.FindPropertyRelative("ConfigName").stringValue = $"New Config {index + 1}";
       element.FindPropertyRelative("SceneName").stringValue = "";
-      element.FindPropertyRelative("DisplayName").stringValue = $"New Level {index + 1}";
-      element.FindPropertyRelative("Type").enumValueIndex = 1; // Level
-      element.FindPropertyRelative("InitialGameState").enumValueIndex = 1; // Preparation
       element.FindPropertyRelative("SetStateOnLoad").boolValue = true;
-      element.FindPropertyRelative("IsUnlocked").boolValue = true;
+      element.FindPropertyRelative("InitialGameState").enumValueIndex = 1; // Preparation
       element.FindPropertyRelative("CanRestart").boolValue = true;
       element.FindPropertyRelative("CanSkip").boolValue = false;
       element.FindPropertyRelative("LoadDelay").floatValue = 0f;
-      element.FindPropertyRelative("UseCustomLoadMethod").boolValue = false;
-      element.FindPropertyRelative("CustomLoadMethod").stringValue = "";
-      element.FindPropertyRelative("NextSceneName").stringValue = "";
-      element.FindPropertyRelative("PreviousSceneName").stringValue = "";
+      element.FindPropertyRelative("HasLevelCompleteScene").boolValue = true;
+      element.FindPropertyRelative("LevelCompleteSceneName").stringValue = "LevelComplete";
     }
 
-    private void OnRemoveElement(ReorderableList list) {
+    private void OnRemoveConfiguration(ReorderableList list) {
+      ReorderableList.defaultBehaviours.DoRemoveButton(list);
+    }
+
+    private void OnAddGameLevel(ReorderableList list) {
+      var index = list.serializedProperty.arraySize;
+      list.serializedProperty.arraySize++;
+      var element = list.serializedProperty.GetArrayElementAtIndex(index);
+      element.stringValue = "";
+    }
+
+    private void OnRemoveGameLevel(ReorderableList list) {
       ReorderableList.defaultBehaviours.DoRemoveButton(list);
     }
 
     private void DrawUtilityButtons() {
-      EditorGUILayout.LabelField("Development Tools", EditorStyles.boldLabel);
+      EditorGUILayout.LabelField("Utilities", EditorStyles.boldLabel);
 
       using (new EditorGUILayout.HorizontalScope()) {
-        if (GUILayout.Button("Export Configuration", GUILayout.Height(30))) {
-          ExportConfiguration();
+        if (GUILayout.Button("Auto-Detect Scenes", GUILayout.Height(25))) {
+          AutoDetectScenes();
         }
 
-        if (GUILayout.Button("Import Configuration", GUILayout.Height(30))) {
-          ImportConfiguration();
+        if (GUILayout.Button("Sort by Scene Name", GUILayout.Height(25))) {
+          SortConfigurationsBySceneName();
+        }
+
+        if (GUILayout.Button("Validate All", GUILayout.Height(25))) {
+          ValidateConfiguration();
         }
       }
 
       using (new EditorGUILayout.HorizontalScope()) {
-        if (GUILayout.Button("Reset All to Defaults", GUILayout.Height(25))) {
-          if (EditorUtility.DisplayDialog("Reset Configuration",
-              "This will reset all level configurations to default values. Are you sure?",
-              "Reset", "Cancel")) {
-            ResetAllToDefaults();
-          }
+        if (GUILayout.Button("Sync Game Levels", GUILayout.Height(25))) {
+          SyncGameLevelsWithConfigurations();
         }
       }
     }
@@ -291,67 +286,98 @@ namespace GMTK {
     private void AutoDetectScenes() {
       var levelService = target as LevelService;
       var scenes = GetAllSceneNames().Where(s => s != "None").ToArray();
-
-      var newLevels = new List<LevelConfig>();
+      var newConfigs = new List<LevelConfig>();
 
       // Keep existing configurations
-      if (levelService.Levels != null) {
-        newLevels.AddRange(levelService.Levels);
+      if (levelService.Configurations != null) {
+        newConfigs.AddRange(levelService.Configurations);
       }
 
       // Add new scenes
       foreach (var sceneName in scenes) {
-        if (!newLevels.Any(l => l.SceneName == sceneName)) {
-          newLevels.Add(new LevelConfig {
+        if (!newConfigs.Any(l => l.SceneName == sceneName)) {
+          newConfigs.Add(new LevelConfig {
+            ConfigName = sceneName,
             SceneName = sceneName,
-            DisplayName = sceneName,
-            Type = SceneType.Level,
-            InitialGameState = GameStates.Preparation,
             SetStateOnLoad = true,
+            InitialGameState = GameStates.Preparation,
             CanRestart = true,
-            CanSkip = false
+            CanSkip = false,
+            LoadDelay = 0f,
+            HasLevelCompleteScene = true,
+            LevelCompleteSceneName = "LevelComplete"
           });
         }
       }
 
-      levelService.Levels = newLevels.ToArray();
+      levelService.Configurations = newConfigs.ToArray();
       EditorUtility.SetDirty(target);
 
-      Debug.Log($"[LevelServiceEditor] Auto-detected {scenes.Length} scenes, added {newLevels.Count - (levelService.Levels?.Length ?? 0)} new configurations");
+      Debug.Log($"[LevelServiceEditor] Auto-detected {scenes.Length} scenes, added {newConfigs.Count - (levelService.Configurations?.Length ?? 0)} new configurations");
     }
 
-    private void SortLevelsBySceneName() {
+    private void SortConfigurationsBySceneName() {
       var levelService = target as LevelService;
-      if (levelService.Levels != null) {
-        System.Array.Sort(levelService.Levels, (a, b) => string.Compare(a.SceneName, b.SceneName));
+      if (levelService.Configurations != null) {
+        System.Array.Sort(levelService.Configurations, (a, b) => string.Compare(a.SceneName, b.SceneName));
         EditorUtility.SetDirty(target);
-        Debug.Log("[LevelServiceEditor] Levels sorted by scene name");
+        Debug.Log("[LevelServiceEditor] Configurations sorted by scene name");
       }
     }
 
-    private void ValidateAllLevels() {
+    private void SyncGameLevelsWithConfigurations() {
+      var levelService = target as LevelService;
+      if (levelService.Configurations != null) {
+        var gameScenes = levelService.Configurations
+          .Where(c => !string.IsNullOrEmpty(c.SceneName))
+          .Select(c => c.SceneName)
+          .ToList();
+
+        _gameLevelSceneNamesProp.ClearArray();
+        for (int i = 0; i < gameScenes.Count; i++) {
+          _gameLevelSceneNamesProp.InsertArrayElementAtIndex(i);
+          _gameLevelSceneNamesProp.GetArrayElementAtIndex(i).stringValue = gameScenes[i];
+        }
+
+        EditorUtility.SetDirty(target);
+        Debug.Log($"[LevelServiceEditor] Synced {gameScenes.Count} game levels");
+      }
+    }
+
+    private void ValidateConfiguration() {
       var levelService = target as LevelService;
       var allScenes = GetAllSceneNames();
       var issues = new List<string>();
 
-      if (levelService.Levels != null) {
-        for (int i = 0; i < levelService.Levels.Length; i++) {
-          var level = levelService.Levels[i];
+      // Validate configurations
+      if (levelService.Configurations != null) {
+        for (int i = 0; i < levelService.Configurations.Length; i++) {
+          var config = levelService.Configurations[i];
 
-          // Check if scene exists
-          if (!allScenes.Contains(level.SceneName)) {
-            issues.Add($"Level {i}: Scene '{level.SceneName}' not found");
+          if (string.IsNullOrEmpty(config.SceneName)) {
+            issues.Add($"Config {i}: Missing scene name");
+          }
+          else if (!allScenes.Contains(config.SceneName)) {
+            issues.Add($"Config {i}: Scene '{config.SceneName}' not found");
           }
 
-          // Check next scene reference
-          if (!string.IsNullOrEmpty(level.NextSceneName) && !allScenes.Contains(level.NextSceneName)) {
-            issues.Add($"Level {i}: Next scene '{level.NextSceneName}' not found");
+          if (string.IsNullOrEmpty(config.ConfigName)) {
+            issues.Add($"Config {i}: Missing config name");
           }
+        }
+      }
 
-          // Check previous scene reference
-          if (!string.IsNullOrEmpty(level.PreviousSceneName) && !allScenes.Contains(level.PreviousSceneName)) {
-            issues.Add($"Level {i}: Previous scene '{level.PreviousSceneName}' not found");
-          }
+      // Validate game levels
+      for (int i = 0; i < _gameLevelSceneNamesProp.arraySize; i++) {
+        var sceneName = _gameLevelSceneNamesProp.GetArrayElementAtIndex(i).stringValue;
+        if (string.IsNullOrEmpty(sceneName)) {
+          issues.Add($"Game Level {i}: Empty scene name");
+        }
+        else if (!allScenes.Contains(sceneName)) {
+          issues.Add($"Game Level {i}: Scene '{sceneName}' not found");
+        }
+        else if (levelService.Configurations?.All(c => c.SceneName != sceneName) ?? true) {
+          issues.Add($"Game Level {i}: No configuration found for scene '{sceneName}'");
         }
       }
 
@@ -361,33 +387,8 @@ namespace GMTK {
         Debug.LogWarning($"[LevelServiceEditor] {issues.Count} validation issues found");
       }
       else {
-        EditorUtility.DisplayDialog("Validation Results", "All levels validated successfully!", "OK");
-        Debug.Log("[LevelServiceEditor] All levels validated successfully");
-      }
-    }
-
-    private void ExportConfiguration() {
-      // Implementation for exporting configuration to JSON/XML
-      Debug.Log("[LevelServiceEditor] Export configuration - implement as needed");
-    }
-
-    private void ImportConfiguration() {
-      // Implementation for importing configuration from JSON/XML
-      Debug.Log("[LevelServiceEditor] Import configuration - implement as needed");
-    }
-
-    private void ResetAllToDefaults() {
-      var levelService = target as LevelService;
-      if (levelService.Levels != null) {
-        foreach (var level in levelService.Levels) {
-          level.InitialGameState = GameStates.Preparation;
-          level.SetStateOnLoad = true;
-          level.CanRestart = true;
-          level.CanSkip = false;
-          level.LoadDelay = 0f;
-        }
-        EditorUtility.SetDirty(target);
-        Debug.Log("[LevelServiceEditor] All levels reset to defaults");
+        EditorUtility.DisplayDialog("Validation Results", "All configurations validated successfully!", "OK");
+        Debug.Log("[LevelServiceEditor] All configurations validated successfully");
       }
     }
   }

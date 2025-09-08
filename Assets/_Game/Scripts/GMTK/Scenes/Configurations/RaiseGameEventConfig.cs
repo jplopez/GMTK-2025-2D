@@ -25,7 +25,7 @@ namespace GMTK {
     private void Awake() {
       if (eventChannel == null) eventChannel = ServiceLocator.Get<GameEventChannel>();
       if (eventChannel == null) {
-        Debug.LogError("[RaiseGameEventConfig] No EventChannel found in ServiceLocator. Please ensure a GameEventChannel is registered.");
+        this.LogError("No EventChannel found in ServiceLocator. Please ensure a GameEventChannel is registered.");
       }
     }
     public void ApplyConfig(SceneController controller) {
@@ -33,10 +33,10 @@ namespace GMTK {
       if (controller == null) return;
       if (eventChannel == null) return;
       if (!ValidateEventParam()) {
-        Debug.LogError("[RaiseGameEventConfig] Event parameter validation failed. Event not raised.");
+        this.LogError("Event parameter validation failed. Event not raised.");
         return;
       }
-      Debug.Log($"[RaiseGameEventConfig] Raising event {EventType} with payload {Payload}");
+      this.Log($"Raising event {EventType} with payload {Payload}");
       switch (Payload) {
         case PayloadType.Void:
           eventChannel.Raise(EventType);
@@ -56,7 +56,7 @@ namespace GMTK {
         case PayloadType.EventArg:
           break;
         default:
-          Debug.LogError("[RaiseGameEventConfig] Unknown payload type. Event not raised.");
+          this.LogError("Unknown payload type. Event not raised.");
           break;
       }
     }
@@ -77,7 +77,7 @@ namespace GMTK {
         case PayloadType.EventArg:
           return false; // eventParam is not supported
         default:
-          Debug.LogError("[RaiseGameEventConfig] Unknown payload type.");
+          this.LogError("Unknown payload type.");
           return false;
       }
     }

@@ -2,11 +2,14 @@
 
 namespace GMTK {
   [System.Serializable]
+
+  /// <summary>
+  /// Configuration data for a level in the game.
+  /// </summary>
   public class LevelConfig {
     //"Basic Info"
+    public string ConfigName;
     public string SceneName;
-    public string DisplayName;
-    public SceneType Type = SceneType.Level;
 
     //"Game State"
     [Tooltip("If true, the game state will be set to the InitialGameState when the scene is loaded.")]
@@ -19,17 +22,17 @@ namespace GMTK {
     public bool CanRestart = true;
     [Tooltip("If true, this scene can be skipped. For example, the player can skip a cutscene.")]
     public bool CanSkip = false;
-    [Tooltip("The name of the scene to load when the player goes to the previous scene. It can be empty")]
-    public string PreviousSceneName;
-    [Tooltip("The name of the scene to load when the player goes to the next scene. It can be empty")]
-    public string NextSceneName;
+
     [Tooltip("If greater than 0, the scene will be loaded after a delay. This can be used to create a loading screen.")]
     public float LoadDelay = 0f;
 
-    //public bool IsUnlocked = true;
-    //public string[] UnlockConditions;
+    [Tooltip("If true, the level has a dedicated level complete scene to load when the level is finished.")]
+    public bool HasLevelCompleteScene = true;
+    [Tooltip("The name of the level complete scene to load when the level is finished. Default value is 'LevelComplete'")]
+    public string LevelCompleteSceneName = "LevelComplete";
 
-    //"Optional Overrides"
+    // Custom Drawer properties
+    [HideInInspector] public bool isExpanded = false;
 
     public LevelConfig() { }
 
@@ -37,17 +40,14 @@ namespace GMTK {
     public LevelConfig(LevelConfig other) {
       if (other == null) return;
       SceneName = other.SceneName;
-      DisplayName = other.DisplayName;
-      Type = other.Type;
+      ConfigName = other.ConfigName;
       SetStateOnLoad = other.SetStateOnLoad;
       InitialGameState = other.InitialGameState;
       CanRestart = other.CanRestart;
       CanSkip = other.CanSkip;
-      NextSceneName = other.NextSceneName;
-      PreviousSceneName = other.PreviousSceneName;
       LoadDelay = other.LoadDelay;
-      //IsUnlocked = other.IsUnlocked;
-      //UnlockConditions = other.UnlockConditions != null ? (string[])other.UnlockConditions.Clone() : null;
+      HasLevelCompleteScene = other.HasLevelCompleteScene;
+      LevelCompleteSceneName = other.LevelCompleteSceneName;
     }
 
     public static LevelConfig Clone(LevelConfig config) => new(config);

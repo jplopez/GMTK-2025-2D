@@ -50,18 +50,25 @@ namespace GMTK {
     protected float _timeSinceLevelStart = 0f;
 
     protected LevelService _levelService;
+    protected LevelOrderManager _levelOrderManager;
     protected GameEventChannel _eventChannel;
 
     #region MonoBehaviour methods
 
     private void Awake() {
-     
+
       _eventChannel = ServiceLocator.Get<GameEventChannel>();
       _levelService = ServiceLocator.Get<LevelService>();
+      _levelOrderManager = ServiceLocator.Get<LevelOrderManager>();
       if (_eventChannel == null) {
-        Debug.Log($"LevelManager: EventChannel is missing. LevelManager won't be able to handle game events");
+        this.Log($"LevelManager: EventChannel is missing. LevelManager won't be able to handle game events");
         return;
       }
+
+      if (_levelOrderManager != null && _levelService != null) {
+        _levelOrderManager.Initialize(_levelService);
+      }
+
       _eventChannel.AddListener<EventArgs>(GameEventType.EnterCheckpoint, HandleCheckPointEvent);
     }
 
@@ -71,7 +78,7 @@ namespace GMTK {
 
     public void Start() {
       if (StartLevelCheckpoint == null) {
-        Debug.LogWarning("[LevelManager] StartLevelCheckpoint is not assigned in LevelManager.");
+        this.LogWarning("StartLevelCheckpoint is not assigned in LevelManager.");
         return;
       }
       StartMarble();
@@ -80,7 +87,7 @@ namespace GMTK {
 
     private void StartMarble() {
       if (PlayableMarble == null) {
-        Debug.LogWarning("[LevelManager] PlayableMarble is not assigned in LevelManager.");
+        this.LogWarning("PlayableMarble is not assigned in LevelManager.");
         return;
       }
       PlayableMarble.Model.transform.position = StartLevelCheckpoint.Position;
@@ -93,12 +100,12 @@ namespace GMTK {
     }
 
     public void Update() {
-      if (_levelEnded) LoadCompleteLevelScene();
+      if (_levelEnded) LoadLevelCompleteScene();
       if (_levelStarted) {
         _timeSinceLevelStart += Time.deltaTime;
         //check if player is out of time 
         if (!InfitiniteTime && LevelMaxTime > 0f && _timeSinceLevelStart >= LevelMaxTime) {
-          Debug.Log("[LevelManager] Level Time Expired! Restarting level.");
+          this.Log("Level Time Expired! Restarting level.");
           ResetLevel();
         }
         UpdateMarbleMovement();
@@ -115,7 +122,7 @@ namespace GMTK {
     private void HandleCheckPointEvent(EventArgs eventArgs) {
       if (eventArgs is MarbleEventArgs marbleEventArgs) {
         if (string.IsNullOrEmpty(marbleEventArgs.HitCheckpoint.ID)) {
-          Debug.LogWarning($"[LevelManager] Can't resolve Checkpoint event {marbleEventArgs.EventType} because Checkpoint ID is null or empty");
+          this.LogWarning($"Can't resolve Checkpoint event {marbleEventArgs.EventType} because Checkpoint ID is null or empty");
           return;
         }
 
@@ -123,7 +130,7 @@ namespace GMTK {
           HandleEnterCheckpoint(marbleEventArgs.HitCheckpoint.ID);
         }
         else if (marbleEventArgs.EventType == GameEventType.ExitCheckpoint) {
-          Debug.Log("LevelManager doesn't handle ExitCheckpoint events"); return;
+          this.Log("LevelManager doesn't handle ExitCheckpoint events"); return;
         }
       }
     }
@@ -134,7 +141,7 @@ namespace GMTK {
     protected void HandleEnterCheckpoint(string checkpointID) {
       // mark level as complete when marble enters end checkpoint
       if (EndLevelCheckpoint.ID.Equals(checkpointID) && _levelStarted && !_levelEnded) {
-        Debug.Log($"[LevelManager] Marble entered end checkpoint {EndLevelCheckpoint.ID}. Ending level.");
+        this.Log($"Marble entered end checkpoint {EndLevelCheckpoint.ID}. Ending level.");
         _eventChannel.Raise(GameEventType.LevelObjectiveCompleted);
       }
     }
@@ -151,21 +158,21 @@ namespace GMTK {
       _levelEnded = false;
       StartLevelCheckpoint.enabled = false;
       EndLevelCheckpoint.enabled = true;
-      Debug.Log($"LevelStarted? {_levelStarted}");
+      this.Log($"LevelStarted? {_levelStarted}");
     }
 
     public void EndLevel() {
       if (!_levelStarted) {
-        Debug.LogWarning("[LevelManager] Level has not started yet!");
+        this.LogWarning("Level has not started yet!");
         return;
       }
       if (_levelEnded) {
-        Debug.LogWarning("[LevelManager] Level has already ended!");
+        this.LogWarning("Level has already ended!");
         return;
       }
       _levelStarted = false;
       _levelEnded = true;
-      Debug.Log($"LevelEnded? {_levelEnded}");
+      this.Log($"LevelEnded? {_levelEnded}");
     }
 
     /// <summary>
@@ -191,7 +198,7 @@ namespace GMTK {
     /// </summary>
     private void UpdateMarbleMovement() {
       if (PlayableMarble == null) {
-        Debug.LogWarning($"No PlayableMarble found on LevelManager {name}");
+        this.LogWarning($"No PlayableMarble found on LevelManager {name}");
         return;
       }
       if (PlayableMarble.IsMoving) {
@@ -204,15 +211,38 @@ namespace GMTK {
     }
 
     /// <summary>
-    /// Triggers the LevelComplete scene loading.<br/>
-    /// TODO: turn this into event-driven and async scene loading to measure percentage of progress.
+    /// Triggers the LevelComplete scene loading using the new LevelOrderManager.<br/>
+    /// This now supports non-linear progression and intermediate scenes.
     /// </summary>
-    private void LoadCompleteLevelScene() {
-      //var levelSequence = Services.Get<LevelSequence>();
-      //levelSequence.SetCurrentScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-      _levelService.SetCurrentLevel(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-      UnityEngine.SceneManagement.SceneManager.LoadScene(LEVEL_COMPLETE_SCENE_NAME); // Load a generic level complete scene
+    private void LoadLevelCompleteScene() {
+      if (_levelService.CurrentLevelConfig.HasLevelCompleteScene) {
+        this.Log($"[LevelManager] Loading configured level complete scene: {_levelService.CurrentLevelConfig.LevelCompleteSceneName}");
+        UnityEngine.SceneManagement.SceneManager.LoadScene(_levelService.CurrentLevelConfig.LevelCompleteSceneName);
+      } else {
+        this.LogWarning($"[LevelManager] Current level config does not have a LevelCompleteScene configured.");
+      } 
     }
+
+    /// <summary>
+    /// Get the next gameplay level scene name
+    /// </summary>
+    public string GetNextLevelScene() {
+      if (_levelOrderManager == null) return null;
+
+      string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+      return _levelOrderManager.GetNextLevelScene(currentSceneName);
+    }
+
+    /// <summary>
+    /// Check if there's a next level available
+    /// </summary>
+    public bool HasNextLevel() {
+      if (_levelOrderManager == null) return false;
+
+      string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+      return _levelOrderManager.HasNextLevel(currentSceneName);
+    }
+
     private void ResetTimers() {
       _timeSinceLevelStart = 0f;
       _timeSinceLastMove = 0f;

@@ -39,7 +39,7 @@ namespace GMTK {
     }
 
     private void CleanupAllEventListeners() {
-      LogDebug("Cleaning up event listeners...");
+      this.Log("Cleaning up event listeners...");
 
       var eventChannel = ServiceLocator.Get<GameEventChannel>();
       var stateMachine = ServiceLocator.Get<GameStateMachine>();
@@ -47,45 +47,40 @@ namespace GMTK {
       // Clear event channel listeners
       if (eventChannel != null) {
         eventChannel.RemoveAllListeners();
-        LogDebug("✓ GameEventChannel listeners cleared");
+        this.Log("✓ GameEventChannel listeners cleared");
       }
 
       // Clear state machine event handlers
       if (stateMachine != null) {
         stateMachine.RemoveAllListeners();
-        LogDebug("✓ StateMachine event handlers cleared");
+        this.Log("✓ StateMachine event handlers cleared");
       }
     }
 
     private void ClearTransientGameData() {
-      LogDebug("Clearing transient game data...");
+      this.Log("Clearing transient game data...");
 
       var scoreKeeper = ServiceLocator.Get<ScoreGateKeeper>();
       if (scoreKeeper != null) {
         // Reset score if needed
         scoreKeeper.ResetScore();
-        LogDebug("✓ Score data cleared");
+        this.Log("✓ Score data cleared");
       }
 
       var levelService = ServiceLocator.Get<LevelService>();
       if (levelService != null) {
         //return levelService to the Scene marked as Start
-        levelService.SetCurrentLevel(levelService.FirstStartConfig().SceneName);
-        LogDebug("✓ Level progress cleared");
+        levelService.MoveToStartScene();
+        this.Log("✓ Level progress cleared");
       }
     }
 
     private void ResetAllServices() {
-      LogDebug("Resetting services...");
+      this.Log("Resetting services...");
       ServiceLocator.Clear();
-      LogDebug("✓ ServiceLocator reset");
+      this.Log("✓ ServiceLocator reset");
     }
 
-    private void LogDebug(string message) {
-      if (EnableDebugLogging) {
-        Debug.Log($"[EndScene] {message}");
-      }
-    }
   }
 
 }

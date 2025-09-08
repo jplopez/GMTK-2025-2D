@@ -25,23 +25,23 @@ namespace GMTK {
     public bool ConnectGameStateMachineEvents = true;
 
     private void Awake() {
-      LogDebug("=== SERVICES INITIALIZATION START ===");
+      this.Log("=== SERVICES INITIALIZATION START ===");
       InitializeAllServices();
 
       if (ConnectGameStateMachineEvents) {
         InitializeGameStateIntegration();
       }
-      LogDebug("=== SERVICES INITIALIZATION COMPLETE ===");
+      this.Log("=== SERVICES INITIALIZATION COMPLETE ===");
     }
     /// <summary>
     /// Initializes the ServiceLocator and all registered services
     /// </summary>
     private void InitializeAllServices() {
       if (!ServiceLocator.IsInitialized || ForceReinitialize) {
-        LogDebug("Initializing ServiceLocator...");
+        this.Log("Initializing ServiceLocator...");
 
         if(string.IsNullOrEmpty(ServiceRegistryResourcePath)) {
-          LogWarning("ServiceRegistryResourcePath is null or empty, using default 'ServiceRegistry'");
+          this.LogWarning("ServiceRegistryResourcePath is null or empty, using default 'ServiceRegistry'");
           ServiceLocator.ServiceRegistryResourcePath = "ServiceRegistry";
         }
         else {
@@ -50,19 +50,19 @@ namespace GMTK {
 
         if (ForceReinitialize) {
           ServiceLocator.Clear();
-          LogDebug("ServiceLocator cleared for reinitialization");
+          this.Log("ServiceLocator cleared for reinitialization");
         }
 
         if (ServiceLocator.TryInitialize()) {
-          LogDebug("✓ ServiceLocator initialized successfully");
+          this.Log("✓ ServiceLocator initialized successfully");
           LogRegisteredServices();
         }
         else {
-          LogError("✗ ServiceLocator initialization failed");
+          this.LogError("✗ ServiceLocator initialization failed");
         }
       }
       else {
-        LogDebug("ServiceLocator already initialized, skipping");
+        this.Log("ServiceLocator already initialized, skipping");
       }
     }
 
@@ -71,31 +71,31 @@ namespace GMTK {
     /// </summary>
     private void InitializeGameStateIntegration() {
       if (!ServiceLocator.IsInitialized) {
-        LogError("Cannot initialize GameState integration - ServiceLocator not ready");
+        this.LogError("Cannot initialize GameState integration - ServiceLocator not ready");
         return;
       }
 
       if (ServiceLocator.TryGet<GameEventChannel>(out var eventChannel)) {
-        LogDebug("✓ GameEventChannel service found");
+        this.Log("✓ GameEventChannel service found");
 
         if (ServiceLocator.TryGet<GameStateMachine>(out var stateMachine)) {
-          LogDebug("✓ GameStateMachine service found");
+          this.Log("✓ GameStateMachine service found");
 
           // Connect external events
           if (!stateMachine.IsSubscribedToExternalEvents) {
             stateMachine.ConnectToExternalEvents(eventChannel);
-            LogDebug("✓ GameStateMachine connected to external events");
+            this.Log("✓ GameStateMachine connected to external events");
           }
           else {
-            LogDebug("GameStateMachine already connected to external events");
+            this.Log("GameStateMachine already connected to external events");
           }
         }
         else {
-          LogWarning("GameStateMachine service not found - external events not connected");
+          this.LogWarning("GameStateMachine service not found - external events not connected");
         }
       }
       else {
-        LogWarning("GameEventChannel service not found - external events not connected");
+        this.LogWarning("GameEventChannel service not found - external events not connected");
       }
     }
 
@@ -106,26 +106,12 @@ namespace GMTK {
       if (!EnableDebugLogging) return;
 
       var registeredTypes = ServiceLocator.GetRegisteredTypes();
-      LogDebug($"Registered services ({registeredTypes.Length}):");
+      this.Log($"Registered services ({registeredTypes.Length}):");
 
       foreach (var type in registeredTypes) {
-        LogDebug($"  - {type.Name}");
+        this.Log($"  - {type.Name}");
       }
     }
 
-    // Logging helpers
-    private void LogDebug(string message) {
-      if (EnableDebugLogging) {
-        Debug.Log($"[Bootstrap] {message}");
-      }
-    }
-
-    private void LogWarning(string message) {
-      Debug.LogWarning($"[Bootstrap] {message}");
-    }
-
-    private void LogError(string message) {
-      Debug.LogError($"[Bootstrap] {message}");
-    }
   }
 }
