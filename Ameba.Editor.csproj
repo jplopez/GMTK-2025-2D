@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\Ameba\Editor\StateMachine\StateMachineEditor.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Editor\StateMachine\AmebaStateMachineEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Editor\Runtime\RuntimeMapEditor.cs" />
   </ItemGroup>
   <ItemGroup>

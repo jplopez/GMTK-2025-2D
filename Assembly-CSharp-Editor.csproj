@@ -80,7 +80,9 @@
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Editor\CodingHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\_Game\Editor\GMTK_USS.uss" />
     <None Include="Packages\com.bezi.sidekick\Editor\BeziSidekickInternal.dll" />
+    <None Include="Assets\_Game\Editor\AmebaStateMachine_UXML.uxml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1537,9 +1539,17 @@
       <Project>{0FC1A9BD-01ED-5A48-7E19-17E42FC7C3D3}</Project>
       <Name>Assembly-CSharp</Name>
     </ProjectReference>
+    <ProjectReference Include="Gamelogic.Extensions.csproj">
+      <Project>{02D49F38-0BE3-2C8C-4AE3-BE22E79A365C}</Project>
+      <Name>Gamelogic.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="sc.utilities.screenshot.editor.csproj">
       <Project>{900D7AA2-01A0-3409-13A6-3DB57626FA0E}</Project>
       <Name>sc.utilities.screenshot.editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Poseidon.Core.csproj">
+      <Project>{2DB87A9C-114D-1261-A230-97DFBEE6B4B8}</Project>
+      <Name>Poseidon.Core</Name>
     </ProjectReference>
     <ProjectReference Include="Ameba.csproj">
       <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
@@ -1557,6 +1567,10 @@
       <Project>{9221C05C-856E-BDBC-9B62-082573738239}</Project>
       <Name>Ameba.Editor</Name>
     </ProjectReference>
+    <ProjectReference Include="Poseidon.Utilities.csproj">
+      <Project>{C9635E27-3B0A-D0DF-FE9E-29B673514B7A}</Project>
+      <Name>Poseidon.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="CFXR.WelcomeScreen.csproj">
       <Project>{B2D37327-AC46-32B8-7471-CB8F5EB9E91E}</Project>
       <Name>CFXR.WelcomeScreen</Name>
@@ -1568,6 +1582,10 @@
     <ProjectReference Include="Lofelt.NiceVibrations.Editor.csproj">
       <Project>{6AB64B3F-2EEE-9C87-2542-B4B390A6BD06}</Project>
       <Name>Lofelt.NiceVibrations.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Poseidon.Extras.Editor.csproj">
+      <Project>{35D6A628-CE9B-95B7-B26C-6A4B15237B32}</Project>
+      <Name>Poseidon.Extras.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="MoreMountains.Tools.csproj">
       <Project>{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}</Project>
@@ -1584,6 +1602,10 @@
     <ProjectReference Include="Lofelt.NiceVibrations.csproj">
       <Project>{729BEF02-8FA5-5868-5525-6C7942E40077}</Project>
       <Name>Lofelt.NiceVibrations</Name>
+    </ProjectReference>
+    <ProjectReference Include="Gamelogic.Extensions.Editor.csproj">
+      <Project>{F64A443A-0E43-0AD8-5E76-28634C1B8053}</Project>
+      <Name>Gamelogic.Extensions.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="ToonyColorsPro.Demo.Editor.csproj">
       <Project>{DFF3E070-1BE6-8EFC-819C-2486B904B260}</Project>

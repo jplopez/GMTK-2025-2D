@@ -555,8 +555,8 @@
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacksForThirdParty\URP\Feedbacks\MMF_WhiteBalance_URP.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\MMCamera\MMCameraFog.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacksForThirdParty\PostProcessing\Springs\MMSpringVignetteCenter.cs" />
-    <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacks\Core\MMChannels\MMChannel.cs" />
     <Compile Include="Assets\Feel\MMTools\Foundation\MMAnimation\MMStopMotionAnimation.cs" />
+    <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacks\Core\MMChannels\MMChannel.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\MMHelpers\MMFade.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\MMActivation\MMActivationOnStart.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacks\Feedbacks\MMF_TextureOffset.cs" />
@@ -766,8 +766,8 @@
     <Compile Include="Assets\Feel\MMTools\Accessories\MMSprites\MMLineRendererCircle.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacks\Shakers\MMAudioSourceVolumeShaker.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacks\Springs\Springs\MMSpringCameraOrthographicSize.cs" />
-    <Compile Include="Assets\Feel\FeelDemos\SquashAndStretch\Scripts\FeelSquashAndStretchCarController.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\MMInstantiation\MMSpawnAround.cs" />
+    <Compile Include="Assets\Feel\FeelDemos\SquashAndStretch\Scripts\FeelSquashAndStretchCarController.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacksForThirdParty\TextMeshPro\Feedbacks\MMF_TMPSoftness.cs" />
     <Compile Include="Assets\Feel\MMTools\Foundation\MMControls\MMControlsTestInputManager.cs" />
     <Compile Include="Assets\Feel\MMTools\Foundation\MMControls\MMTouchFollowerJoystick.cs" />

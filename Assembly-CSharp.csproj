@@ -61,30 +61,48 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\Modify\ModifyValuePercentAdd.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\MSFEffectExample.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Example\Scripts\BtnModify.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TextSwitcher\TextSwitcherTrack.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\SceneExtensions.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\ObjectExtensions.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TextSwitcher\TextSwitcherBehaviour.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TransformTween\TransformTweenMixerBehaviour.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\RigidbodyExtensions.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TimeDilation\TimeDilationClip.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\NavMeshAgentControl\NavMeshAgentControlClip.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\Vector4Extensions.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\GraphicExtensions.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\SubEmitterByTime.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TextSwitcher\TextSwitcherClip.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\AnimatorExtensions.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\NavMeshAgentExtensions.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\LightControl\LightControlClip.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\Vector2IntExtensions.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Interactive\InteractiveWindSSU.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\UnscaledTimeSSU.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\IListExtensions.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Interactive\WindManagerSSU.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TimeDilation\TimeDilationMixerBehaviour.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\ComponentExtensions.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Interactive\WindParallaxSSU.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\GameObjectExtensions.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\Color32Extensions.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\FloatExtenssions.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_Camera.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Example\Scripts\ShowStatUI.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\Modify\IModifyValue.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\SoleValue.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\NavMeshAgentControl\NavMeshAgentControlTrack.cs" />
@@ -93,12 +111,18 @@
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\ScreenFader\ScreenFaderMixerBehaviour.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\Video\VideoPlayableBehaviour.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\CommonStatRuntimeSO.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\ColorExtensions.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\LightControl\LightControlBehaviour.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\Vector3IntExtensions.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\AutoRotate.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Example\ExtensionsExample.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\MonoBehaviourExtensions.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\Video\VideoSchedulerPlayableBehaviour.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\MaterialInstancerSSU.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_VectorPicker.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\ValueConfigSO.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_Display.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\MSFEffectGroupExample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
@@ -109,26 +133,36 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\ImageSSU.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\ScreenFader\ScreenFaderBehaviour.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\DictionaryExtensions.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TextSwitcher\TextSwitcherMixerBehaviour.cs" />
     <Compile Include="Assets\ThirdParty\VFX\Matthew Guz\Status and Auras FREE\Scripts\OrbitScript.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TransformTween\TransformTweenBehaviour.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_VectorFollow.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_FloatPicker.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\Vector2Extensions.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Example\Scripts\BtnModifyReference.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\DecimalExtensions.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\Modify\ModifyValueAdd.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TimeDilation\TimeDilationTrack.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Interactive\InteractiveSquishSSU.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\SoleObjectRuntimeValueSO.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\Vector3Extensions.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\SoleValueRuntime.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\BillBoardParticle.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\ColliderExtensions.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TransformTween\TransformTweenTrack.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TimeDilation\TimeDilationBehaviour.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\TransformExtensions.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\LightControl\LightControlTrack.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\Video\VideoScriptPlayableAsset.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\NavMeshAgentControl\NavMeshAgentControlMixerBehaviour.cs" />
@@ -137,8 +171,10 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_SpriteFader.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_Player.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\Modify\ModifyReference.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Internal\InstancerSSU.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\ScreenFader\ScreenFaderClip.cs" />
+    <Compile Include="Assets\Roofen\ScriptableCoreKit\CommonStat\Scripts\Modify\ModifyValuePercentMul.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_DisplayTitle.cs" />
@@ -149,8 +185,11 @@
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Demo\Scripts\Demo_Shaders.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TransformTween\TransformTweenClip.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\LightControl\LightControlMixerBehaviour.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\StringExtension.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\BulletShooter.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\IntExtensions.cs" />
+    <Compile Include="Assets\SABI\C# Extensions\C# Extension Core\BehaviourExtension.cs" />
     <Compile Include="Assets\ThirdParty\VFX\MasterStylizedFX\Scripts\MSFEffectsGroup.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\ScreenFader\ScreenFaderTrack.cs" />
   </ItemGroup>
@@ -1538,9 +1577,17 @@
       <Project>{AF4FC8D9-9462-8D9B-6065-9388C13DD207}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
     </ProjectReference>
+    <ProjectReference Include="Gamelogic.Extensions.csproj">
+      <Project>{02D49F38-0BE3-2C8C-4AE3-BE22E79A365C}</Project>
+      <Name>Gamelogic.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="sc.utilities.screenshot.editor.csproj">
       <Project>{900D7AA2-01A0-3409-13A6-3DB57626FA0E}</Project>
       <Name>sc.utilities.screenshot.editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Poseidon.Core.csproj">
+      <Project>{2DB87A9C-114D-1261-A230-97DFBEE6B4B8}</Project>
+      <Name>Poseidon.Core</Name>
     </ProjectReference>
     <ProjectReference Include="Ameba.csproj">
       <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
@@ -1558,6 +1605,10 @@
       <Project>{9221C05C-856E-BDBC-9B62-082573738239}</Project>
       <Name>Ameba.Editor</Name>
     </ProjectReference>
+    <ProjectReference Include="Poseidon.Utilities.csproj">
+      <Project>{C9635E27-3B0A-D0DF-FE9E-29B673514B7A}</Project>
+      <Name>Poseidon.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="CFXR.WelcomeScreen.csproj">
       <Project>{B2D37327-AC46-32B8-7471-CB8F5EB9E91E}</Project>
       <Name>CFXR.WelcomeScreen</Name>
@@ -1569,6 +1620,10 @@
     <ProjectReference Include="Lofelt.NiceVibrations.Editor.csproj">
       <Project>{6AB64B3F-2EEE-9C87-2542-B4B390A6BD06}</Project>
       <Name>Lofelt.NiceVibrations.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Poseidon.Extras.Editor.csproj">
+      <Project>{35D6A628-CE9B-95B7-B26C-6A4B15237B32}</Project>
+      <Name>Poseidon.Extras.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="MoreMountains.Tools.csproj">
       <Project>{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}</Project>
@@ -1585,6 +1640,10 @@
     <ProjectReference Include="Lofelt.NiceVibrations.csproj">
       <Project>{729BEF02-8FA5-5868-5525-6C7942E40077}</Project>
       <Name>Lofelt.NiceVibrations</Name>
+    </ProjectReference>
+    <ProjectReference Include="Gamelogic.Extensions.Editor.csproj">
+      <Project>{F64A443A-0E43-0AD8-5E76-28634C1B8053}</Project>
+      <Name>Gamelogic.Extensions.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="ToonyColorsPro.Demo.Editor.csproj">
       <Project>{DFF3E070-1BE6-8EFC-819C-2486B904B260}</Project>
