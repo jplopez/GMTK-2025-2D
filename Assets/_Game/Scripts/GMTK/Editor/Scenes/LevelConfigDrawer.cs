@@ -9,7 +9,7 @@ namespace GMTK {
   public class LevelConfigDrawer : PropertyDrawer {
 
     private SerializedProperty configNameProp;
-    private SerializedProperty sceneNameProp;
+    //private SerializedProperty sceneNameProp;
     private SerializedProperty setStateOnLoadProp;
     private SerializedProperty initialGameStateProp;
     private SerializedProperty canRestartProp;
@@ -55,8 +55,8 @@ namespace GMTK {
             using (new EditorGUI.IndentLevelScope()) {
               foldoutRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
               EditorGUI.PropertyField(foldoutRect, configNameProp);
-              foldoutRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-              DrawSceneDropdown(foldoutRect, sceneNameProp, "Scene Name");
+              //foldoutRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+              //DrawSceneDropdown(foldoutRect, sceneNameProp, "Scene Name");
             }
 
             // Game State Section
@@ -105,7 +105,7 @@ namespace GMTK {
 
     private void LoadSerializedProperties(SerializedProperty property) {
       configNameProp = property.FindPropertyRelative("ConfigName");
-      sceneNameProp = property.FindPropertyRelative("SceneName");
+      //sceneNameProp = property.FindPropertyRelative("SceneName");
       setStateOnLoadProp = property.FindPropertyRelative("SetStateOnLoad");
       initialGameStateProp = property.FindPropertyRelative("InitialGameState");
       canRestartProp = property.FindPropertyRelative("CanRestart");
@@ -117,40 +117,12 @@ namespace GMTK {
 
     private string NormalizeLabel(GUIContent label) {
       var configName = configNameProp?.stringValue ?? "";
-      var sceneName = sceneNameProp?.stringValue ?? "";
+      //var sceneName = sceneNameProp?.stringValue ?? "";
 
       string displayText = string.IsNullOrEmpty(configName) ? "LevelConfig" : configName;
-      string sceneText = string.IsNullOrEmpty(sceneName) ? "(Scene missing)" : $"(Scene: {sceneName})";
+      //string sceneText = string.IsNullOrEmpty(sceneName) ? "(Scene missing)" : $"(Scene: {sceneName})";
 
-      return $"{displayText} {sceneText}";
-    }
-
-    private void DrawSceneDropdown(Rect position, SerializedProperty sceneNameProp, string label) {
-      // Get all scenes in build settings
-      var scenes = EditorBuildSettings.scenes
-        .Select(s => System.IO.Path.GetFileNameWithoutExtension(s.path))
-        .ToList();
-      // Insert "None" at the start
-      scenes.Insert(0, "None");
-      var scenesArray = scenes.ToArray();
-
-      label = string.IsNullOrEmpty(label) ? "Scene Name" : label;
-
-      // Determine current index (empty string means "None")
-      int currentIndex = 0;
-      if (!string.IsNullOrEmpty(sceneNameProp.stringValue)) {
-        int foundIndex = scenes.FindIndex(s => s == sceneNameProp.stringValue);
-        currentIndex = foundIndex >= 0 ? foundIndex : 0;
-      }
-
-      int newIndex = EditorGUI.Popup(position, label, currentIndex, scenesArray);
-
-      if (newIndex == 0) {
-        sceneNameProp.stringValue = string.Empty;
-      }
-      else if (newIndex >= 0 && newIndex < scenesArray.Length) {
-        sceneNameProp.stringValue = scenesArray[newIndex];
-      }
+      return $"{displayText}";
     }
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {

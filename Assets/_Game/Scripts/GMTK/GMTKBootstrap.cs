@@ -24,6 +24,15 @@ namespace GMTK {
     [Tooltip("Automatically connect GameStateMachine to external events")]
     public bool ConnectGameStateMachineEvents = true;
 
+#if UNITY_EDITOR
+    private void OnValidate() {
+      this.Log("=== UE: SERVICES INITIALIZATION START ===");
+      InitializeAllServices();
+      this.Log("=== UE: SERVICES INITIALIZATION COMPLETE ===");
+    }
+#endif
+
+
     private void Awake() {
       this.Log("=== SERVICES INITIALIZATION START ===");
       InitializeAllServices();

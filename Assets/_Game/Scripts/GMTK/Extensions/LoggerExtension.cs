@@ -21,5 +21,24 @@ namespace GMTK {
         Debug.Log($"[{DateTime.Now:HH:mm:ss}] [{obj.GetType().Name}] {message}");
       }
     }
+
+    public static void Log(this ScriptableObject obj, string message) {
+      Debug.Log($"[{DateTime.Now:HH:mm:ss}] [{obj.GetType().Name}] {message}");
+    }
+    public static void LogWarning(this ScriptableObject obj, string message) {
+      Debug.LogWarning($"[{DateTime.Now:HH:mm:ss}] [{obj.GetType().Name}] {message}");
+    }
+    public static void LogError(this ScriptableObject obj, string message) {
+      Debug.LogError($"[{DateTime.Now:HH:mm:ss}] [{obj.GetType().Name}] {message}");
+    }
+    public static void LogException(this ScriptableObject obj, Exception ex) {
+      Debug.LogError($"[{DateTime.Now:HH:mm:ss}] [{obj.GetType().Name}] Exception: {ex.Message}\n{ex.StackTrace}");
+    }
+    public static void LogDebug(this ScriptableObject obj, string message, bool enableLogging = true) {
+      if (enableLogging) {
+        Debug.Log($"[{DateTime.Now:HH:mm:ss}] [{obj.GetType().Name}] {message}");
+      }
+    }
+
   }
 }

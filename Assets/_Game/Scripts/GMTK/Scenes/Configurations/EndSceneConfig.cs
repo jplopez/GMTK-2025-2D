@@ -70,7 +70,7 @@ namespace GMTK {
       var levelService = ServiceLocator.Get<LevelService>();
       if (levelService != null) {
         //return levelService to the Scene marked as Start
-        levelService.MoveToStartScene();
+        levelService.MoveToFirstLevel();
         this.Log("✓ Level progress cleared");
       }
     }

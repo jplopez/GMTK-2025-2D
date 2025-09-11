@@ -27,7 +27,7 @@ namespace GMTK {
       var currentConfig = controller.GetLevelConfig();
       //clone the current config to restore later
       _originalConfig = new LevelConfig() {
-        SceneName = currentConfig.SceneName,
+        //SceneName = currentConfig.SceneName,
         ConfigName = currentConfig.ConfigName,
         //Type = currentConfig.Type,
         SetStateOnLoad = currentConfig.SetStateOnLoad,

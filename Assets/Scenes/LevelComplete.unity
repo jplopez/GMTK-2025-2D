@@ -550,7 +550,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7516393865110553054}
         m_TargetAssemblyTypeName: GMTK.SceneController, GMTK
-        m_MethodName: AdvanceToNextLevel
+        m_MethodName: LoadNextScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1722,20 +1722,52 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
+      propertyPath: EnableDebugLogging
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
+      propertyPath: SelectedConfigName
+      value: LevelComplete
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
       propertyPath: ConfigurationSource
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
+      propertyPath: _effectiveConfig.CanSkip
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
       propertyPath: _effectiveConfig.LoadDelay
-      value: 0.5
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
+      propertyPath: _effectiveConfig.CanRestart
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
+      propertyPath: _effectiveConfig.ConfigName
+      value: LevelComplete
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
+      propertyPath: _effectiveConfig.isExpanded
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
       propertyPath: _effectiveConfig.NextSceneName
       value: Level2
       objectReference: {fileID: 0}
     - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
+      propertyPath: _effectiveConfig.InitialGameState
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
       propertyPath: _effectiveConfig.PreviousSceneName
       value: Level1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042607826818083894, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
+      propertyPath: _effectiveConfig.HasLevelCompleteScene
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7313048824216027666, guid: a3ff32ec24d45794da24505f583620d2, type: 3}
       propertyPath: m_Name

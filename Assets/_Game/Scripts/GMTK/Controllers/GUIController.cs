@@ -14,6 +14,8 @@ namespace GMTK {
     [Header("Score")]
     [SerializeField] protected TMP_Text scoreText;
     public bool PauseScore = false;
+    [Tooltip("How the score will be calculated: elapsed time, distance, etc.")]
+    public ScoreCalculationStrategy ScoreStrategy;
 
     [Header("Playback")]
     public bool ShowPlaybackButtons = true;
@@ -55,6 +57,11 @@ namespace GMTK {
     #region Initialization
 
     private void Awake() {
+
+      //the camera gets lost on canvas when the LevelGUI prefab is first added to the scene
+      //this method ensures the main camera is assigned to the canvas
+      EnsureCameraOnCanvas();
+      
       try {
         if (_marbleScoreKeeper == null) _marbleScoreKeeper = ServiceLocator.Get<ScoreGateKeeper>();
         if (_eventsChannel == null) _eventsChannel = ServiceLocator.Get<GameEventChannel>();
@@ -105,8 +112,12 @@ namespace GMTK {
           _isScoreInitialized = true;
           return;
         }
-        var scoreStrategy = gameObject.AddComponent<TimeBasedScoreCalculator>();
-        _marbleScoreKeeper.SetStrategy(scoreStrategy, transform);
+        if (ScoreStrategy == null) {
+          ScoreStrategy = gameObject.AddComponent<TimeBasedScoreCalculator>(); //default strategy
+          ScoreStrategy.gameObject.transform.parent = transform;
+        }
+
+        _marbleScoreKeeper.SetStrategy(ScoreStrategy, transform);
         _isScoreInitialized = true;
         UpdateScoreText(_marbleScoreKeeper.GetScore());
       }
@@ -126,6 +137,19 @@ namespace GMTK {
         TutorialButton.onClick.AddListener(ToggleTutorial);
       }
     }
+    private void EnsureCameraOnCanvas() {
+      Canvas canvas = GetComponentInChildren<Canvas>();
+      if (canvas != null && canvas.worldCamera == null) {
+        Camera camera = Camera.main;
+        if (camera != null) {
+          canvas.worldCamera = camera;
+        }
+        else {
+          this.LogWarning("No main camera found for Canvas");
+        }
+      }
+    }
+
 
     #endregion
 
@@ -176,6 +200,7 @@ namespace GMTK {
       if (_marbleScoreKeeper != null) {
         _marbleScoreKeeper.PauseScore(PauseScore);
         if (!PauseScore) {
+          _marbleScoreKeeper.Tick(Time.deltaTime); // score is updated only when not paused
           UpdateScoreText(_marbleScoreKeeper.GetScore());
         }
       }

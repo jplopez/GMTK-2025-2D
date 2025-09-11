@@ -9,87 +9,71 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 119b5e051878213409088236c7304cf7, type: 3}
+  m_Script: {fileID: 11500000, guid: a98cad8a5bfd9004f980b262c6767367, type: 3}
   m_Name: LevelService
   m_EditorClassIdentifier: 
   Configurations:
-  - ConfigName: Start Scene
-    SceneName: Start
+  - ConfigName: Start Level
     SetStateOnLoad: 1
     InitialGameState: 0
-    CanRestart: 1
+    CanRestart: 0
     CanSkip: 0
-    LoadDelay: 0.5
+    LoadDelay: 0
     HasLevelCompleteScene: 0
     LevelCompleteSceneName: LevelComplete
     isExpanded: 0
-  - ConfigName: Level1
-    SceneName: Level1
+  - ConfigName: Common Level
     SetStateOnLoad: 1
     InitialGameState: 1
     CanRestart: 1
     CanSkip: 0
-    LoadDelay: 0.2
+    LoadDelay: 0.3
     HasLevelCompleteScene: 1
     LevelCompleteSceneName: LevelComplete
     isExpanded: 0
-  - ConfigName: Level2
-    SceneName: Level2
-    SetStateOnLoad: 1
-    InitialGameState: 1
-    CanRestart: 0
-    CanSkip: 0
-    LoadDelay: 0.5
-    HasLevelCompleteScene: 1
-    LevelCompleteSceneName: LevelComplete
-    isExpanded: 0
-  - ConfigName: Level Complete
-    SceneName: LevelComplete
+  - ConfigName: LevelComplete
     SetStateOnLoad: 1
     InitialGameState: 4
     CanRestart: 0
     CanSkip: 1
-    LoadDelay: 0.5
+    LoadDelay: 0.3
     HasLevelCompleteScene: 0
     LevelCompleteSceneName: LevelComplete
     isExpanded: 0
-  - ConfigName: End Scene
-    SceneName: End
+  - ConfigName: Gameover
     SetStateOnLoad: 1
     InitialGameState: 5
     CanRestart: 0
     CanSkip: 0
-    LoadDelay: 0.5
+    LoadDelay: 0
     HasLevelCompleteScene: 0
     LevelCompleteSceneName: LevelComplete
     isExpanded: 0
   startSceneConfigSource: 0
-  _startSceneName: Start
-  _startSceneConfig:
-    ConfigName: 
-    SceneName: 
+  StartSceneName: Start
+  StartSceneConfig:
+    ConfigName: Start Level
     SetStateOnLoad: 1
-    InitialGameState: 1
-    CanRestart: 1
+    InitialGameState: 0
+    CanRestart: 0
     CanSkip: 0
     LoadDelay: 0
-    HasLevelCompleteScene: 1
+    HasLevelCompleteScene: 0
     LevelCompleteSceneName: LevelComplete
     isExpanded: 0
   endSceneConfigSource: 0
-  _endSceneName: End
-  _endSceneConfig:
-    ConfigName: 
-    SceneName: 
+  EndSceneName: End
+  EndSceneConfig:
+    ConfigName: Gameover
     SetStateOnLoad: 1
-    InitialGameState: 1
-    CanRestart: 1
+    InitialGameState: 5
+    CanRestart: 0
     CanSkip: 0
     LoadDelay: 0
-    HasLevelCompleteScene: 1
+    HasLevelCompleteScene: 0
     LevelCompleteSceneName: LevelComplete
     isExpanded: 0
   _gameLevelSceneNames:
   - Level1
   - Level2
-  _currentLevelIndex: 0
+  _currentLevelIndex: -1

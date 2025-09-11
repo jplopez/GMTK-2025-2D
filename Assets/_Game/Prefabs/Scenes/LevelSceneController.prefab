@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6722259985259585816}
   - component: {fileID: 3030093075343189651}
-  - component: {fileID: 2311321038449806740}
+  - component: {fileID: 2512739437266943046}
   m_Layer: 0
   m_Name: LevelSceneController
   m_TagString: Untagged
@@ -46,44 +46,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ConfigurationSource: 0
-  SceneName: Level1
+  SelectedConfigName: 
   _manualConfig:
-    SceneName: 
-    DisplayName: 
-    Type: 3
+    ConfigName: 
     SetStateOnLoad: 1
     InitialGameState: 1
     CanRestart: 1
     CanSkip: 0
-    PreviousSceneName: 
-    NextSceneName: 
     LoadDelay: 0
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
   _presetConfig:
-    SceneName: 
-    DisplayName: 
-    Type: 2
+    ConfigName: 
     SetStateOnLoad: 1
     InitialGameState: 1
     CanRestart: 1
     CanSkip: 0
-    PreviousSceneName: 
-    NextSceneName: 
     LoadDelay: 0
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
   _effectiveConfig:
-    SceneName: Level1
-    DisplayName: Level1
-    Type: 2
+    ConfigName: Level1
     SetStateOnLoad: 1
     InitialGameState: 1
-    CanRestart: 0
+    CanRestart: 1
     CanSkip: 0
-    PreviousSceneName: Start
-    NextSceneName: Level2
-    LoadDelay: 0
-  AutoScanForHandlers: 1
+    LoadDelay: 0.2
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 1
   OnSceneLoadEvents: 
-  EnableDebugLogging: 0
---- !u!114 &2311321038449806740
+  LoadingPrefab: {fileID: 0}
+  LoadingParent: {fileID: 0}
+  LoadingHideDelay: 0.5
+  EnableDebugLogging: 1
+--- !u!114 &2512739437266943046
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,18 +91,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 5766481896205880206}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 658e8dcb1c39ee641b0236fa7dc6928c, type: 3}
+  m_Script: {fileID: 11500000, guid: df1133e569ee97941b790508748becac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TransitionSceneName: LevelComplete
-  Config:
-    SceneName: 
-    DisplayName: 
-    Type: 2
-    SetStateOnLoad: 1
-    InitialGameState: 1
-    CanRestart: 1
-    CanSkip: 0
-    PreviousSceneName: 
-    NextSceneName: 
-    LoadDelay: 0
+  scoreKeeper: {fileID: 11400000, guid: 584c2a77812de864c8cc37435490bfef, type: 2}
+  scoreTransform: {fileID: 0}

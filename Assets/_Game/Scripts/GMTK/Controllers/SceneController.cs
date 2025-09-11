@@ -19,6 +19,7 @@ namespace GMTK {
     [Header("Scene Identification")]
     [Tooltip("Source of configuration for this scene")]
     public ConfigSource ConfigurationSource = ConfigSource.Preset;
+    public string SelectedConfigName;
 
     [Header("Level Configuration")]
     [Tooltip("Manual configuration for this scene (used if ConfigSource is Manual)")]
@@ -127,21 +128,18 @@ namespace GMTK {
     /// Load level configuration from LevelService
     /// </summary>
     protected virtual void LoadLevelConfig() {
-      _presetConfig = _levelService.GetConfigBySceneName(_sceneName);
 
-      if (_presetConfig == null) {
-        this.LogWarning($"No level configuration found for scene: {_sceneName}. Creating empty config");
-        _presetConfig = new LevelConfig() {
-          SceneName = _sceneName,
-          ConfigName = _sceneName,
-          SetStateOnLoad = true,
-          InitialGameState = GameStates.Preparation,
-          CanRestart = false,
-          CanSkip = false,
-          LoadDelay = 0f,
-          HasLevelCompleteScene = false,
-          LevelCompleteSceneName = "LevelComplete"
-        };
+      switch (ConfigurationSource) {
+        case ConfigSource.Preset:
+          if (string.IsNullOrEmpty(SelectedConfigName)) {
+            SelectedConfigName = _presetConfig.ConfigName;
+            this.LogWarning($"No SelectedConfigName set, defaulting to scene name: {SelectedConfigName}");
+          }
+          _presetConfig = _levelService.FindConfig(SelectedConfigName);
+          break;
+        case ConfigSource.Manual:
+          //nothing to do, manual config is already set
+          break;
       }
       UpdateEffectiveConfig();
     }
@@ -262,7 +260,7 @@ namespace GMTK {
         _effectiveConfig = config;
       }
     }
- 
+
     /// <summary>
     /// Reloads the scene specified in <seealso cref="UnityEngine.SceneManagement.SceneManager.GetActiveScene()"/>.<br/>
     /// This is a safe operation that will always reload the current scene, regardless of LevelService state or LevelConfig settings. Useful for unity editor.
@@ -291,6 +289,16 @@ namespace GMTK {
       UnityEngine.SceneManagement.SceneManager.LoadScene(currentPlayableLevel);
     }
 
+    public string ComputeNextSceneName() {     
+      var config = GetLevelConfig();
+      var currentState = _stateMachine.Current;
+
+      if(_levelService.TryComputeNextSceneName(_sceneName, config, currentState, out var nextScene)) {
+        return nextScene;
+      }
+      return null;
+    }
+
     /// <summary>
     /// Loads the next Scene, considering the rules defined on the LevelConfig and LevelService
     /// </summary>
@@ -304,24 +312,8 @@ namespace GMTK {
         ReloadCurrentScene();
         return;
       }
-      //default to current scene, for safety
-      string nextSceneToLoad = _sceneName;
 
-      // If the current scene is a Level and has a dedicated completion scene, load that first
-      if (_effectiveConfig.HasLevelCompleteScene) {
-        nextSceneToLoad = _effectiveConfig.LevelCompleteSceneName;
-        this.Log($"LoadNextScene: dedicated completion scene '{nextSceneToLoad}'");
-      }
-      // Otherwise, try to get the next level scene directly
-      else if (_levelService.TryComputeNextSceneName(out var next) && !string.IsNullOrEmpty(next)) {
-        nextSceneToLoad = next;
-        this.Log($"LoadNextScene: '{nextSceneToLoad}'");
-      }
-      // If no next scene is found, fallback to Start scene
-      else {
-        this.LogWarning($"LoadNextScene: Next Level is not accessible or not found. Will Load to Start Scene");
-        LoadStartScene();
-      }
+      string nextSceneToLoad = ComputeNextSceneName();
 
       // Load the determined scene
       if (string.IsNullOrEmpty(nextSceneToLoad)) {
@@ -351,7 +343,7 @@ namespace GMTK {
       }
       else {
         this.LogWarning("No next level available, Setting next level to Start");
-        _levelService.MoveToStartScene();
+        _levelService.MoveToFirstLevel();
       }
     }
 
@@ -362,13 +354,9 @@ namespace GMTK {
         this.LogError("LevelService is not available, cannot load Start scene");
         return;
       }
-      string startSceneName = "Start";
-      var startLevel = _levelService.StartSceneConfig;
-      if (startLevel != null && !string.IsNullOrEmpty(startLevel.SceneName)) {
-        startSceneName = startLevel.SceneName;
-      }
-      this.Log($"Loading Start scene: '{startSceneName}'");
-      UnityEngine.SceneManagement.SceneManager.LoadScene(startSceneName);
+       _levelService.StartSceneName = string.IsNullOrEmpty(_levelService.StartSceneName) ? "Start" : _levelService.StartSceneName;
+      this.Log($"Loading Start scene: '{_levelService.StartSceneName}'");
+      UnityEngine.SceneManagement.SceneManager.LoadScene(_levelService.StartSceneName);
     }
     /// <summary>
     /// Check if there is a next level available
@@ -380,7 +368,7 @@ namespace GMTK {
       return false;
     }
 
-    protected virtual bool TryGetNextLevelConfig(out LevelConfig nextLevel) => _levelService.TryGetConfigByName(_sceneName, out nextLevel);
+    protected virtual bool TryGetNextLevelConfig(out LevelConfig nextLevel) => _levelService.TryFindConfig(_sceneName, out nextLevel);
 
     public void QuitGame() {
 #if UNITY_EDITOR

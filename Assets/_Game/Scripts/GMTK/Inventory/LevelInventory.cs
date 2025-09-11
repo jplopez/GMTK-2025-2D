@@ -45,7 +45,7 @@ namespace GMTK {
         }
       }
 
-      // Load EventChannel if not assigned
+      // Load _eventChannel if not assigned
       if (EventChannel == null) {
         EventChannel = ServiceLocator.Get<GameEventChannel>();
       }

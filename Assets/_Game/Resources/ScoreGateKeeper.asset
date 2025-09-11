@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalScore: 0
   strategy: {fileID: 0}
-  pauseScore: 1
+  pauseScore: 0

@@ -9,7 +9,7 @@ namespace GMTK {
   public class LevelConfig {
     //"Basic Info"
     public string ConfigName;
-    public string SceneName;
+
 
     //"Game State"
     [Tooltip("If true, the game state will be set to the InitialGameState when the scene is loaded.")]
@@ -39,7 +39,6 @@ namespace GMTK {
     //Copy Constructor
     public LevelConfig(LevelConfig other) {
       if (other == null) return;
-      SceneName = other.SceneName;
       ConfigName = other.ConfigName;
       SetStateOnLoad = other.SetStateOnLoad;
       InitialGameState = other.InitialGameState;

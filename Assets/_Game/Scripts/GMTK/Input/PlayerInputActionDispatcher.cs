@@ -12,7 +12,7 @@ namespace GMTK {
   /// </summary>
   public class PlayerInputActionDispatcher : MonoBehaviour, PlayerControls.IGameplayActions {
 
-    //Reference to the EventChannel used to propagate InputAction events
+    //Reference to the _eventChannel used to propagate InputAction events
     public InputActionEventChannel InputEvents { get; private set; }
     public Vector2 PointerScreenPosition { get; private set; }
     public Vector3 PointerWorldPoition { get; private set; }
@@ -24,7 +24,7 @@ namespace GMTK {
     }
     private void Awake() {
      
-      //Getting the EventChannel with 2 fallbacks
+      //Getting the _eventChannel with 2 fallbacks
       if (InputEvents == null) {
         InputEvents = ServiceLocator.Get<InputActionEventChannel>();
       }

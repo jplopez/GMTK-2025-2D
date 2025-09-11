@@ -2,7 +2,11 @@ using UnityEngine;
 using Ameba;
 
 namespace GMTK {
-  public class LevelCompleteManager : MonoBehaviour {
+
+  /// <summary>
+  /// Handles the level complete screen, displaying the player's score and managing animations.
+  /// </summary>
+  public class LevelCompleteController : MonoBehaviour {
 
     public TMPro.TMP_Text ScoreText;
     
@@ -13,7 +17,7 @@ namespace GMTK {
     private void Awake() {
       
       if (!TryGetComponent(out _animator)) {
-        this.LogWarning("No Animator component found on LevelCompleteManager.");
+        this.LogWarning("No Animator component found on LevelCompleteController.");
       }
       _currentScore = ServiceLocator.Get<ScoreGateKeeper>().GetScore();
     }

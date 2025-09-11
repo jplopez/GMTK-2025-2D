@@ -36,7 +36,7 @@ namespace GMTK {
       if (GUILayout.Button("Test Event")) {
         var eventChannel = serializedObject.FindProperty("_externalEventChannel").objectReferenceValue as GameEventChannel;
         if (eventChannel == null) {
-          Debug.LogError("[RaiseGameEventConfigEditor] No EventChannel assigned.");
+          Debug.LogError("[RaiseGameEventConfigEditor] No _eventChannel assigned.");
           return;
         }
         Debug.Log($"[RaiseGameEventConfigEditor] Testing event {gameEventType} with payload {payload}");

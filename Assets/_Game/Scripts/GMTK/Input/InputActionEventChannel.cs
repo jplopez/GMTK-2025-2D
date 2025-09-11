@@ -49,7 +49,7 @@ namespace GMTK {
   }
 
   /// <summary>
-  /// EventChannel for InputAction events. This channel works with the PlayerControl class to simplify the detection of player inputs across the game
+  /// _eventChannel for InputAction events. This channel works with the PlayerControl class to simplify the detection of player inputs across the game
   /// </summary>
   [CreateAssetMenu(fileName = "InputActionEventChannel" , menuName = "GMTK/InputAction Event Channel")]
   public class InputActionEventChannel : EventChannel<InputActionType> {  }

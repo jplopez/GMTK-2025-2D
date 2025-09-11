@@ -6,7 +6,7 @@ namespace GMTK {
   /// This prevents dependency issues during initialization
   /// </summary>
   public class GameStateMachineEventChannel : EventChannel<GameEventType> {
-    // Inherits all functionality from EventChannel<GameEventType>
+    // Inherits all functionality from _eventChannel<GameEventType>
     // Can add GameStateMachine-specific methods here if needed
   }
 }

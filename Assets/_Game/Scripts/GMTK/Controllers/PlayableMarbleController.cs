@@ -12,14 +12,14 @@ namespace GMTK {
     public float GravityScale = 1f;
     public float AngularDamping = 0.05f;
     public Vector2 InitialForce = Vector2.zero;
-    [Tooltip("The minimum distance the marble's position has to change between Update calls, to consider is moving")]
+    [Tooltip("The minimum distance the Marble's position has to change between Update calls, to consider is moving")]
     [Min(0.001f)]
     public float MinimalMovementThreshold = 0.01f;
 
     [Header("Spawn")]
     [Tooltip("Where should the Marble spawned")]
     public Transform SpawnTransform;
-    [Tooltip("The LayerMask the marble should collide. Level and Interactables the most common")]
+    [Tooltip("The LayerMask the Marble should collide. Level and Interactables the most common")]
     public LayerMask GroundedMask;
 
     /// <summary>
@@ -28,7 +28,7 @@ namespace GMTK {
     public bool Grounded { get => IsGrounded(); }
 
     /// <summary>
-    /// Whether the marble has moved since the last Update call
+    /// Whether the Marble has moved since the last Update call
     /// </summary>
     public bool IsMoving => _timeSinceLastMove > 0f;
 
@@ -61,7 +61,7 @@ namespace GMTK {
       if (!_rb.gravityScale.Equals(GravityScale)) _rb.gravityScale = GravityScale;
       if (!_rb.angularDamping.Equals(AngularDamping)) _rb.angularDamping = AngularDamping;
 
-      //calculate if marble has moved since last update
+      //calculate if Marble has moved since last update
       Vector2 currentMarblePosition = Model.transform.position;
       if (Vector2.Distance(currentMarblePosition, _lastMarblePosition) <= MinimalMovementThreshold) {
         _timeSinceLastMove += Time.deltaTime;

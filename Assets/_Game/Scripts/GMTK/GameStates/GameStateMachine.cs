@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static GMTK.GameStateMachine;
 
 namespace GMTK {
 
@@ -434,22 +433,22 @@ namespace GMTK {
       }
 
       var eventArg = new StateMachineEventArg<GameStates>(fromState, toState);
-      LogDebug($"Notifying {_handlers.Count} handlers of state change: {fromState} -> {toState}");
+      LogDebug($"NotifyHandlers: count:{_handlers.Count} | state change: {fromState} -> {toState}");
 
       foreach (var handler in _handlers) {
         if (handler == null) {
-          LogWarning("Found null handler in list");
+          LogWarning("NotifyHandlers: Found null handler in list");
           continue;
         }
 
         if (!handler.IsEnabled) continue;
 
         try {
-          handler.HandleStateChange(eventArg);
-          LogDebug($"✓ {handler.HandlerName} handled state change");
+          handler.NotifyStateChange(eventArg);
+          LogDebug($"NotifyHandlers: ✓ {handler.HandlerName} notified of state change");
         }
         catch (System.Exception ex) {
-          LogError($"✗ Handler '{handler.HandlerName}' failed: {ex.Message}");
+          LogError($"NotifyHandlers: ✗ Handler '{handler.HandlerName}' notification failed: {ex.Message}");
           Debug.LogException(ex);
         }
       }

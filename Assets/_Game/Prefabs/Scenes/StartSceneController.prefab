@@ -45,39 +45,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ConfigurationSource: 0
-  SceneName: Start
+  SelectedConfigName: Start Level
   _manualConfig:
-    SceneName: 
-    DisplayName: 
-    Type: 2
+    ConfigName: 
     SetStateOnLoad: 1
     InitialGameState: 1
     CanRestart: 1
     CanSkip: 0
-    PreviousSceneName: 
-    NextSceneName: 
     LoadDelay: 0
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
   _presetConfig:
-    SceneName: 
-    DisplayName: 
-    Type: 2
+    ConfigName: 
     SetStateOnLoad: 1
     InitialGameState: 1
     CanRestart: 1
     CanSkip: 0
-    PreviousSceneName: 
-    NextSceneName: 
     LoadDelay: 0
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
   _effectiveConfig:
-    SceneName: Start
-    DisplayName: Start
-    Type: 0
+    ConfigName: Start Level
     SetStateOnLoad: 1
     InitialGameState: 0
-    CanRestart: 1
+    CanRestart: 0
     CanSkip: 0
-    PreviousSceneName: 
-    NextSceneName: Level1
     LoadDelay: 0
+    HasLevelCompleteScene: 0
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 1
   OnSceneLoadEvents: 17000000
-  EnableDebugLogging: 1
+  LoadingPrefab: {fileID: 0}
+  LoadingParent: {fileID: 0}
+  LoadingHideDelay: 0.5
+  EnableDebugLogging: 0

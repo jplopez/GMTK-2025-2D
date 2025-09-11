@@ -136,66 +136,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1 &511746821247446548
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5678286562742245013}
-  - component: {fileID: 1645365875321904203}
-  m_Layer: 5
-  m_Name: GUIController
-  m_TagString: GameController
-  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5678286562742245013
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 511746821247446548}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -764.9672, y: 525.95483, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1893667962429471678}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1645365875321904203
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 511746821247446548}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9252ed727e9fd8a4aaefdfdf13a2286f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scoreText: {fileID: 8352515154826754556}
-  PauseScore: 0
-  ShowPlaybackButtons: 1
-  DisablePlaybackButtons: 0
-  PlayButton: {fileID: 7110829841785122906}
-  ResetButton: {fileID: 4500581457037236071}
-  PlayFeedback: {fileID: 0}
-  ResetFeedback: {fileID: 0}
-  TutorialButton: {fileID: 873448705243950344}
-  TutorialFeedback: {fileID: 0}
-  tutorialBoxes:
-  - {fileID: 8129449678415959832}
-  - {fileID: 3763861996649602302}
-  - {fileID: 5763652864735745010}
-  ShowTutorialOnStart: 1
-  EnableDebugLogging: 1
 --- !u!1 &2102297344306161688
 GameObject:
   m_ObjectHideFlags: 0
@@ -319,7 +259,6 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5678286562742245013}
   - {fileID: 1427622429825030143}
   - {fileID: 3836198809777516005}
   m_Father: {fileID: 3563271952754438075}
@@ -437,6 +376,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3563271952754438075}
+  - component: {fileID: 5645019209226111892}
+  - component: {fileID: 1768641132664463839}
   m_Layer: 5
   m_Name: LevelGUI
   m_TagString: Untagged
@@ -453,13 +394,56 @@ Transform:
   m_GameObject: {fileID: 8269083644528509160}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.00733, y: 0.9917, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1893667962429471678}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5645019209226111892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8269083644528509160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9252ed727e9fd8a4aaefdfdf13a2286f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scoreText: {fileID: 8352515154826754556}
+  PauseScore: 0
+  ScoreStrategy: {fileID: 1768641132664463839}
+  ShowPlaybackButtons: 1
+  DisablePlaybackButtons: 0
+  PlayButton: {fileID: 7110829841785122906}
+  ResetButton: {fileID: 4500581457037236071}
+  PlayFeedback: {fileID: 0}
+  ResetFeedback: {fileID: 0}
+  TutorialButton: {fileID: 873448705243950344}
+  TutorialFeedback: {fileID: 0}
+  tutorialBoxes:
+  - {fileID: 8129449678415959832}
+  - {fileID: 3763861996649602302}
+  - {fileID: 5763652864735745010}
+  ShowTutorialOnStart: 1
+  EnableDebugLogging: 1
+--- !u!114 &1768641132664463839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8269083644528509160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5831207b1d24ca6438d38235dfbca992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PointsScoredInterval: 0.3
+  PointsPerInterval: 10
 --- !u!1001 &8029450143229342697
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -556,10 +540,6 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7165590555550015201, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 1645365875321904203}
     - target: {fileID: 7165590555550015201, guid: 204bacb6e91245145aa1b4e0e7ebe09e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: ToggleTutorial

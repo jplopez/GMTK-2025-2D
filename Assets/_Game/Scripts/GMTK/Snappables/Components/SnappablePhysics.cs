@@ -36,9 +36,9 @@ namespace GMTK {
     public float GravityMultiplier = 1.0f;
 
     [Header("Material Settings")]
-    [Tooltip("Friction the element puts on the marble. High=slows down the marvel. Mid=keeps the current speed. Low=smooth surface, marble will gain speed")]
+    [Tooltip("Friction the element puts on the Marble. High=slows down the marvel. Mid=keeps the current speed. Low=smooth surface, Marble will gain speed")]
     public FrictionLevel Friction = FrictionLevel.Mid;
-    [Tooltip("Bounce experienced by the marble when collisioning with this element. High=The marble bounces and gains more speed. Mid=regular bounce, no force added to the ball. Low=minimum bouncing, no force added to the ball ")]
+    [Tooltip("Bounce experienced by the Marble when collisioning with this element. High=The Marble bounces and gains more speed. Mid=regular bounce, no force added to the ball. Low=minimum bouncing, no force added to the ball ")]
     public BouncinessLevel Bounciness = BouncinessLevel.Mid;
     [Tooltip("Optional override for experimentation. If set, this will be used instead of auto-assigned material.")]
     public PhysicsMaterial2D OverrideMaterial;
@@ -104,7 +104,18 @@ namespace GMTK {
       }
     }
 
-
+    protected override void ResetComponent() { 
+      //if (!isInitialized) {
+      //  TryInitialize();
+      //  return;
+      //}
+      transform.position = _initialPosition;
+      transform.localScale = _initialScale;
+      transform.rotation = _initialRotation;
+      _currentRotation = _initialRotation.eulerAngles.z;
+      _rigidbody2D.linearVelocity = Vector2.zero;
+      _rigidbody2D.angularVelocity = 0f;
+    }
 
     private void ApplyMovementControl() {
       _rigidbody2D.bodyType = (AllowPositionChange || AllowRotation) ?

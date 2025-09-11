@@ -55,9 +55,9 @@ namespace Ameba {
     private void AddCommonServiceTypes() {
       // Add your common ScriptableObject types here
       string[] commonTypes = {
+                "LevelService",
                 "GameEventChannel",
                 "GameStateMachine",
-                "GameStateHandlerRegistry"
             };
 
       foreach (var typeName in commonTypes) {
@@ -100,6 +100,21 @@ namespace Ameba {
       }
 
       Debug.Log($"[ServiceRegistry] Validation complete: {validCount}/{_serviceTypeNames.Count} services are valid");
+    }
+
+    [ContextMenu("Initialize ServiceLocator")]
+    public void InitializeServiceLocator() {
+      Debug.Log("[ServiceRegistry] Initializing ServiceLocator");
+      try {
+        if(ServiceLocator.TryInitialize()) {
+          Debug.Log($"[ServiceRegistry] Service Locator initialized with {ServiceLocator.GetRegisteredTypes().Length} services");
+        } else {
+          Debug.LogError($"[ServiceRegistry] Service locator failed to initialize");
+        }
+      } catch(Exception ex) {
+        Debug.LogError($"[ServiceRegistry] Service locator initialization threw an exception: {ex.Message}");
+        Debug.LogException(ex);
+      }
     }
 
 #endregion

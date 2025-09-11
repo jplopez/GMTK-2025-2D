@@ -55,15 +55,17 @@ namespace GMTK {
 
     private bool TryGameStateTransition() {
       if (_currentArgs == null) return false;
+      this.Log($"TryGameStateTransition: {_currentArgs.FromState} to {_currentArgs.ToState}");
       return TryHandleFromState(_currentArgs) && TryHandleToState(_currentArgs);
     }
 
-    public virtual void HandleStateChange(StateMachineEventArg<GameStates> eventArg) {
+    public virtual void NotifyStateChange(StateMachineEventArg<GameStates> eventArg) {
       if (!_isInitialized) Init();
       if(eventArg != null) {
         _currentArgs = eventArg;
         //This flag tells the Update method to attempt the game state transition
         _inTransition = true;
+        this.Log($"Received state change request from {eventArg?.FromState} to {eventArg?.ToState} - In Transition:{_inTransition}");
       } else {
         this.LogWarning($"Can't resolve state change request because StateMachineEventArg is null");
       }
@@ -101,6 +103,7 @@ namespace GMTK {
     /// </summary>
     /// <exception cref="ArgumentException">If state is not recognized or supported</exception>
     protected virtual void HandleFromState(GameStates state) {
+      this.Log($"Handling FromState: {state}");
       switch (state) {
         case GameStates.Start:
           FromStart(); break;
@@ -138,6 +141,8 @@ namespace GMTK {
     /// </summary>
     /// <exception cref="ArgumentException">If state is not recognized or supported</exception>
     protected virtual void HandleToState(GameStates state) {
+      this.Log($"Handling ToState: {state}");
+
       switch (state) {
         case GameStates.Start:
           ToStart(); break;

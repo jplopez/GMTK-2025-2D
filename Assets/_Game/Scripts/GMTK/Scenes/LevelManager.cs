@@ -3,14 +3,22 @@ using UnityEngine;
 using Ameba;
 
 namespace GMTK {
+
+  /// <summary>
+  /// <para>
+  /// Defines a playable level in the game.<br/>
+  /// Manages the level's state and life cycle (start, reset, complete), monitoring marble's movements and interactions with checkpoints.
+  /// Is also responsible for tracking level time, score, and stale conditions.<br/>
+  /// </para>
+  /// </summary>
   public class LevelManager : MonoBehaviour {
 
-    private const string LEVEL_COMPLETE_SCENE_NAME = "LevelComplete";
+    //private const string LEVEL_COMPLETE_SCENE_NAME = "LevelComplete";
 
     [Header("Marble Settings")]
     [Tooltip("Reference to the Marble prefab")]
     public PlayableMarbleController PlayableMarble;
-    [Tooltip("Initial force applied to the marble when the level starts.")]
+    [Tooltip("Initial force applied to the Marble when the level starts.")]
     public Vector2 MarbleInitialForce = Vector2.zero;
 
     [Header("Level Checkpoints")]
@@ -20,7 +28,7 @@ namespace GMTK {
     public Checkpoint EndLevelCheckpoint;
 
     [Header("Level Stale Settings")]
-    [Tooltip("Time in seconds after which the level is considered stale if the marble hasn't moved.")]
+    [Tooltip("Time in seconds after which the level is considered stale if the Marble hasn't moved.")]
     public float StaleTimeThreshold = 5f;
     public bool RestartOnStale = true;
 
@@ -50,7 +58,6 @@ namespace GMTK {
     protected float _timeSinceLevelStart = 0f;
 
     protected LevelService _levelService;
-    protected LevelOrderManager _levelOrderManager;
     protected GameEventChannel _eventChannel;
 
     #region MonoBehaviour methods
@@ -59,15 +66,15 @@ namespace GMTK {
 
       _eventChannel = ServiceLocator.Get<GameEventChannel>();
       _levelService = ServiceLocator.Get<LevelService>();
-      _levelOrderManager = ServiceLocator.Get<LevelOrderManager>();
+      //_levelOrderManager = ServiceLocator.Get<LevelOrderManager>();
       if (_eventChannel == null) {
-        this.Log($"LevelManager: EventChannel is missing. LevelManager won't be able to handle game events");
+        this.Log($"LevelManager: _eventChannel is missing. LevelManager won't be able to handle game events");
         return;
       }
 
-      if (_levelOrderManager != null && _levelService != null) {
-        _levelOrderManager.Initialize(_levelService);
-      }
+      //if (_levelOrderManager != null && _levelService != null) {
+      //  _levelOrderManager.Initialize(_levelService);
+      //}
 
       _eventChannel.AddListener<EventArgs>(GameEventType.EnterCheckpoint, HandleCheckPointEvent);
     }
@@ -100,8 +107,10 @@ namespace GMTK {
     }
 
     public void Update() {
-      if (_levelEnded) LoadLevelCompleteScene();
-      if (_levelStarted) {
+      if (_levelEnded) {
+        _eventChannel.Raise(GameEventType.LevelObjectiveCompleted);
+      }
+      else if (_levelStarted) {
         _timeSinceLevelStart += Time.deltaTime;
         //check if player is out of time 
         if (!InfitiniteTime && LevelMaxTime > 0f && _timeSinceLevelStart >= LevelMaxTime) {
@@ -139,7 +148,7 @@ namespace GMTK {
     /// Actual Marble Event Handler
     /// </summary>
     protected void HandleEnterCheckpoint(string checkpointID) {
-      // mark level as complete when marble enters end checkpoint
+      // mark level as complete when Marble enters end checkpoint
       if (EndLevelCheckpoint.ID.Equals(checkpointID) && _levelStarted && !_levelEnded) {
         this.Log($"Marble entered end checkpoint {EndLevelCheckpoint.ID}. Ending level.");
         _eventChannel.Raise(GameEventType.LevelObjectiveCompleted);
@@ -193,7 +202,7 @@ namespace GMTK {
     #region Utilities
 
     /// <summary>
-    /// Checks if the marble is moving to inform the score.<br/>
+    /// Checks if the Marble is moving to inform the score.<br/>
     /// Update time since last move to signal if the level has gone stale.
     /// </summary>
     private void UpdateMarbleMovement() {
@@ -214,34 +223,34 @@ namespace GMTK {
     /// Triggers the LevelComplete scene loading using the new LevelOrderManager.<br/>
     /// This now supports non-linear progression and intermediate scenes.
     /// </summary>
-    private void LoadLevelCompleteScene() {
-      if (_levelService.CurrentLevelConfig.HasLevelCompleteScene) {
-        this.Log($"[LevelManager] Loading configured level complete scene: {_levelService.CurrentLevelConfig.LevelCompleteSceneName}");
-        UnityEngine.SceneManagement.SceneManager.LoadScene(_levelService.CurrentLevelConfig.LevelCompleteSceneName);
-      } else {
-        this.LogWarning($"[LevelManager] Current level config does not have a LevelCompleteScene configured.");
-      } 
-    }
+    //private void LoadLevelCompleteScene() {
+      //if (_levelService.CurrentLevelConfig.HasLevelCompleteScene) {
+      //  this.Log($"[LevelManager] Loading configured level complete scene: {_levelService.CurrentLevelConfig.LevelCompleteSceneName}");
+      //  UnityEngine.SceneManagement.SceneManager.LoadScene(_levelService.CurrentLevelConfig.LevelCompleteSceneName);
+      //} else {
+      //  this.LogWarning($"[LevelManager] Current level config does not have a LevelCompleteScene configured.");
+      //} 
+    //}
 
-    /// <summary>
-    /// Get the next gameplay level scene name
-    /// </summary>
-    public string GetNextLevelScene() {
-      if (_levelOrderManager == null) return null;
+    ///// <summary>
+    ///// Get the next gameplay level scene name
+    ///// </summary>
+    //public string GetNextLevelScene() {
+    //  if (_levelOrderManager == null) return null;
 
-      string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-      return _levelOrderManager.GetNextLevelScene(currentSceneName);
-    }
+    //  string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+    //  return _levelOrderManager.GetNextLevelScene(currentSceneName);
+    //}
 
-    /// <summary>
-    /// Check if there's a next level available
-    /// </summary>
-    public bool HasNextLevel() {
-      if (_levelOrderManager == null) return false;
+    ///// <summary>
+    ///// Check if there's a next level available
+    ///// </summary>
+    //public bool HasNextLevel() {
+    //  if (_levelOrderManager == null) return false;
 
-      string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-      return _levelOrderManager.HasNextLevel(currentSceneName);
-    }
+    //  string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+    //  return _levelOrderManager.HasNextLevel(currentSceneName);
+    //}
 
     private void ResetTimers() {
       _timeSinceLevelStart = 0f;

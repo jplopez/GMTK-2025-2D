@@ -9,12 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3071d13f9a570704b9202b8d360ffd3d, type: 3}
-  m_Name: ServiceRegistry
+  m_Script: {fileID: 11500000, guid: 120eebe2a0293e747bf291c30af29c29, type: 3}
+  m_Name: AmebaStateMachine
   m_EditorClassIdentifier: 
-  _serviceTypeNames:
-  - LevelService
-  - GameEventChannel
-  - GameStateMachine
-  - InputActionEventChannel
-  - ScoreGateKeeper
+  StartingState: 
+  Current: 
+  NoRestrictions: 0
+  _serializedTransitions: []

@@ -4,16 +4,21 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Ameba {
 
-  [CustomEditor(typeof(ScriptableObject), true)]
+  //[CustomEditor(typeof(ScriptableObject), true)]
   public class StateMachineEditor : Editor {
 
     private FieldInfo startingStateField;
     private FieldInfo noRestrictionsField;
     private Type enumType;
 
+
+    public void OnEnable() {
+      
+    }
 
     public override void OnInspectorGUI() {
       var targetType = target.GetType();
@@ -23,7 +28,6 @@ namespace Ameba {
         DrawDefaultInspector();
         return;
       }
-
 
       serializedObject.Update();
 
@@ -36,20 +40,6 @@ namespace Ameba {
 
       enumType = baseType.GetGenericArguments()[0];
       startingStateField = baseType.GetField("StartingState", BindingFlags.NonPublic | BindingFlags.Instance);
-      //var transitionsField = baseType.GetField("_serializedTransitions", BindingFlags.NonPublic | BindingFlags.Instance);
-
-      //EditorGUILayout.LabelField("State Transitions", EditorStyles.boldLabel);
-
-      //if (transitionsField?.GetValue(target) is IDictionary transitions) {
-      //  foreach (var key in transitions.Keys) {
-      //    EditorGUILayout.LabelField($"From: {key}");
-      //    if (transitions[key] is IEnumerable<object> list) {
-      //      foreach (var toState in list) {
-      //        EditorGUILayout.LabelField($"  → {toState}");
-      //      }
-      //    }
-      //  }
-      //}
 
       if (GUILayout.Button("ResetToStartingState States")) {
         var resetMethod = baseType.GetMethod("ResetToStartingState");
@@ -58,5 +48,6 @@ namespace Ameba {
 
       serializedObject.ApplyModifiedProperties();
     }
+
   }
 }

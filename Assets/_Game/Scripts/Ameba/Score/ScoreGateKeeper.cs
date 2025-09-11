@@ -5,11 +5,12 @@ namespace Ameba {
   [CreateAssetMenu(menuName = "Ameba/ScoreGateKeeper")]
   public class ScoreGateKeeper : ScriptableObject {
 
+    [Header("Score Settings")]
     [SerializeField] protected int totalScore;
     [SerializeField] protected ScoreCalculationStrategy strategy;
+    [Tooltip("If paused, the score strategy is not counting score")]
     [SerializeField] protected bool pauseScore = false;
 
-    [Tooltip("If paused, the score strategy is not counting score")]
     public string ScoreState => pauseScore.ToString();
 
     public void SetStrategy(ScoreCalculationStrategy newStrategy, Transform playerTransform) {
@@ -22,7 +23,7 @@ namespace Ameba {
 
     public void Tick(float deltaTime) {
       if (strategy == null || pauseScore) return;
-      totalScore += strategy.CalculateScore(deltaTime);
+      totalScore += strategy.CalculateDelta(deltaTime);
     }
     public void SetScore(int amount) => totalScore = amount;
 

@@ -28,6 +28,9 @@ namespace Ameba {
     protected T _currentState = default;
     protected UnityEvent<StateMachineEventArg<T>> OnStateChanged;
 
+    protected bool _inTransition = false;
+    protected Queue<StateMachineEventArg<T>> _queuedChanges = new();
+
     #region Object Lifecycle
 
     /// <summary>
@@ -150,11 +153,21 @@ namespace Ameba {
 
     #region Change State
 
+    //TODO : consider making this private and force usage of a queue system (define queue size, delay between changes, retry attempts, etc)
+    //TODO : remember to include methods to empty queue, pause queue processing, resume queue processing, etc
+    //TODO : consider adding a priority system to the queued changes (e.g. ChangeState(T newState, int priority = 0) )
+    //TODO : consider adding an event for invalid transition attempts (e.g. OnInvalidTransitionAttempt(T fromState, T toState) )
+    //TODO : consider making this async and awaitable (Task<bool> ChangeStateAsync(T newState) )
+    //TODO : consider adding an optional parameter to force the change even if invalid transition (e.g. ChangeState(T newState, bool force = false), or put the force flag in the EventArgs )
+
     public virtual bool ChangeState(T newState) {
       if (TestTransition(_currentState, newState)) {
         var oldState = _currentState;
         _currentState = newState;
-        OnStateChanged?.Invoke(new StateMachineEventArg<T>(oldState, newState));
+        var args = new StateMachineEventArg<T>(oldState, newState);
+        _queuedChanges.Enqueue(args);
+        _inTransition = true;
+        OnStateChanged?.Invoke(args);
         return true;
       }
 #if UNITY_EDITOR

@@ -25,7 +25,7 @@ namespace GMTK {
     private void Awake() {
       if (eventChannel == null) eventChannel = ServiceLocator.Get<GameEventChannel>();
       if (eventChannel == null) {
-        this.LogError("No EventChannel found in ServiceLocator. Please ensure a GameEventChannel is registered.");
+        this.LogError("No _eventChannel found in ServiceLocator. Please ensure a GameEventChannel is registered.");
       }
     }
     public void ApplyConfig(SceneController controller) {

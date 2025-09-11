@@ -16,7 +16,7 @@ namespace GMTK {
 
     private LevelService _levelService;
     private string[] _presetNames;
-    private int _selectedPresetIndex = 0;
+    //private int _selectedPresetIndex = 0;
 
     private void OnEnable() {
       _transitionConfigProp = serializedObject.FindProperty("TransitionConfig");
@@ -27,7 +27,7 @@ namespace GMTK {
         _presetNames = new string[_levelService.Configurations.Length];
         for (int i = 0; i < _levelService.Configurations.Length; i++) {
           var cfg = _levelService.Configurations[i];
-          _presetNames[i] = $"{cfg.ConfigName} ({cfg.SceneName})";
+          _presetNames[i] = $"{cfg.ConfigName}";
         }
       }
     }
@@ -42,25 +42,25 @@ namespace GMTK {
 
       EditorGUILayout.PropertyField(_transitionSceneNameProp, new GUIContent("Transition Scene Name"));
       // Preset selection
-      if (EnsureLevelService()) {
-        int currentIndex = ResolveCurrentConfigIndex();
-        _selectedPresetIndex = EditorGUILayout.Popup("Preset", currentIndex, _presetNames);
+      //if (EnsureLevelService()) {
+      //  int currentIndex = ResolveCurrentConfigIndex();
+      //  _selectedPresetIndex = EditorGUILayout.Popup("Preset", currentIndex, _presetNames);
 
-        if (_selectedPresetIndex >= 0 && _selectedPresetIndex < _levelService.Configurations.Length) {
-          // Obtain selected preset as SerializedProperty to draw in editor
-          var selectedConfig = _levelService.Configurations[_selectedPresetIndex];
-          _transitionSceneNameProp.stringValue = selectedConfig.SceneName;
-          var so = new SerializedObject(_levelService);
-          var levelsProp = so.FindProperty("Configurations");
+      //  if (_selectedPresetIndex >= 0 && _selectedPresetIndex < _levelService.Configurations.Length) {
+      //    // Obtain selected preset as SerializedProperty to draw in editor
+      //    var selectedConfig = _levelService.Configurations[_selectedPresetIndex];
+      //    _transitionSceneNameProp.stringValue = selectedConfig.SceneName;
+      //    var so = new SerializedObject(_levelService);
+      //    var levelsProp = so.FindProperty("Configurations");
 
-          if (levelsProp != null && levelsProp.arraySize > _selectedPresetIndex) {
-            _transitionConfigProp = levelsProp.GetArrayElementAtIndex(_selectedPresetIndex);
-          }
-        }
-      }
-      else {
-        EditorGUILayout.HelpBox("No LevelService or LevelConfigs found.", MessageType.Warning);
-      }
+      //    if (levelsProp != null && levelsProp.arraySize > _selectedPresetIndex) {
+      //      _transitionConfigProp = levelsProp.GetArrayElementAtIndex(_selectedPresetIndex);
+      //    }
+      //  }
+      //}
+      //else {
+      //  EditorGUILayout.HelpBox("No LevelService or LevelConfigs found.", MessageType.Warning);
+      //}
 
       if (_transitionConfigProp != null) {
         using (new EditorGUI.IndentLevelScope()) {
@@ -76,7 +76,7 @@ namespace GMTK {
     }
 
     private int ResolveCurrentConfigIndex() {
-      return Mathf.Max(0, System.Array.FindIndex(_levelService.Configurations, l => l.SceneName == _transitionSceneNameProp.stringValue));
+      return Mathf.Max(0, System.Array.FindIndex(_levelService.Configurations, l => l.ConfigName == _transitionSceneNameProp.stringValue));
     }
   }
 

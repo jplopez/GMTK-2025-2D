@@ -5,7 +5,7 @@ using UnityEngine;
 namespace GMTK {
 
   /// <summary>
-  /// This checkpoint notifies if the marble enters or exits its trigger area. 
+  /// This checkpoint notifies if the Marble enters or exits its trigger area. 
   /// </summary>
   /// 
   [RequireComponent(typeof(Collider2D))]
@@ -20,9 +20,9 @@ namespace GMTK {
 
     [SerializeField] private string checkpointID;
 
-    [Tooltip("Optional visual cue to show when the marble is near the checkpoint. If null, no visual cue will be shown.")]
+    [Tooltip("Optional visual cue to show when the Marble is near the checkpoint. If null, no visual cue will be shown.")]
     public GameObject VisualCuePrefab;
-    [Tooltip("When to show the visual cue. None = never, OnEnter = when marble enters, BoostOnExit = when marble exits, Always = always visible")]
+    [Tooltip("When to show the visual cue. None = never, OnEnter = when Marble enters, BoostOnExit = when Marble exits, Always = always visible")]
     public VisualCueMode CueMode = VisualCueMode.OnEnter;
 
     public Vector2 Position => transform.position;

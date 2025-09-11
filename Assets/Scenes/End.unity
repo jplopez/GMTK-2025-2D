@@ -618,7 +618,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -200.05241}
+  m_AnchoredPosition: {x: 0, y: -200.0524}
   m_SizeDelta: {x: -500, y: -460.13104}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &607334336
@@ -686,7 +686,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 3
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -1547,7 +1547,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 3
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -1608,41 +1608,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1ffef80e2bf95744ad80fc95f87140f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConfigurationSource: 1
-  SceneName: LevelComplete
+  ConfigurationSource: 0
+  SelectedConfigName: Gameover
   _manualConfig:
-    SceneName: 
-    DisplayName: 
-    Type: 3
+    ConfigName: 
     SetStateOnLoad: 1
     InitialGameState: 1
     CanRestart: 1
     CanSkip: 0
-    PreviousSceneName: 
-    NextSceneName: 
     LoadDelay: 0
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 1
   _presetConfig:
-    SceneName: 
-    DisplayName: 
-    Type: 2
+    ConfigName: 
     SetStateOnLoad: 1
     InitialGameState: 1
     CanRestart: 1
     CanSkip: 0
-    PreviousSceneName: 
-    NextSceneName: 
     LoadDelay: 0
+    HasLevelCompleteScene: 1
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
   _effectiveConfig:
-    SceneName: End
-    DisplayName: End
-    Type: 1
+    ConfigName: Gameover
     SetStateOnLoad: 1
-    InitialGameState: 4
+    InitialGameState: 5
     CanRestart: 0
     CanSkip: 0
-    PreviousSceneName: 
-    NextSceneName: Start
-    LoadDelay: 0.5
+    LoadDelay: 0
+    HasLevelCompleteScene: 0
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 1
   OnSceneLoadEvents: 
   LoadingPrefab: {fileID: 0}
   LoadingParent: {fileID: 0}
