@@ -324,6 +324,7 @@ GameObject:
   - component: {fileID: 775963077}
   - component: {fileID: 775963076}
   - component: {fileID: 775963079}
+  - component: {fileID: 775963080}
   m_Layer: 5
   m_Name: Play
   m_TagString: Untagged
@@ -394,16 +395,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3088978449455377498}
-        m_TargetAssemblyTypeName: GMTK.SceneController, GMTK
-        m_MethodName: LoadNextScene
-        m_Mode: 1
+      - m_Target: {fileID: 1339131699}
+        m_TargetAssemblyTypeName: Ameba.AudioSourcePool, Ameba
+        m_MethodName: PlayPresetAudio
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: ButtonClick
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &775963077
@@ -464,6 +465,51 @@ MonoBehaviour:
   m_FlexibleWidth: 0
   m_FlexibleHeight: 0
   m_LayoutPriority: 1
+--- !u!114 &775963080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775963074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1339131699}
+          m_TargetAssemblyTypeName: Ameba.AudioSourcePool, Ameba
+          m_MethodName: PlayPresetAudio
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: ButtonHover
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1339131699}
+          m_TargetAssemblyTypeName: Ameba.AudioSourcePool, Ameba
+          m_MethodName: PlayPresetAudio
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: ButtonClick
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &787663315
 GameObject:
   m_ObjectHideFlags: 0
@@ -564,6 +610,7 @@ GameObject:
   - component: {fileID: 974136606}
   - component: {fileID: 974136605}
   - component: {fileID: 974136608}
+  - component: {fileID: 974136609}
   m_Layer: 5
   m_Name: Exit
   m_TagString: Untagged
@@ -634,16 +681,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3088978449455377498}
-        m_TargetAssemblyTypeName: GMTK.SceneController, GMTK
-        m_MethodName: QuitGame
-        m_Mode: 1
+      - m_Target: {fileID: 1339131699}
+        m_TargetAssemblyTypeName: Ameba.AudioSourcePool, Ameba
+        m_MethodName: PlayPresetAudio
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: ButtonClick
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &974136606
@@ -704,6 +751,51 @@ MonoBehaviour:
   m_FlexibleWidth: 0
   m_FlexibleHeight: 0
   m_LayoutPriority: 1
+--- !u!114 &974136609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974136603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1339131699}
+          m_TargetAssemblyTypeName: Ameba.AudioSourcePool, Ameba
+          m_MethodName: PlayPresetAudio
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: ButtonHover
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1339131699}
+          m_TargetAssemblyTypeName: Ameba.AudioSourcePool, Ameba
+          m_MethodName: PlayPresetAudio
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: ButtonClick
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!20 &1024928883 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 324727064011554559, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
@@ -763,9 +855,81 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6099585740067810328, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1339131698}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
+--- !u!1 &1339131697
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1339131698}
+  - component: {fileID: 1339131699}
+  m_Layer: 0
+  m_Name: AudioSourcePool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1339131698
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339131697}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1783822807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1339131699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339131697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7abfe704fa8d5143887a3c5d0784f15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PrewarmOnAwake: 1
+  MaxPoolSize: 10
+  InitialPoolSize: 5
+  poolParent: {fileID: 1783822807}
+  GameObjectPrefix: PooledAudioSource_
+  AudioMixer: {fileID: 24100000, guid: 235a4deb4ac403e43ae8a2defdc4cef3, type: 2}
+  DefaultMixerGroup: {fileID: 8717407162667542489, guid: 235a4deb4ac403e43ae8a2defdc4cef3, type: 2}
+  DefaultVolume: 1
+  DefaultPitch: 1
+  DisableRandomization: 0
+  VolumeRange: {x: 0.1, y: 2}
+  PitchRange: {x: 0.3, y: 1.5}
+  PresetAudioEvents:
+  - eventName: ButtonHover
+    clip: {fileID: 8300000, guid: 407a31c25fe2fa0408d85d004bccca6b, type: 3}
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 8717407162667542489, guid: 235a4deb4ac403e43ae8a2defdc4cef3, type: 2}
+    enableRandomization: 1
+  - eventName: ButtonClick
+    clip: {fileID: 8300000, guid: 990dd3b3807918645b88ed60b6671eda, type: 3}
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 8717407162667542489, guid: 235a4deb4ac403e43ae8a2defdc4cef3, type: 2}
+    enableRandomization: 1
 --- !u!1 &1579908468
 GameObject:
   m_ObjectHideFlags: 0
@@ -853,17 +1017,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 367911226}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3088978449455377498 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2505816176993346491, guid: eb87fbc323a51fe478edb9cc319d58b7, type: 3}
-  m_PrefabInstance: {fileID: 4852907063887277012}
+--- !u!4 &1783822807 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6099585740067810328, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
+  m_PrefabInstance: {fileID: 1232321175}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4852907063887277013}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1ffef80e2bf95744ad80fc95f87140f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &3637194273615739780
 PrefabInstance:
   m_ObjectHideFlags: 0
