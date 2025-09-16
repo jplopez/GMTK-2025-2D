@@ -6,7 +6,8 @@ using UnityEngine.InputSystem;
 namespace GMTK {
 
   /// <summary>
-  /// MonoBehaviour to handle player input for <see cref="GridSnappable"/> objects, enabling selection, dragging, rotation, and flipping.
+  /// MonoBehaviour to handle player input for PlayableElement objects, enabling selection, dragging, rotation, and flipping.
+  /// Extends DraggingController to implement the dragging system using PlayerInputActionDispatcher.
   /// 
   /// <para><b>Events:</b></para>
   /// <list type="bullet">
@@ -17,29 +18,40 @@ namespace GMTK {
   ///   <item><b>OnElementSecondary</b>: Reserved for secondary interactions (e.g., right-click). Not yet implemented.</item>
   /// </list>
   /// </summary>
-  public class SnappableInputHandler : MonoBehaviour {
+  public class SnappableInputHandler : DraggingController {
 
-    public GridSnappable Current => _currentElement;
-    public GridSnappable LastOnOver => _lastElementOver;
+    [Header("Snappable Input Handler")]
+    [SerializeField] private PlayableElement _currentElement;
+    [SerializeField] private PlayableElement _lastElementOver;
 
-    [SerializeField] private GridSnappable _currentElement;
-    [SerializeField] private GridSnappable _lastElementOver;
+    // Legacy properties for compatibility
+    public GridSnappable Current => ConvertToGridSnappable(_currentElement);
+    public GridSnappable LastOnOver => ConvertToGridSnappable(_lastElementOver);
+
+    // New properties for PlayableElement
+    public PlayableElement CurrentElement => _currentElement;
+    public PlayableElement LastElementOver => _lastElementOver;
 
     public bool IsMoving { get; private set; } = false;
     public bool IsOverElement { get; private set; } = false;
 
-    private Vector2 _pointerScreenPos;
-    private Vector3 _pointerWorldPos;
+    [SerializeField] private Vector2 _pointerScreenPos;
+    [SerializeField] private Vector3 _pointerWorldPos;
 
     protected bool DisableDragging = false;
 
     protected GameEventChannel _eventsChannel;
     protected PlayerInputActionDispatcher _inputDispatcher;
 
+    // Input phase tracking for proper event handling
+    private bool _primaryPressed = false;
+    private bool _primaryReleased = false;
+    private bool _secondaryPressed = false;
+    private bool _secondaryReleased = false;
+
     #region MonoBehaviour methods
 
     private void Awake() {
-     
       if (_eventsChannel == null) {
         _eventsChannel = ServiceLocator.Get<GameEventChannel>();
       }
@@ -50,9 +62,7 @@ namespace GMTK {
     }
 
     private void Start() {
-
       if (_inputDispatcher != null) {
-
         _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.Select, HandleSelect);
         _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.Secondary, HandleSecondary);
         _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.RotateCW, RotateCW);
@@ -61,13 +71,6 @@ namespace GMTK {
         _inputDispatcher.InputEvents.AddListener<EventArgs>(InputActionType.FlipY, FlipY);
       }
       UpdatePointerPosition();
-    }
-
-    private void UpdatePointerPosition() {
-      if (_inputDispatcher != null) {
-        _pointerScreenPos = _inputDispatcher.PointerScreenPosition;
-        _pointerWorldPos = _inputDispatcher.PointerWorldPoition;
-      }
     }
 
     private void OnDestroy() {
@@ -81,78 +84,207 @@ namespace GMTK {
       }
     }
 
-    protected virtual void Update() {
+    #endregion
 
+    #region DraggingController Implementation
+
+    protected override Vector2 GetPointerScreenPosition() {
+      UpdatePointerPosition();
+      return _pointerScreenPos;
+    }
+
+    protected override Vector3 GetPointerWorldPosition() {
+      UpdatePointerPosition();
+      return _pointerWorldPos;
+    }
+
+    protected override bool GetPrimaryButtonDown() {
+      bool result = _primaryPressed;
+      _primaryPressed = false; // Reset after reading
+      return result;
+    }
+
+    protected override bool GetPrimaryButtonUp() {
+      bool result = _primaryReleased;
+      _primaryReleased = false; // Reset after reading
+      return result;
+    }
+
+    protected override bool GetPrimaryButtonHeld() {
+      return IsMoving; // Use our existing tracking
+    }
+
+    protected override bool GetSecondaryButtonDown() {
+      bool result = _secondaryPressed;
+      _secondaryPressed = false; // Reset after reading
+      return result;
+    }
+
+    protected override bool GetSecondaryButtonUp() {
+      bool result = _secondaryReleased;
+      _secondaryReleased = false; // Reset after reading
+      return result;
+    }
+
+    protected override bool GetPrimaryDoubleClick() {
+      // Not implemented in the current system
+      return false;
+    }
+
+    protected override bool GetSecondaryDoubleClick() {
+      // Not implemented in the current system
+      return false;
+    }
+
+    #endregion
+
+    #region Overridden DraggingController Methods
+
+    protected override void Update() {
       UpdatePointerPosition();
 
-      //TODO change this to snappable component that decides when to update position
+      // Handle element position updates during dragging
       if (IsMoving && _currentElement != null) {
         _currentElement.UpdatePosition(_pointerWorldPos);
       }
 
-      if (TryGetElementOnCurrentPointer(out GridSnappable element)) {
-        IsOverElement = true;
-        if (!element.Equals(_lastElementOver)) {
+      // Handle hover detection
+      UpdateHoverDetection();
 
-          // moved over a different element
-          UnhoverLastElement();
-
-          _lastElementOver = element;
-          _lastElementOver.OnPointerOver();
-          //RaiseEvent(OnElementHovered, _lastElementOver);
-          _eventsChannel.Raise(GameEventType.ElementHovered,
-              new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos, _pointerWorldPos));
-          //Debug.Log($"OnElementHovered: {_lastElementOver.name}");
-        }
-      }
-      //no element, means we have unhover the lastElementOver
-      else { UnhoverLastElement(); }
+      // Call base update for dragging controller logic
+      base.Update();
     }
 
-    private void UnhoverLastElement() {
-      if (_lastElementOver != null && IsOverElement) {
-        _lastElementOver.OnPointerOut();
-        //RaiseEvent(OnElementUnhovered, _lastElementOver);
+    protected override IDraggable GetObjectAtPointer() {
+      if (TryGetElementOnCurrentPointer(out PlayableElement element)) {
+        return element;
+      }
+      return null;
+    }
+
+    protected override void OnObjectHoverStart(IDraggable obj) {
+      if (obj is PlayableElement element) {
+        _lastElementOver = element;
+        IsOverElement = true;
+        element.OnPointerOver();
+        _eventsChannel.Raise(GameEventType.ElementHovered,
+            new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
+      }
+    }
+
+    protected override void OnObjectHoverEnd(IDraggable obj) {
+      if (obj is PlayableElement element) {
+        element.OnPointerOut();
         _eventsChannel.Raise(GameEventType.ElementUnhovered,
-            new GridSnappableEventArgs(_lastElementOver, _pointerScreenPos, _pointerWorldPos));
-        //Debug.Log($"OnElementUnhovered: {_lastElementOver.name}");
-        _lastElementOver = null;
-        IsOverElement = false;
+            new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
+
+        if (_lastElementOver == element) {
+          _lastElementOver = null;
+          IsOverElement = false;
+        }
+      }
+    }
+
+    protected override void OnObjectDragStart(IDraggable obj) {
+      if (obj is PlayableElement element) {
+        _currentElement = element;
+        IsMoving = true;
+        _eventsChannel.Raise(GameEventType.ElementSelected,
+            new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
+      }
+    }
+
+    protected override void OnObjectDragEnd(IDraggable obj) {
+      if (obj is PlayableElement element) {
+        _eventsChannel.Raise(GameEventType.ElementDropped,
+            new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
+
+        if (_currentElement == element) {
+          _currentElement = null;
+          IsMoving = false;
+        }
       }
     }
 
     #endregion
 
-    //The element dragging is disabled during Playing, to prevent players
-    //from moving elements while the level is running
-    //In the future, this might not be always the case, which is why
-    //this specific encapsulation
-    public void UpdateFromGameState(GameStates state) {
-      switch (state) {
-        case GameStates.Preparation:
-          DisableDragging = false;
-          break;
-        case GameStates.Playing:
-          DisableDragging = true;
-          break;
+    #region Utility Methods
+
+    private void UpdatePointerPosition() {
+      if (_inputDispatcher != null) {
+        _pointerScreenPos = _inputDispatcher.PointerScreenPosition;
+        _pointerWorldPos = _inputDispatcher.PointerWorldPoition;
       }
     }
 
-    #region Gameplay InputAction methods
+    private void UpdateHoverDetection() {
+      // This method maintains compatibility with the original hover detection system
+      // The base DraggingController also handles hover, but we need this for legacy event compatibility
+      // In the future, this could be simplified to rely entirely on the base class
+    }
+
+    private bool TryGetElementOnCurrentPointer(out PlayableElement element) {
+      // Raycast to detect the element under the cursor
+      Vector2 worldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPos);
+      RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
+
+      // Check if we hit something
+      if (hit && hit.collider != null && hit.collider.gameObject is var selected) {
+        // Check if it's a PlayableElement and is draggable
+        if (selected.TryGetComponent(out element)) {
+          return true;
+        }
+      }
+      element = null;
+      return false;
+    }
+
+    private GridSnappable ConvertToGridSnappable(PlayableElement element) {
+      // Compatibility layer: In a real implementation, you might want to handle this differently
+      // For now, we'll try to get a GridSnappable component if it exists, or return null
+      if (element == null) return null;
+      return element.ToGridSnappable();
+    }
+
+    private bool TryHandleAsInputActionEventArgs(EventArgs args, out InputActionEventArgs inputArgs) {
+      inputArgs = default;
+      if (args is InputActionEventArgs validArgs) {
+        inputArgs = validArgs;
+        return true;
+      }
+      return false;
+    }
+
+    #endregion
+
+    #region Legacy Input Action Methods (for compatibility)
 
     public void HandleSelect(EventArgs eventArgs) {
       if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
         var phase = inputArgs.Phase;
         switch (phase) {
-          case InputActionPhase.Performed: BeginMovingElement(); break;
-          case InputActionPhase.Canceled: EndMovingElement(); break;
+          case InputActionPhase.Performed:
+            _primaryPressed = true;
+            break;
+          case InputActionPhase.Canceled:
+            _primaryReleased = true;
+            break;
         }
       }
     }
 
     public void HandleSecondary(EventArgs eventArgs) {
-      this.Log("HandleSecondary : Not implemented yet");
-      //_eventsChannel.Raise(GameEventType.InputSecondary);
+      if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
+        var phase = inputArgs.Phase;
+        switch (phase) {
+          case InputActionPhase.Performed:
+            _secondaryPressed = true;
+            break;
+          case InputActionPhase.Canceled:
+            _secondaryReleased = true;
+            break;
+        }
+      }
     }
 
     public void RotateCW(EventArgs eventArgs) {
@@ -191,78 +323,47 @@ namespace GMTK {
       }
     }
 
-    private void RaiseGameEvent(GameEventType eventType, GridSnappable snappable) {
-      _eventsChannel.Raise(eventType,
-              new GridSnappableEventArgs(snappable, _pointerScreenPos, _pointerWorldPos));
-    }
-
-    private void TryExecuteOnCurrentElement(Action<GridSnappable> action) {
-      //Debug.Log($"SnappableInputHandler:TryExecute: {nameof(action)} Current: {_currentElement.name}");
+    private void TryExecuteOnCurrentElement(Action<PlayableElement> action) {
       if (_currentElement != null) action.Invoke(_currentElement);
-    }
-
-    private bool TryGetElementOnCurrentPointer(out GridSnappable element) {
-      // Raycast to detect the element under the cursor
-      Vector2 worldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPos);
-      RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
-      //check if we hit something
-      if (hit && hit.collider != null && hit.collider.gameObject is var selected) {
-        // check if is a GridSnappable and is draggable
-        if (selected.TryGetComponent(out element)) {
-          return true;
-        }
-      }
-      element = null;
-      return false;
-    }
-
-    private bool TryHandleAsInputActionEventArgs(EventArgs args, out InputActionEventArgs inputArgs) {
-      inputArgs = default;
-      if (args is InputActionEventArgs validArgs) {
-        inputArgs = validArgs;
-        return true;
-      }
-      return false;
     }
 
     #endregion
 
+    #region Game State Management
 
-    #region GridSnappable Movement Tracking
-
-    private void BeginMovingElement() {
-      if (TryGetElementOnCurrentPointer(out GridSnappable selectedElement)) {
-        if (!DisableDragging && selectedElement.Draggable) {
-          _currentElement = selectedElement;
-          IsMoving = true;
-          //RaiseEvent(OnElementSelected, _currentElement);
-          _eventsChannel.Raise(GameEventType.ElementSelected,
-              new GridSnappableEventArgs(_currentElement, _pointerScreenPos, _pointerWorldPos));
-        }
-      }
-    }
-
-    private void EndMovingElement() {
-      if (_currentElement != null) {
-        //RaiseEvent(OnElementDropped, _currentElement);
-        _eventsChannel.Raise(GameEventType.ElementDropped,
-            new GridSnappableEventArgs(_currentElement, _pointerScreenPos, _pointerWorldPos));
-        _currentElement = null;
-        IsMoving = false;
+    // The element dragging is disabled during Playing, to prevent players
+    // from moving elements while the level is running
+    public void UpdateFromGameState(GameStates state) {
+      switch (state) {
+        case GameStates.Preparation:
+          DisableDragging = false;
+          DraggingEnabled = true;
+          break;
+        case GameStates.Playing:
+          DisableDragging = true;
+          DraggingEnabled = false;
+          break;
       }
     }
 
     #endregion
 
 #if UNITY_EDITOR
-    public void TriggerHoveredEvent() => RaiseGameEvent(GameEventType.ElementHovered, _currentElement);
+    public void TriggerHoveredEvent() =>
+        _eventsChannel.Raise(GameEventType.ElementHovered,
+            new GridSnappableEventArgs(ConvertToGridSnappable(_currentElement), _pointerScreenPos, _pointerWorldPos));
 
-    public void TriggerUnhoveredEvent() => RaiseGameEvent(GameEventType.ElementUnhovered, _currentElement);
+    public void TriggerUnhoveredEvent() =>
+        _eventsChannel.Raise(GameEventType.ElementUnhovered,
+            new GridSnappableEventArgs(ConvertToGridSnappable(_currentElement), _pointerScreenPos, _pointerWorldPos));
 
-    public void TriggerSelectedEvent() => RaiseGameEvent(GameEventType.ElementSelected, _currentElement);
+    public void TriggerSelectedEvent() =>
+        _eventsChannel.Raise(GameEventType.ElementSelected,
+            new GridSnappableEventArgs(ConvertToGridSnappable(_currentElement), _pointerScreenPos, _pointerWorldPos));
 
-    public void TriggerDroppedEvent() => RaiseGameEvent(GameEventType.ElementDropped, _currentElement);
-
+    public void TriggerDroppedEvent() =>
+        _eventsChannel.Raise(GameEventType.ElementDropped,
+            new GridSnappableEventArgs(ConvertToGridSnappable(_currentElement), _pointerScreenPos, _pointerWorldPos));
 #endif
   }
 }

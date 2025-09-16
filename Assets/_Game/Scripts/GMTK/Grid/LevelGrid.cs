@@ -289,14 +289,14 @@ namespace GMTK {
         this.Log($"Started tracking '{element.name}' - was not in grid");
       }
 
-      // Notify DragFeedbackComponent to start visual feedback
+      // Notify _dragFeedbackComponent to start visual feedback
       if (element.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
         dragFeedback.StartDragFeedback();
       }
     }
 
     private void StopTrackingCurrentSelected() {
-      // Notify DragFeedbackComponent to stop visual feedback
+      // Notify _dragFeedbackComponent to stop visual feedback
       if (_currentSelected != null) {
         if (_currentSelected.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
           dragFeedback.StopDragFeedback();
@@ -549,6 +549,13 @@ namespace GMTK {
 
     public virtual bool CanPlace(GridSnappable snappable, Vector2Int gridOrigin) {
       foreach (var cell in snappable.GetWorldOccupiedCells(gridOrigin)) {
+        if (_occupancyMap.HasAnyOccupants(cell)) return false;
+      }
+      return true;
+    }
+
+    public virtual bool CanPlace(PlayableElement element, Vector2Int gridOrigin) {
+      foreach (var cell in element.GetWorldOccupiedCells(gridOrigin)) {
         if (_occupancyMap.HasAnyOccupants(cell)) return false;
       }
       return true;

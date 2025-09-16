@@ -12,7 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 120eebe2a0293e747bf291c30af29c29, type: 3}
   m_Name: AmebaStateMachine
   m_EditorClassIdentifier: 
-  StartingState: 
+  StartingState: Game
   Current: 
   NoRestrictions: 0
-  _serializedTransitions: []
+  _serializedTransitions:
+  - From:
+      Name: Start
+    Targets:
+    - Name: Game
+    - Name: OptionsMenu
+    - Name: Exit
+  - From:
+      Name: Game
+    Targets:
+    - Name: OptionsMenu
+    - Name: Pause
+    - Name: Gameover

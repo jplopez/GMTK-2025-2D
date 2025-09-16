@@ -914,6 +914,8 @@ MonoBehaviour:
   DefaultMixerGroup: {fileID: 8717407162667542489, guid: 235a4deb4ac403e43ae8a2defdc4cef3, type: 2}
   DefaultVolume: 1
   DefaultPitch: 1
+  ScaleActiveSourcesVolume: 1
+  ActiveSourcesVolumeFactor: 0.1
   DisableRandomization: 0
   VolumeRange: {x: 0.1, y: 2}
   PitchRange: {x: 0.3, y: 1.5}
