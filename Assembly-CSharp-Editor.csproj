@@ -81,6 +81,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_Game\Editor\GMTK_USS.uss" />
+    <None Include="Assets\_Game\Editor\PlayablePhysics.uss" />
+    <None Include="Assets\_Game\Editor\GMTK_UXML.uxml" />
     <None Include="Packages\com.bezi.sidekick\Editor\BeziSidekickInternal.dll" />
     <None Include="Assets\_Game\Editor\AmebaStateMachine_UXML.uxml" />
   </ItemGroup>

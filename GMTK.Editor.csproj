@@ -62,11 +62,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\SceneControllerEditor.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Elements\CollisionSourceFilterDrawer.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\SceneTransitionConfigEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\LevelServiceEditor.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Elements\PlayableElementEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\EditorUtils.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\DisplayWithoutEditDrawer.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\LevelConfigDrawer.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Elements\Gizmos\PlayableElementOccupancyGizmo.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateMachineEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\RaiseGameEventConfigEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateTransitionDrawer.cs" />

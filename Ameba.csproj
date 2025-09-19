@@ -62,11 +62,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IServiceLocalable.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\Core\InitializationComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\ScoreCalculationStrategy.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\ISelectable.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\AmebaController.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeVariableAttribute.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\IHover.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Events\EventChannel.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\IDraggable.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\IHoverable.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\DraggingController.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\GameState.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\StateChangePayload.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\IGameStateHandler.cs" />
@@ -76,10 +80,11 @@
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\ServiceRegistry.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeVariable.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\TimeBasedScoreCalculator.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\Core\InitializationManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\Pointer.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeMap.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\AmebaStateMachine.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\Attributes\InputHandlerAttribute.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\ISelector.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\ScoreGateKeeper.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\HandlerRegistry.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\DistanceBasedScoreCalculator.cs" />
@@ -89,7 +94,9 @@
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\StateMachine.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IEventChannelListener.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IPoolable.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Pool\AudioSourcePool.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeRegistry.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\IDragger.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\StateTransition.cs" />
   </ItemGroup>
   <ItemGroup>

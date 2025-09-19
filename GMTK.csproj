@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\UIStateHandler.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.IHoverable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\GameplayStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\ISceneConfiguration.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayerInputActionDispatcher.cs" />
@@ -69,28 +70,41 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\GameStateEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\LevelManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\OccupancyCell.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\PlayableElementComponent.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\GravityElementComponent.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\PhysicsElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\Components\SnappableComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridOccupancyMap.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\PlayableElementEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Levels\LevelConfig.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\LevelInventoryItem.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\SceneTransitionConfig.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\InventoryCategory.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.ISelector.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\GridSnappableEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\LevelCompleteController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.IDragger.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\InventoryEventData.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\Components\SnappablePhysics.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Attributes\DisplayWithoutEdit.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\ScoreConfig.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\AutoRotationElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Checkpoint.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\PlayableMarbleController.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Input\SnappableInputHandler.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.IDraggable.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\MaterialsElementComponent.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\PlayableElementDragFeedback.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\SnappableMaterialStrategy.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\LevelInventory.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\SceneController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Extensions\LoggerExtension.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.ISelectable.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\SnappableElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GMTKBootstrap.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\PlayableElementDragging.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\InputStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\LevelGrid.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\GameStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameEventType.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Levels\LevelService.cs" />
@@ -98,13 +112,17 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateMachine.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\GameElement.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateMachineEventChannel.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\SelectableElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\GUIController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\InputActionEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Booster.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\MarbleEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\PlayerControls.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\SnapDraggingFeedbackComponent.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.IHover.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\GridSnappable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\RaiseGameEventConfig.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\Components\DragFeedbackComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\GameInventory.cs" />
@@ -1242,6 +1260,10 @@
     <ProjectReference Include="Ameba.csproj">
       <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
       <Name>Ameba</Name>
+    </ProjectReference>
+    <ProjectReference Include="MoreMountains.Tools.csproj">
+      <Project>{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}</Project>
+      <Name>MoreMountains.Tools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
