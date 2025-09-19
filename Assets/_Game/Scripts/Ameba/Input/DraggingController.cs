@@ -12,43 +12,7 @@ namespace Ameba {
     [SerializeField] protected bool _enableDragging = true;
     [SerializeField] protected bool _debugLogging = false;
 
-    /// <summary>
-    /// Current object being dragged
-    /// </summary>
-    public IDraggable CurrentDragged { get; protected set; }
 
-    /// <summary>
-    /// Current object being hovered over
-    /// </summary>
-    public IDraggable CurrentHovered { get; protected set; }
-
-    /// <summary>
-    /// Current active/selected object
-    /// </summary>
-    public IDraggable CurrentActive { get; protected set; }
-
-    /// <summary>
-    /// Whether dragging is currently enabled
-    /// </summary>
-    public bool DraggingEnabled {
-      get => _enableDragging;
-      set => _enableDragging = value;
-    }
-
-    /// <summary>
-    /// Whether any object is currently being dragged
-    /// </summary>
-    public bool IsDragging => CurrentDragged != null;
-
-    /// <summary>
-    /// Whether any object is currently hovered
-    /// </summary>
-    public bool IsHovering => CurrentHovered != null;
-
-    /// <summary>
-    /// Whether any object is currently active
-    /// </summary>
-    public bool HasActiveElement => CurrentActive != null;
 
     #region Abstract Methods - Input Implementation
 
@@ -103,42 +67,12 @@ namespace Ameba {
 
     protected virtual void Update() {
       if (!_enableDragging) return;
-
-      UpdateHovering();
-      UpdateDragging();
       UpdateInput();
     }
 
     #endregion
 
     #region Core Dragging Logic
-
-    protected virtual void UpdateHovering() {
-      var hoveredObject = GetObjectAtPointer();
-
-      if (hoveredObject != CurrentHovered) {
-        // Exit previous hover
-        if (CurrentHovered != null) {
-          CurrentHovered.OnPointerExit();
-          OnObjectHoverEnd(CurrentHovered);
-        }
-
-        // Enter new hover
-        CurrentHovered = hoveredObject;
-        if (CurrentHovered != null) {
-          CurrentHovered.OnPointerEnter();
-          OnObjectHoverStart(CurrentHovered);
-        }
-      }
-    }
-
-    protected virtual void UpdateDragging() {
-      if (CurrentDragged != null) {
-        Vector3 worldPos = GetPointerWorldPosition();
-        CurrentDragged.OnDragUpdate(worldPos);
-        OnObjectDragUpdate(CurrentDragged, worldPos);
-      }
-    }
 
     protected virtual void UpdateInput() {
       // Handle primary button press
@@ -193,11 +127,11 @@ namespace Ameba {
     }
 
     protected virtual void HandlePrimaryRelease() {
-      if (CurrentDragged != null) {
-        StopDragging(CurrentDragged);
-      }
+      //if (CurrentDragged != null) {
+      //  StopDragging(CurrentDragged);
+      //}
 
-      OnPrimaryRelease(GetPointerWorldPosition(), CurrentDragged);
+      //OnPrimaryRelease(GetPointerWorldPosition(), CurrentDragged);
     }
 
     protected virtual void HandleSecondaryPress() {
@@ -225,44 +159,44 @@ namespace Ameba {
     #region Drag Management
 
     protected virtual void StartDragging(IDraggable obj) {
-      if (obj == null || !obj.IsDraggable) return;
+      //if (obj == null || !obj.IsDraggable) return;
 
-      CurrentDragged = obj;
-      obj.OnDragStart();
-      OnObjectDragStart(obj);
+      //CurrentDragged = obj;
+      //obj.OnDragStart();
+      //OnObjectDragStart(obj);
 
-      DebugLog($"Started dragging {obj}");
+      //DebugLog($"Started dragging {obj}");
     }
 
     protected virtual void StopDragging(IDraggable obj) {
       if (obj == null) return;
 
-      obj.OnDragEnd();
-      OnObjectDragEnd(obj);
-      CurrentDragged = null;
+      //obj.OnDragEnd();
+      //OnObjectDragEnd(obj);
+      //CurrentDragged = null;
 
-      DebugLog($"Stopped dragging {obj}");
+      //DebugLog($"Stopped dragging {obj}");
     }
 
     protected virtual void SetActiveObject(IDraggable obj) {
-      if (obj == CurrentActive) return;
+      //if (obj == CurrentActive) return;
 
-      // Deactivate previous
-      if (CurrentActive != null) {
-        CurrentActive.IsActive = false;
-        CurrentActive.OnBecomeInactive();
-        OnObjectBecomeInactive(CurrentActive);
-      }
+      //// Deactivate previous
+      //if (CurrentActive != null) {
+      //  CurrentActive.IsActive = false;
+      //  CurrentActive.OnBecomeInactive();
+      //  OnObjectBecomeInactive(CurrentActive);
+      //}
 
-      // Activate new
-      CurrentActive = obj;
-      if (CurrentActive != null) {
-        CurrentActive.IsActive = true;
-        CurrentActive.OnBecomeActive();
-        OnObjectBecomeActive(CurrentActive);
-      }
+      //// Activate new
+      //CurrentActive = obj;
+      //if (CurrentActive != null) {
+      //  CurrentActive.IsActive = true;
+      //  CurrentActive.OnBecomeActive();
+      //  OnObjectBecomeActive(CurrentActive);
+      //}
 
-      DebugLog($"Active object changed to {obj}");
+      //DebugLog($"Active object changed to {obj}");
     }
 
     #endregion

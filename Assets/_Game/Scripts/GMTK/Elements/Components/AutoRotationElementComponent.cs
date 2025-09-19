@@ -20,7 +20,7 @@ namespace GMTK {
     public RotationDirections AutoRotationDirection = RotationDirections.Clockwise;
 
     [Header("Auto Rotation Constraints")]
-    [Tooltip("If true, auto rotation will respect the rotation limits from PlayableElementPhysics")]
+    [Tooltip("If true, auto rotation will respect the rotation limits from PhysicsElementComponent")]
     public bool RespectRotationLimits = true;
     [Tooltip("If true, auto rotation will pause when the element is being dragged")]
     public bool PauseOnDrag = true;
@@ -32,7 +32,7 @@ namespace GMTK {
     [SerializeField, DisplayWithoutEdit] private bool _isRotating = false;
     [SerializeField, DisplayWithoutEdit] private bool _isPaused = false;
 
-    private PlayableElementPhysics _physicsComponent;
+    private PhysicsElementComponent _physicsComponent;
     private bool _isDragging = false;
     private bool _isHovering = false;
 
@@ -45,7 +45,7 @@ namespace GMTK {
       }
 
       // Try to get the physics component for integration
-      _physicsComponent = _playableElement.GetComponent<PlayableElementPhysics>();
+      _physicsComponent = _playableElement.GetComponent<PhysicsElementComponent>();
 
       // Initialize rotation state
       UpdateRotationState();

@@ -9,10 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5542800092596650057}
+  - component: {fileID: 4315615596032914740}
   - component: {fileID: 3574247149974132831}
   - component: {fileID: 794265824971413072}
   - component: {fileID: 771818983478109027}
-  - component: {fileID: 5837626284638177325}
+  - component: {fileID: 6808478782076994236}
   m_Layer: 7
   m_Name: Ramp_3x1
   m_TagString: Untagged
@@ -36,6 +37,28 @@ Transform:
   - {fileID: 8879746121491160761}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4315615596032914740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2023003198559400959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 852fbbe6cb9b6614fa2190a842d3fec1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SnapTransform: {fileID: 5542800092596650057}
+  Model: {fileID: 5542800092596650057}
+  HighlightModel: {fileID: 0}
+  Draggable: 0
+  _occupiedCells: []
+  Flippable: 0
+  CanRotate: 0
+  SelectedFeedback: {fileID: 0}
+  PointerOnFeedback: {fileID: 0}
+  PointerOutFeedback: {fileID: 0}
 --- !u!212 &3574247149974132831
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -78,8 +101,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 5
-  m_SortingOrder: 0
+  m_SortingLayer: 4
+  m_SortingOrder: 1
   m_Sprite: {fileID: -7938867026890526847, guid: 084872b9862cb6f4095a9f2dcc973d39, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -117,7 +140,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 7
 --- !u!60 &771818983478109027
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -171,7 +194,7 @@ PolygonCollider2D:
       - {x: -1.4599999, y: -1.52}
       - {x: 1.4499999, y: -1.52}
   m_UseDelaunayMesh: 0
---- !u!114 &5837626284638177325
+--- !u!114 &6808478782076994236
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -180,23 +203,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 2023003198559400959}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da9b17e31f29c36419dc13260e2e8d90, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d81270cdb3f7e741a40535b81e087fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AppliedTemplate: {fileID: 0}
-  SnapTransform: {fileID: 5542800092596650057}
-  Model: {fileID: 5542800092596650057}
-  HighlightModel: {fileID: 3718797714339420354}
-  _occupiedCells: []
-  _rigidBody: {fileID: 0}
-  _collider: {fileID: 771818983478109027}
-  Draggable: 1
-  CanRotate: 1
-  Flippable: 1
-  StaticBody: 1
-  OverrideBodySettings: 0
-  Mass: 1
-  AngularDamping: 0.05
+  IsActive: 1
+  DelayRun: 0
+  InitialDelay: 0.1
+  SelectionTriggers: 0
+  HoverThreshold: 0.2
+  Accuracy: 0.8
+  MaxOffset: 2
+  _isSelected: 0
+  _canSelect: 1
+  OnSelectFeedback: {fileID: 0}
+  OnDeselectFeedback: {fileID: 0}
 --- !u!1 &3718797714339420354
 GameObject:
   m_ObjectHideFlags: 0
@@ -271,7 +291,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 5
+  m_SortingLayer: 4
   m_SortingOrder: 1
   m_Sprite: {fileID: -7938867026890526847, guid: 084872b9862cb6f4095a9f2dcc973d39, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

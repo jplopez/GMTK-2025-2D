@@ -7,15 +7,16 @@ namespace GMTK {
 
   /// <summary>
   /// Represents any object in the game that can be snapped into a LevelGrid and dragged by the player.
-  /// This class replaces GridSnappable and implements the IDraggable interface for improved dragging support.
+  /// This class replaces GridSnappable and implements the IDraggable, ISelectable, and IHoverable interfaces for improved interaction support.
   /// Additional abilities are provided by PlayableElementComponent-derived classes.
   /// </summary>
   [AddComponentMenu("GMTK/Playable Element")]
-  public class PlayableElement : MonoBehaviour, IDraggable {
+  [RequireComponent(typeof(SelectableElementComponent))]
+  public partial class PlayableElement : MonoBehaviour, IDraggable, ISelectable, IHoverable {
 
     public enum SnappableBodyType { Static, Interactive }
 
-    [Header("Snappable Settings")]
+    [Header("Model Settings")]
     [Tooltip("If set, this transform will be used for snapping instead of the GameObject's transform.")]
     public Transform SnapTransform; // if null, uses this.transform
     [Tooltip("If set, this transform will be used to look for SpriteRenderers, RigidBody and Collisions. If empty, it will use the GameObject's transform")]
@@ -23,34 +24,18 @@ namespace GMTK {
     [Tooltip("(Optional) highlight model to show when hovering or dragging.")]
     public GameObject HighlightModel;
 
-    [Header("Dragging")]
     [Tooltip("If true, the object can be dragged. Set it to false for elements that you want static in the playable area")]
     public bool Draggable = true;
 
     [Header("Local Grid Footprint")]
-    [SerializeField] protected List<Vector2Int> _occupiedCells = new();
+    public List<Vector2Int> OccupiedCells = new();
 
-    [Header("Actions")]
+    //[Header("Actions")]
     [Tooltip("If true, the object can be flipped on the X and Y axis")]
     public bool Flippable = false;
     [Tooltip("If true, the object can be rotated in its Z axis")]
     public bool CanRotate = false;
  
-    [Header("Feedbacks")]
-    [Tooltip("The feedback when the pointer selects the element.")]
-    public GameObject SelectedFeedback;
-    [Tooltip("The feedback when the pointer is over the element.")]
-    public GameObject PointerOnFeedback;
-    [Tooltip("The feedback when the pointer moves out of the element.")]
-    public GameObject PointerOutFeedback;
-
-    // IDraggable interface properties
-    public bool IsDraggable => Draggable;
-    public bool IsBeingDragged { get; private set; }
-    public bool IsActive { get; set; }
-    public Transform DragTransform => SnapTransform != null ? SnapTransform : transform;
-    public Collider2D InteractionCollider => _collider;
-
     // Public properties for compatibility with existing code
     public bool IsRegistered => _isRegistered;
 
@@ -59,10 +44,11 @@ namespace GMTK {
     private Quaternion _initialRotation;
     private Vector3 _initialScale;
     protected bool _isRegistered = false;
-    protected SnappableBodyType _bodyType = SnappableBodyType.Static;
+    //protected SnappableBodyType _bodyType = SnappableBodyType.Static;
     protected SpriteRenderer _modelRenderer;
     protected PolygonCollider2D _collider;
     protected List<PlayableElementComponent> _components = new();
+    private SelectableElementComponent _selectableComponent;
 
     // Events for components to listen to
     protected event Action<PlayableElementEventArgs> OnPlayableElementEvent;
@@ -109,6 +95,9 @@ namespace GMTK {
       _components.Clear();
       _components.AddRange(GetComponents<PlayableElementComponent>());
       _components.ForEach(comp => comp.TryInitialize());
+      
+      // Cache the SelectableElementComponent reference
+      _selectableComponent = GetComponent<SelectableElementComponent>();
     }
 
     private bool CheckForRenderers() {
@@ -141,67 +130,17 @@ namespace GMTK {
 
     #endregion
 
-    #region IDraggable Implementation
-
-    public virtual void OnDragStart() {
-      IsBeingDragged = true;
-      
-      // Notify components
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.DragStart);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-
-      this.Log($"Drag started on {name}");
-    }
-
-    public virtual void OnDragUpdate(Vector3 worldPosition) {
-      if (IsBeingDragged) {
-        UpdatePosition(worldPosition);
-        
-        // Notify components
-        var eventArgs = new PlayableElementEventArgs(this, worldPosition, PlayableElementEventType.DragUpdate);
-        OnPlayableElementEvent?.Invoke(eventArgs);
-      }
-    }
-
-    public virtual void OnDragEnd() {
-      IsBeingDragged = false;
-
-      // Notify components
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.DragEnd);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-
-      this.Log($"Drag ended on {name}");
-    }
-
-    public virtual void OnPointerEnter() => OnPointerOver();
-
-    public virtual void OnPointerExit() => OnPointerOut();
-
-    public virtual void OnBecomeActive() {
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.BecomeActive);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-      this.Log($"became active");
-    }
-
-    public virtual void OnBecomeInactive() {
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.BecomeInactive);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-      this.Log($"became inactive");
-    }
-
-    #endregion
-
     #region Occupancy (Grid System Compatibility)
 
-    public List<Vector2Int> GetFootprint() => _occupiedCells;
+    public List<Vector2Int> GetFootprint() => OccupiedCells;
 
     public IEnumerable<Vector2Int> GetWorldOccupiedCells(Vector2Int gridOrigin, bool flippedX = false, bool flippedY = false, int rotation = 0) {
       // Patch while we fill occupied cells for all snappables.
-      if (_occupiedCells.Count == 0) {
+      if (OccupiedCells.Count == 0) {
         yield return TransformLocalCell(Vector2Int.zero, flippedX, flippedY, rotation) + gridOrigin;
       }
       else {
-        foreach (var local in _occupiedCells) {
+        foreach (var local in OccupiedCells) {
           var transformed = TransformLocalCell(local, flippedX, flippedY, rotation);
           yield return transformed + gridOrigin;
         }
@@ -214,32 +153,16 @@ namespace GMTK {
 
       // Rotation in 90° increments
       return (rotation % 360) switch {
-        90 => new Vector2Int(-y, x),
-        180 => new Vector2Int(-x, -y),
-        270 => new Vector2Int(y, -x),
+        90 => new Vector2Int(-y - 1, x),
+        180 => new Vector2Int(-x - 1, -y - 1),
+        270 => new Vector2Int(y, -x - 1),
         _ => new Vector2Int(x, y),
       };
     }
 
     #endregion
 
-    #region Event Handlers (Compatibility with existing system)
-
-    public void OnPointerOver() {
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.PointerOver);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-      SetGlow(true);
-    }
-
-    public void OnPointerOut() {
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.PointerOut);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-      SetGlow(false);
-    }
-
-    public virtual void SetGlow(bool active) {
-      if (HighlightModel != null) HighlightModel.SetActive(active);
-    }
+    #region Event System
 
     public void AddComponentListener(PlayableElementComponent component) => OnPlayableElementEvent += component.OnPlayableElementEvent;
 
@@ -350,31 +273,6 @@ namespace GMTK {
     public override string ToString() => name;
   }
 
-  #region Event System for PlayableElement
-
-  public enum PlayableElementEventType {
-    DragStart, DragUpdate, DragEnd,
-    PointerOver, PointerOut,
-    BecomeActive, BecomeInactive,
-    RotateCW, RotateCCW,
-    FlippedX, FlippedY
-  }
-
-  public class PlayableElementEventArgs : EventArgs {
-    public PlayableElement Element { get; }
-    public Vector3 WorldPosition { get; }
-    public PlayableElementEventType EventType { get; }
-    public bool Handled { get; set; } = false;
-
-    public PlayableElementEventArgs(PlayableElement element, Vector3 worldPosition, PlayableElementEventType eventType) {
-      Element = element;
-      WorldPosition = worldPosition;
-      EventType = eventType;
-    }
-  }
-
-  #endregion
-
   #region Casting to GridSnappable (for compatibility)
 
   public static class PlayableElementExtensions {
@@ -395,8 +293,6 @@ namespace GMTK {
         snappable.Draggable = element.Draggable;
         snappable.Flippable = element.Flippable;
         snappable.CanRotate = element.CanRotate;
-        snappable.PointerOnFeedback = element.PointerOnFeedback;
-        snappable.PointerOutFeedback = element.PointerOutFeedback;
         snappable.transform.parent = null;
         GameObject.Destroy(snappable, ttl); // destroy after ttl seconds to avoid cluttering the scene
         return snappable;

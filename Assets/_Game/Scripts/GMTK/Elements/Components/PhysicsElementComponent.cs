@@ -6,8 +6,8 @@ namespace GMTK {
   /// Physics component for PlayableElement that handles rotation, movement, and collision behavior.
   /// Auto Rotation, Gravity and Material properties are now handled by separate components.
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Playable Physics Component")]
-  public class PlayableElementPhysics : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Physics Component")]
+  public class PhysicsElementComponent : PlayableElementComponent {
 
     public enum CollisionSourceFilter { Everything, MarbleOnly, ElementsOnly }
 
@@ -144,10 +144,10 @@ namespace GMTK {
       if (ChangeRotationOnCollision) {
         _playableElement.CanRotate = AllowRotation; // Use our rotation setting instead
       }
-      else {
-        // Use PlayableElement's rotation setting if we're not overriding
-        _playableElement.CanRotate = _playableElement.CanRotate; // Keep original value
-      }
+      //else {
+      //  // Use PlayableElement's rotation setting if we're not overriding
+      //  _playableElement.CanRotate = _playableElement.CanRotate; // Keep original value
+      //}
     }
 
     protected override bool Validate() => _rigidbody2D != null && _collider2D != null;
@@ -256,7 +256,7 @@ namespace GMTK {
         case CollisionSourceFilter.ElementsOnly:
           // Check if the colliding object is another playable element
           return collisionObject.GetComponent<PlayableElement>() != null ||
-                 collisionObject.GetComponent<PlayableElementPhysics>() != null;
+                 collisionObject.GetComponent<PhysicsElementComponent>() != null;
 
         default:
           return false;
@@ -487,7 +487,7 @@ namespace GMTK {
       foreach (var collider in overlapping) {
         if (collider != _collider2D && collider.gameObject != _playableElement.gameObject) {
           // Check if the overlapping object also has solid collision
-          var otherPhysics = collider.GetComponent<PlayableElementPhysics>();
+          var otherPhysics = collider.GetComponent<PhysicsElementComponent>();
           if (otherPhysics != null && otherPhysics.SolidOnCollision) {
             return true;
           }
@@ -723,7 +723,7 @@ namespace GMTK {
     // Legacy API for backward compatibility
     [System.Obsolete("Use GravityElementComponent component instead")]
     public void SetGravity(bool hasGravity, float multiplier = 1.0f) {
-      Debug.LogWarning("[PlayableElementPhysics] SetGravity is deprecated. Use GravityElementComponent component instead.");
+      Debug.LogWarning("[PhysicsElementComponent] SetGravity is deprecated. Use GravityElementComponent component instead.");
 
       // Try to find or create gravity component
       if (!_playableElement.TryGetComponent<GravityElementComponent>(out var gravityComp)) {
@@ -734,7 +734,7 @@ namespace GMTK {
 
     [System.Obsolete("Use MaterialsElementComponent component instead")]
     public void SetFrictionLevel(FrictionLevel level) {
-      Debug.LogWarning("[PlayableElementPhysics] SetFrictionLevel is deprecated. Use MaterialsElementComponent component instead.");
+      Debug.LogWarning("[PhysicsElementComponent] SetFrictionLevel is deprecated. Use MaterialsElementComponent component instead.");
 
       // Try to find or create material component
       if (!_playableElement.TryGetComponent<MaterialsElementComponent>(out var materialComp)) {
@@ -745,7 +745,7 @@ namespace GMTK {
 
     [System.Obsolete("Use MaterialsElementComponent component instead")]
     public void SetBouncinessLevel(BouncinessLevel level) {
-      Debug.LogWarning("[PlayableElementPhysics] SetBouncinessLevel is deprecated. Use MaterialsElementComponent component instead.");
+      Debug.LogWarning("[PhysicsElementComponent] SetBouncinessLevel is deprecated. Use MaterialsElementComponent component instead.");
 
       // Try to find or create material component
       if (!_playableElement.TryGetComponent<MaterialsElementComponent>(out var materialComp)) {
@@ -756,7 +756,7 @@ namespace GMTK {
 
     [System.Obsolete("Use AutoRotationElementComponent component instead")]
     public void SetAutoRotationSpeed(float speed) {
-      Debug.LogWarning("[PlayableElementPhysics] SetAutoRotationSpeed is deprecated. Use AutoRotationElementComponent component instead.");
+      Debug.LogWarning("[PhysicsElementComponent] SetAutoRotationSpeed is deprecated. Use AutoRotationElementComponent component instead.");
 
       // Try to find or create auto rotation component
       if (!_playableElement.TryGetComponent<AutoRotationElementComponent>(out var autoRotationComp)) {

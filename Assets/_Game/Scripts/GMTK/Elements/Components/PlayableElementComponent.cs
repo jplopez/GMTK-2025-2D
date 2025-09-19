@@ -107,6 +107,10 @@ namespace GMTK {
           HandleDragUpdate(eventArgs); break;
         case PlayableElementEventType.DragEnd:
           HandleDragEnd(eventArgs); break;
+        case PlayableElementEventType.DropSuccess:
+          HandleDropSuccess(eventArgs); break;
+        case PlayableElementEventType.DropInvalid:
+          HandleDropInvalid(eventArgs); break;
         case PlayableElementEventType.PointerOver:
           HandlePointerOver(eventArgs); break;
         case PlayableElementEventType.PointerOut:
@@ -123,6 +127,10 @@ namespace GMTK {
           HandleFlipX(eventArgs); break;
         case PlayableElementEventType.FlippedY:
           HandleFlipY(eventArgs); break;
+        case PlayableElementEventType.Selected:
+          HandleSelected(eventArgs); break;
+        case PlayableElementEventType.Deselected:
+          HandleDeselected(eventArgs); break;
       }
     }
 
@@ -136,6 +144,8 @@ namespace GMTK {
     protected virtual void HandleDragStart(PlayableElementEventArgs evt) { }
     protected virtual void HandleDragUpdate(PlayableElementEventArgs evt) { }
     protected virtual void HandleDragEnd(PlayableElementEventArgs evt) { }
+    protected virtual void HandleDropSuccess(PlayableElementEventArgs evt) { }
+    protected virtual void HandleDropInvalid(PlayableElementEventArgs evt) { }
     protected virtual void HandlePointerOver(PlayableElementEventArgs evt) { }
     protected virtual void HandlePointerOut(PlayableElementEventArgs evt) { }
     protected virtual void HandleBecomeActive(PlayableElementEventArgs evt) { }
@@ -144,6 +154,8 @@ namespace GMTK {
     protected virtual void HandleRotateCounterClockwise(PlayableElementEventArgs evt) { }
     protected virtual void HandleFlipX(PlayableElementEventArgs evt) { }
     protected virtual void HandleFlipY(PlayableElementEventArgs evt) { }
+    protected virtual void HandleSelected(PlayableElementEventArgs evt) { }
+    protected virtual void HandleDeselected(PlayableElementEventArgs evt) { }
 
     public void RunBeforeUpdate() { if (IsActive && isInitialized) BeforeUpdate(); }
     public void RunOnUpdate() {
@@ -187,5 +199,4 @@ namespace GMTK {
     protected virtual void OnDelayedUpdate() { }
     protected virtual void ResetComponent() { }
   }
-
 }

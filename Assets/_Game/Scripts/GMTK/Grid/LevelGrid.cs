@@ -36,7 +36,7 @@ namespace GMTK {
 
     [Header("Input Handler")]
     [Tooltip("Reference to the InputHandler detecting moving elements")]
-    [SerializeField] protected SnappableInputHandler _inputHandler;
+    [SerializeField] protected PlayableElementInputHandler _inputHandler;
 
     [Header("Gizmos")]
     [SerializeField] private bool enableGizmos = true;
@@ -56,6 +56,7 @@ namespace GMTK {
 
     public Vector2 GridOrigin => _gridOrigin;
 
+    private bool _isInitialized = false;
     protected Vector2 _gridOrigin = Vector2.zero;
     protected GridOccupancyMap _occupancyMap;
     protected GridSnappable _currentSelected;
@@ -101,8 +102,9 @@ namespace GMTK {
     #region Initialization
 
     protected virtual void Initialize() {
+      _isInitialized = false;
       if (_inputHandler == null) {
-        this.LogWarning($"SnappableInputHandler is missing. LevelGrid will not be able to track player inputs on Elements");
+        this.LogWarning($"PlayableElementInputHandler is missing. LevelGrid will not be able to track player inputs on Elements");
         return;
       }
 
@@ -120,6 +122,7 @@ namespace GMTK {
       InitializeGrid();
       InitializeAllEdgeColliderBounds();
       UpdateAllEdgeColliderBoundPoints();
+      _isInitialized = true;
     }
     protected virtual void InitializeGrid() {
 
@@ -283,10 +286,10 @@ namespace GMTK {
         _elementOriginalGridPosition = WorldToGrid(currentPosition);
         // Unregister from grid while moving to avoid conflicts
         _occupancyMap.Unregister(element, _elementOriginalGridPosition);
-        this.Log($"Started tracking '{element.name}' - unregistered from ({_elementOriginalGridPosition})");
+        this.LogDebug($"Started tracking '{element.name}' - unregistered from ({_elementOriginalGridPosition})");
       }
       else {
-        this.Log($"Started tracking '{element.name}' - was not in grid");
+        this.LogDebug($"Started tracking '{element.name}' - was not in grid");
       }
 
       // Notify _dragFeedbackComponent to start visual feedback
@@ -351,7 +354,7 @@ namespace GMTK {
 
       // Request inventory to add this element
       _eventsChannel.Raise(GameEventType.InventoryAddRequest, eventData);
-      this.Log($"Requested inventory to add {element.name} with context");
+      this.LogDebug($"Requested inventory to add {element.name} with context");
 
       //else {
       //  // Fallback to old positioning system
@@ -371,7 +374,7 @@ namespace GMTK {
             UnityEngine.Random.Range(-bounds.size.y * 0.4f, bounds.size.y * 0.4f),
             0);
         element.transform.position = bounds.center + randomOffset;
-        this.Log($"Used fallback positioning for {element.name}");
+        this.LogDebug($"Used fallback positioning for {element.name}");
       }
       else {
         element.transform.position = ELEMENT_DEFAULT_POSITION;
@@ -380,13 +383,13 @@ namespace GMTK {
 
     protected virtual void HandleInventoryElementAdded(InventoryEventData data) {
       if (data.Success) {
-        this.Log($"Element successfully added to inventory: {data.ElementName} " +
+        this.LogDebug($"Element successfully added to inventory: {data.ElementName} " +
                  $"(Available: {data.AvailableQuantity}/{data.TotalQuantity}) from {data.SourceSystem}");
 
         // Element was successfully added to inventory and destroyed by LevelInventory
         // We can use the rich context for additional logic
         if (data.WasInGrid) {
-          this.Log($"Element was moved from grid to inventory");
+          this.LogDebug($"Element was moved from grid to inventory");
         }
       }
       else {
@@ -400,7 +403,7 @@ namespace GMTK {
 
     protected virtual void HandleInventoryElementRetrieved(InventoryEventData data) {
       if (data.Success && data.Element != null) {
-        this.Log($"Element retrieved from inventory: {data.ElementName} " +
+        this.LogDebug($"Element retrieved from inventory: {data.ElementName} " +
                  $"(Remaining: {data.AvailableQuantity}/{data.TotalQuantity}) by {data.SourceSystem}");
 
         // Position the retrieved element based on context
@@ -428,7 +431,7 @@ namespace GMTK {
     }
 
     protected virtual void HandleInventoryUpdated(InventoryEventData data) {
-      this.Log($"Inventory updated: {data.Message} | Source: {data.SourceSystem}");
+      this.LogDebug($"Inventory updated: {data.Message} | Source: {data.SourceSystem}");
       // Could trigger UI updates or other systems that care about inventory state
     }
 
@@ -449,7 +452,7 @@ namespace GMTK {
       element.transform.position = targetPosition;
       element.Draggable = true;
 
-      this.Log($"Positioned retrieved element {element.name} at {targetPosition} " +
+      this.LogDebug($"Positioned retrieved element {element.name} at {targetPosition} " +
                $"(Category: {context.CategoryId}, Source: {context.SourceSystem})");
     }
     #endregion
@@ -465,7 +468,7 @@ namespace GMTK {
         if (_elementWasInGrid) {
           _elementOriginalGridPosition = WorldToGrid(_elementOriginalWorldPosition);
         }
-        this.Log($"Element '{e.Element.name}' selected at {_elementOriginalWorldPosition}");
+        this.LogDebug($"Element '{e.Element.name}' selected at {_elementOriginalWorldPosition}");
         if (_elementWasInGrid) this.Log($"Element '{e.Element.name}' at grid {_elementOriginalGridPosition}");
         e.Element.OnPointerOver();
       }
@@ -485,7 +488,7 @@ namespace GMTK {
           if (CanPlace(element, newGridOrigin)) {
             element.transform.position = SnapToGrid(newGridOrigin);
             _occupancyMap.Register(element, newGridOrigin);
-            this.Log($"Placed {element.name} at {newGridOrigin}");
+            this.LogDebug($"Placed {element.name} at {newGridOrigin}");
           }
           else {
             // Failed to place - return to original position if it was in grid
@@ -493,24 +496,24 @@ namespace GMTK {
 
               element.transform.position = SnapToGrid(_elementOriginalGridPosition);
               _occupancyMap.Register(element, _elementOriginalGridPosition);
-              this.Log($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
+              this.LogDebug($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
             }
             // Element came from outside grid - return to inventory
             else {
               HandleElementReturnToInventory(element);
-              this.Log($"Returned {element.name} to inventory");
+              this.LogDebug($"Returned {element.name} to inventory");
             }
           }
 
           // Check if this was the element we were tracking
           if (element == _currentSelected) {
-            this.Log($"Dropping tracked element '{element.name}' at {newGridOrigin}");
+            this.LogDebug($"Dropping tracked element '{element.name}' at {newGridOrigin}");
             // Clean up tracking
             StopTrackingCurrentSelected();
           }
           else {
             // Element wasn't being tracked (probably just clicked)
-            this.Log($"Element '{element.name}' clicked but not moved");
+            this.LogDebug($"Element '{element.name}' clicked but not moved");
           }
         }
       }
@@ -548,6 +551,7 @@ namespace GMTK {
     public bool IsOccupied(Vector2 position) => _occupancyMap.HasAnyOccupants(position);
 
     public virtual bool CanPlace(GridSnappable snappable, Vector2Int gridOrigin) {
+      if (!_isInitialized) return false;
       foreach (var cell in snappable.GetWorldOccupiedCells(gridOrigin)) {
         if (_occupancyMap.HasAnyOccupants(cell)) return false;
       }
@@ -555,6 +559,7 @@ namespace GMTK {
     }
 
     public virtual bool CanPlace(PlayableElement element, Vector2Int gridOrigin) {
+      if (!_isInitialized) return false;
       foreach (var cell in element.GetWorldOccupiedCells(gridOrigin)) {
         if (_occupancyMap.HasAnyOccupants(cell)) return false;
       }

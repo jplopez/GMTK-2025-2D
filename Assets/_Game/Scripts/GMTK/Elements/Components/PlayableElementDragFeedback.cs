@@ -45,8 +45,8 @@ namespace GMTK {
 
     // State tracking
     private bool _isDragging = false;
-    private bool _isHovering = false;
-    private bool _isValidDropZone = true;
+    //private bool _isHovering = false;
+    //private bool _isValidDropZone = true;
     private Color _originalColor;
     private Color _targetColor;
     private SpriteRenderer _renderer;
@@ -86,7 +86,7 @@ namespace GMTK {
       if (evt.Element != _playableElement) return;
 
       _isDragging = true;
-      _isHovering = false;
+      //_isHovering = false;
       _pulseTimer = 0f;
 
       // Start with neutral dragging color
@@ -110,7 +110,7 @@ namespace GMTK {
     protected override void HandlePointerOver(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || _isDragging) return;
 
-      _isHovering = true;
+      //_isHovering = true;
       // Light highlight when hovering (not dragging)
       _targetColor = HoverColor;
       _targetColor.a = HoverAlpha;
@@ -119,7 +119,7 @@ namespace GMTK {
     protected override void HandlePointerOut(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || _isDragging) return;
 
-      _isHovering = false;
+      //_isHovering = false;
       // Return to original color when not hovering
       _targetColor = _originalColor;
     }
@@ -146,7 +146,7 @@ namespace GMTK {
     }
 
     private void SetValidDropZone(bool isValid) {
-      _isValidDropZone = isValid;
+      //_isValidDropZone = isValid;
       _targetColor = isValid ? ValidDropColor : InvalidDropColor;
       _targetColor.a = DragAlpha;
     }
@@ -202,7 +202,7 @@ namespace GMTK {
       if (_renderer != null) {
         _renderer.color = _originalColor;
       }
-      _isHovering = false;
+      //_isHovering = false;
     }
 
     // Legacy compatibility handlers

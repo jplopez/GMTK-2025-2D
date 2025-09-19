@@ -25,7 +25,7 @@ namespace GMTK {
     [SerializeField, DisplayWithoutEdit] private Rigidbody2D _rigidbody2D;
     [SerializeField, DisplayWithoutEdit] private float _currentGravityScale;
 
-    private PlayableElementPhysics _physicsComponent;
+    private PhysicsElementComponent _physicsComponent;
 
     protected override void Initialize() {
       // Get required components
@@ -36,7 +36,7 @@ namespace GMTK {
       }
 
       // Try to get the physics component for integration
-      _physicsComponent = _playableElement.GetComponent<PlayableElementPhysics>();
+      _physicsComponent = _playableElement.GetComponent<PhysicsElementComponent>();
 
       // Apply initial gravity settings
       UpdateGravity();

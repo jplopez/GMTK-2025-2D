@@ -74,7 +74,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 5
+  m_SortingLayer: 4
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 1a7cbbfee9db42247985a1e982ad5a58, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -96,10 +96,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2613725006712789763}
-  - component: {fileID: 7721471715386369477}
+  - component: {fileID: 3010473190746398589}
   - component: {fileID: 4709464889615310111}
   - component: {fileID: 9162873659418208509}
   - component: {fileID: 5560866668721753946}
+  - component: {fileID: 7083012866832140322}
   m_Layer: 7
   m_Name: Ramp_1x1
   m_TagString: Untagged
@@ -123,7 +124,7 @@ Transform:
   - {fileID: 8893451546942822966}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7721471715386369477
+--- !u!114 &3010473190746398589
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -132,23 +133,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 6107416296668224829}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da9b17e31f29c36419dc13260e2e8d90, type: 3}
+  m_Script: {fileID: 11500000, guid: 852fbbe6cb9b6614fa2190a842d3fec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AppliedTemplate: {fileID: 11400000, guid: ce665a2615eeecc47ba1250185588272, type: 2}
   SnapTransform: {fileID: 2613725006712789763}
   Model: {fileID: 2613725006712789763}
-  HighlightModel: {fileID: 1851865663591360781}
+  HighlightModel: {fileID: 0}
+  Draggable: 0
   _occupiedCells: []
-  _rigidBody: {fileID: 5560866668721753946}
-  _collider: {fileID: 9162873659418208509}
-  Draggable: 1
-  CanRotate: 1
-  Flippable: 1
-  StaticBody: 1
-  OverrideBodySettings: 0
-  Mass: 1
-  AngularDamping: 0.05
+  Flippable: 0
+  CanRotate: 0
+  SelectedFeedback: {fileID: 0}
+  PointerOnFeedback: {fileID: 0}
+  PointerOutFeedback: {fileID: 0}
 --- !u!212 &4709464889615310111
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -191,8 +188,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1878654211
-  m_SortingLayer: 5
-  m_SortingOrder: 0
+  m_SortingLayer: 4
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 1a7cbbfee9db42247985a1e982ad5a58, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -274,7 +271,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 0
-  m_Material: {fileID: 6200000, guid: e7891e9b65e88644f870f903e67531f3, type: 2}
+  m_Material: {fileID: 6200000, guid: 159821a8f41c62f43b8779a7f445da0f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -284,4 +281,27 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 7
+--- !u!114 &7083012866832140322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107416296668224829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d81270cdb3f7e741a40535b81e087fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsActive: 1
+  DelayRun: 0
+  InitialDelay: 0.1
+  SelectionTriggers: 0
+  HoverThreshold: 0.2
+  Accuracy: 0.8
+  MaxOffset: 2
+  _isSelected: 0
+  _canSelect: 1
+  OnSelectFeedback: {fileID: 0}
+  OnDeselectFeedback: {fileID: 0}

@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7956316667899920837}
+  - component: {fileID: 1641467828553944183}
   - component: {fileID: 7926144506979983261}
   - component: {fileID: 8807545580737657185}
   - component: {fileID: 3708051782456796498}
-  - component: {fileID: 4346465707993233227}
-  - component: {fileID: 324596006050025253}
+  - component: {fileID: 6937583693255677144}
   m_Layer: 7
   m_Name: Platform_YengaThin
   m_TagString: Untagged
@@ -37,6 +37,28 @@ Transform:
   - {fileID: 7866857387545042591}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1641467828553944183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 617128071334964795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 852fbbe6cb9b6614fa2190a842d3fec1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SnapTransform: {fileID: 7956316667899920837}
+  Model: {fileID: 7956316667899920837}
+  HighlightModel: {fileID: 0}
+  Draggable: 0
+  _occupiedCells: []
+  Flippable: 0
+  CanRotate: 0
+  SelectedFeedback: {fileID: 0}
+  PointerOnFeedback: {fileID: 0}
+  PointerOutFeedback: {fileID: 0}
 --- !u!212 &7926144506979983261
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -118,7 +140,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 3
+  m_Constraints: 7
 --- !u!60 &3708051782456796498
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -170,7 +192,7 @@ PolygonCollider2D:
       - {x: -0.56, y: -1.49}
       - {x: 0.56, y: -1.49}
   m_UseDelaunayMesh: 0
---- !u!114 &4346465707993233227
+--- !u!114 &6937583693255677144
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -179,54 +201,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 617128071334964795}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da9b17e31f29c36419dc13260e2e8d90, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d81270cdb3f7e741a40535b81e087fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SnapTransform: {fileID: 7956316667899920837}
-  Model: {fileID: 7956316667899920837}
-  HighlightModel: {fileID: 4057196616176214308}
-  Draggable: 1
-  _occupiedCells:
-  - {x: 0, y: 2}
-  - {x: 0, y: 1}
-  - {x: 0, y: 0}
-  - {x: 0, y: -1}
-  - {x: 0, y: -2}
-  - {x: 0, y: -3}
-  - {x: -1, y: 2}
-  - {x: -1, y: 1}
-  - {x: -1, y: 0}
-  - {x: -1, y: -1}
-  - {x: -1, y: -2}
-  - {x: -1, y: -3}
-  BehaviourDelegate: 1
-  Flippable: 0
-  CanRotate: 1
-  PointerOnFeedback: {fileID: 0}
-  PointerOutFeedback: {fileID: 0}
---- !u!114 &324596006050025253
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 617128071334964795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d099d47a97942243af506ddec5f1205, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsActive: 0
+  IsActive: 1
   DelayRun: 0
   InitialDelay: 0.1
-  ValidDropColor: {r: 0, g: 1, b: 0, a: 1}
-  InvalidDropColor: {r: 1, g: 0, b: 0, a: 1}
-  DraggingColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  DragAlpha: 0.7
-  ColorTransitionSpeed: 5
-  EnablePulseEffect: 1
-  PulseSpeed: 2
-  PulseIntensity: 0.2
+  SelectionTriggers: 0
+  HoverThreshold: 0.2
+  Accuracy: 0.8
+  MaxOffset: 2
+  _isSelected: 0
+  _canSelect: 1
+  OnSelectFeedback: {fileID: 0}
+  OnDeselectFeedback: {fileID: 0}
 --- !u!1 &4057196616176214308
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,7 @@ namespace GMTK {
 
   /// <summary>
   /// MonoBehaviour to handle player input for PlayableElement objects, enabling selection, dragging, rotation, and flipping.
-  /// Extends DraggingController to implement the dragging system using PlayerInputActionDispatcher.
+  /// Implements dragging logic directly without depending on DraggingController.
   /// 
   /// <para><b>Events:</b></para>
   /// <list type="bullet">
@@ -18,9 +18,11 @@ namespace GMTK {
   ///   <item><b>OnElementSecondary</b>: Reserved for secondary interactions (e.g., right-click). Not yet implemented.</item>
   /// </list>
   /// </summary>
-  public class SnappableInputHandler : DraggingController {
+  public partial class PlayableElementInputHandler : MonoBehaviour, ISelector<PlayableElement>, IDragger<PlayableElement>, IHover<PlayableElement> {
 
-    [Header("Snappable Input Handler")]
+    [Header("Input Handler Settings")]
+    [SerializeField] private bool _enableInput = true;
+    [SerializeField] private bool _debugLogging = false;
     [SerializeField] private PlayableElement _currentElement;
     [SerializeField] private PlayableElement _lastElementOver;
 
@@ -37,8 +39,6 @@ namespace GMTK {
 
     [SerializeField] private Vector2 _pointerScreenPos;
     [SerializeField] private Vector3 _pointerWorldPos;
-
-    protected bool DisableDragging = false;
 
     protected GameEventChannel _eventsChannel;
     protected PlayerInputActionDispatcher _inputDispatcher;
@@ -86,124 +86,298 @@ namespace GMTK {
 
     #endregion
 
-    #region DraggingController Implementation
+    #region Core Update Logic (replacing DraggingController)
 
-    protected override Vector2 GetPointerScreenPosition() {
+    public void Update() {
+      if (!_enableInput) return;
+
+      UpdatePointerPosition();
+      UpdateInput();
+    }
+
+    protected virtual void UpdateInput() {
+      // Update hover detection
+      UpdateHover();
+
+      // Handle element position updates during dragging
+      if (IsDragging && DraggedElement != null) {
+        UpdateDrag(_pointerWorldPos);
+      }
+
+      // Handle primary button press
+      if (GetPrimaryButtonDown()) {
+        HandlePrimaryPress();
+      }
+
+      // Handle primary button release
+      if (GetPrimaryButtonUp()) {
+        HandlePrimaryRelease();
+      }
+
+      // Handle secondary button press
+      if (GetSecondaryButtonDown()) {
+        HandleSecondaryPress();
+      }
+
+      // Handle secondary button release
+      if (GetSecondaryButtonUp()) {
+        HandleSecondaryRelease();
+      }
+
+      // Handle double clicks (if implemented in the future)
+      if (GetPrimaryDoubleClick()) {
+        HandlePrimaryDoubleClick();
+      }
+
+      if (GetSecondaryDoubleClick()) {
+        HandleSecondaryDoubleClick();
+      }
+    }
+
+    #endregion
+
+    #region Input Handlers (from DraggingController)
+
+    protected virtual void HandlePrimaryPress() {
+      var targetObject = GetObjectAtPointer();
+
+      if (targetObject != null && targetObject.IsDraggable) {
+        // Start dragging
+        StartDragging(targetObject);
+        // Set as active
+        SetActiveObject(targetObject);
+      }
+      else {
+        // Clicked on empty space - clear active object
+        SetActiveObject(null);
+      }
+
+      OnPrimaryPress(_pointerWorldPos, targetObject);
+    }
+
+    protected virtual void HandlePrimaryRelease() {
+      if (IsDragging && DraggedElement != null) {
+        StopDragging(DraggedElement);
+      }
+
+      OnPrimaryRelease(_pointerWorldPos, DraggedElement);
+    }
+
+    protected virtual void HandleSecondaryPress() {
+      var targetObject = GetObjectAtPointer();
+      OnSecondaryPress(_pointerWorldPos, targetObject);
+    }
+
+    protected virtual void HandleSecondaryRelease() {
+      var targetObject = GetObjectAtPointer();
+      OnSecondaryRelease(_pointerWorldPos, targetObject);
+    }
+
+    protected virtual void HandlePrimaryDoubleClick() {
+      var targetObject = GetObjectAtPointer();
+      OnPrimaryDoubleClick(_pointerWorldPos, targetObject);
+    }
+
+    protected virtual void HandleSecondaryDoubleClick() {
+      var targetObject = GetObjectAtPointer();
+      OnSecondaryDoubleClick(_pointerWorldPos, targetObject);
+    }
+
+    #endregion
+
+    #region Drag Management (from DraggingController)
+
+    protected virtual void StartDragging(IDraggable obj) {
+      if (obj == null || !obj.IsDraggable) return;
+
+      if (obj is PlayableElement element) {
+        TryStartDrag(element);
+      }
+
+      OnObjectDragStart(obj);
+      DebugLog($"Started dragging {obj}");
+    }
+
+    protected virtual void StopDragging(IDraggable obj) {
+      if (obj == null) return;
+
+      if (obj is PlayableElement element && DraggedElement == element) {
+        TryStopDrag();
+      }
+
+      OnObjectDragEnd(obj);
+      DebugLog($"Stopped dragging {obj}");
+    }
+
+    protected virtual void SetActiveObject(IDraggable obj) {
+      if (obj is PlayableElement element) {
+        // Deactivate previous
+        if (_currentElement != null && _currentElement != element) {
+          _currentElement.IsActive = false;
+          _currentElement.OnBecomeInactive();
+          OnObjectBecomeInactive(_currentElement);
+        }
+
+        // Activate new
+        _currentElement = element;
+        if (_currentElement != null) {
+          _currentElement.IsActive = true;
+          _currentElement.OnBecomeActive();
+          OnObjectBecomeActive(_currentElement);
+        }
+      }
+      else if (obj == null) {
+        // Deactivate current
+        if (_currentElement != null) {
+          _currentElement.IsActive = false;
+          _currentElement.OnBecomeInactive();
+          OnObjectBecomeInactive(_currentElement);
+          _currentElement = null;
+        }
+      }
+
+      DebugLog($"Active object changed to {obj}");
+    }
+
+    #endregion
+
+    #region Object Detection (from DraggingController)
+
+    /// <summary>
+    /// Get the IDraggable object at the current pointer position
+    /// </summary>
+    protected virtual IDraggable GetObjectAtPointer() {
+      Vector2 worldPos = _pointerWorldPos;
+      RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
+
+      if (hit.collider != null) {
+        var draggable = hit.collider.GetComponent<IDraggable>();
+        if (draggable != null) {
+          return draggable;
+        }
+
+        // Also try getting from parent
+        draggable = hit.collider.GetComponentInParent<IDraggable>();
+        return draggable;
+      }
+
+      return null;
+    }
+
+    #endregion
+
+    #region Pointer Positions
+
+    public Vector2 GetPointerScreenPosition() {
       UpdatePointerPosition();
       return _pointerScreenPos;
     }
 
-    protected override Vector3 GetPointerWorldPosition() {
+    public Vector3 GetPointerWorldPosition() {
       UpdatePointerPosition();
       return _pointerWorldPos;
     }
 
-    protected override bool GetPrimaryButtonDown() {
+    #endregion
+
+    #region Button State Methods (from DraggingController)
+
+    protected bool GetPrimaryButtonDown() {
       bool result = _primaryPressed;
       _primaryPressed = false; // Reset after reading
       return result;
     }
 
-    protected override bool GetPrimaryButtonUp() {
+    protected bool GetPrimaryButtonUp() {
       bool result = _primaryReleased;
       _primaryReleased = false; // Reset after reading
       return result;
     }
 
-    protected override bool GetPrimaryButtonHeld() {
+    protected bool GetPrimaryButtonHeld() {
       return IsMoving; // Use our existing tracking
     }
 
-    protected override bool GetSecondaryButtonDown() {
+    protected bool GetSecondaryButtonDown() {
       bool result = _secondaryPressed;
       _secondaryPressed = false; // Reset after reading
       return result;
     }
 
-    protected override bool GetSecondaryButtonUp() {
+    protected bool GetSecondaryButtonUp() {
       bool result = _secondaryReleased;
       _secondaryReleased = false; // Reset after reading
       return result;
     }
 
-    protected override bool GetPrimaryDoubleClick() {
+    protected bool GetPrimaryDoubleClick() {
       // Not implemented in the current system
       return false;
     }
 
-    protected override bool GetSecondaryDoubleClick() {
+    protected bool GetSecondaryDoubleClick() {
       // Not implemented in the current system
       return false;
     }
 
     #endregion
 
-    #region Overridden DraggingController Methods
+    #region Virtual Event Methods (from DraggingController)
 
-    protected override void Update() {
-      UpdatePointerPosition();
-
-      // Handle element position updates during dragging
-      if (IsMoving && _currentElement != null) {
-        _currentElement.UpdatePosition(_pointerWorldPos);
-      }
-
-      // Handle hover detection
-      UpdateHoverDetection();
-
-      // Call base update for dragging controller logic
-      base.Update();
-    }
-
-    protected override IDraggable GetObjectAtPointer() {
-      if (TryGetElementOnCurrentPointer(out PlayableElement element)) {
-        return element;
-      }
-      return null;
-    }
-
-    protected override void OnObjectHoverStart(IDraggable obj) {
+    protected virtual void OnObjectHoverStart(IDraggable obj) {
       if (obj is PlayableElement element) {
-        _lastElementOver = element;
-        IsOverElement = true;
-        element.OnPointerOver();
-        _eventsChannel.Raise(GameEventType.ElementHovered,
-            new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
+        StartHover(element);
       }
     }
 
-    protected override void OnObjectHoverEnd(IDraggable obj) {
-      if (obj is PlayableElement element) {
-        element.OnPointerOut();
-        _eventsChannel.Raise(GameEventType.ElementUnhovered,
-            new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
-
-        if (_lastElementOver == element) {
-          _lastElementOver = null;
-          IsOverElement = false;
-        }
+    protected virtual void OnObjectHoverEnd(IDraggable obj) {
+      if (obj is PlayableElement element && HoveredElement == element) {
+        StopHover();
       }
     }
 
-    protected override void OnObjectDragStart(IDraggable obj) {
-      if (obj is PlayableElement element) {
-        _currentElement = element;
-        IsMoving = true;
-        _eventsChannel.Raise(GameEventType.ElementSelected,
-            new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
-      }
+    protected virtual void OnObjectDragStart(IDraggable obj) {
+      // Already handled in StartDragging method
     }
 
-    protected override void OnObjectDragEnd(IDraggable obj) {
-      if (obj is PlayableElement element) {
-        _eventsChannel.Raise(GameEventType.ElementDropped,
-            new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
+    protected virtual void OnObjectDragUpdate(IDraggable obj, Vector3 worldPosition) {
+      // Handled in UpdateDrag method
+    }
 
-        if (_currentElement == element) {
-          _currentElement = null;
-          IsMoving = false;
-        }
-      }
+    protected virtual void OnObjectDragEnd(IDraggable obj) {
+      // Already handled in StopDragging method
+    }
+
+    protected virtual void OnObjectBecomeActive(IDraggable obj) {
+      // Handled in SetActiveObject method
+    }
+
+    protected virtual void OnObjectBecomeInactive(IDraggable obj) {
+      // Handled in SetActiveObject method
+    }
+
+    protected virtual void OnPrimaryPress(Vector3 worldPosition, IDraggable targetObject) {
+      // Override for custom behavior
+    }
+
+    protected virtual void OnPrimaryRelease(Vector3 worldPosition, IDraggable targetObject) {
+      // Override for custom behavior
+    }
+
+    protected virtual void OnSecondaryPress(Vector3 worldPosition, IDraggable targetObject) {
+      // Override for custom behavior
+    }
+
+    protected virtual void OnSecondaryRelease(Vector3 worldPosition, IDraggable targetObject) {
+      // Override for custom behavior
+    }
+
+    protected virtual void OnPrimaryDoubleClick(Vector3 worldPosition, IDraggable targetObject) {
+      // Override for custom behavior
+    }
+
+    protected virtual void OnSecondaryDoubleClick(Vector3 worldPosition, IDraggable targetObject) {
+      // Override for custom behavior
     }
 
     #endregion
@@ -217,12 +391,6 @@ namespace GMTK {
       }
     }
 
-    private void UpdateHoverDetection() {
-      // This method maintains compatibility with the original hover detection system
-      // The base DraggingController also handles hover, but we need this for legacy event compatibility
-      // In the future, this could be simplified to rely entirely on the base class
-    }
-
     private bool TryGetElementOnCurrentPointer(out PlayableElement element) {
       // Raycast to detect the element under the cursor
       Vector2 worldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPos);
@@ -230,7 +398,7 @@ namespace GMTK {
 
       // Check if we hit something
       if (hit && hit.collider != null && hit.collider.gameObject is var selected) {
-        // Check if it's a PlayableElement and is draggable
+        // Check if it's a PlayableElement
         if (selected.TryGetComponent(out element)) {
           return true;
         }
@@ -255,6 +423,12 @@ namespace GMTK {
       return false;
     }
 
+    protected void DebugLog(string message) {
+      if (_debugLogging) {
+        Debug.Log($"[{GetType().Name}] {message}");
+      }
+    }
+
     #endregion
 
     #region Legacy Input Action Methods (for compatibility)
@@ -265,6 +439,16 @@ namespace GMTK {
         switch (phase) {
           case InputActionPhase.Performed:
             _primaryPressed = true;
+            
+            // Try to select element at current pointer position
+            if (TryGetElementOnCurrentPointer(out PlayableElement element)) {
+              TrySelect(element);
+            } else {
+              // If clicking on empty space, deselect current element
+              TryDeselect();
+            }
+            
+            _eventsChannel.Raise(GameEventType.InputSelected);
             break;
           case InputActionPhase.Canceled:
             _primaryReleased = true;
@@ -279,6 +463,9 @@ namespace GMTK {
         switch (phase) {
           case InputActionPhase.Performed:
             _secondaryPressed = true;
+            
+            // Secondary click for deselection
+            TryDeselect();
             break;
           case InputActionPhase.Canceled:
             _secondaryReleased = true;
@@ -291,7 +478,13 @@ namespace GMTK {
       if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
         if (inputArgs.Phase == InputActionPhase.Performed) {
           _eventsChannel.Raise(GameEventType.InputRotateCW);
-          TryExecuteOnCurrentElement(e => e.RotateClockwise());
+          
+          // Rotate the selected element if any, otherwise rotate current element
+          if (SelectedElement != null) {
+            SelectedElement.RotateClockwise();
+          } else {
+            TryExecuteOnCurrentElement(e => e.RotateClockwise());
+          }
         }
       }
     }
@@ -300,7 +493,13 @@ namespace GMTK {
       if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
         if (inputArgs.Phase == InputActionPhase.Performed) {
           _eventsChannel.Raise(GameEventType.InputRotateCCW);
-          TryExecuteOnCurrentElement(e => e.RotateCounterClockwise());
+          
+          // Rotate the selected element if any, otherwise rotate current element
+          if (SelectedElement != null) {
+            SelectedElement.RotateCounterClockwise();
+          } else {
+            TryExecuteOnCurrentElement(e => e.RotateCounterClockwise());
+          }
         }
       }
     }
@@ -309,7 +508,13 @@ namespace GMTK {
       if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
         if (inputArgs.Phase == InputActionPhase.Performed) {
           _eventsChannel.Raise(GameEventType.InputFlippedX);
-          TryExecuteOnCurrentElement(e => e.FlipX());
+          
+          // Flip the selected element if any, otherwise flip current element
+          if (SelectedElement != null) {
+            SelectedElement.FlipX();
+          } else {
+            TryExecuteOnCurrentElement(e => e.FlipX());
+          }
         }
       }
     }
@@ -318,7 +523,13 @@ namespace GMTK {
       if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
         if (inputArgs.Phase == InputActionPhase.Performed) {
           _eventsChannel.Raise(GameEventType.InputFlippedY);
-          TryExecuteOnCurrentElement(e => e.FlipY());
+          
+          // Flip the selected element if any, otherwise flip current element
+          if (SelectedElement != null) {
+            SelectedElement.FlipY();
+          } else {
+            TryExecuteOnCurrentElement(e => e.FlipY());
+          }
         }
       }
     }
@@ -336,12 +547,17 @@ namespace GMTK {
     public void UpdateFromGameState(GameStates state) {
       switch (state) {
         case GameStates.Preparation:
-          DisableDragging = false;
-          DraggingEnabled = true;
+          CanSelect = true;
+          CanDrag = true;
+          CanHover = true;
           break;
         case GameStates.Playing:
-          DisableDragging = true;
-          DraggingEnabled = false;
+          CanHover = false;
+          CanSelect = false;
+          CanDrag = false;
+          // Deselect and stop dragging when entering play mode
+          TryDeselect();
+          TryStopDrag();
           break;
       }
     }
@@ -364,6 +580,7 @@ namespace GMTK {
     public void TriggerDroppedEvent() =>
         _eventsChannel.Raise(GameEventType.ElementDropped,
             new GridSnappableEventArgs(ConvertToGridSnappable(_currentElement), _pointerScreenPos, _pointerWorldPos));
+
 #endif
   }
 }

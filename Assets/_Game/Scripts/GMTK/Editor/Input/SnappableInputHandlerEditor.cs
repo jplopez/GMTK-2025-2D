@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GMTK {
 
-  [CustomEditor(typeof(SnappableInputHandler))]
+  [CustomEditor(typeof(PlayableElementInputHandler))]
   public class SnappableInputHandlerEditor : Editor {
 
     private SerializedProperty pointerWorldPosProp;
@@ -14,7 +14,7 @@ namespace GMTK {
     }
 
     public override void OnInspectorGUI() {
-      SnappableInputHandler handler = (SnappableInputHandler)target;
+      PlayableElementInputHandler handler = (PlayableElementInputHandler)target;
 
       //EditorGUILayout.Space();
       //DrawRegistrySection(handler);
@@ -36,7 +36,7 @@ namespace GMTK {
     }
 
 
-    private void DrawMovingSection(SnappableInputHandler handler) {
+    private void DrawMovingSection(PlayableElementInputHandler handler) {
       EditorGUILayout.LabelField("Moving Elements", EditorStyles.boldLabel);
       using (new EditorGUI.IndentLevelScope()) {
         EditorGUILayout.LabelField("Is Moving", handler.IsMoving.ToString());
@@ -64,7 +64,7 @@ namespace GMTK {
       }
     }
 
-    private void DrawHoverSection(SnappableInputHandler handler) {
+    private void DrawHoverSection(PlayableElementInputHandler handler) {
       EditorGUILayout.LabelField("Hover", EditorStyles.boldLabel);
 
       using (new EditorGUI.IndentLevelScope()) {
@@ -77,7 +77,7 @@ namespace GMTK {
       }
     }
 
-    private void DrawEventButtons(SnappableInputHandler handler) {
+    private void DrawEventButtons(PlayableElementInputHandler handler) {
       EditorGUILayout.LabelField("Manual Event Triggers", EditorStyles.boldLabel);
 
       GridSnappable current = handler.Current;

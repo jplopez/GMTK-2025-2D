@@ -4,7 +4,7 @@ namespace GMTK {
   public class InputStateHandler : GameStateHandler {
 
     [Header("Input References")]
-    public SnappableInputHandler snappableInput;
+    public PlayableElementInputHandler snappableInput;
 
     private void OnEnable() {
       Priority = 50;
@@ -13,7 +13,7 @@ namespace GMTK {
 
     protected override void Init() {
       if (snappableInput == null) {
-        snappableInput = FindFirstObjectByType<SnappableInputHandler>();
+        snappableInput = FindFirstObjectByType<PlayableElementInputHandler>();
       }
     }
 

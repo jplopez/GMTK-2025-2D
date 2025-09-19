@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace GMTK {
   /// <summary>
-  /// Dragging component for PlayableElement that handles drag behavior, constraints, and feedback.
-  /// This component provides drag-specific functionality separate from physics.
+  /// Dragging component for PlayableElement that handles drag behavior and constraints.
+  /// This component provides pure drag functionality without any feedback - feedback should be handled by separate components.
   /// </summary>
   [AddComponentMenu("GMTK/Playable Element Components/Playable Dragging Component")]
   public class PlayableElementDragging : PlayableElementComponent {
@@ -26,68 +26,25 @@ namespace GMTK {
     [Tooltip("Maximum world position for dragging")]
     public Vector2 MaxPosition = new(100, 100);
 
-    [Header("Drag Feedback")]
-    [Tooltip("Scale multiplier when dragging starts")]
-    [Range(0.5f, 2f)]
-    public float DragScale = 1.1f;
-    [Tooltip("Should the element move to a higher sorting layer when dragged?")]
-    public bool MoveToFrontOnDrag = true;
-    [Tooltip("Sorting layer offset when dragging")]
-    public int DragSortingLayerOffset = 10;
-    // Visual feedback component
-    [Tooltip("The component that handles visual feedback during dragging. If not set, a default one will be created.")]
-    [SerializeField] [DisplayWithoutEdit] protected PlayableElementDragFeedback _dragFeedbackComponent;
-
     [Header("Drop Validation")]
     [Tooltip("If true, element will return to original position if dropped in invalid location")]
     public bool ValidateDropLocation = true;
 
     // Private state
     private Vector3 _originalPosition;
-    private Vector3 _originalScale;
-    private int _originalSortingOrder;
-    private SpriteRenderer _spriteRenderer;
     private bool _isDragging = false;
     private Vector3 _dragOffset;
 
 
-    private void OnValidate() {
-      //try get the _dragFeedbackComponent if not set
-      EnsureDragFeedbackComponent(false); // false to avoid adding components in edit mode
-    }
-
     protected override void Initialize() {
-      _spriteRenderer = _playableElement.Model.GetComponent<SpriteRenderer>();
-      if (_spriteRenderer != null) {
-        _originalSortingOrder = _spriteRenderer.sortingOrder;
-      }
-
       // Override PlayableElement dragging capability
       _playableElement.Draggable = true;
 
-      // Auto-assign _dragFeedbackComponent if needed
-      EnsureDragFeedbackComponent();
+      DebugLog("Initialized successfully");
     }
 
     protected override bool Validate() {
       return _playableElement != null;
-    }
-
-    protected virtual void EnsureDragFeedbackComponent(bool addIfMissing=true) {
-      if (_dragFeedbackComponent == null) {
-        if (TryGetComponent<PlayableElementDragFeedback>(out var existing)) {
-          _dragFeedbackComponent = existing;
-        }
-        // If still null and addIfMissing is true, add one
-        // this flag is false during OnValidate to avoid adding components in edit mode
-        else if (addIfMissing) {
-          this.LogWarning($"[PlayableElementDragging] UseDraggingVisuals is true but no _dragFeedbackComponent found on {name}. Adding one automatically.");
-          _dragFeedbackComponent = gameObject.AddComponent<PlayableElementDragFeedback>();
-          _dragFeedbackComponent.transform.parent = transform;
-          _dragFeedbackComponent.enabled = true;
-          _dragFeedbackComponent.gameObject.SetActive(true);
-        }
-      }
     }
 
     protected override void HandleDragStart(PlayableElementEventArgs evt) {
@@ -95,19 +52,16 @@ namespace GMTK {
 
       _isDragging = true;
       _originalPosition = _playableElement.GetPosition();
-      _originalScale = _playableElement.SnapTransform.localScale;
 
       // Calculate drag offset (difference between pointer and element center)
       _dragOffset = _originalPosition - evt.WorldPosition;
-
-      // Apply drag visual effects
-      ApplyDragStartEffects();
 
       DebugLog($"Drag started on {_playableElement.name}");
     }
 
     protected override void HandleDragUpdate(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || !_isDragging) return;
+      if (evt.Handled) return; // Allow other components (like SnapDraggingFeedbackComponent) to override behavior
 
       Vector3 targetPosition = evt.WorldPosition + _dragOffset;
 
@@ -125,6 +79,7 @@ namespace GMTK {
 
     protected override void HandleDragEnd(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || !_isDragging) return;
+      if (evt.Handled) return; // Allow other components to override behavior
 
       _isDragging = false;
 
@@ -140,32 +95,7 @@ namespace GMTK {
         _playableElement.UpdatePosition(snappedPosition);
       }
 
-      // Remove drag visual effects
-      RemoveDragEffects();
-
       DebugLog($"Drag ended on {_playableElement.name}");
-    }
-
-    private void ApplyDragStartEffects() {
-      // Scale effect
-      if (DragScale != 1f) {
-        _playableElement.SnapTransform.localScale = _originalScale * DragScale;
-      }
-
-      // Sorting layer effect
-      if (MoveToFrontOnDrag && _spriteRenderer != null) {
-        _spriteRenderer.sortingOrder = _originalSortingOrder + DragSortingLayerOffset;
-      }
-    }
-
-    private void RemoveDragEffects() {
-      // Reset scale
-      _playableElement.SnapTransform.localScale = _originalScale;
-
-      // Reset sorting order
-      if (_spriteRenderer != null) {
-        _spriteRenderer.sortingOrder = _originalSortingOrder;
-      }
     }
 
     private Vector3 ApplyConstraints(Vector3 position) {
@@ -220,14 +150,11 @@ namespace GMTK {
       SnapDuringDrag = snapDuringDrag;
     }
 
-    public void SetDragScale(float scale) {
-      DragScale = scale;
-    }
+    public bool IsDragging => _isDragging;
 
     protected override void ResetComponent() {
       if (_isDragging) {
         _isDragging = false;
-        RemoveDragEffects();
       }
     }
 
@@ -276,5 +203,4 @@ namespace GMTK {
       Gizmos.DrawWireCube(center, size);
     }
   }
-
 }
