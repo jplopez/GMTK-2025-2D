@@ -31,6 +31,7 @@ namespace GMTK {
     private SerializedProperty _modelProp;
     private SerializedProperty _draggableProp;
     private SerializedProperty _canRotateProp;
+    private SerializedProperty _canSelectProp;
     private SerializedProperty _flippableProp;
 
     //non-public properties
@@ -46,6 +47,7 @@ namespace GMTK {
       _modelProp = serializedObject.FindProperty("Model");
       _draggableProp = serializedObject.FindProperty("Draggable");
       _canRotateProp = serializedObject.FindProperty("CanRotate");
+      _canSelectProp = serializedObject.FindProperty("_canSelect");
       _flippableProp = serializedObject.FindProperty("Flippable");
 
       //non-public properties
@@ -123,6 +125,9 @@ namespace GMTK {
 
         EditorGUILayout.PropertyField(_canRotateProp);
         CheckRotationOverride();
+
+        EditorGUILayout.PropertyField(_canSelectProp);
+
       }
       EditorGUILayout.Space();
     }

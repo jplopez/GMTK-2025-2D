@@ -20,13 +20,12 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: InteractivesGlow
+  m_Name: ElementSelected
   m_Shader: {fileID: 4800000, guid: da8efd605fdd20949a21be6242000625, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ENABLEOUTEROUTLINE_ON
-  - _OUTEROUTLINEOUTLINEONLYTOGGLE_ON
+  - _ENABLEINKSPREAD_ON
   - _SHADERFADING_NONE
   - _SHADERSPACE_UV
   - _TEXTURELAYER2SHEETTOGGLE_ON
@@ -315,11 +314,11 @@ Material:
     - _EnableHalftone: 0
     - _EnableHologram: 0
     - _EnableHue: 0
-    - _EnableInkSpread: 0
+    - _EnableInkSpread: 1
     - _EnableInnerOutline: 0
     - _EnableMetal: 0
     - _EnableNegative: 0
-    - _EnableOuterOutline: 1
+    - _EnableOuterOutline: 0
     - _EnablePingPongGlow: 0
     - _EnablePixelOutline: 0
     - _EnablePixelate: 0
@@ -412,15 +411,15 @@ Material:
     - _HologramMinAlpha: 0.2
     - _Hue: 0
     - _InkSpreadContrast: 5.51
-    - _InkSpreadDistance: 3.66
+    - _InkSpreadDistance: 3
     - _InkSpreadFade: 1
     - _InkSpreadNoiseFactor: 0.5
-    - _InkSpreadWidth: 4.03
+    - _InkSpreadWidth: 7
     - _InnerOutlineDistortionToggle: 0
     - _InnerOutlineFade: 1
     - _InnerOutlineOutlineOnlyToggle: 0
     - _InnerOutlineTextureToggle: 0
-    - _InnerOutlineWidth: 0.02
+    - _InnerOutlineWidth: 0.04
     - _MaskBrightness: 1
     - _MaskDistortionIntensity: 1
     - _MaskSmoothstep: 0
@@ -436,14 +435,14 @@ Material:
     - _OcclusionStrength: 1
     - _OuterOutlineDistortionToggle: 0
     - _OuterOutlineFade: 1
-    - _OuterOutlineOutlineOnlyToggle: 1
+    - _OuterOutlineOutlineOnlyToggle: 0
     - _OuterOutlineTextureToggle: 0
-    - _OuterOutlineWidth: 0.2
+    - _OuterOutlineWidth: 0.4
     - _OverallSpeed: 1
     - _Parallax: 0.005
-    - _PingPongGlowContrast: 1
-    - _PingPongGlowFade: 1
-    - _PingPongGlowFrequency: 3
+    - _PingPongGlowContrast: 3
+    - _PingPongGlowFade: 0.14
+    - _PingPongGlowFrequency: 10
     - _PixelOutlineAlphaLimit: 0.5
     - _PixelOutlineFade: 1
     - _PixelOutlineOutlineOnlyToggle: 0
@@ -682,13 +681,13 @@ Material:
     - _GlitchNoiseSpeed: {r: 0, g: 1, b: 0, a: 0}
     - _HalftonePosition: {r: 0, g: 0, b: 0, a: 0}
     - _HologramTint: {r: 0.3137255, g: 1.662745, b: 2.996078, a: 1}
-    - _InkSpreadColor: {r: 8.47419, g: 5.013525, b: 0.08873497, a: 0}
-    - _InkSpreadNoiseScale: {r: 0.4, g: 0.4, b: 0, a: 0}
-    - _InkSpreadPosition: {r: 0.5, g: -1, b: 0, a: 0}
-    - _InnerOutlineColor: {r: 11.98431, g: 1.254902, b: 1.254902, a: 1}
-    - _InnerOutlineDistortionIntensity: {r: 0.01, g: 0.01, b: 0, a: 0}
+    - _InkSpreadColor: {r: 0.35494056, g: 33.89676, b: 2.6505811, a: 0}
+    - _InkSpreadNoiseScale: {r: 1, g: 1, b: 0, a: 0}
+    - _InkSpreadPosition: {r: 0, g: 0, b: 0, a: 0}
+    - _InnerOutlineColor: {r: 0.3294117, g: 2.9960783, b: 0.46816748, a: 1}
+    - _InnerOutlineDistortionIntensity: {r: 0.05, g: 0.05, b: 0, a: 0}
     - _InnerOutlineNoiseScale: {r: 4, g: 4, b: 0, a: 0}
-    - _InnerOutlineNoiseSpeed: {r: 0, g: 0.1, b: 0, a: 0}
+    - _InnerOutlineNoiseSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _InnerOutlineTextureSpeed: {r: 0.5, g: 0, b: 0, a: 0}
     - _MaskPanSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _MaskUVScale: {r: 1, g: 1, b: 0, a: 0}
@@ -704,8 +703,8 @@ Material:
     - _OuterOutlineNoiseScale: {r: 4, g: 4, b: 0, a: 0}
     - _OuterOutlineNoiseSpeed: {r: 1, g: 1, b: 0, a: 0}
     - _OuterOutlineTextureSpeed: {r: 0.5, g: 0, b: 0, a: 0}
-    - _PingPongGlowFrom: {r: 5.992157, g: 0.1882353, b: 0.1882353, a: 0}
-    - _PingPongGlowTo: {r: 0.1882353, g: 0.1882353, b: 5.992157, a: 0}
+    - _PingPongGlowFrom: {r: 0.18823531, g: 5.992157, b: 0.42506492, a: 0}
+    - _PingPongGlowTo: {r: 5.992157, g: 1.8565769, b: 0.21960792, a: 0}
     - _PixelOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _PixelOutlineTextureSpeed: {r: 0.5, g: 0, b: 0, a: 0}
     - _PoisonColor: {r: 0.3137255, g: 2.996078, b: 0.3137255, a: 0}

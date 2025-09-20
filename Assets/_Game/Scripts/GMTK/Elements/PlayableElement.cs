@@ -11,7 +11,7 @@ namespace GMTK {
   /// Additional abilities are provided by PlayableElementComponent-derived classes.
   /// </summary>
   [AddComponentMenu("GMTK/Playable Element")]
-  [RequireComponent(typeof(SelectableElementComponent))]
+  [RequireComponent(typeof(PointerElementComponent))]
   public partial class PlayableElement : MonoBehaviour, IDraggable, ISelectable, IHoverable {
 
     public enum SnappableBodyType { Static, Interactive }
@@ -48,9 +48,13 @@ namespace GMTK {
     protected SpriteRenderer _modelRenderer;
     protected PolygonCollider2D _collider;
     protected List<PlayableElementComponent> _components = new();
-    private SelectableElementComponent _selectableComponent;
+
+    protected GameEventChannel _gameEventChannel;
+
+    private PointerElementComponent _pointerComponent;
 
     // Events for components to listen to
+    [Obsolete("Use RaisePlayableElementEvent instead")]
     public event Action<PlayableElementEventArgs> OnPlayableElementEvent;
 
     #region MonoBehaviour Methods
@@ -82,6 +86,9 @@ namespace GMTK {
       if (SnapTransform == null) SnapTransform = this.transform;
       if (Model == null) Model = this.transform;
 
+      // Get GameEventChannel from ServiceLocator
+      _gameEventChannel = ServiceLocator.Get<GameEventChannel>();
+
       // Store initial position for the ResetToStartingState function
       _initialPosition = SnapTransform.position;
       _initialRotation = SnapTransform.rotation;
@@ -96,8 +103,8 @@ namespace GMTK {
       _components.AddRange(GetComponents<PlayableElementComponent>());
       _components.ForEach(comp => comp.TryInitialize());
       
-      // Cache the SelectableElementComponent reference
-      _selectableComponent = GetComponent<SelectableElementComponent>();
+      // Cache the PointerElementComponent reference
+      _pointerComponent = GetComponent<PointerElementComponent>();
     }
 
     private bool CheckForRenderers() {
@@ -164,11 +171,32 @@ namespace GMTK {
 
     #region Event System
 
+    [Obsolete("Use RaisePlayableElementEvent instead")]
     public void AddComponentListener(PlayableElementComponent component) => OnPlayableElementEvent += component.OnPlayableElementEvent;
 
+    [Obsolete("Use RaisePlayableElementEvent instead")]
     public void RemoveComponentListener(PlayableElementComponent component) => OnPlayableElementEvent -= component.OnPlayableElementEvent;
 
+    [Obsolete("Use RaisePlayableElementEvent instead")]
     public void InvokePlayableElementEvent(PlayableElementEventArgs eventArgs) => OnPlayableElementEvent?.Invoke(eventArgs);
+
+    /// <summary>
+    /// Helper method to raise PlayableElement events and reduce code duplication.
+    /// </summary>
+    /// <param name="eventType">The type of event to raise</param>
+    /// <param name="worldPosition">The world position for the event (uses transform.position if not provided)</param>
+    protected virtual void RaisePlayableElementEvent(PlayableElementEventType eventType, Vector3? worldPosition = null) {
+      var eventArgs = BuildEventArgs(eventType);
+      _gameEventChannel.Raise(GameEventType.PlayableElementEvent, eventArgs);
+      OnPlayableElementEvent?.Invoke(eventArgs);
+
+      this.LogDebug($"PlayableElementEvent {eventType} started on {name}");
+    }
+
+    protected PlayableElementEventArgs BuildEventArgs(PlayableElementEventType eventType, Vector3? worldPosition = null) {
+      var position = worldPosition ?? transform.position;
+      return new PlayableElementEventArgs(this, position, eventType);
+    }
 
     #endregion
 

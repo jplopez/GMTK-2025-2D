@@ -34,31 +34,18 @@ namespace GMTK {
 
     public void OnHover() {
       _isHovered = true;
-
-      // Trigger PlayableElement event for components
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.PointerOver);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-
-      SetGlow(true);
-      this.LogDebug($"Hover started on {name}");
+      RaisePlayableElementEvent(PlayableElementEventType.PointerOver);
     }
 
     public void OnHoverUpdate() {
       if (!_isHovered) return;
-
       // Continuous hover update - can be used for animations or state updates
       // Currently no specific behavior needed
     }
 
     public void OnUnhover() {
       _isHovered = false;
-
-      // Trigger PlayableElement event for components
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.PointerOut);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-
-      SetGlow(false);
-      this.LogDebug($"Hover ended on {name}");
+      RaisePlayableElementEvent(PlayableElementEventType.PointerOut);
     }
 
     public void OnHoverEnabled() {
@@ -71,14 +58,6 @@ namespace GMTK {
       if (_isHovered) {
         MarkHovered(false);
       }
-    }
-
-    #endregion
-
-    #region Hover Visual Feedback
-
-    public virtual void SetGlow(bool active) {
-      if (HighlightModel != null) HighlightModel.SetActive(active);
     }
 
     public void OnPointerEnter() => OnHover();

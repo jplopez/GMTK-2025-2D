@@ -1,7 +1,9 @@
 using Ameba;
+using MoreMountains.Feedbacks;
 using System;
 using System.Collections;
 using UnityEngine;
+using static Codice.Client.BaseCommands.Import.Commit;
 
 namespace GMTK {
 
@@ -14,11 +16,11 @@ namespace GMTK {
   }
 
   /// <summary>
-  /// Component that handles selection behavior for PlayableElement.
-  /// This component is required by PlayableElement and implements the actual ISelectable functionality.
+  /// Component that enhances the PlayableElement with pointer-based selection functionality.<br/>
+  /// This component allows elements to be selected via mouse, touch input or both, supporting hover and click interactions, as well as playing feedbacks.<br/>
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Selectable Element Component")]
-  public class SelectableElementComponent : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Pointer Element Component")]
+  public class PointerElementComponent : PlayableElementComponent {
 
     [Header("Selection Settings")]
     [Tooltip("Selection trigger methods. Multiple options can be selected.")]
@@ -41,10 +43,12 @@ namespace GMTK {
     [Header("Selection State")]
     [SerializeField] private bool _isSelected = false;
     [SerializeField] private bool _canSelect = true;
+    [Tooltip("If true, this component will sync its selection state with the PlayableElement's IsSelected property each frame")]
+    public bool SyncStateWithElement = false;
 
     [Header("Feedbacks")]
-    public GameObject OnSelectFeedback;
-    public GameObject OnDeselectFeedback;
+    public MMF_Player OnSelectedFeedback;
+    public MMF_Player OnDeselectedFeedback;
 
     // ISelectable properties
     public bool IsSelected => _isSelected;
@@ -70,6 +74,19 @@ namespace GMTK {
       return _playableElement != null && _canSelect;
     }
 
+    protected override void OnUpdate() {
+      base.OnUpdate();
+      if(SyncStateWithElement) {
+        if (_playableElement.IsSelected != _isSelected) {
+          _isSelected = _playableElement.IsSelected;
+        }
+
+        if(_playableElement.CanSelect != _canSelect) {
+          _canSelect = _playableElement.CanSelect;
+        }
+      } 
+    }
+
     protected void OnPointerOver(PlayableElementEventArgs evt) {
       if (!CanSelect || !HasSelectionTrigger(SelectionTrigger.OnHover)) return;
 
@@ -82,35 +99,42 @@ namespace GMTK {
       _hoverCoroutine = StartCoroutine(HoverSelectionCoroutine());
     }
 
-    protected  void OnPointerOut(PlayableElementEventArgs evt) {
+    protected void OnPointerOut(PlayableElementEventArgs evt) {
       _isHovering = false;
 
       if (_hoverCoroutine != null) {
         StopCoroutine(_hoverCoroutine);
         _hoverCoroutine = null;
       }
-    }
 
-    protected void OnSelected(PlayableElementEventArgs evt) {
-      if (!CanSelect) return;
-
-      if (evt.Element != null && evt.Element == _playableElement) {
-        if (HasSelectionTrigger(SelectionTrigger.OnClick)) {
-          if (IsValidClickPosition(evt.WorldPosition)) {
-            MarkSelected(true);
-          }
-        }
+      if (HasSelectionTrigger(SelectionTrigger.OnHover) && IsSelected) {
+        MarkSelected(false);
+        PlayFeedback(OnDeselectedFeedback);
       }
     }
 
-    protected void OnDeselected(PlayableElementEventArgs evt) {
+    public void OnSelected(PlayableElementEventArgs evt) {
+      this.Log($"OnSelected event received for {evt.Element?.name}");
       if (!CanSelect) return;
+      if (evt.Element != null && evt.Element == _playableElement && !IsSelected) {
+        TrySelectingElementAtWorldPos(evt.WorldPosition, true);
+      }
+    }
 
-      if (evt.Element != null && evt.Element == _playableElement) {
-        if (HasSelectionTrigger(SelectionTrigger.OnClick)) {
-          if (IsValidClickPosition(evt.WorldPosition)) {
-            MarkSelected(false);
-          }
+    public void OnDeselected(PlayableElementEventArgs evt) {
+      this.Log($"OnDeselected event received for {evt.Element?.name}");
+      if (!CanSelect) return;
+      if (evt.Element != null && evt.Element == _playableElement && IsSelected) {
+        TrySelectingElementAtWorldPos(evt.WorldPosition, false);
+      }
+    }
+
+    private void TrySelectingElementAtWorldPos(Vector3 worldPosition, bool selected) {
+      if (HasSelectionTrigger(SelectionTrigger.OnClick)) {
+        if (IsValidClickPosition(worldPosition)) {
+          this.Log($"Element {name} {(selected ? "Selected" : "Deselected")} at position {worldPosition}");
+          MarkSelected(selected);
+          PlayFeedback(selected ? OnSelectedFeedback : OnDeselectedFeedback);
         }
       }
     }
@@ -136,6 +160,7 @@ namespace GMTK {
 
       if (_isHovering && CanSelect) {
         MarkSelected(true);
+        PlayFeedback(OnSelectedFeedback);
       }
 
       _hoverCoroutine = null;
@@ -171,40 +196,17 @@ namespace GMTK {
 
     #region ISelectable Implementation
 
-    public void MarkSelected(bool selected = true) {
-      if (_isSelected == selected) return;
-
-      _isSelected = selected;
-
-      if (selected) {
-        OnSelect();
-      }
-      else {
-        OnDeselect();
-      }
-    }
+    public void MarkSelected(bool selected = true) => _isSelected = selected && CanSelect;
 
     public void EnableSelectable(bool selectable = true) {
       _canSelect = selectable;
-
       if (!selectable && _isSelected) {
         MarkSelected(false);
       }
     }
 
-    public void OnSelect() {
-      //TODO play feedbacks
-
-      this.Log($"Selected {_playableElement.name}");
-    }
-
-    public void OnDeselect() {
-      //TODO play feedbacks
-
-      this.Log($"Deselected {_playableElement.name}");
-    }
-
     #endregion
+
 
     #region Public API
 

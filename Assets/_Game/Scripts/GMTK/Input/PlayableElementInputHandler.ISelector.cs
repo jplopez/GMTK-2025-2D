@@ -1,4 +1,5 @@
 using Ameba;
+using Unity.Android.Gradle;
 using UnityEngine;
 
 namespace GMTK {
@@ -50,7 +51,7 @@ namespace GMTK {
       // Convert screen position to world position
       Camera camera = Camera.main;
       if (camera == null) {
-        Debug.LogWarning("[PlayableElementInputHandler] No main camera found for screen to world conversion");
+        this.LogWarning("No main camera found for screen to world conversion");
         return false;
       }
 
@@ -60,24 +61,32 @@ namespace GMTK {
 
     public bool TrySelect(PlayableElement element) {
       if (!CanSelect || element == null) return false;
+      this.Log($"Attempting to select element: {element.name} CanSelect: {element.CanSelect}");
+      this.Log($"IsSelecting: {IsSelecting} CanSelect {CanSelect}");
+
+      if (_selectedElement != null)
+        this.Log($"_selectedElement: {_selectedElement.name}");
+      else this.Log($"_selectedElement: null");
 
       // Check if element can be selected
       if (!element.CanSelect) return false;
 
       // If we already have a selected element, deselect it first
       if (_selectedElement != null && _selectedElement != element) {
+        this.Log($"Deselecting current element");
         DeselectCurrentElement();
       }
 
-      // Select the new element
-      if (_selectedElement != element) {
+      // if selected is null (first time) or different from the new element, select it
+      if (_selectedElement == null || _selectedElement != element) {
         _selectedElement = element;
+
+        this.Log($"Marking element: {element.name}");
         element.MarkSelected(true);
 
         // Trigger selection events
         _eventsChannel.Raise(GameEventType.ElementSelected,
             new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
-
         this.Log($"Selected element: {element.name}");
         return true;
       }
@@ -87,16 +96,19 @@ namespace GMTK {
 
     public bool TryDeselect() {
       if (_selectedElement == null) return false;
-
       DeselectCurrentElement();
       return true;
     }
+
     private void DeselectCurrentElement() {
       if (_selectedElement != null) {
         var elementToDeselect = _selectedElement;
         _selectedElement = null;
-
         elementToDeselect.MarkSelected(false);
+
+        //legacy event for GridSnappable
+        _eventsChannel.Raise(GameEventType.ElementDeselected,
+            new GridSnappableEventArgs(ConvertToGridSnappable(elementToDeselect), _pointerScreenPos, _pointerWorldPos));
 
         this.Log($"Deselected element: {elementToDeselect.name}");
       }

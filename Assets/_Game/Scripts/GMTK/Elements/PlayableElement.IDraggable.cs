@@ -21,49 +21,33 @@ namespace GMTK {
 
     #region IDraggable Implementation
 
+
+
     public virtual void OnDragStart() {
       IsBeingDragged = true;
-
-      // Notify components
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.DragStart);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-
-      this.LogDebug($"Drag started on {name}");
+      RaisePlayableElementEvent(PlayableElementEventType.DragStart);
     }
 
     public virtual void OnDragUpdate(Vector3 worldPosition) {
       if (IsBeingDragged) {
         UpdatePosition(worldPosition);
-
-        // Notify components
-        var eventArgs = new PlayableElementEventArgs(this, worldPosition, PlayableElementEventType.DragUpdate);
-        OnPlayableElementEvent?.Invoke(eventArgs);
+        RaisePlayableElementEvent(PlayableElementEventType.DragUpdate, worldPosition);
       }
     }
 
     public virtual void OnDragEnd() {
       IsBeingDragged = false;
-
-      // Notify components
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.DragEnd);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-
-      this.LogDebug($"Drag ended on {name}");
+      RaisePlayableElementEvent(PlayableElementEventType.DragEnd);
     }
-
 
     public virtual void OnBecomeActive() {
       IsActive = true;
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.BecomeActive);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-      this.LogDebug($"became active");
+      RaisePlayableElementEvent(PlayableElementEventType.BecomeActive);
     }
 
     public virtual void OnBecomeInactive() {
       IsActive = false;
-      var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.BecomeInactive);
-      OnPlayableElementEvent?.Invoke(eventArgs);
-      this.LogDebug($"became inactive");
+      RaisePlayableElementEvent(PlayableElementEventType.BecomeInactive);
     }
 
     #endregion

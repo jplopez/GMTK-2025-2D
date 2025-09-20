@@ -85,6 +85,6 @@ namespace GMTK {
     InventoryOperationFailed,   // When an inventory operation fails (InventoryEventData)
     InventoryUpdated,          // When inventory state changes (InventoryEventData)
     InventoryFull,             // When inventory reaches capacity (InventoryEventData)
-
+    ElementDeselected,
   }
 }
