@@ -5,7 +5,7 @@ namespace GMTK {
   /// Auto rotation component for PlayableElement that handles automatic continuous rotation.
   /// This component provides independent automatic rotation functionality separate from manual rotation controls.
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Auto Rotation Component")]
+  [AddComponentMenu("GMTK/Playable Element Components/Element Auto-Rotation Component")]
   public class AutoRotationElementComponent : PlayableElementComponent {
 
     // Move the enum here since it's only used by auto rotation
@@ -108,23 +108,23 @@ namespace GMTK {
     }
 
     // Handle drag events
-    protected override void HandleDragStart(PlayableElementEventArgs evt) {
+    protected void OnDragStart(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       _isDragging = true;
     }
 
-    protected override void HandleDragEnd(PlayableElementEventArgs evt) {
+    protected void OnDragEnd(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       _isDragging = false;
     }
 
     // Handle hover events
-    protected override void HandlePointerOver(PlayableElementEventArgs evt) {
+    protected void OnPointerOver(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       _isHovering = true;
     }
 
-    protected override void HandlePointerOut(PlayableElementEventArgs evt) {
+    protected void OnPointerOut(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       _isHovering = false;
     }

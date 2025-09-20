@@ -5,8 +5,8 @@ namespace GMTK {
   /// Drag feedback component for PlayableElement that provides visual feedback during dragging.
   /// This component handles color changes, pulse effects, and drop zone validation feedback.
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Playable Drag Feedback Component")]
-  public class PlayableElementDragFeedback : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Dragging Feedback Element Component")]
+  public class DraggingFeedbackElementComponent : PlayableElementComponent {
 
     [Header("Drag Feedback Settings")]
     [Tooltip("Color when the element can be placed at current position")]
@@ -55,7 +55,7 @@ namespace GMTK {
     protected override void Initialize() {
       _renderer = _playableElement.Model.GetComponent<SpriteRenderer>();
       if (_renderer == null) {
-        Debug.LogWarning($"[PlayableElementDragFeedback] No SpriteRenderer found on {_playableElement.name}");
+        Debug.LogWarning($"[DraggingFeedbackElementComponent] No SpriteRenderer found on {_playableElement.name}");
         return;
       }
 
@@ -82,7 +82,7 @@ namespace GMTK {
       }
     }
 
-    protected override void HandleDragStart(PlayableElementEventArgs evt) {
+    protected void OnDragStart(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
 
       _isDragging = true;
@@ -95,19 +95,19 @@ namespace GMTK {
       DebugLog($"Started drag feedback for {_playableElement.name}");
     }
 
-    protected override void HandleDragUpdate(PlayableElementEventArgs evt) {
+    protected  void OnDragUpdate(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || !_isDragging) return;
 
       // Feedback is updated in OnUpdate() method
     }
 
-    protected override void HandleDragEnd(PlayableElementEventArgs evt) {
+    protected void OnDragEnd(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
 
       StopDragFeedback();
     }
 
-    protected override void HandlePointerOver(PlayableElementEventArgs evt) {
+    protected void OnPointerOver(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || _isDragging) return;
 
       //_isHovering = true;
@@ -116,7 +116,7 @@ namespace GMTK {
       _targetColor.a = HoverAlpha;
     }
 
-    protected override void HandlePointerOut(PlayableElementEventArgs evt) {
+    protected void OnPointerOut(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || _isDragging) return;
 
       //_isHovering = false;
@@ -223,7 +223,7 @@ namespace GMTK {
     }
 
     private void DebugLog(string message) {
-      Debug.Log($"[PlayableElementDragFeedback] {message}");
+      Debug.Log($"[DraggingFeedbackElementComponent] {message}");
     }
   }
 

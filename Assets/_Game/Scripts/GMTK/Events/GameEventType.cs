@@ -70,6 +70,9 @@ namespace GMTK {
     ElementMovedToInventory,
     ElementMovedToGrid,
 
+    //PlayableElementComponent Base Event
+    PlayableElementEvent, //when a PlayableElementComponent wants to broadcast something (PlayableElementEventArgs)
+
     // Inventory Events - using EventArgs pattern
     InventoryAddRequest,        // Request to add element (InventoryEventData)
     InventoryRetrieveRequest,   // Request to retrieve element (InventoryEventData)  

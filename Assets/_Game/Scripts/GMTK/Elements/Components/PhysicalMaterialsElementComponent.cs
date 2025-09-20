@@ -5,8 +5,8 @@ namespace GMTK {
   /// Material component for PlayableElement that handles physics material properties.
   /// This component manages friction, bounciness, and physics materials for collision interactions.
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Playable Material Component")]
-  public class MaterialsElementComponent : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Physical Material Element Component")]
+  public class PhysicalMaterialsElementComponent : PlayableElementComponent {
 
     [Header("Material Settings")]
     [Tooltip("Friction the element puts on the Marble. High=slows down the marble. Mid=keeps the current speed. Low=smooth surface, Marble will gain speed")]

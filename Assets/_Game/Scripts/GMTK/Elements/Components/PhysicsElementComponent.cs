@@ -6,7 +6,7 @@ namespace GMTK {
   /// Physics component for PlayableElement that handles rotation, movement, and collision behavior.
   /// Auto Rotation, Gravity and Material properties are now handled by separate components.
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Physics Component")]
+  [AddComponentMenu("GMTK/Playable Element Components/Physics Element Component")]
   public class PhysicsElementComponent : PlayableElementComponent {
 
     public enum CollisionSourceFilter { Everything, MarbleOnly, ElementsOnly }
@@ -75,7 +75,7 @@ namespace GMTK {
 
     // Component references
     private GravityElementComponent _gravityComponent;
-    private MaterialsElementComponent _materialComponent;
+    private PhysicalMaterialsElementComponent _materialComponent;
     private AutoRotationElementComponent _autoRotationComponent;
 
     // Collision state tracking
@@ -112,7 +112,7 @@ namespace GMTK {
 
       // Get optional component references
       _gravityComponent = _playableElement.GetComponent<GravityElementComponent>();
-      _materialComponent = _playableElement.GetComponent<MaterialsElementComponent>();
+      _materialComponent = _playableElement.GetComponent<PhysicalMaterialsElementComponent>();
       _autoRotationComponent = _playableElement.GetComponent<AutoRotationElementComponent>();
 
       // Initialize with default gravity (will be overridden by gravity component if present)
@@ -290,14 +290,14 @@ namespace GMTK {
       }
     }
 
-    protected override void HandleDragStart(PlayableElementEventArgs evt) {
+    protected void OnDragStart(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
 
       _isDragOverride = true;
       ApplyMovementControl(); // Update rigidbody settings for dragging
     }
 
-    protected override void HandleDragEnd(PlayableElementEventArgs evt) {
+    protected void OnDragEnd(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
 
       _isDragOverride = false;
@@ -496,7 +496,7 @@ namespace GMTK {
       return false;
     }
 
-    protected override void HandleRotateClockwise(PlayableElementEventArgs evt) {
+    protected void OnRotateCW(PlayableElementEventArgs evt) {
       bool canRotate = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
       if (canRotate) {
         ApplyRotationChange(-RotationStep);
@@ -504,7 +504,7 @@ namespace GMTK {
       }
     }
 
-    protected override void HandleRotateCounterClockwise(PlayableElementEventArgs evt) {
+    protected void OnRotateCCW(PlayableElementEventArgs evt) {
       bool canRotate = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
       if (canRotate) {
         ApplyRotationChange(RotationStep);
@@ -732,24 +732,24 @@ namespace GMTK {
       gravityComp.SetGravity(hasGravity, multiplier);
     }
 
-    [System.Obsolete("Use MaterialsElementComponent component instead")]
+    [System.Obsolete("Use PhysicalMaterialsElementComponent component instead")]
     public void SetFrictionLevel(FrictionLevel level) {
-      Debug.LogWarning("[PhysicsElementComponent] SetFrictionLevel is deprecated. Use MaterialsElementComponent component instead.");
+      Debug.LogWarning("[PhysicsElementComponent] SetFrictionLevel is deprecated. Use PhysicalMaterialsElementComponent component instead.");
 
       // Try to find or create material component
-      if (!_playableElement.TryGetComponent<MaterialsElementComponent>(out var materialComp)) {
-        materialComp = _playableElement.gameObject.AddComponent<MaterialsElementComponent>();
+      if (!_playableElement.TryGetComponent<PhysicalMaterialsElementComponent>(out var materialComp)) {
+        materialComp = _playableElement.gameObject.AddComponent<PhysicalMaterialsElementComponent>();
       }
       materialComp.SetFrictionLevel(level);
     }
 
-    [System.Obsolete("Use MaterialsElementComponent component instead")]
+    [System.Obsolete("Use PhysicalMaterialsElementComponent component instead")]
     public void SetBouncinessLevel(BouncinessLevel level) {
-      Debug.LogWarning("[PhysicsElementComponent] SetBouncinessLevel is deprecated. Use MaterialsElementComponent component instead.");
+      Debug.LogWarning("[PhysicsElementComponent] SetBouncinessLevel is deprecated. Use PhysicalMaterialsElementComponent component instead.");
 
       // Try to find or create material component
-      if (!_playableElement.TryGetComponent<MaterialsElementComponent>(out var materialComp)) {
-        materialComp = _playableElement.gameObject.AddComponent<MaterialsElementComponent>();
+      if (!_playableElement.TryGetComponent<PhysicalMaterialsElementComponent>(out var materialComp)) {
+        materialComp = _playableElement.gameObject.AddComponent<PhysicalMaterialsElementComponent>();
       }
       materialComp.SetBouncinessLevel(level);
     }

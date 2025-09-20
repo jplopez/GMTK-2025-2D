@@ -6,19 +6,17 @@ namespace GMTK {
   /// <summary>
   /// A Dragging Feedback component that provides ghost-based dragging feedback.<br/>
   /// The element stays in place while a ghost image is dragged around.<br/>
-  /// Requires both <see cref="PlayableElementDragging"/> and <see cref="SnappableElementComponent"/> on the same GameObject.<br/>
+  /// Requires both <see cref="DraggingElementComponent"/> and optionally other grid components on the same GameObject.<br/>
   /// Integrates with <see cref="MMF_Player"/> (Feel) for visual and audio feedback.<br/>
   /// This component is the ONLY one that should apply feedbacks - the core components work without feedback dependencies.
   /// </summary>
   [AddComponentMenu("GMTK/Playable Element Components/Snap Dragging Feedback Component")]
-  [RequireComponent(typeof(PlayableElementDragging), typeof(SnappableElementComponent))]
+  [RequireComponent(typeof(DraggingElementComponent))]
   public class SnapDraggingFeedbackComponent : PlayableElementComponent {
 
     [Header("Dependencies")]
-    [Tooltip("The PlayableElementDragging component (auto-assigned)")]
-    [SerializeField] private PlayableElementDragging _draggingComponent;
-    [Tooltip("The SnappableElementComponent (auto-assigned)")]
-    [SerializeField] private SnappableElementComponent _snappableComponent;
+    [Tooltip("The DraggingElementComponent component (auto-assigned)")]
+    [SerializeField] private DraggingElementComponent _draggingComponent;
 
     [Header("Ghost Settings")]
     [Tooltip("Alpha value for the ghost image")]
@@ -77,20 +75,12 @@ namespace GMTK {
     private float _ghostPulseTimer = 0f;
     private Vector3 _ghostOffset;
 
-    #region PlayableElementComponent Implementation
-
     protected override void Initialize() {
       // Auto-assign required components
-      _draggingComponent = GetComponent<PlayableElementDragging>();
-      _snappableComponent = GetComponent<SnappableElementComponent>();
+      _draggingComponent = GetComponent<DraggingElementComponent>();
 
       if (_draggingComponent == null) {
-        Debug.LogError($"[SnapDraggingFeedbackComponent] PlayableElementDragging component not found on {gameObject.name}");
-        return;
-      }
-
-      if (_snappableComponent == null) {
-        Debug.LogError($"[SnapDraggingFeedbackComponent] SnappableElementComponent component not found on {gameObject.name}");
+        Debug.LogError($"[SnapDraggingFeedbackComponent] DraggingElementComponent component not found on {gameObject.name}");
         return;
       }
 
@@ -108,8 +98,7 @@ namespace GMTK {
     }
 
     protected override bool Validate() {
-      return _draggingComponent != null && _snappableComponent != null &&
-             _originalRenderer != null && _playableElement != null;
+      return _draggingComponent != null && _originalRenderer != null && _playableElement != null;
     }
 
     protected override void OnUpdate() {
@@ -119,35 +108,33 @@ namespace GMTK {
       UpdateGhostVisuals();
     }
 
-    #endregion
+    #region New On* Event Handlers (using reflection-based system)
 
-    #region Event Handlers - All Feedback Types
-
-    protected override void HandleSelected(PlayableElementEventArgs evt) {
+    protected virtual void OnSelected(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       PlayFeedback(OnElementSelectedFeedback);
       this.LogDebug($"Element selected");
     }
 
-    protected override void HandleDeselected(PlayableElementEventArgs evt) {
+    protected virtual void OnDeselected(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       PlayFeedback(OnElementDeselectedFeedback);
       this.LogDebug($"Element deselected");
     }
 
-    protected override void HandlePointerOver(PlayableElementEventArgs evt) {
+    protected virtual void OnPointerOver(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       PlayFeedback(OnElementSelectedFeedback);
       this.LogDebug($"Pointer over element");
     }
 
-    protected override void HandlePointerOut(PlayableElementEventArgs evt) {
+    protected virtual void OnPointerOut(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       PlayFeedback(OnElementDeselectedFeedback);
       this.LogDebug($"Pointer out of element");
     }
 
-    protected override void HandleDragStart(PlayableElementEventArgs evt) {
+    protected virtual void OnDragStart(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
 
       _isDragging = true;
@@ -166,16 +153,16 @@ namespace GMTK {
       this.LogDebug($"Drag started - ghost created at {evt.WorldPosition}");
     }
 
-    protected override void HandleDragUpdate(PlayableElementEventArgs evt) {
+    protected virtual void OnDragUpdate(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || !_isDragging) return;
 
       // Update ghost position
       if (_ghostObject != null) {
         Vector3 targetPosition = evt.WorldPosition + _ghostOffset;
 
-        // Apply snapping if enabled
-        if (_snappableComponent != null && _snappableComponent.LevelGrid != null) {
-          targetPosition = _snappableComponent.LevelGrid.SnapToGrid(targetPosition);
+        // Apply snapping if enabled and levelGrid is available
+        if (_levelGrid != null) {
+          targetPosition = _levelGrid.SnapToGrid(targetPosition);
         }
 
         _ghostObject.transform.position = targetPosition;
@@ -185,7 +172,7 @@ namespace GMTK {
       evt.Handled = true;
     }
 
-    protected override void HandleDragEnd(PlayableElementEventArgs evt) {
+    protected virtual void OnDragEnd(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || !_isDragging) return;
 
       _isDragging = false;
@@ -196,8 +183,8 @@ namespace GMTK {
       if (isValidDrop) {
         // Update element position and trigger success event
         Vector3 finalPosition = evt.WorldPosition + _ghostOffset;
-        if (_snappableComponent != null && _snappableComponent.LevelGrid != null) {
-          finalPosition = _snappableComponent.LevelGrid.SnapToGrid(finalPosition);
+        if (_levelGrid != null) {
+          finalPosition = _levelGrid.SnapToGrid(finalPosition);
         }
 
         _playableElement.UpdatePosition(finalPosition);
@@ -225,13 +212,13 @@ namespace GMTK {
       evt.Handled = true;
     }
 
-    protected override void HandleDropSuccess(PlayableElementEventArgs evt) {
+    protected virtual void OnDropSuccess(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       PlayFeedback(OnDropSuccessFeedback);
       this.LogDebug($"Drop success feedback triggered");
     }
 
-    protected override void HandleDropInvalid(PlayableElementEventArgs evt) {
+    protected virtual void OnDropInvalid(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       PlayFeedback(OnDropInvalidFeedback);
       this.LogDebug($"Drop invalid feedback triggered");
@@ -296,8 +283,7 @@ namespace GMTK {
     #region Drop Validation & Feedback
 
     private void UpdateGhostFeedback() {
-      if (_ghostObject == null || _snappableComponent == null ||
-          _snappableComponent.LevelGrid == null) return;
+      if (_ghostObject == null || _levelGrid == null) return;
 
       Vector3 ghostPosition = _ghostObject.transform.position;
       bool isValidLocation = IsValidDropLocation(ghostPosition);
@@ -322,16 +308,16 @@ namespace GMTK {
     }
 
     private bool IsValidDropLocation(Vector3 worldPosition) {
-      if (_snappableComponent?.LevelGrid == null) return false;
+      if (_levelGrid == null) return false;
 
       // Check if position is inside playable area
-      if (!_snappableComponent.LevelGrid.IsInsidePlayableArea(worldPosition)) {
+      if (!_levelGrid.IsInsidePlayableArea(worldPosition)) {
         return false;
       }
 
       // Check if the position is available for placement
-      Vector2Int gridPos = _snappableComponent.LevelGrid.WorldToGrid(worldPosition);
-      return _snappableComponent.LevelGrid.CanPlace(_playableElement, gridPos);
+      Vector2Int gridPos = _levelGrid.WorldToGrid(worldPosition);
+      return _levelGrid.CanPlace(_playableElement, gridPos);
     }
 
     private void TriggerDropEvent(PlayableElementEventArgs args) {
@@ -342,14 +328,7 @@ namespace GMTK {
     }
 
     #endregion
-
     #region Feel Feedback Integration
-
-    private void PlayFeedback(MMF_Player feedback) {
-      if (feedback != null && feedback.gameObject.activeInHierarchy) {
-        feedback.PlayFeedbacks();
-      }
-    }
 
     #endregion
 
@@ -374,8 +353,7 @@ namespace GMTK {
 
     #endregion
 
-    #region Legacy Event Handlers (Required by base class)
-
+    // Legacy compatibility handlers - still required by abstract base class
     protected override void HandleElementSelected(GridSnappableEventArgs evt) {
       // Legacy compatibility - handle through new event system
     }
@@ -391,8 +369,6 @@ namespace GMTK {
     protected override void HandleElementUnhovered(GridSnappableEventArgs evt) {
       // Legacy compatibility - handle through new event system
     }
-
-    #endregion
 
     #region Public API
 

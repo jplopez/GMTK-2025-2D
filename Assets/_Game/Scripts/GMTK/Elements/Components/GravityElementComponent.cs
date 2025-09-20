@@ -5,7 +5,7 @@ namespace GMTK {
   /// Gravity component for PlayableElement that handles gravity effects.
   /// This component manages gravity scale and provides runtime control over gravitational forces.
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Gravity Component")]
+  [AddComponentMenu("GMTK/Playable Element Components/Gravity Element Component")]
   public class GravityElementComponent : PlayableElementComponent {
 
     [Header("Gravity Settings")]

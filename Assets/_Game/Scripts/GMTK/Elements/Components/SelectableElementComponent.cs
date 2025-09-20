@@ -70,7 +70,7 @@ namespace GMTK {
       return _playableElement != null && _canSelect;
     }
 
-    protected override void HandlePointerOver(PlayableElementEventArgs evt) {
+    protected void OnPointerOver(PlayableElementEventArgs evt) {
       if (!CanSelect || !HasSelectionTrigger(SelectionTrigger.OnHover)) return;
 
       _isHovering = true;
@@ -82,7 +82,7 @@ namespace GMTK {
       _hoverCoroutine = StartCoroutine(HoverSelectionCoroutine());
     }
 
-    protected override void HandlePointerOut(PlayableElementEventArgs evt) {
+    protected  void OnPointerOut(PlayableElementEventArgs evt) {
       _isHovering = false;
 
       if (_hoverCoroutine != null) {
@@ -91,7 +91,7 @@ namespace GMTK {
       }
     }
 
-    protected override void HandleSelected(PlayableElementEventArgs evt) {
+    protected void OnSelected(PlayableElementEventArgs evt) {
       if (!CanSelect) return;
 
       if (evt.Element != null && evt.Element == _playableElement) {
@@ -103,7 +103,7 @@ namespace GMTK {
       }
     }
 
-    protected override void HandleDeselected(PlayableElementEventArgs evt) {
+    protected void OnDeselected(PlayableElementEventArgs evt) {
       if (!CanSelect) return;
 
       if (evt.Element != null && evt.Element == _playableElement) {

@@ -129,17 +129,17 @@ namespace GMTK {
 
     private void DrawDraggableProperties() {
       using (new EditorGUI.IndentLevelScope()) {
-        if (_element.TryGetComponent<PlayableElementDragging>(out var draggingComponent)) {
-          EditorGUILayout.HelpBox("See PlayableElementDragging component for Dragging settings", MessageType.Info);
+        if (_element.TryGetComponent<DraggingElementComponent>(out var draggingComponent)) {
+          EditorGUILayout.HelpBox("See DraggingElementComponent component for Dragging settings", MessageType.Info);
           //link to component
           if (GUILayout.Button("Go To Dragging Component", GUILayout.Width(250))) {
             Selection.activeGameObject = draggingComponent.gameObject;
           }
         }
         else {
-          EditorGUILayout.HelpBox("No PlayableElementDragging component found. Add one to configure dragging settings.", MessageType.Warning);
-          if (GUILayout.Button("Add PlayableElementDragging Component", GUILayout.Width(250))) {
-            _element.gameObject.AddComponent<PlayableElementDragging>();
+          EditorGUILayout.HelpBox("No DraggingElementComponent component found. Add one to configure dragging settings.", MessageType.Warning);
+          if (GUILayout.Button("Add DraggingElementComponent Component", GUILayout.Width(250))) {
+            _element.gameObject.AddComponent<DraggingElementComponent>();
           }
         }
       }

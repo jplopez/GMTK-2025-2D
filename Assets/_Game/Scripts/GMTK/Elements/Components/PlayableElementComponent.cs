@@ -1,4 +1,6 @@
 using Ameba;
+using MoreMountains.Feedbacks;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -62,8 +64,45 @@ namespace GMTK {
       _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleGlobalElementHovered);
       _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleGlobalElementUnhovered);
 
-      // Listen to PlayableElement events
+      // Listen to PlayableElement events through the GameEventChannel
+      _gameEventChannel.AddListener<PlayableElementEventArgs>(GameEventType.PlayableElementEvent, HandlePlayableElementEvent);
+      
+      // Listen to direct PlayableElement events
       if (_playableElement != null) _playableElement.AddComponentListener(this);
+    }
+
+    /// <summary>
+    /// <para>
+    /// Common method to handle broadcasted events of the type <c>GameEventType.PlayableElementEvent</c> through the <see cref="GameEventChannel"/> event channel.<br/> 
+    /// Internally, <see cref="PlayableElementComponent"/> handle these events as <see cref="PlayableElementEventArgs"/>, using the <see cref="PlayableElementEventType"/> enum.
+    /// </para>
+    /// <para>
+    /// To handle a <c>PlayableElementEvent</c> the <see cref="PlayableElementComponent"/> must have a method named as "On" + PlayableElementEventType name in args.<br/>
+    /// For example, the method <c>OnDragStart</c> handles <c>PlayableElementEventType.DragStart</c> events. The method must receive a single <see cref="PlayableElementEventArgs"/> argument.
+    /// </para>
+    /// </summary>
+    /// <param name="args"></param>
+    protected virtual void HandlePlayableElementEvent(PlayableElementEventArgs args) {
+      // Only handle events for our own PlayableElement
+      if (args.Element != _playableElement) return;
+
+      // Use reflection to look for a method named as "On" + PlayableElementEventType name in args
+      // For example OnDragStart for PlayableElementEventType.DragStart, that receives a PlayableElementEventArgs argument
+      var methodName = "On" + args.EventType.ToString();
+      var method = GetType().GetMethod(methodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+      
+      if (method != null) {
+        try {
+          method.Invoke(this, new object[] { args });
+        }
+        catch (Exception ex) {
+          Debug.LogError($"[{GetType().Name}] Error invoking method {methodName}: {ex.Message}");
+        }
+      }
+      else {
+        // Optional: Log when no handler method is found (useful for debugging)
+        // Debug.LogWarning($"[{GetType().Name}] No handler method found for {methodName}");
+      }
     }
 
     private void RemoveListeners() {
@@ -73,6 +112,8 @@ namespace GMTK {
       _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleGlobalElementDropped);
       _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleGlobalElementHovered);
       _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleGlobalElementUnhovered);
+
+      _gameEventChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.PlayableElementEvent, HandlePlayableElementEvent);
 
       if (_playableElement != null) _playableElement.RemoveComponentListener(this);
     }
@@ -96,66 +137,24 @@ namespace GMTK {
       HandleElementUnhovered(evt);
     }
 
-    // PlayableElement event handler
+    // PlayableElement event handler - now broadcasts to GameEventChannel and uses reflection
     public virtual void OnPlayableElementEvent(PlayableElementEventArgs eventArgs) {
       if (eventArgs.Element != _playableElement) return;
 
-      switch (eventArgs.EventType) {
-        case PlayableElementEventType.DragStart:
-          HandleDragStart(eventArgs); break;
-        case PlayableElementEventType.DragUpdate:
-          HandleDragUpdate(eventArgs); break;
-        case PlayableElementEventType.DragEnd:
-          HandleDragEnd(eventArgs); break;
-        case PlayableElementEventType.DropSuccess:
-          HandleDropSuccess(eventArgs); break;
-        case PlayableElementEventType.DropInvalid:
-          HandleDropInvalid(eventArgs); break;
-        case PlayableElementEventType.PointerOver:
-          HandlePointerOver(eventArgs); break;
-        case PlayableElementEventType.PointerOut:
-          HandlePointerOut(eventArgs); break;
-        case PlayableElementEventType.BecomeActive:
-          HandleBecomeActive(eventArgs); break;
-        case PlayableElementEventType.BecomeInactive:
-          HandleBecomeInactive(eventArgs); break;
-        case PlayableElementEventType.RotateCW:
-          HandleRotateClockwise(eventArgs); break;
-        case PlayableElementEventType.RotateCCW:
-          HandleRotateCounterClockwise(eventArgs); break;
-        case PlayableElementEventType.FlippedX:
-          HandleFlipX(eventArgs); break;
-        case PlayableElementEventType.FlippedY:
-          HandleFlipY(eventArgs); break;
-        case PlayableElementEventType.Selected:
-          HandleSelected(eventArgs); break;
-        case PlayableElementEventType.Deselected:
-          HandleDeselected(eventArgs); break;
-      }
+      // Broadcast the event through GameEventChannel for other components to listen
+      _gameEventChannel?.Raise(GameEventType.PlayableElementEvent, eventArgs);
+
+      // Handle the event locally using reflection
+      HandlePlayableElementEvent(eventArgs);
     }
 
-    // Abstract methods for legacy compatibility
+    // Abstract methods for legacy compatibility - these still need to be implemented
     protected abstract void HandleElementSelected(GridSnappableEventArgs evt);
     protected abstract void HandleElementDropped(GridSnappableEventArgs evt);
     protected abstract void HandleElementHovered(GridSnappableEventArgs evt);
     protected abstract void HandleElementUnhovered(GridSnappableEventArgs evt);
 
-    // Virtual methods for PlayableElement events - can be overridden as needed
-    protected virtual void HandleDragStart(PlayableElementEventArgs evt) { }
-    protected virtual void HandleDragUpdate(PlayableElementEventArgs evt) { }
-    protected virtual void HandleDragEnd(PlayableElementEventArgs evt) { }
-    protected virtual void HandleDropSuccess(PlayableElementEventArgs evt) { }
-    protected virtual void HandleDropInvalid(PlayableElementEventArgs evt) { }
-    protected virtual void HandlePointerOver(PlayableElementEventArgs evt) { }
-    protected virtual void HandlePointerOut(PlayableElementEventArgs evt) { }
-    protected virtual void HandleBecomeActive(PlayableElementEventArgs evt) { }
-    protected virtual void HandleBecomeInactive(PlayableElementEventArgs evt) { }
-    protected virtual void HandleRotateClockwise(PlayableElementEventArgs evt) { }
-    protected virtual void HandleRotateCounterClockwise(PlayableElementEventArgs evt) { }
-    protected virtual void HandleFlipX(PlayableElementEventArgs evt) { }
-    protected virtual void HandleFlipY(PlayableElementEventArgs evt) { }
-    protected virtual void HandleSelected(PlayableElementEventArgs evt) { }
-    protected virtual void HandleDeselected(PlayableElementEventArgs evt) { }
+    #region Component Lifecycle
 
     public void RunBeforeUpdate() { if (IsActive && isInitialized) BeforeUpdate(); }
     public void RunOnUpdate() {
@@ -198,5 +197,23 @@ namespace GMTK {
     protected virtual void FinalizeComponent() { }
     protected virtual void OnDelayedUpdate() { }
     protected virtual void ResetComponent() { }
+
+    /// <summary>
+    /// null safe method to play a MMF_Player feedback
+    /// </summary>
+    /// <param name="feedback"></param>
+    protected virtual void PlayFeedback(MMF_Player feedback) {
+      if (feedback != null && feedback.gameObject.activeInHierarchy) {
+        feedback.PlayFeedbacks();
+      }
+    }
+
+    protected virtual void StopFeedback(MMF_Player feedback) {
+      if (feedback != null && feedback.gameObject.activeInHierarchy) {
+        feedback.StopFeedbacks();
+      }
+    }
+
+    #endregion
   }
 }

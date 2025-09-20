@@ -51,7 +51,7 @@ namespace GMTK {
     private SelectableElementComponent _selectableComponent;
 
     // Events for components to listen to
-    protected event Action<PlayableElementEventArgs> OnPlayableElementEvent;
+    public event Action<PlayableElementEventArgs> OnPlayableElementEvent;
 
     #region MonoBehaviour Methods
 
@@ -167,6 +167,8 @@ namespace GMTK {
     public void AddComponentListener(PlayableElementComponent component) => OnPlayableElementEvent += component.OnPlayableElementEvent;
 
     public void RemoveComponentListener(PlayableElementComponent component) => OnPlayableElementEvent -= component.OnPlayableElementEvent;
+
+    public void InvokePlayableElementEvent(PlayableElementEventArgs eventArgs) => OnPlayableElementEvent?.Invoke(eventArgs);
 
     #endregion
 
