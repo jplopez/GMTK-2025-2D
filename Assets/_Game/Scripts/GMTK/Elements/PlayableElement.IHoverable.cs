@@ -9,33 +9,44 @@ namespace GMTK {
   /// </summary>
   public partial class PlayableElement : IHoverable {
 
-    // Private hover state
-    private bool _isHovered = false;
+
+    [Tooltip("Whether the element is currently hovered by a pointer")]
+    [SerializeField] protected bool _isHovered = false;
+    [Tooltip("If true, this element can be hovered by a pointer")]
+    [SerializeField] [DisplayWithoutEdit] protected bool _canHover = true;
 
     // IHoverable interface properties
-    public bool CanHover => true; // PlayableElements can always be hovered
+    // PlayableElements can always be hovered
+    public bool CanHover => _canHover; 
     public bool IsHovered => _isHovered;
+
     public Transform HoverTransform => SnapTransform != null ? SnapTransform : transform;
 
     #region IHoverable Implementation
 
     public void MarkHovered(bool hovered = true) {
       if (_isHovered == hovered) return;
+      _isHovered = hovered && _canHover;
 
-      _isHovered = hovered;
-
-      if (hovered) {
-        OnHover();
+      this.Log($"Element {name} marked as {(hovered ? "Hovered" : "Unhovered")}");
+      var eventArgs = BuildEventArgs(hovered ? PlayableElementEventType.PointerOver : PlayableElementEventType.PointerOut);
+      //first try to delegate to component if it exists
+      if (!TryDelegateToPointerComponent(eventArgs)) {
+        this.LogWarning($"No PointerElementComponent found on {name} to handle hover event");
       }
-      else {
-        OnUnhover();
+      _gameEventChannel.Raise(GameEventType.PlayableElementEvent, eventArgs);
+    }
+
+    public void EnableHovering(bool enable=true) {
+      if (_canHover == enable) return;
+      _canHover = enable;
+      if (!_canHover && _isHovered) {
+        MarkHovered(false);
       }
     }
 
-    public void OnHover() {
-      _isHovered = true;
-      RaisePlayableElementEvent(PlayableElementEventType.PointerOver);
-    }
+    public void OnHover() => MarkHovered(true);
+    public void OnUnhover() => MarkHovered(false);
 
     public void OnHoverUpdate() {
       if (!_isHovered) return;
@@ -43,22 +54,8 @@ namespace GMTK {
       // Currently no specific behavior needed
     }
 
-    public void OnUnhover() {
-      _isHovered = false;
-      RaisePlayableElementEvent(PlayableElementEventType.PointerOut);
-    }
-
-    public void OnHoverEnabled() {
-      // Handle when hovering is enabled
-      // No specific behavior needed for now
-    }
-
-    public void OnHoverDisabled() {
-      // Handle when hovering is disabled
-      if (_isHovered) {
-        MarkHovered(false);
-      }
-    }
+    public void OnHoverEnabled() => EnableHovering(true);
+    public void OnHoverDisabled() => EnableHovering(false);
 
     public void OnPointerEnter() => OnHover();
     public void OnPointerExit() => OnUnhover();

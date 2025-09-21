@@ -11,9 +11,9 @@ namespace GMTK {
   /// </summary>
   public partial class PlayableElement : ISelectable {
 
-    [Tooltip("If true, this element can be selected.")]
+    [Tooltip("Whether this element is currently selected by a pointer")]
     [SerializeField] protected bool _isSelected = false;
-    [Tooltip("If true, this element can be selected.")]
+    [Tooltip("If true, this element can be selected by a pointer")]
     [SerializeField] protected bool _canSelect = true;
 
     // ISelectable interface properties
