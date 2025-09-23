@@ -30,7 +30,7 @@ namespace GMTK {
     public void MarkSelected(bool selected = true) {
       if (IsSelected == selected) return; //avoid redundant state change
       IsSelected = selected && CanSelect;
-      this.Log($"Element {name} marked as {(IsSelected ? "Selected" : "Deselected")}");
+      this.LogDebug($"Element {name} marked as {(IsSelected ? "Selected" : "Deselected")}");
       var eventArgs = BuildEventArgs(selected ? PlayableElementEventType.Selected : PlayableElementEventType.Deselected);
       // first try to delegate to component if it exists
       if (!TryDelegateToPointerComponent(eventArgs)) {
@@ -72,7 +72,7 @@ namespace GMTK {
     /// <returns>true if the event was handled by the PointerElementComponent. false otherwise</returns>
     private bool TryDelegateToPointerComponent(PlayableElementEventArgs eventArgs) {
       if (_pointerComponent == null) return false;
-      this.Log($"Delegating {eventArgs.EventType} event to PointerElementComponent on {name}");
+      this.LogDebug($"Delegating {eventArgs.EventType} event to PointerElementComponent on {name}");
       switch (eventArgs.EventType) {
         case PlayableElementEventType.Selected:
           _pointerComponent.OnSelected(eventArgs);

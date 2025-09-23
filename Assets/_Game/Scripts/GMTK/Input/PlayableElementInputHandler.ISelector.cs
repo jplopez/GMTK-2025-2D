@@ -61,19 +61,19 @@ namespace GMTK {
 
     public bool TrySelect(PlayableElement element) {
       if (!CanSelect || element == null) return false;
-      this.Log($"Attempting to select element: {element.name} CanSelect: {element.CanSelect}");
-      this.Log($"IsSelecting: {IsSelecting} CanSelect {CanSelect}");
+      this.LogDebug($"Attempting to select element: {element.name} CanSelect: {element.CanSelect}");
+      this.LogDebug($"IsSelecting: {IsSelecting} CanSelect {CanSelect}");
 
       if (_selectedElement != null)
-        this.Log($"_selectedElement: {_selectedElement.name}");
-      else this.Log($"_selectedElement: null");
+        this.LogDebug($"_selectedElement: {_selectedElement.name}");
+      else this.LogDebug($"_selectedElement: null");
 
       // Check if element can be selected
       if (!element.CanSelect) return false;
 
       // If we already have a selected element, deselect it first
       if (_selectedElement != null && _selectedElement != element) {
-        this.Log($"Deselecting current element");
+        this.LogDebug($"Deselecting current element");
         DeselectCurrentElement();
       }
 
@@ -81,13 +81,13 @@ namespace GMTK {
       if (_selectedElement == null || _selectedElement != element) {
         _selectedElement = element;
 
-        this.Log($"Marking element: {element.name}");
+        this.LogDebug($"Marking element: {element.name}");
         element.MarkSelected(true);
 
         // Trigger selection events
         _eventsChannel.Raise(GameEventType.ElementSelected,
             new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
-        this.Log($"Selected element: {element.name}");
+        this.LogDebug($"Selected element: {element.name}");
         return true;
       }
 
@@ -110,7 +110,7 @@ namespace GMTK {
         _eventsChannel.Raise(GameEventType.ElementDeselected,
             new GridSnappableEventArgs(ConvertToGridSnappable(elementToDeselect), _pointerScreenPos, _pointerWorldPos));
 
-        this.Log($"Deselected element: {elementToDeselect.name}");
+        this.LogDebug($"Deselected element: {elementToDeselect.name}");
       }
     }
 

@@ -507,7 +507,7 @@ namespace GMTK {
     public void FlipX(EventArgs eventArgs) {
       if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
         if (inputArgs.Phase == InputActionPhase.Performed) {
-          _eventsChannel.Raise(GameEventType.InputFlippedX);
+          //_eventsChannel.Raise(GameEventType.InputFlippedX);
           
           // Flip the selected element if any, otherwise flip current element
           if (SelectedElement != null) {
@@ -522,8 +522,8 @@ namespace GMTK {
     public void FlipY(EventArgs eventArgs) {
       if (TryHandleAsInputActionEventArgs(eventArgs, out InputActionEventArgs inputArgs)) {
         if (inputArgs.Phase == InputActionPhase.Performed) {
-          _eventsChannel.Raise(GameEventType.InputFlippedY);
-          
+          //_eventsChannel.Raise(GameEventType.InputFlippedY);
+
           // Flip the selected element if any, otherwise flip current element
           if (SelectedElement != null) {
             SelectedElement.FlipY();

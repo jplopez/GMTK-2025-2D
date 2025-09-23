@@ -1506,6 +1506,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8640411528628209826, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
   m_PrefabInstance: {fileID: 7824413446565601161}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1283371348 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2863527360892847021, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
+  m_PrefabInstance: {fileID: 1778038183}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1311197829
 GameObject:
   m_ObjectHideFlags: 0
@@ -3502,13 +3507,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ramp_2x2 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 3084063251501326685, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
+      propertyPath: CanRotate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3084063251501326685, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
+      propertyPath: Draggable
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3084063251501326685, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
+      propertyPath: Flippable
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6566122477424756932, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 18.099997
+      value: 18.199997
       objectReference: {fileID: 0}
     - target: {fileID: 6566122477424756932, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.0000014
+      value: -2.4000013
       objectReference: {fileID: 0}
     - target: {fileID: 6566122477424756932, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3545,13 +3562,55 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2863527360892847021, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1778038190}
   m_SourcePrefab: {fileID: 100100000, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
 --- !u!4 &1778038184 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6566122477424756932, guid: 6c2fb8de88fdceb48a5e62d2912e5180, type: 3}
   m_PrefabInstance: {fileID: 1778038183}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1778038190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283371348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 060134c866fcd634987d051a3d91cf43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsActive: 1
+  DelayRun: 0
+  InitialDelay: 0.1
+  SnapOnDrop: 1
+  SnapDuringDrag: 0
+  SnapThreshold: 0.5
+  ConstrainHorizontal: 0
+  ConstrainVertical: 0
+  MinPosition: {x: -100, y: -100}
+  MaxPosition: {x: 100, y: 100}
+  ValidateDropLocation: 1
+  ChangeUpdate: 1
+  EnableGhost: 1
+  GhostAlpha: 0.7
+  GhostScale: 1.1
+  ValidGhostColor: {r: 0, g: 1, b: 0, a: 1}
+  InvalidGhostColor: {r: 1, g: 0, b: 0, a: 1}
+  NeutralGhostColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  OnDragStartFeedback: {fileID: 0}
+  OnDragUpdateFeedback: {fileID: 0}
+  DragUpdateWaitInterval: 0.2
+  OnDragEndFeedback: {fileID: 0}
+  PositionChangeFeedback: {fileID: 0}
+  OnGhostModeStartFeedback: {fileID: 0}
+  OnGhostModeEndFeedback: {fileID: 0}
+  OnValidPlacementFeedback: {fileID: 0}
+  OnInvalidPlacementFeedback: {fileID: 0}
 --- !u!1 &1817547537
 GameObject:
   m_ObjectHideFlags: 0
@@ -4977,6 +5036,8 @@ MonoBehaviour:
   - {x: 0, y: 2}
   Flippable: 0
   CanRotate: 1
+  _isHovered: 0
+  _canHover: 1
   _isSelected: 0
   _canSelect: 1
 --- !u!114 &8807545581079233425
@@ -5529,6 +5590,8 @@ MonoBehaviour:
   - {x: 0, y: 2}
   Flippable: 0
   CanRotate: 0
+  _isHovered: 0
+  _canHover: 1
   _isSelected: 0
   _canSelect: 1
 --- !u!114 &8807545582166061502

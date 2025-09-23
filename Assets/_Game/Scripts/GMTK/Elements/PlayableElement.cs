@@ -2,6 +2,7 @@ using Ameba;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using GMTK.Extensions;
 
 namespace GMTK {
 
@@ -35,7 +36,7 @@ namespace GMTK {
     public bool Flippable = false;
     [Tooltip("If true, the object can be rotated in its Z axis")]
     public bool CanRotate = false;
- 
+
     // Public properties for compatibility with existing code
     public bool IsRegistered => _isRegistered;
 
@@ -102,7 +103,7 @@ namespace GMTK {
       _components.Clear();
       _components.AddRange(GetComponents<PlayableElementComponent>());
       _components.ForEach(comp => comp.TryInitialize());
-      
+
       // Cache the PointerElementComponent reference
       _pointerComponent = GetComponent<PointerElementComponent>();
     }
@@ -185,12 +186,13 @@ namespace GMTK {
     /// </summary>
     /// <param name="eventType">The type of event to raise</param>
     /// <param name="worldPosition">The world position for the event (uses transform.position if not provided)</param>
-    protected virtual void RaisePlayableElementEvent(PlayableElementEventType eventType, Vector3? worldPosition = null) {
+    protected virtual PlayableElementEventArgs RaisePlayableElementEvent(PlayableElementEventType eventType, Vector3? worldPosition = null) {
       var eventArgs = BuildEventArgs(eventType);
       _gameEventChannel.Raise(GameEventType.PlayableElementEvent, eventArgs);
       OnPlayableElementEvent?.Invoke(eventArgs);
 
       this.LogDebug($"PlayableElementEvent {eventType} started on {name}");
+      return eventArgs;
     }
 
     protected PlayableElementEventArgs BuildEventArgs(PlayableElementEventType eventType, Vector3? worldPosition = null) {
@@ -224,68 +226,70 @@ namespace GMTK {
     /// <summary>
     /// Rotates the PlayableElement clockwise, if CanRotate is true
     /// </summary>
-    public void RotateClockwise() {
-      if (CanRotate) {
-        // Notify components first - they might handle the rotation
-        var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.RotateCW);
-        OnPlayableElementEvent?.Invoke(eventArgs);
-        
-        // If no component handled it, do the default rotation
-        if (!eventArgs.Handled) {
-          SnapTransform.Rotate(Vector3.forward, -90f);
-        }
-      }
-    }
+    public void RotateClockwise() => InnerRotate(PlayableElementEventType.RotateCW);
 
     /// <summary>
     /// Rotates the PlayableElement counter clockwise, if CanRotate is true
     /// </summary>
-    public void RotateCounterClockwise() {
-      if (CanRotate) {
-        // Notify components first - they might handle the rotation
-        var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.RotateCCW);
-        OnPlayableElementEvent?.Invoke(eventArgs);
-        
-        // If no component handled it, do the default rotation
-        if (!eventArgs.Handled) {
-          SnapTransform.Rotate(Vector3.forward, 90f);
+    public void RotateCounterClockwise() => InnerRotate(PlayableElementEventType.RotateCCW);
+
+    /// <summary>
+    /// Internal method to handle rotation logic for both clockwise and counter-clockwise rotation
+    /// </summary>
+    /// <param name="eventType">The type of rotation event (RotateCW or RotateCCW)</param>
+    private void InnerRotate(PlayableElementEventType eventType) {
+      if (!CanRotate) return;
+
+      // Notify components first - they might handle the rotation
+      var eventArgs = new PlayableElementEventArgs(this, transform.position, eventType);
+      OnPlayableElementEvent?.Invoke(eventArgs);
+
+      // If no component handled it, do the default rotation using extension methods
+      if (!eventArgs.Handled) {
+        if (eventType == PlayableElementEventType.RotateCW) {
+          SnapTransform.RotateClockwise();
+        } else {
+          SnapTransform.RotateCounterClockwise();
         }
+
+        string direction = eventType == PlayableElementEventType.RotateCW ? "clockwise" : "counter-clockwise";
+        this.LogDebug($"Rotated {name} {direction} (flippedX: {SnapTransform.IsFlippedX()}, flippedY: {SnapTransform.IsFlippedY()})");
       }
     }
 
     /// <summary>
     /// Flips the PlayableElement on the X-axis (up-down), if Flippable is true
     /// </summary>
-    public void FlipX() {
-      if (Flippable) {
-        // Notify components first - they might handle the flip
-        var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.FlippedX);
-        OnPlayableElementEvent?.Invoke(eventArgs);
-        
-        // If no component handled it, do the default flip
-        if (!eventArgs.Handled) {
-          Vector3 scale = SnapTransform.localScale;
-          scale.x *= -1;
-          SnapTransform.localScale = scale;
-        }
-      }
-    }
+    public void FlipX() => InnerFlip(flipX: true);
 
     /// <summary>
     /// Flips the PlayableElement on the Y-axis (left-right), if Flippable is true
     /// </summary>
-    public void FlipY() {
-      if (Flippable) {
-        // Notify components first - they might handle the flip
-        var eventArgs = new PlayableElementEventArgs(this, transform.position, PlayableElementEventType.FlippedY);
-        OnPlayableElementEvent?.Invoke(eventArgs);
-        
-        // If no component handled it, do the default flip
-        if (!eventArgs.Handled) {
-          Vector3 scale = SnapTransform.localScale;
-          scale.y *= -1;
-          SnapTransform.localScale = scale;
-        }
+    public void FlipY() => InnerFlip(flipY: true);
+
+    /// <summary>
+    /// Convenience method to flip the PlayableElement on the specified axes, if Flippable is true
+    /// </summary>
+    /// <param name="flipX"></param>
+    /// <param name="flipY"></param>
+    private void InnerFlip(bool flipX = false, bool flipY = false) {
+      if (!Flippable || (!flipX && !flipY)) return;
+      this.Log($"Flipping {(flipX ? "X" : "")} {(flipY ? "Y" : "")} on {name}");
+
+      PlayableElementEventType eventType = flipX ? PlayableElementEventType.FlippedX : PlayableElementEventType.FlippedY;
+
+      // Notify components first - they might handle the flip
+      PlayableElementEventArgs eventArgs = RaisePlayableElementEvent(eventType);
+
+      // If no component handled it, do the default flip using extension methods
+      if (eventArgs != null && eventArgs.Handled) return;
+
+      if (flipX) {
+        SnapTransform.FlipX();
+      }
+
+      if (flipY) {
+        SnapTransform.FlipY();
       }
     }
 
@@ -306,10 +310,11 @@ namespace GMTK {
   #region Casting to GridSnappable (for compatibility)
 
   public static class PlayableElementExtensions {
-    public static GridSnappable ToGridSnappable(this PlayableElement element, float ttl=0.2f) {
-      if(element.TryGetComponent(out GridSnappable existing)) {
+    public static GridSnappable ToGridSnappable(this PlayableElement element, float ttl = 0.2f) {
+      if (element.TryGetComponent(out GridSnappable existing)) {
         return existing;
-      } else {
+      }
+      else {
 
         //instance a GridSnappable and copy properties
         GridSnappable snappable = element.gameObject.AddComponent<GridSnappable>();

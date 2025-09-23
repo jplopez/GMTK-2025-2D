@@ -28,7 +28,7 @@ namespace GMTK {
       if (_isHovered == hovered) return;
       _isHovered = hovered && _canHover;
 
-      this.Log($"Element {name} marked as {(hovered ? "Hovered" : "Unhovered")}");
+      this.LogDebug($"Element {name} marked as {(hovered ? "Hovered" : "Unhovered")}");
       var eventArgs = BuildEventArgs(hovered ? PlayableElementEventType.PointerOver : PlayableElementEventType.PointerOut);
       //first try to delegate to component if it exists
       if (!TryDelegateToPointerComponent(eventArgs)) {
