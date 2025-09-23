@@ -12,9 +12,9 @@ namespace GMTK.Extensions {
     /// </summary>
     /// <param name="transform">The transform to rotate</param>
     /// <returns>The transform for method chaining</returns>
-    public static Transform RotateClockwise(this Transform transform) {
+    public static Transform RotateClockwise(this Transform transform, float angle = 90f) {
       bool shouldInvert = transform.IsFlippedX() ^ transform.IsFlippedY(); // XOR - true if exactly one is flipped
-      float rotationAmount = shouldInvert ? 90f : -90f;
+      float rotationAmount = shouldInvert ? angle : -angle;
       transform.Rotate(Vector3.forward, rotationAmount);
       return transform;
     }
@@ -25,9 +25,9 @@ namespace GMTK.Extensions {
     /// </summary>
     /// <param name="transform">The transform to rotate</param>
     /// <returns>The transform for method chaining</returns>
-    public static Transform RotateCounterClockwise(this Transform transform) {
+    public static Transform RotateCounterClockwise(this Transform transform, float angle = 90f) {
       bool shouldInvert = transform.IsFlippedX() ^ transform.IsFlippedY(); // XOR - true if exactly one is flipped
-      float rotationAmount = shouldInvert ? -90f : 90f;
+      float rotationAmount = shouldInvert ? -angle : angle;
       transform.Rotate(Vector3.forward, rotationAmount);
       return transform;
     }

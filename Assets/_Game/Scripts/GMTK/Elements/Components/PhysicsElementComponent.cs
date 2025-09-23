@@ -1,4 +1,5 @@
 using UnityEngine;
+using GMTK.Extensions; // Add this using statement
 
 namespace GMTK {
 
@@ -11,20 +12,16 @@ namespace GMTK {
 
     public enum CollisionSourceFilter { Everything, MarbleOnly, ElementsOnly }
 
-    [Header("Position Change")]
+    [Header("Collision Settings")]
     [Tooltip("Whether this element changes its position when colliding with other elements. If true, other elements can move it when colliding (eg: push). If false, collision with other elements will not move it")]
+    [Help("By enabling 'ChangePositionOnCollision', this element will change its position when colliding with other elements. If false, collisions with other elements will not move it", UnityEditor.MessageType.Info)]
     public bool ChangePositionOnCollision = false;
     [Tooltip("Determines which objects can move this element through collision")]
     public CollisionSourceFilter CanBeMovedBy = CollisionSourceFilter.Everything;
-
-    [Space(5)]
-    [Header("Rotation Change")]
+    [Space(10)]
     [Tooltip("Whether this element changes its angle when colliding with other elements. If true, other elements can rotate it when colliding. If false, collision with other elements will not rotate it. NOTE: This will override the CanRotate setting from PlayableElement")]
+    [Help("By enabling 'ChangeRotationOnCollision', this element will change its angle when colliding with other elements. If false, collisions with other elements will not rotate it. NOTE: If true, this will override the 'CanRotate' setting from PlayableElement", UnityEditor.MessageType.Info)]
     public bool ChangeRotationOnCollision = false;
-    [Space(2)]
-    [Tooltip("NOTE: When ChangeRotationOnCollision is enabled, it overrides the CanRotate setting from PlayableElement. Adjust rotation settings in the Physics component instead.")]
-    [SerializeField] private string _rotationOverrideInfo = "When enabled above, this overrides PlayableElement.CanRotate";
-    [Space(2)]
     [Tooltip("Determines which objects can rotate this element through collision")]
     public CollisionSourceFilter CanBeRotatedBy = CollisionSourceFilter.Everything;
 
@@ -46,7 +43,7 @@ namespace GMTK {
     [Header("Rotation Settings")]
     [Tooltip("Whether this element can rotate")]
     public bool AllowRotation = false;
-    [Tooltip("How many degrees the element will rotate every time is requested. Recommendation: multiples of 90")]
+    [Tooltip("How many degrees the element will rotate every time is requested. Uses extension methods that handle flip state automatically.")]
     public float RotationStep = 90;
     [Tooltip("If true, you can limit the rotation angle using MinRotationAngle and MaxRotationAngle")]
     public bool LimitRotationAngle = false;
@@ -219,8 +216,12 @@ namespace GMTK {
 
       // Apply the accumulated torque from collisions
       if (Mathf.Abs(torque) > 0.001f) {
-        float rotationDelta = torque * Time.deltaTime;
-        ApplyRotationChange(rotationDelta);
+        // Use extension methods for collision-based rotation with RotationStep
+        if (torque > 0) {
+          ApplyExtensionRotation(true); // Clockwise
+        } else {
+          ApplyExtensionRotation(false); // Counter-clockwise
+        }
       }
     }
 
@@ -499,7 +500,7 @@ namespace GMTK {
     protected void OnRotateCW(PlayableElementEventArgs evt) {
       bool canRotate = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
       if (canRotate) {
-        ApplyRotationChange(-RotationStep);
+        ApplyExtensionRotation(true); // Use extension method for clockwise rotation
         evt.Handled = true; // Prevent default rotation behavior
       }
     }
@@ -507,9 +508,60 @@ namespace GMTK {
     protected void OnRotateCCW(PlayableElementEventArgs evt) {
       bool canRotate = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
       if (canRotate) {
-        ApplyRotationChange(RotationStep);
+        ApplyExtensionRotation(false); // Use extension method for counter-clockwise rotation
         evt.Handled = true; // Prevent default rotation behavior
       }
+    }
+
+    /// <summary>
+    /// Applies rotation using the TransformGameExtensions with flip-state awareness.
+    /// This is the unified rotation method that handles all rotation scenarios.
+    /// </summary>
+    /// <param name="clockwise">If true, rotates clockwise; otherwise counter-clockwise</param>
+    /// <param name="skipPermissionCheck">If true, applies rotation regardless of permissions</param>
+    private void ApplyExtensionRotation(bool clockwise, bool skipPermissionCheck = false) {
+      if (!skipPermissionCheck) {
+        bool canRotate = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
+        if ((!canRotate && !ChangeRotationOnCollision && !_isDragOverride) || _rigidbody2D.bodyType == RigidbodyType2D.Static)
+          return;
+      }
+
+      // Store current rotation for validation
+      float previousRotation = _rigidbody2D.rotation;
+
+      // Apply the rotation using extension methods with RotationStep parameter
+      if (clockwise) {
+        _playableElement.SnapTransform.RotateClockwise(RotationStep);
+      } else {
+        _playableElement.SnapTransform.RotateCounterClockwise(RotationStep);
+      }
+
+      // Get the new rotation after applying extension method
+      float newRotation = _playableElement.SnapTransform.eulerAngles.z;
+
+      // Apply rotation limits if enabled
+      if (LimitRotationAngle) {
+        // Normalize to -180 to 180 range for comparison
+        float normalizedRotation = newRotation;
+        if (normalizedRotation > 180f) normalizedRotation -= 360f;
+        if (normalizedRotation < -180f) normalizedRotation += 360f;
+
+        if (normalizedRotation < MinRotationAngle || normalizedRotation > MaxRotationAngle) {
+          // Revert to previous rotation if it exceeds limits
+          SetRotation(previousRotation, true);
+          return;
+        }
+      }
+
+      // Sync the rigidbody rotation with transform
+      _rigidbody2D.MoveRotation(newRotation);
+      _rigidbody2D.angularVelocity = 0f; // Stop any ongoing rotation
+
+      // Update tracking variables
+      _currentRotation = newRotation;
+      _lastValidRotation = new Vector3(0, 0, newRotation);
+
+      //this.Log($"Applied extension rotation {(clockwise ? "CW" : "CCW")} to {newRotation}° with step {RotationStep}° (flippedX: {_playableElement.SnapTransform.IsFlippedX()}, flippedY: {_playableElement.SnapTransform.IsFlippedY()})");
     }
 
     protected override void ResetComponent() {
@@ -593,8 +645,8 @@ namespace GMTK {
     }
 
     /// <summary>
-    /// Centralized method to apply rotation changes with proper limit checking
-    /// This replaces the old RotateBy method and ensures consistent rotation handling
+    /// Centralized method to apply rotation changes with proper limit checking.
+    /// This method is kept for backward compatibility but now delegates to extension methods when possible.
     /// </summary>
     /// <param name="degrees">Degrees to rotate by</param>
     /// <param name="skipPermissionCheck">If true, applies rotation regardless of permissions (used for corrections)</param>
@@ -605,6 +657,13 @@ namespace GMTK {
           return;
       }
 
+      // If the rotation amount matches our RotationStep, use extension methods for flip-state awareness
+      if (Mathf.Approximately(Mathf.Abs(degrees), RotationStep)) {
+        ApplyExtensionRotation(degrees < 0, skipPermissionCheck);
+        return;
+      }
+
+      // Fall back to traditional rotation for non-standard angles
       float currentAngle = _rigidbody2D.rotation;
       float targetAngle = currentAngle + degrees;
       
@@ -643,9 +702,93 @@ namespace GMTK {
       //this.Log($"Set rotation to {angle} degrees");
     }
 
-    // Public API methods - now use centralized rotation logic
+    // Public API methods - now use unified extension-based rotation logic
     public void RotateBy(float degrees) {
-      ApplyRotationChange(degrees);
+      // Use extension methods if the degrees match RotationStep for consistency
+      if (Mathf.Approximately(Mathf.Abs(degrees), RotationStep)) {
+        ApplyExtensionRotation(degrees < 0);
+      } else {
+        ApplyRotationChange(degrees);
+      }
+    }
+
+    /// <summary>
+    /// Rotates the element clockwise using the extension method with flip-state awareness.
+    /// </summary>
+    public void RotateClockwise() {
+      ApplyExtensionRotation(true);
+    }
+
+    /// <summary>
+    /// Rotates the element counter-clockwise using the extension method with flip-state awareness.
+    /// </summary>
+    public void RotateCounterClockwise() {
+      ApplyExtensionRotation(false);
+    }
+
+    /// <summary>
+    /// Rotates the element by a specific angle using extension methods.
+    /// </summary>
+    /// <param name="angle">The angle to rotate by</param>
+    /// <param name="clockwise">If true, rotates clockwise; otherwise counter-clockwise</param>
+    public void RotateByAngle(float angle, bool clockwise = true) {
+      if (clockwise) {
+        _playableElement.SnapTransform.RotateClockwise(angle);
+      } else {
+        _playableElement.SnapTransform.RotateCounterClockwise(angle);
+      }
+      
+      // Sync with rigidbody
+      float newRotation = _playableElement.SnapTransform.eulerAngles.z;
+      _rigidbody2D.MoveRotation(newRotation);
+      _currentRotation = newRotation;
+      _lastValidRotation = new Vector3(0, 0, newRotation);
+    }
+
+    /// <summary>
+    /// Snaps the current rotation to the nearest cardinal direction (0, 90, 180, 270).
+    /// Useful for correcting rotation after free rotation or collision.
+    /// </summary>
+    public void SnapToCardinal() {
+      int cardinalRotation = _playableElement.SnapTransform.GetCardinalRotation();
+      SetRotation(cardinalRotation, true);
+    }
+
+    /// <summary>
+    /// Gets the current cardinal rotation of the element (0, 90, 180, 270).
+    /// </summary>
+    /// <returns>The current rotation rounded to the nearest 90-degree increment</returns>
+    public int GetCardinalRotation() {
+      return _playableElement.SnapTransform.GetCardinalRotation();
+    }
+
+    /// <summary>
+    /// Sets the element to a specific cardinal direction.
+    /// </summary>
+    /// <param name="degrees">Target cardinal direction (will be rounded to nearest 90-degree increment)</param>
+    public void SetCardinalRotation(int degrees) {
+      _playableElement.SnapTransform.SetCardinalRotation(degrees);
+      // Sync rigidbody with the new transform rotation
+      float newRotation = _playableElement.SnapTransform.eulerAngles.z;
+      _rigidbody2D.MoveRotation(newRotation);
+      _currentRotation = newRotation;
+      _lastValidRotation = new Vector3(0, 0, newRotation);
+    }
+
+    /// <summary>
+    /// Checks if the element is currently flipped on the X-axis.
+    /// </summary>
+    /// <returns>True if flipped on X-axis, false otherwise</returns>
+    public bool IsFlippedX() {
+      return _playableElement.SnapTransform.IsFlippedX();
+    }
+
+    /// <summary>
+    /// Checks if the element is currently flipped on the Y-axis.
+    /// </summary>
+    /// <returns>True if flipped on Y-axis, false otherwise</returns>
+    public bool IsFlippedY() {
+      return _playableElement.SnapTransform.IsFlippedY();
     }
 
     public void CancelRotation() {
@@ -703,6 +846,14 @@ namespace GMTK {
     public void SetRotationRange(float minAngle, float maxAngle) {
       MinRotationAngle = minAngle;
       MaxRotationAngle = maxAngle;
+    }
+
+    /// <summary>
+    /// Sets the rotation step amount used by the extension methods.
+    /// </summary>
+    /// <param name="step">The rotation step in degrees</param>
+    public void SetRotationStep(float step) {
+      RotationStep = step;
     }
 
     // Integration methods for other components
@@ -798,6 +949,26 @@ namespace GMTK {
         Gizmos.color = Color.red;
         Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, zRotation + MinRotationAngle) * Vector3.right * 2f);
         Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, zRotation + MaxRotationAngle) * Vector3.right * 2f);
+      }
+
+      // Show rotation step visualization
+      if (rotationAllowed || ChangeRotationOnCollision) {
+        Gizmos.color = Color.cyan;
+        float currentRotation = _playableElement.SnapTransform.eulerAngles.z;
+        // Show current rotation direction
+        Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, currentRotation) * Vector3.right * 1.2f);
+        // Show next rotation steps
+        Gizmos.color = new Color(0, 1, 1, 0.5f);
+        Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, currentRotation + RotationStep) * Vector3.right * 1f);
+        Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, currentRotation - RotationStep) * Vector3.right * 1f);
+      }
+
+      // Show flip state indicators
+      if (_playableElement.SnapTransform.IsFlippedX() || _playableElement.SnapTransform.IsFlippedY()) {
+        Gizmos.color = Color.magenta;
+        string flipState = $"{(_playableElement.SnapTransform.IsFlippedX() ? "X" : "")}{(_playableElement.SnapTransform.IsFlippedY() ? "Y" : "")}";
+        // Draw a small indicator for flip state
+        Gizmos.DrawWireCube(pos + Vector3.up * 1f, Vector3.one * 0.2f);
       }
 
       // Show position bounds
