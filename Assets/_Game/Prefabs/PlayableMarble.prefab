@@ -50,8 +50,8 @@ MonoBehaviour:
   GravityScale: 3
   AngularDamping: 0.05
   InitialForce: {x: 0, y: 0}
+  MinimalMovementThreshold: 0.01
   SpawnTransform: {fileID: 0}
-  LaunchOnStart: 0
   GroundedMask:
     serializedVersion: 2
     m_Bits: 640
@@ -83,8 +83,8 @@ Transform:
   m_GameObject: {fileID: 8854468689219663725}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
+  m_LocalPosition: {x: -6.7, y: -0.3000002, z: 0}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8640411528628209826}
@@ -131,7 +131,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1799265231
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: e824633eb1c64fa47a8e7710867f51c4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

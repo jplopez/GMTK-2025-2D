@@ -1,5 +1,7 @@
 using UnityEngine;
-using GMTK.Extensions; // Add this using statement
+using MoreMountains.Feedbacks;
+using GMTK.Extensions;
+using System; // Add this using statement
 
 namespace GMTK {
 
@@ -93,6 +95,16 @@ namespace GMTK {
     }
 
     private CollisionState _currentCollisionState;
+
+    [Header("Feel Integration")]
+    [Tooltip("MMF Player for collision feedback")]
+    public MMF_Player CollisionFeedback;
+
+    [Tooltip("MMF Player for rotation feedback")]
+    public MMF_Player RotationFeedback;
+
+    [Tooltip("MMF Player for constraint violation feedback")]
+    public MMF_Player ConstraintViolationFeedback;
 
     protected override void Initialize() {
       // Store initial transform to be able to reset object to initial state on LevelReset
@@ -282,12 +294,13 @@ namespace GMTK {
 
       // Check if rotation exceeds limits and needs clamping
       if (currentRotation < MinRotationAngle || currentRotation > MaxRotationAngle) {
+        // Feel integration - constraint violation feedback
+        if (ConstraintViolationFeedback != null) {
+            ConstraintViolationFeedback.PlayFeedbacks(transform.position, 1f);
+        }
+        
         float clampedRotation = Mathf.Clamp(currentRotation, MinRotationAngle, MaxRotationAngle);
-        
-        // Apply the clamped rotation using our centralized method
-        SetRotation(clampedRotation, true); // Force the rotation regardless of permissions
-        
-        //this.Log($"Rotation limit validation: {currentRotation} clamped to {clampedRotation}");
+        SetRotation(clampedRotation, true);
       }
     }
 
@@ -308,6 +321,16 @@ namespace GMTK {
     // Enhanced collision handling - these methods now prime the component for processing
     private void OnCollisionEnter2D(Collision2D collision) {
       PrimeCollisionProcessing(collision);
+      
+      // Feel integration - play collision feedback based on force
+      if (CollisionFeedback != null) {
+        float intensity = CalculateCollisionIntensity(collision);
+        CollisionFeedback.PlayFeedbacks(transform.position, intensity);
+      }
+    }
+
+    private float CalculateCollisionIntensity(Collision2D collision) {
+      throw new NotImplementedException();
     }
 
     private void OnCollisionStay2D(Collision2D collision) {
@@ -562,6 +585,11 @@ namespace GMTK {
       _lastValidRotation = new Vector3(0, 0, newRotation);
 
       //this.Log($"Applied extension rotation {(clockwise ? "CW" : "CCW")} to {newRotation}° with step {RotationStep}° (flippedX: {_playableElement.SnapTransform.IsFlippedX()}, flippedY: {_playableElement.SnapTransform.IsFlippedY()})");
+
+      // Feel integration - provide rotation feedback
+      if (RotationFeedback != null && newRotation != previousRotation) {
+        RotationFeedback.PlayFeedbacks(transform.position, 1f);
+      }
     }
 
     protected override void ResetComponent() {
