@@ -114,12 +114,12 @@ namespace GMTK {
     /// </summary>
     /// <param name="evt"></param>
     protected void OnPointerOver(PlayableElementEventArgs evt) {
-      this.Log($"OnPointerOver event received for {evt.Element?.name}");
+      this.LogDebug($"OnPointerOver event received for {evt.Element?.name}");
       // edge cases
       if (!CanHover //cant hover
           || (HasSelectionTrigger(SelectionTrigger.OnHover) && !CanSelect) //cant select by hover
           ) return;
-      this.Log($"IsHovering: {IsHovering}, CanHover {CanHover}, SelectOnHover: {HasSelectionTrigger(SelectionTrigger.OnHover)}");
+      this.LogDebug($"IsHovering: {IsHovering}, CanHover {CanHover}, SelectOnHover: {HasSelectionTrigger(SelectionTrigger.OnHover)}");
       // only handle events for our own element, and only if not already hovering
       if (evt.Element != null && evt.Element == _playableElement && !IsHovering) {
 
@@ -138,12 +138,12 @@ namespace GMTK {
     /// </summary>
     /// <param name="evt"></param>
     protected void OnPointerOut(PlayableElementEventArgs evt) {
-      this.Log($"OnPointerOut event received for {evt.Element?.name}");
+      this.LogDebug($"OnPointerOut event received for {evt.Element?.name}");
       // edge cases
       if (!CanHover //cant hover
          || (HasSelectionTrigger(SelectionTrigger.OnHover) && !CanSelect) //cant select by hover
          ) return;
-      this.Log($"IsHovering: {IsHovering}, CanHover {CanHover}, SelectOnHover: {HasSelectionTrigger(SelectionTrigger.OnHover)}");
+      this.LogDebug($"IsHovering: {IsHovering}, CanHover {CanHover}, SelectOnHover: {HasSelectionTrigger(SelectionTrigger.OnHover)}");
       // only handle events for our own element, and only if currently hovering
       if (evt.Element != null && evt.Element == _playableElement && IsHovering) {
 
@@ -156,13 +156,13 @@ namespace GMTK {
 
         // if we were selected by hover, we deselect
         if (HasSelectionTrigger(SelectionTrigger.OnHover) && IsSelected) {
-          this.Log($"Element {_playableElement.name} deselected on unhover");
+          this.LogDebug($"Element {_playableElement.name} deselected on unhover");
           MarkSelected(false);
           PlayFeedback(OnDeselectedFeedback);
         }
         // otherwise we just play unhover feedback
         else {
-          this.Log($"Element {_playableElement.name} unhover feedback played");
+          this.LogDebug($"Element {_playableElement.name} unhover feedback played");
           //skip unhover feedback if we are selected, to avoid feedback overlap
           if (!IsSelected) PlayFeedback(OnUnhoverFeedback);
         }
@@ -175,7 +175,7 @@ namespace GMTK {
     /// <param name="evt"></param>
 
     public void OnSelected(PlayableElementEventArgs evt) {
-      this.Log($"OnSelected event received for {evt.Element?.name}");
+      this.LogDebug($"OnSelected event received for {evt.Element?.name}");
       if (!CanSelect) return;
       if (evt.Element != null && evt.Element == _playableElement && !IsSelected) {
         TrySelectingElementAtWorldPos(evt.WorldPosition, true);
@@ -188,7 +188,7 @@ namespace GMTK {
     /// <param name="evt"></param>
 
     public void OnDeselected(PlayableElementEventArgs evt) {
-      this.Log($"OnDeselected event received for {evt.Element?.name}");
+      this.LogDebug($"OnDeselected event received for {evt.Element?.name}");
       if (!CanSelect) return;
       if (evt.Element != null && evt.Element == _playableElement && IsSelected) {
         TrySelectingElementAtWorldPos(evt.WorldPosition, false);
@@ -202,7 +202,7 @@ namespace GMTK {
     private void TrySelectingElementAtWorldPos(Vector3 worldPosition, bool selected) {
       if (HasSelectionTrigger(SelectionTrigger.OnClick)) {
         if (IsValidClickPosition(worldPosition)) {
-          this.Log($"Element {name} {(selected ? "Selected" : "Deselected")} at position {worldPosition}");
+          this.LogDebug($"Element {name} {(selected ? "Selected" : "Deselected")} at position {worldPosition}");
           MarkSelected(selected);
           ApplyFeedback(selectedChanged: true);
         }
@@ -211,19 +211,19 @@ namespace GMTK {
 
     private IEnumerator HoverSelectionCoroutine() {
       yield return new WaitForSeconds(HoverThreshold);
-      this.Log($"Hover threshold reached for {_playableElement.name}");
+      this.LogDebug($"Hover threshold reached for {_playableElement.name}");
       // if hovering after threshold we apply hover selection logic
       if (_isHovering) {
 
         // select if still hovering and selection by hover is enabled
         if (HasSelectionTrigger(SelectionTrigger.OnHover) && CanSelect && !IsSelected) {
-          this.Log($"Element {_playableElement.name} selected by hover");
+          this.LogDebug($"Element {_playableElement.name} selected by hover");
           MarkSelected(true);
           ApplyFeedback(selectedChanged: true, hoverChanged: true);
         }
         // play hover feedback if not selecting
         else {
-          this.Log($"Element {_playableElement.name} hover feedback played");
+          this.LogDebug($"Element {_playableElement.name} hover feedback played");
           ApplyFeedback(hoverChanged: true);
         }
       }

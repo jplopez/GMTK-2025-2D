@@ -9,6 +9,7 @@ TagManager:
   - TopBound
   - BottomBound
   - Manager
+  - Marble
   layers:
   - Default
   - TransparentFX

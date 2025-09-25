@@ -319,6 +319,9 @@ MonoBehaviour:
   _pendingRotationCollision: 0
   _pendingCollisionForce: {x: 0, y: 0, z: 0}
   _pendingRotationForce: 0
+  CollisionFeedback: {fileID: 0}
+  RotationFeedback: {fileID: 0}
+  ConstraintViolationFeedback: {fileID: 0}
 --- !u!114 &4906885605586746050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -874,10 +877,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ChangePositionFeedback
       objectReference: {fileID: 0}
-    - target: {fileID: 7036061156842236219, guid: f0fe71fe40abfbd44897887369c3cc18, type: 3}
-      propertyPath: managedReferences[7297120430317633895].TargetAudioSource
-      value: 
-      objectReference: {fileID: 7782674680326811978}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -952,9 +951,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6497752336418739941, guid: faf7b8ed0c33c30438e09ebe6a7797f4, type: 3}
-      propertyPath: managedReferences[7297120430317633891].TargetAudioSource
+      propertyPath: managedReferences[7297120588920258821].AttachToTransform
       value: 
-      objectReference: {fileID: 7782674680326811978}
+      objectReference: {fileID: 871531795758366563}
     - target: {fileID: 6497752336418739941, guid: faf7b8ed0c33c30438e09ebe6a7797f4, type: 3}
       propertyPath: managedReferences[7297120430317633953].BoundSpriteRenderer
       value: 
@@ -1073,10 +1072,6 @@ PrefabInstance:
       propertyPath: managedReferences[7297120479013503154].TargetRenderer
       value: 
       objectReference: {fileID: 5385994359189486426}
-    - target: {fileID: 2972408584546408522, guid: 6cd14bac36f169c418435ecae84e93fe, type: 3}
-      propertyPath: managedReferences[7297120479013503155].TargetAudioSource
-      value: 
-      objectReference: {fileID: 7782674680326811978}
     - target: {fileID: 7469426323843468561, guid: 6cd14bac36f169c418435ecae84e93fe, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1272,9 +1267,9 @@ PrefabInstance:
       value: DragUpdateFeedback
       objectReference: {fileID: 0}
     - target: {fileID: 6765849386268978153, guid: 19581b7a3a6849e4282cd35341ae8718, type: 3}
-      propertyPath: managedReferences[7297120430317633891].TargetAudioSource
+      propertyPath: managedReferences[7297120588920258819].AttachToTransform
       value: 
-      objectReference: {fileID: 7782674680326811978}
+      objectReference: {fileID: 8003865679049133628}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

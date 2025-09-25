@@ -88,39 +88,11 @@ namespace GMTK {
     private void OnTriggerEnter2D(Collider2D other) {
       bool showCue = ShowVisualCue.HasFlag(ShowVisualCueModes.OnEnter) || ShowVisualCue.HasFlag(ShowVisualCueModes.Always);
       HandleTrigger(other, GameEventType.EnterCheckpoint, EventTrigger.HasFlag(CheckpointEventTrigger.OnExit), showCue, OnEnterFeedback);
-      ////ignore collision if the game isn't on playing state
-      //if (_stateMachine.Current != GameStates.Playing) return;
-
-      //if (TryGetPlayableMarble(other, out PlayableMarbleController marble)) {
-      //  var eventArgs = new MarbleEventArgs() {
-      //    EventType = GameEventType.EnterCheckpoint,
-      //    Position = new Vector2(other.transform.position.x, other.transform.position.y),
-      //    Marble = marble,
-      //    HitCheckpoint = this
-      //  };
-      //  _eventsChannel.Raise<EventArgs>(GameEventType.EnterCheckpoint, eventArgs);
-
-      //}
-      //ActivateVisualCue(EventTrigger.HasFlag(CheckpointEventTrigger.OnExit));
     }
 
     private void OnTriggerExit2D(Collider2D other) {
       bool showCue = ShowVisualCue.HasFlag(ShowVisualCueModes.OnExit) || ShowVisualCue.HasFlag(ShowVisualCueModes.Always);
       HandleTrigger(other, GameEventType.ExitCheckpoint, EventTrigger.HasFlag(CheckpointEventTrigger.OnEnter), showCue, OnExitFeedback);
-      ////ignore collision if the game isn't on playing state
-      //if (_stateMachine.Current != GameStates.Playing) return;
-
-      //if (TryGetPlayableMarble(other, out PlayableMarbleController marble)) {
-      //  var eventArgs = new MarbleEventArgs() {
-      //    EventType = GameEventType.ExitCheckpoint,
-      //    Position = new Vector2(other.transform.position.x, other.transform.position.y),
-      //    Marble = marble,
-      //    HitCheckpoint = this
-      //  };
-      //  _eventsChannel.Raise<EventArgs>(GameEventType.ExitCheckpoint, eventArgs);
-      //}
-
-      //ActivateVisualCue(EventTrigger.HasFlag(CheckpointEventTrigger.OnEnter));
     }
 
     /// <summary>

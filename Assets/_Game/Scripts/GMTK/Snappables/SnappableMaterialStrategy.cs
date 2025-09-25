@@ -1,8 +1,6 @@
 using UnityEngine;
 
 namespace GMTK {
-  public enum FrictionLevel { Low, Mid, High }
-  public enum BouncinessLevel { Low, Mid, High }
 
   public static class SnappableMaterialStrategy {
 
