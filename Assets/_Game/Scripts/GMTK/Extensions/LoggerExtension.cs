@@ -57,9 +57,40 @@ namespace GMTK {
         }
       }
     }
+
+    private static Dictionary<string, string> _stackedLogs = new();
+
+    public static void StackLogMessage(string key, string message) {
+      if (!_stackedLogs.ContainsKey(key)) {
+        _stackedLogs[key] = "";
+      }
+      _stackedLogs[key] += message;
+    }
+
+    public static void DoDelayedLog(LoggerLevels level, string key) {
+      if (CanLog(level)) {
+        if (!_stackedLogs.ContainsKey(key)) {
+          _stackedLogs[key] = "";
+        }
+        DoLog(level, _stackedLogs[key]);
+      }
+    }
+
     #endregion
 
     #region MonoBehaviour Logger Extensions
+
+    public static void StackLog(this MonoBehaviour obj, string message) {
+      LoggerExtension.StackLogMessage(obj.GetType().Name, message);
+    }
+
+    public static void DelayLog(this MonoBehaviour obj) {
+      LoggerExtension.DoDelayedLog(LoggerLevels.Info, obj.GetType().Name);
+    }
+
+    public static void DelayLogDebug(this MonoBehaviour obj) {
+      LoggerExtension.DoDelayedLog(LoggerLevels.Debug, obj.GetType().Name);
+    }
 
     public static void Log(this MonoBehaviour obj, string message) {
       LoggerExtension.DoLog(LoggerLevels.Info, $"[{obj.GetType().Name}] {message}");
