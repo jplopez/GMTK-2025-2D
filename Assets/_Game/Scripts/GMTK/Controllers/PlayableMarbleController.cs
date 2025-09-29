@@ -22,6 +22,12 @@ namespace GMTK {
     [Tooltip("The LayerMask the Marble should collide. Level and Interactables the most common")]
     public LayerMask GroundedMask;
 
+    [Header("Collision Intensity")]
+    [Tooltip("Use Burst Jobs for collision intensity calculation (recommended for high collision scenarios)")]
+    public bool UseBurstJobs = true;
+    [Tooltip("Enable collision intensity calculation")]
+    public bool EnableCollisionIntensity = true;
+
     /// <summary>
     /// Whether the Marble is currently colliding with an object is considered ground (ex: wall, platform)
     /// </summary>
@@ -37,6 +43,10 @@ namespace GMTK {
     protected GameEventChannel _eventChannel;
     protected Vector2 _lastMarblePosition = Vector2.zero;
     protected float _timeSinceLastMove = 0f;
+    
+    // Collision intensity calculation components
+    protected MarbleCollisionIntensityCalculator _componentCalculator;
+    protected MarbleCollisionIntensityJobManager _jobManager;
 
     #region MonoBehaviour methods
     private void Awake() {
@@ -51,6 +61,10 @@ namespace GMTK {
 
       _rb = Model.GetComponent<Rigidbody2D>();
       _sr = Model.GetComponent<SpriteRenderer>();
+      
+      // Initialize collision intensity calculation
+      InitializeCollisionIntensityCalculation();
+      
       Spawn();
     }
 
@@ -119,5 +133,99 @@ namespace GMTK {
 
     #endregion
 
+    #region Collision Intensity Management
+    
+    /// <summary>
+    /// Initializes the collision intensity calculation system based on settings
+    /// </summary>
+    private void InitializeCollisionIntensityCalculation() {
+      if (!EnableCollisionIntensity) return;
+      
+      if (UseBurstJobs) {
+        // Use Burst Jobs approach for high performance
+        _jobManager = Model.GetComponent<MarbleCollisionIntensityJobManager>();
+        if (_jobManager == null) {
+          _jobManager = Model.AddComponent<MarbleCollisionIntensityJobManager>();
+        }
+        
+        // Remove component calculator if it exists
+        if (_componentCalculator != null) {
+          DestroyImmediate(_componentCalculator);
+          _componentCalculator = null;
+        }
+      } else {
+        // Use component-based approach for baseline comparison
+        _componentCalculator = Model.GetComponent<MarbleCollisionIntensityCalculator>();
+        if (_componentCalculator == null) {
+          _componentCalculator = Model.AddComponent<MarbleCollisionIntensityCalculator>();
+        }
+        
+        // Remove job manager if it exists
+        if (_jobManager != null) {
+          DestroyImmediate(_jobManager);
+          _jobManager = null;
+        }
+      }
+    }
+    
+    /// <summary>
+    /// Switches between component-based and job-based collision intensity calculation
+    /// </summary>
+    public void SwitchCollisionIntensityMethod(bool useBurstJobs) {
+      if (UseBurstJobs == useBurstJobs) return;
+      
+      UseBurstJobs = useBurstJobs;
+      InitializeCollisionIntensityCalculation();
+    }
+    
+    /// <summary>
+    /// Gets collision intensity statistics from the active calculator
+    /// </summary>
+    public CollisionIntensityStats GetCollisionIntensityStats() {
+      if (!EnableCollisionIntensity) return new CollisionIntensityStats();
+      
+      if (UseBurstJobs && _jobManager != null) {
+        return new CollisionIntensityStats {
+          TotalCollisions = _jobManager.TotalCollisionsProcessed,
+          AverageIntensity = _jobManager.AverageIntensity,
+          CurrentFrameCollisions = _jobManager.CurrentFrameCollisions,
+          LastExecutionTime = _jobManager.LastJobExecutionTime,
+          UsingBurstJobs = true
+        };
+      } else if (!UseBurstJobs && _componentCalculator != null) {
+        return new CollisionIntensityStats {
+          TotalCollisions = _componentCalculator.CollisionCount,
+          AverageIntensity = _componentCalculator.AverageIntensity,
+          CurrentFrameCollisions = 0, // Component doesn't track per-frame
+          LastExecutionTime = 0f, // Component doesn't track execution time
+          UsingBurstJobs = false
+        };
+      }
+      
+      return new CollisionIntensityStats();
+    }
+    
+    /// <summary>
+    /// Resets collision intensity statistics
+    /// </summary>
+    public void ResetCollisionIntensityStats() {
+      if (_jobManager != null) _jobManager.ResetStatistics();
+      if (_componentCalculator != null) _componentCalculator.ResetStatistics();
+    }
+    
+    #endregion
+
+  }
+  
+  /// <summary>
+  /// Data structure for collision intensity statistics
+  /// </summary>
+  [System.Serializable]
+  public struct CollisionIntensityStats {
+    public int TotalCollisions;
+    public float AverageIntensity;
+    public int CurrentFrameCollisions;
+    public float LastExecutionTime;
+    public bool UsingBurstJobs;
   }
 }
