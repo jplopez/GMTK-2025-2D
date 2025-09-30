@@ -3403,8 +3403,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 530312664}
     - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: ConsiderAngle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
       propertyPath: ConsiderFriction
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: ConsiderVelocity
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
       propertyPath: ConsiderBounciness
@@ -3413,6 +3421,10 @@ PrefabInstance:
     - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
       propertyPath: fallDistanceRange.x
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: ConsiderFallDistance
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
       propertyPath: angleIntensityMultiplier
@@ -3425,6 +3437,46 @@ PrefabInstance:
     - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
       propertyPath: collisionIntensityRange.x
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: angleCurve.m_Curve.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: angleCurve.m_Curve.Array.data[1].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: angleCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: angleCurve.m_Curve.Array.data[1].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: angleCurve.m_Curve.Array.data[0].tangentMode
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: angleCurve.m_Curve.Array.data[1].tangentMode
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: fallDistanceCurve.m_Curve.Array.data[1].time
+      value: 0.69104004
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: fallDistanceCurve.m_Curve.Array.data[1].value
+      value: 0.356781
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: collisionVelocityCurve.m_Curve.Array.data[1].time
+      value: 0.7768097
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907087471582971153, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
+      propertyPath: collisionVelocityCurve.m_Curve.Array.data[1].value
+      value: 0.43011475
       objectReference: {fileID: 0}
     - target: {fileID: 8630336186298808820, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
       propertyPath: m_Name

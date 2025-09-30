@@ -18,7 +18,7 @@ namespace GMTK {
     public float DragAlpha = 0.7f;
 
     [Header("Animation Settings")]
-    [Tooltip("Speed of color transitions")]
+    [Tooltip("Velocity of color transitions")]
     public float ColorTransitionSpeed = 5f;
 
     [Tooltip("Pulse effect during dragging")]

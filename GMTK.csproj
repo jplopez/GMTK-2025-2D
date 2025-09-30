@@ -69,6 +69,7 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\GUI\ScoreTextAnimator.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\GameStateEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\LevelManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Physics\Intensity\MarbleCollisionIntensityCalculator.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\PhysicalMaterialsElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\OccupancyCell.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\PlayableElementComponent.cs" />
@@ -90,12 +91,15 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\InventoryEventData.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\Components\SnappablePhysics.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Attributes\DisplayWithoutEdit.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Extensions\TransformGameExtensions.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\ScoreConfig.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\AutoRotationElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Checkpoint.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\PlayableMarbleController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.IDraggable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\SnappableMaterialStrategy.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Marble\PlayableMarbleController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Enums\FrictionLevel.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Marble\CollisionIntensityContext.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\LevelInventory.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\SceneController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Extensions\LoggerExtension.cs" />
@@ -114,9 +118,11 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\GUIController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\InputActionEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Booster.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Enums\BouncinessLevel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\MarbleEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\PlayerControls.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.IHover.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Physics\Intensity\IIntensityCalculator.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Snappables\GridSnappable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\RaiseGameEventConfig.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.cs" />

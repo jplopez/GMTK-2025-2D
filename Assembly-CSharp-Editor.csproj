@@ -74,6 +74,7 @@
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Editor\SpriteSheetSSUEditor.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Editor\UnscaledTimeSSUEditor.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TextSwitcher\Editor\TextSwitcherDrawer.cs" />
+    <Compile Include="Assets\_Game\Tests\Editor\MarcleCollisionIntensityCalculatorTests.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\Editor\TimelinePlayableWizard.cs" />
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Interactive\Editor\WindManagerSSUEditor.cs" />
     <Compile Include="Assets\UnityTechnologies\DefaultPlayables\TimeDilation\Editor\TimeDilationDrawer.cs" />

@@ -248,7 +248,7 @@ namespace GMTK {
 
       // Log collision for debugging
       this.Log($"Collision with {collision.gameObject.name} - Intensity: {intensity:F2}, " +
-                   $"Speed: {context.Speed:F2}, Fall: {context.FallDistance:F2}, " +
+                   $"Velocity: {context.Velocity:F2}, Fall: {context.FallDistance:F2}, " +
                    $"Angle: {context.CollisionAngle:F2}, Type: {context.CollisionType}");
     }
 
@@ -257,8 +257,8 @@ namespace GMTK {
     /// </summary>
     protected CollisionIntensityContext GetCollisionContext(Collision2D collision) {
       var context = new CollisionIntensityContext {
-        // Speed at collision
-        Speed = _lastVelocity.magnitude,
+        // Velocity at collision
+        Velocity = _lastVelocity.magnitude,
 
         // Fall distance
         FallDistance = _fallDistance
@@ -384,7 +384,7 @@ namespace GMTK {
       var displayData = new CollisionDisplayData {
         ObjectName = objectName,
         Intensity = intensity,
-        Speed = context.Speed,
+        Speed = context.Velocity,
         FallDistance = context.FallDistance,
         CollisionAngle = context.CollisionAngle,
         CollisionType = context.CollisionType,
@@ -730,6 +730,16 @@ namespace GMTK {
     public BouncinessLevel Bounciness;
     public PhysicsMaterial2D PhysicsMaterial;
     public bool HasCustomProperties;
+
+    public MaterialProperties Clone(MaterialProperties other) {
+      if (other.Equals(null)) return new();
+      return new() {
+        Friction = other.Friction,
+        Bounciness = other.Bounciness,
+        PhysicsMaterial = other.PhysicsMaterial,
+        HasCustomProperties = other.HasCustomProperties
+      };
+    }
   }
 
   /// <summary>
@@ -764,7 +774,7 @@ namespace GMTK {
     readonly string BuildDisplayString() {
       return $"{ObjectName,-LG_Width}"[..LG_Width] +
              $"Inten: {Intensity,-SM_Width:F2}" +
-             $"Speed: {Speed,-SM_Width:F2}" +
+             $"Velocity: {Speed,-SM_Width:F2}" +
              $"Fall : {FallDistance,-SM_Width:F2} " +
              $"Angle: {CollisionAngle,-SM_Width:F2}" +
              $"Type : {CollisionType,-M_Width}";

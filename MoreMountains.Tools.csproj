@@ -65,6 +65,7 @@
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacks\Core\Legacy\MMFeedback.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\MMActivation\MMApplicationPlatformActivation.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacks\Feedbacks\MMF_Flash.cs" />
+    <Compile Include="Assets\Feel\FeelDemos\Strike\Scripts\StrikeBall.cs" />
     <Compile Include="Assets\Feel\FeelDemos\Springs\Scripts\FeelSpringsDemoSlider.cs" />
     <Compile Include="Assets\Feel\FeelDemos\Springs\Scripts\FeelSpringsComparisonDemo.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\MMSaveLoad\MMSaveLoadManagerMethod.cs" />
@@ -165,6 +166,7 @@
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacksForThirdParty\HDRP\Shakers\MMChannelMixerShaker_HDRP.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacksForThirdParty\URP\Feedbacks\MMF_ChannelMixer_URP.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\MMAttributes\MMConditionAttribute.cs" />
+    <Compile Include="Assets\Feel\FeelDemos\Strike\Scripts\Strike.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\MMRadio\MMProperty\MMPropertyPicker\MMPropertyReceiver.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\MMFeedbacksForThirdParty\UIToolkit\Feedbacks\MMF_UIToolkitBorderRadius.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\MMPerformance\MMFPSCounter.cs" />
@@ -829,7 +831,9 @@
     <None Include="Assets\Feel\MMTools\Accessories\MMShaders\MMRipple.shader" />
     <None Include="Assets\Feel\MMTools\Accessories\MMShaders\MMStochastic.shader" />
     <None Include="Assets\Feel\FeelDemos\MoreMountains.Feel.Demos.asmref" />
+    <None Include="Assets\Feel\MMTools\Accessories\MMShaders\MMAdvancedToon_URP.shader" />
     <None Include="Assets\Feel\MMTools\Accessories\MMShaders\MMVFX.shader" />
+    <None Include="Assets\Feel\MMTools\Accessories\MMShaders\MM2DReflection_URP.shader" />
     <None Include="Assets\Feel\MMTools\Accessories\MMShaders\MMZTestAlwaysAdditive.shader" />
     <None Include="Assets\Feel\MMTools\Accessories\MMShaders\MMBoilingLine.shader" />
     <None Include="Assets\Feel\MMTools\Demos\MMTween\Fonts\Lato\OFL.txt" />
