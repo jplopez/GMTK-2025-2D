@@ -37,6 +37,7 @@ namespace GMTK {
     [Tooltip("If true, the object can be rotated in its Z axis")]
     public bool CanRotate = false;
 
+
     // Public properties for compatibility with existing code
     public bool IsRegistered => _isRegistered;
 
@@ -201,6 +202,8 @@ namespace GMTK {
     }
 
     #endregion
+
+
 
     #region Transformation methods
 

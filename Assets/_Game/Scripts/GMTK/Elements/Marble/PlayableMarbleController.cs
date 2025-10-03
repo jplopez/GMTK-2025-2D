@@ -18,6 +18,16 @@ namespace GMTK {
     [Header("Model")]
     public GameObject Model;
 
+    [Header("Movement and Speed")]
+    [Tooltip("The maximum linear speed the Marble can reach")]
+    public float MaxLinearSpeed = 20f;
+    [Tooltip("The minimum linear speed the Marble needs to start playing rolling sound")]
+    public float MinLinearSpeedForRollingSound = 0.5f;
+    [Tooltip("Curve to map linear speed (0 to MaxLinearSpeed) to rolling sound volume (0 to 1)")]
+    public AnimationCurve LinearSpeedToRollingVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+    [Tooltip("The maximum angular speed the Marble can reach")]
+    public float MaxAngularSpeed = 720f; // degrees per second
+
     [Header("Physics")]
     public float Mass = 15f;
     public float GravityScale = 3f;
@@ -134,7 +144,7 @@ namespace GMTK {
       Spawn();
     }
 
-    void Update() {
+    protected void Update() {
       //if rigidBody isn't loaded, we do nothing and wait until next frame
       if (_rb == null) return;
       if (!_rb.mass.Equals(Mass)) _rb.mass = Mass;
@@ -150,8 +160,13 @@ namespace GMTK {
         _timeSinceLastMove = 0;
       }
 
+      //adjust speed and movement based on settings
+      ApplyMovementConstraints();
+
       // Track fall distance
       UpdateFallDistance();
+      // adjust sound clips and volumes based on movement
+      //UpdateMovementSounds();
 
       // Store last velocity for collision calculations
       _lastVelocity = _rb.linearVelocity;
@@ -192,6 +207,49 @@ namespace GMTK {
       RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, GroundedMask);
       return hit.collider != null;
     }
+
+    protected virtual void ApplyMovementConstraints() {
+      // Clamp linear velocity
+      if (_rb.linearVelocity.magnitude > MaxLinearSpeed) {
+        _rb.linearVelocity = _rb.linearVelocity.normalized * MaxLinearSpeed;
+      }
+      // Clamp angular velocity
+      if (Mathf.Abs(_rb.angularVelocity) > MaxAngularSpeed) {
+        _rb.angularVelocity = Mathf.Sign(_rb.angularVelocity) * MaxAngularSpeed;
+      }
+    }
+
+    /// <summary>
+    /// Updates the movement-related sounds based on current speed.
+    /// This is a workaround, until I figure out how to pass a variable
+    /// to an MMF_Player's AudioSource feedback.
+    /// </summary>
+    protected virtual void UpdateMovementSounds() {
+
+      float speed = _rb.linearVelocity.magnitude;
+      this.Log($"linearVelocity: {_rb.linearVelocity}, speed: {speed}");
+      bool longWhoosh = false;
+      bool shortWhoosh = false;
+      if (speed > MinLinearSpeedForRollingSound) {
+        float speedToVolume = Mathf.Clamp01(speed / MaxLinearSpeed);
+        longWhoosh = LinearSpeedToRollingVolume.Evaluate(speedToVolume) > 0.1f;
+        shortWhoosh = !longWhoosh;
+      }
+      this.Log($"Speed: {speed:F2}, LongWhoosh: {longWhoosh}, ShortWhoosh: {shortWhoosh}");
+      // Adjust audio feedback chances based on speed
+      var audioFeedbacks = CollisionFeedback.GetFeedbacksOfType<MMF_MMSoundManagerSound>();
+      foreach (var audioFeedback in audioFeedbacks) {
+        this.Log($"Adjusting Audio Feedback '{audioFeedback.GetLabel()}'");
+        if (audioFeedback.GetLabel() == "Whoosh-Long") {
+          audioFeedback.Active = longWhoosh;
+        }
+        if (audioFeedback.GetLabel() == "Whoosh-Short") {
+          audioFeedback.Active = shortWhoosh;
+        }
+
+      }
+    }
+
 
     #region Collision Detection & Feedback
 
@@ -279,9 +337,10 @@ namespace GMTK {
     }
 
     private float CalculateCollisionIntensity(Collision2D collision) {
-      if(IntensityCalculator.TryCalculateIntensity(GetCollisionContext(collision), out float intensity)) {
+      if (IntensityCalculator.TryCalculateIntensity(GetCollisionContext(collision), out float intensity)) {
         return intensity;
-      } else {  
+      }
+      else {
         return 0f;
       }
     }

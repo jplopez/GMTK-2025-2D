@@ -4,15 +4,15 @@ using UnityEditor;
 
 namespace GMTK {
 
-  [CustomPropertyDrawer(typeof(PhysicsElementComponent.CollisionSourceFilter))]
+  [CustomPropertyDrawer(typeof(CollisionSourceFilter))]
   public class CollisionSourceFilterDrawer : PropertyDrawer {
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
       EditorGUI.BeginProperty(position, label, property);
 
       // Get the enum value
-      PhysicsElementComponent.CollisionSourceFilter currentValue =
-        (PhysicsElementComponent.CollisionSourceFilter)property.enumValueIndex;
+      CollisionSourceFilter currentValue =
+        (CollisionSourceFilter)property.enumValueIndex;
 
       // Create display names for the dropdown
       string[] displayNames = new string[] {

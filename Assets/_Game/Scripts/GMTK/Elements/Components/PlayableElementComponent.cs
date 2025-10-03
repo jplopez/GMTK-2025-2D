@@ -96,12 +96,12 @@ namespace GMTK {
           method.Invoke(this, new object[] { args });
         }
         catch (Exception ex) {
-          Debug.LogError($"[{GetType().Name}] Error invoking method {methodName}: {ex.Message}");
+          this.LogError($"Error invoking method {methodName}: {ex.Message}");
         }
       }
       else {
         // Optional: Log when no handler method is found (useful for debugging)
-        // Debug.LogWarning($"[{GetType().Name}] No handler method found for {methodName}");
+        // this.LogWarning($"No handler method found for {methodName}");
       }
     }
 
@@ -202,9 +202,13 @@ namespace GMTK {
     /// null safe method to play a MMF_Player feedback
     /// </summary>
     /// <param name="feedback"></param>
-    protected virtual void PlayFeedback(MMF_Player feedback) {
+    protected virtual void PlayFeedback(MMF_Player feedback, bool playInReverse=false) {
       if (feedback != null && feedback.gameObject.activeInHierarchy) {
-        feedback.PlayFeedbacks();
+        if (playInReverse) {
+          feedback.PlayFeedbacksInReverse();
+        } else {
+          feedback.PlayFeedbacks();
+        }
       }
     }
 
@@ -212,6 +216,11 @@ namespace GMTK {
       if (feedback != null && feedback.gameObject.activeInHierarchy) {
         feedback.StopFeedbacks();
       }
+    }
+    protected virtual void RaisePlayableElementEvent(PlayableElementEventType eventType, Vector3? worldPosition = null, GameObject otherObject = null) {
+      var position = worldPosition ?? _playableElement.SnapTransform.position;
+      PlayableElementEventArgs eventArgs = new(_playableElement, position, eventType, otherObject);
+      _gameEventChannel.Raise(GameEventType.PlayableElementEvent, eventArgs);
     }
 
     #endregion

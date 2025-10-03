@@ -2,12 +2,6 @@ using UnityEngine;
 using MoreMountains.Tools;
 
 namespace GMTK {
-  /// <summary>
-  /// MonoBehaviour implementation of IIntensityCalculator specifically designed for marble collision intensity calculations.
-  /// This component handles all the configuration and logic for determining collision feedback intensity.
-  /// </summary>
-  [AddComponentMenu("GMTK/Marble/Marble Collision Intensity Calculator")]
-  public class MarbleCollisionIntensityCalculator : MonoBehaviour, IIntensityCalculator {
 
     public enum IntensityCalculationMethod {
       Minimum,       // Use the lowest factor
@@ -16,6 +10,14 @@ namespace GMTK {
       Additive,      // Sum of all factors
       Multiplicative // Product of all factors
     }
+
+  /// <summary>
+  /// MonoBehaviour implementation of IIntensityCalculator specifically designed for marble collision intensity calculations.
+  /// This component handles all the configuration and logic for determining collision feedback intensity.
+  /// </summary>
+  [AddComponentMenu("GMTK/Marble/Marble Collision Intensity Calculator")]
+  public class MarbleCollisionIntensityCalculator : MonoBehaviour, IIntensityCalculator {
+
 
     [Header("Calculation Settings")]
     [MMInformation("Limit the min and max values this calculator can provide. For example, (0.5, 1) makes all collisions at least half as intense, while (0, 0.5) will tone down all collisions to half their intensity. You can change this value at runtime. Values are inclusive", MMInformationAttribute.InformationType.Info, false)]
