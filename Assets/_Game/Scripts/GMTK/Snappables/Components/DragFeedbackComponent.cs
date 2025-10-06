@@ -38,7 +38,7 @@ namespace GMTK {
     private Color _targetColor;
     private SpriteRenderer _renderer;
     private float _pulseTimer = 0f;
-    private Vector3 _lastPosition;
+    private Vector3 _lastPosition; // Tracks position from previous frame to detect movement
 
     protected override void Initialize() {
       _renderer = _snappable.Model.GetComponent<SpriteRenderer>();
