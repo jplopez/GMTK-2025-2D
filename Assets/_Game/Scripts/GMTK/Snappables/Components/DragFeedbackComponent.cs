@@ -38,6 +38,7 @@ namespace GMTK {
     private Color _targetColor;
     private SpriteRenderer _renderer;
     private float _pulseTimer = 0f;
+    private Vector3 _lastPosition;
 
     protected override void Initialize() {
       _renderer = _snappable.Model.GetComponent<SpriteRenderer>();
@@ -57,15 +58,22 @@ namespace GMTK {
     protected override void OnUpdate() {
       if (!_isDragging) return;
 
-      // Update feedback while dragging
-      UpdateDragFeedback();
+      // Check if the element has moved since last frame
+      Vector3 currentPosition = _snappable.transform.position;
+      bool hasMovedThisFrame = currentPosition != _lastPosition;
+
+      // Only update feedback if the element is actually moving
+      if (hasMovedThisFrame) {
+        UpdateDragFeedback();
+        _lastPosition = currentPosition;
+      }
 
       // Apply color transitions
       _renderer.color = Color.Lerp(_renderer.color, _targetColor,
           Time.deltaTime * ColorTransitionSpeed);
 
-      // Apply pulse effect
-      if (EnablePulseEffect) {
+      // Apply pulse effect only when moving
+      if (EnablePulseEffect && hasMovedThisFrame) {
         ApplyPulseEffect();
       }
     }
@@ -155,6 +163,7 @@ namespace GMTK {
 
       _isDragging = true;
       _pulseTimer = 0f;
+      _lastPosition = _snappable.transform.position;
 
       // Start with neutral dragging color
       SetNeutralDragging();
