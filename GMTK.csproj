@@ -66,6 +66,7 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\GameplayStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\ISceneConfiguration.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayerInputActionDispatcher.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\BaseGameStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GUI\ScoreTextAnimator.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\GameStateEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\LevelManager.cs" />
@@ -80,7 +81,10 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\PlayableElementEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Levels\LevelConfig.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\LevelInventoryItem.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\ForceApplierElementComponent.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\MagneticElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\SceneTransitionConfig.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\InventoryCategory.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.ISelector.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\DraggingElementComponent.cs" />
@@ -93,6 +97,7 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Attributes\DisplayWithoutEdit.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Extensions\TransformGameExtensions.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\ScoreConfig.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\PlayableElementEventType.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\AutoRotationElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Checkpoint.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.IDraggable.cs" />
@@ -100,6 +105,7 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Marble\PlayableMarbleController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Enums\FrictionLevel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Marble\CollisionIntensityContext.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Feedbacks\GameEventFeedback.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\LevelInventory.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\SceneController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Extensions\LoggerExtension.cs" />
@@ -115,11 +121,14 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateMachine.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Inventory\GameElement.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateMachineEventChannel.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\ControlsElementComponent.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Components\CollisionIntensityCalculator.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\GUIController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\InputActionEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Booster.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Enums\BouncinessLevel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\MarbleEventArgs.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\FeelToEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\PlayerControls.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.IHover.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Physics\Intensity\IIntensityCalculator.cs" />
