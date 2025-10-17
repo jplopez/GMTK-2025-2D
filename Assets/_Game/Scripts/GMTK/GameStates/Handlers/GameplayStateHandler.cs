@@ -1,11 +1,13 @@
 using Ameba;
+using MoreMountains.Feedbacks;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace GMTK {
  
-  public class GameplayStateHandler : GameStateHandler {
+  public class GameplayStateHandler : BaseGameStateHandler {
 
     [Header("Gameplay References")]
     [Tooltip("Reference to the playable Marble in the scene")]
@@ -14,6 +16,16 @@ namespace GMTK {
     public LevelManager SceneLevelManager;
     [Tooltip("Reference to the SceneController in the scene")]
     public SceneController CurrentSceneController;
+
+    [Header("Feedbacks (optional)")]
+    [Tooltip("Feedback played when the game state changes to Preparation")]
+    public MMF_Player ToPreparationFeedback;
+    [Tooltip("Feedback played when the game state changes to Playing")]
+    public MMF_Player ToPlayingFeedback;
+    [Tooltip("Feedback played when the game state changes to Reset")]
+    public MMF_Player ToResetFeedback;
+    [Tooltip("Feedback played when the game state changes to LevelComplete")]
+    public MMF_Player ToLevelCompleteFeedback;
 
     //snappables the player can interact with
     protected List<GridSnappable> _draggableSnappables = new();
@@ -67,43 +79,63 @@ namespace GMTK {
       ToReset();
 
       //place Marble in starting point
-      Marble.Spawn();
+      Marble.Spawn(hidden:true);
       SetDraggableSnappables(true);
+
+      StartCoroutine(PlayFeedbackDelayed(ToPreparationFeedback));
     }
 
     protected override void ToPlaying() {
-      this.Log("ToPlaying: starting level");
+      this.LogDebug("ToPlaying: starting level");
       SetDraggableSnappables(false);
       SceneLevelManager.StartLevel();
       Marble.Launch();
+
+      StartCoroutine(PlayFeedbackDelayed(ToPlayingFeedback));
     }
 
     protected override void ToReset() {
-      this.Log("ToReset: resetting up level");
-      Marble.Spawn();
-      Marble.Model.SetActive(false);
+      this.LogDebug("ToReset: resetting up level");
+      Marble.Spawn(hidden:true);
+      //Marble.Model.SetActive(false);
       SceneLevelManager.ResetLevel();
       ResetSnappables(draggables:false);
+
+      StartCoroutine(PlayFeedbackDelayed(ToResetFeedback));
     }
 
     /// <summary>
     /// Prepares the game to load the victory scene
     /// </summary>
     protected override void ToLevelComplete() {
-      this.Log("ToLevelComplete: level complete");
-      Marble.Spawn();
-      Marble.Model.SetActive(false);
-      SceneLevelManager.EndLevel();
-      //ResetSnappables();
-      //TODO: trigger effects of slowing down and victory music
-      //TODO: fadeout 
+      this.LogDebug("ToLevelComplete: level complete");
+
+      StartCoroutine(ToLevelCompleteCoroutine());
       CurrentSceneController.LoadNextScene();
+
+      StartCoroutine(PlayFeedbackDelayed(ToLevelCompleteFeedback));
     }
+
+    private IEnumerator ToLevelCompleteCoroutine(float delay=0f) {
+      yield return new WaitForSeconds(delay);
+
+      Marble.Spawn(hidden: true);
+      SceneLevelManager.EndLevel();
+
+      yield return new WaitUntil(() => SceneLevelManager.IsLevelEnded);
+    }
+
+    private IEnumerator PlayFeedbackDelayed(MMF_Player feedback, float delay=0f) {
+      yield return new WaitForSeconds(delay);
+      if(feedback != null)
+        yield return feedback.PlayFeedbacksCoroutine(transform.position);
+    }
+
 
     private void SetDraggableSnappables(bool enabled) => _draggableSnappables.ForEach(s => s.Draggable = enabled);
 
     private void ResetSnappables(bool draggables=true, bool nonDraggables=true) {
-      this.Log("ResetSnappables");
+      this.LogDebug("ResetSnappables");
       if (draggables) {
         _draggableSnappables.ForEach(s => s.ResetSnappable());
       }

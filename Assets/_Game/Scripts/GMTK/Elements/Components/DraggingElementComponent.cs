@@ -109,7 +109,8 @@ namespace GMTK {
         if (_originalRenderer == null) {
           Debug.LogError($"[DraggingElementComponent] No SpriteRenderer found on {_playableElement.name} - Ghost functionality disabled");
           EnableGhost = false;
-        } else {
+        }
+        else {
           _originalColor = _originalRenderer.color;
           _originalScale = _playableElement.transform.localScale;
           _ghostTargetColor = NeutralGhostColor;
@@ -169,7 +170,7 @@ namespace GMTK {
       var distanceToLast = Vector3.Distance(targetPosition, _lastValidPosition);
       if (distanceToLast >= SnapThreshold) {
         // Apply grid snapping if enabled
-        if (SnapOnDrop && SnapDuringDrag && _levelGrid != null ) {
+        if (SnapOnDrop && SnapDuringDrag && _levelGrid != null) {
           targetPosition = ApplyGridSnapping(targetPosition);
         }
 
@@ -183,6 +184,7 @@ namespace GMTK {
           TriggerPositionChangeEvent(targetPosition, true, "DragUpdate");
         }
 
+        // TODO: while dragging, if the position doesnt change, we should avoid triggering feedbacks and events
         //Fires the feedback only if the time interval has passed and the feedback isn't playing
         if (OnDragUpdateFeedback != null && DragUpdateWaitInterval > 0f) {
           if (!OnDragUpdateFeedback.IsPlaying && Time.time - _lastDragUpdateFeedbackTime >= DragUpdateWaitInterval) {
@@ -196,7 +198,8 @@ namespace GMTK {
             PlayFeedback(OnDragUpdateFeedback);
           }
         }
-      } else {
+      }
+      else {
         // Below threshold - do not update position or trigger events
         this.LogDebug($"Drag update ignored, below snap threshold ({distanceToLast} < {SnapThreshold})");
         return;
@@ -223,7 +226,7 @@ namespace GMTK {
       if (_lastValidPosition == finalTargetPosition) {
         //it means the element never moved, so we'll skip the drop logic, to prevent unnecessary events
         this.LogDebug($"Drag ended without movement on {_playableElement.name}");
-        
+
         // Still end ghost mode
         if (EnableGhost && _isInGhostMode) {
           EndGhostMode();
@@ -405,10 +408,11 @@ namespace GMTK {
     }
 
     private void ApplyPositionUpdate(Vector3 targetPosition) {
-      _playableElement.UpdatePosition(targetPosition);
-      _lastValidPosition = targetPosition;
-      if (PositionChangeFeedback != null) {
-        PositionChangeFeedback.PlayFeedbacks();
+      // Update position only if it has changed
+      if (!targetPosition.Equals(_lastValidPosition)) {
+        _playableElement.UpdatePosition(targetPosition);
+        _lastValidPosition = targetPosition;
+        PlayFeedback(PositionChangeFeedback);
       }
     }
 
@@ -568,12 +572,12 @@ namespace GMTK {
       if (_isDragging) {
         _isDragging = false;
       }
-      
+
       // End ghost mode if active
       if (_isInGhostMode) {
         EndGhostMode();
       }
-      
+
       _lastPlacementWasValid = true;
     }
 

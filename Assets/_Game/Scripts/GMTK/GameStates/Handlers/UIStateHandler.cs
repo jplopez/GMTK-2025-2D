@@ -6,7 +6,7 @@ namespace GMTK {
   /// <summary>
   /// Handles all changes in the UI when the GameState changes.
   /// </summary>
-  public class UIStateHandler : GameStateHandler {
+  public class UIStateHandler : BaseGameStateHandler {
 
     [Header("UI References")]
     public GUIController GUI;

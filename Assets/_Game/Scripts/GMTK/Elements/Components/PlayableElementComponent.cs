@@ -88,8 +88,8 @@ namespace GMTK {
 
       // Use reflection to look for a method named as "On" + PlayableElementEventType name in args
       // For example OnDragStart for PlayableElementEventType.DragStart, that receives a PlayableElementEventArgs argument
-      var methodName = "On" + args.EventType.ToString();
-      var method = GetType().GetMethod(methodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+      string methodName = "On" + args.EventType.ToString();
+      System.Reflection.MethodInfo method = GetType().GetMethod(methodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
       
       if (method != null) {
         try {

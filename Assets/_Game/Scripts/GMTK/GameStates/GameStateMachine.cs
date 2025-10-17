@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace GMTK {
 
-  public enum GameStates { Start, Preparation, Playing, Reset, LevelComplete, Gameover, Pause, Options }
+  public enum GameStates { Start, Preparation, Playing, Reset, LevelComplete, Gameover, Pause, Options, LoadingScene }
 
   [CreateAssetMenu(menuName = "GMTK/Game State Machine")]
   public class GameStateMachine : StateMachine<GameStates> {
@@ -51,7 +51,7 @@ namespace GMTK {
     public GameStateMachineEventChannel EventChannel => _internalEventChannel;
 
     // Self-contained collections
-    private List<GameStateHandler> _handlers = new();
+    private List<BaseGameStateHandler> _handlers = new();
     private Dictionary<GameEventType, GameStates> _eventToStateMap = new();
     private GameEventChannel _externalEventChannel;
 
@@ -91,6 +91,12 @@ namespace GMTK {
     /// </summary>
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
       LogDebug($"Scene loaded: {scene.name} (mode: {mode})");
+
+      //TODO: skip if is the 'loading' scene?
+      if(Current == GameStates.LoadingScene) {
+        LogDebug("Skipping handler discovery for loading scene");
+        return;
+      }
 
       // Only discover handlers if mode is set to AfterSceneLoad
       if (HandlerDiscoveryMode == HandlerDiscoveryModes.AfterSceneLoad) {
@@ -279,7 +285,7 @@ namespace GMTK {
     /// <summary>
     /// Registers a handler if not already present (for Incremental mode)
     /// </summary>
-    private bool RegisterHandler(GameStateHandler handler) {
+    private bool RegisterHandler(BaseGameStateHandler handler) {
       if (handler == null) return false;
 
       // In Incremental mode, check for duplicates
@@ -297,17 +303,17 @@ namespace GMTK {
       LogDebug($"Handlers sorted by priority");
     }
 
-    public virtual void UnregisterHandler(GameStateHandler handler) {
+    public virtual void UnregisterHandler(BaseGameStateHandler handler) {
       _handlers.Remove(handler);
       //_registeredHandlers.RemoveAll(h => h.Handler == handler);
       LogDebug($"Unregistered handler: {handler.HandlerName}");
     }
 
-    private GameStateHandler[] FindAllStateHandlersFilteredByTag() {
+    private BaseGameStateHandler[] FindAllStateHandlersFilteredByTag() {
 
-      // Find all GameStateHandler components in the scene
-      var allStateHandlers = FindObjectsByType<GameStateHandler>(FindObjectsSortMode.None);
-      LogDebug($"Found {allStateHandlers.Length} GameStateHandler components in scene");
+      // Find all BaseGameStateHandler components in the scene
+      var allStateHandlers = FindObjectsByType<BaseGameStateHandler>(FindObjectsSortMode.None);
+      LogDebug($"Found {allStateHandlers.Length} BaseGameStateHandler components in scene");
       if (IncludeTags.Length == 0 && ExcludeTags.Length == 0) return allStateHandlers;
 
       // Filter by tags
@@ -520,7 +526,7 @@ namespace GMTK {
     #region Logging and Debugging 
     // Logging helpers
     private void LogDebug(string message) {
-      if (EnableDebugLogging) Debug.Log($"[GameStateMachine] {message}");
+      if (EnableDebugLogging) this.Log($"{message}");
     }
     private void LogWarning(string message) => Debug.LogWarning($"[GameStateMachine] {message}");
     private void LogError(string message) => Debug.LogError($"[GameStateMachine] {message}");

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace GMTK {
-  public class InputStateHandler : GameStateHandler {
+  public class InputStateHandler : BaseGameStateHandler {
 
     [Header("Input References")]
     public PlayableElementInputHandler snappableInput;

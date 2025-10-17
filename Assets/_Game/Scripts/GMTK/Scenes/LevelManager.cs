@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using Ameba;
+using MoreMountains.Feedbacks;
+using System.Collections;
 
 namespace GMTK {
 
@@ -39,16 +41,25 @@ namespace GMTK {
     public int ScoreMultiplier = 300;
 
     [Header("Winning Conditions")]
-    [Tooltip("Number of checkpoints that must be reached to win the level. Currently not implemented.")]
+    [Tooltip("Number of checkpoints that must be reached to win the level. If set to zero, the wining condition is to reach the EndLevelCheckpoint.")]
     public int CheckpointsToWin = 1;
-    [Tooltip("Number of checkpoints reached so far. Currently not implemented.")]
+    [Tooltip("Number of checkpoints reached so far, if CheckpointsToWin is greated than zero.")]
     public int CheckpointsReached = 0;
+
+    [Header("Feedbacks (optionals)")]
+    public MMF_Player StartLevelFeedback;
+    public MMF_Player EndLevelFeedback;
+    public MMF_Player ResetLevelFeedback;
+    [Tooltip("If true, LevelManager will wait for feedbacks to complete before proceeding with level transitions (start, end, reset).")]
+    public bool WaitForFeedbacks = false;
 
     //[Tooltip("LevelExtensions to encapsulate specific behaviours, that might not be needed everywhere")]
     //public List<LevelExtension> Extensions = new();
 
     public bool IsLevelStarted => _levelStarted;
     public bool IsLevelStale => _timeSinceLastMove >= StaleTimeThreshold;
+
+    public bool IsLevelEnded => _levelEnded;
 
     protected bool _levelStarted = false;
     protected bool _levelEnded = false;
@@ -82,7 +93,7 @@ namespace GMTK {
       }
 
       StartMarble();
-      ResetTimers();
+      ResetTimersAndCounters();
     }
 
     public void Update() {
@@ -92,11 +103,19 @@ namespace GMTK {
       if (RestartOnStale && IsLevelStale && _levelStarted) {
         this.Log("Level has gone stale! Restarting level.");
         ResetLevel();
+        _eventChannel.Raise(GameEventType.LevelReset);
         return;
       }
-      //check if level has ended
+      //check checkpoints reached if needed (CheckpointsToWin > 0)
+      if (CheckpointsToWin > 0 && CheckpointsReached >= CheckpointsToWin) {
+        _eventChannel.Raise(GameEventType.LevelObjectiveCompleted);
+        return;
+      }
+
+      //check level flags 
       if (_levelEnded) {
         _eventChannel.Raise(GameEventType.LevelObjectiveCompleted);
+        return;
       }
       else if (_levelStarted) {
         _timeSinceLevelStart += Time.deltaTime;
@@ -107,6 +126,8 @@ namespace GMTK {
         }
         UpdateMarbleMovement();
       }
+
+
     }
 
     #endregion
@@ -166,9 +187,9 @@ namespace GMTK {
           StartLevelCheckpoint = startCP;
         }
       }
-
+      CheckpointsReached = 0;
       _isInitialized = true;
-      this.Log($"LevelManager initialized? {_isInitialized}. StartLevelCheckpoint? {StartLevelCheckpoint != null}");
+      //this.Log($"LevelManager initialized? {_isInitialized}. StartLevelCheckpoint? {StartLevelCheckpoint != null}");
     }
 
     protected virtual bool TryEnsureStartLevelCheckpoint() {
@@ -194,7 +215,7 @@ namespace GMTK {
       if (PlayableMarble.InitialForce == null || PlayableMarble.InitialForce == Vector2.zero) {
         PlayableMarble.InitialForce = MarbleInitialForce;
       }
-      PlayableMarble.Spawn();
+      //PlayableMarble.Spawn();
     }
 
     /// <summary>
@@ -211,9 +232,10 @@ namespace GMTK {
       }
     }
 
-    protected virtual void ResetTimers() {
+    protected virtual void ResetTimersAndCounters() {
       _timeSinceLevelStart = 0f;
       _timeSinceLastMove = 0f;
+      CheckpointsReached = 0;
     }
 
     #endregion
@@ -221,7 +243,8 @@ namespace GMTK {
     #region Checkpoint Events Handlers (Wrapper and actual)
 
     /// <summary>
-    /// Wrapper to transfrom input from EventArgs -> MarbleEventArgs
+    /// Method called when a Checkpoint event is raised.<br/>
+    /// LevelManagers use checkpoints to know when the level objectives are complete so the level ends.
     /// </summary>
     protected virtual void HandleCheckpointEvent(EventArgs eventArgs) {
       if (eventArgs is MarbleEventArgs marbleEventArgs) {
@@ -229,25 +252,67 @@ namespace GMTK {
           this.LogWarning($"Can't resolve Checkpoint event {marbleEventArgs.EventType} because Checkpoint ID is null or empty");
           return;
         }
-
-        if (marbleEventArgs.EventType == GameEventType.EnterCheckpoint) {
-          HandleEnterCheckpoint(marbleEventArgs.HitCheckpoint.ID);
-        }
-        else if (marbleEventArgs.EventType == GameEventType.ExitCheckpoint) {
-          this.Log("LevelManager doesn't handle ExitCheckpoint events"); return;
+        this.Log($"Checkpoint event {marbleEventArgs.EventType} received from Checkpoint {marbleEventArgs.HitCheckpoint.ID}");
+        switch (marbleEventArgs.EventType) {
+          case GameEventType.EnterCheckpoint:
+            HandleEnterCheckpoint(marbleEventArgs.HitCheckpoint.ID, marbleEventArgs);
+            break;
+          case GameEventType.ExitCheckpoint:
+            HandleExitCheckpoint(marbleEventArgs.HitCheckpoint.ID, marbleEventArgs);
+            break;
+          default:
+            this.LogWarning($"Unhandled Checkpoint event type {marbleEventArgs.EventType}");
+            return;
         }
       }
     }
 
     /// <summary>
-    /// Actual Marble Event Handler
+    /// If level has started, counts checkpoints reached (if CheckpointsToWin > 0) 
+    /// or checks if EndLevelCheckpoint is reached to complete the level.
     /// </summary>
-    protected virtual void HandleEnterCheckpoint(string checkpointID) {
-      // mark level as complete when Marble enters end checkpoint
-      if (EndLevelCheckpoint.ID.Equals(checkpointID) && _levelStarted && !_levelEnded) {
-        this.Log($"Marble entered end checkpoint {EndLevelCheckpoint.ID}. Ending level.");
-        _eventChannel.Raise(GameEventType.LevelObjectiveCompleted);
+    protected virtual void HandleEnterCheckpoint(string checkpointID, EventArgs eventArgs) {
+
+      //count checkpoint if is not the Start
+      if (CheckpointsToWin > 0) 
+      {
+        if (!StartLevelCheckpoint.ID.Equals(checkpointID)) CheckpointsReached++;
       }
+      else //no checkpoints, just reach to EndPoint
+      {
+        // mark level as complete when Marble enters end checkpoint
+        if (EndLevelCheckpoint.ID.Equals(checkpointID) && _levelStarted && !_levelEnded) {
+          _eventChannel.Raise(GameEventType.LevelObjectiveCompleted);
+        }
+      }
+    }
+
+    /// <summary>
+    /// No implementation for now. Method exists for symmetry with EnterCheckpoint.
+    /// </summary>
+    /// <param name="checkpointID"></param>
+    /// <param name="eventArgs"></param>
+    protected virtual void HandleExitCheckpoint(string checkpointID, EventArgs eventArgs) {
+      // currently not used
+      this.Log("LevelManager doesn't handle ExitCheckpoint events"); return;
+    }
+
+    #endregion
+
+    #region Feedbacks
+    protected virtual void PlayFeedback(MMF_Player feedback) {
+      if (feedback == null) return;
+      if (WaitForFeedbacks) {
+        StartCoroutine(PlayFeedbackAndWait(feedback));
+      }
+      else {
+        feedback.PlayFeedbacks();
+      }
+    }
+
+    private IEnumerator PlayFeedbackAndWait(MMF_Player feedback) {
+      if (feedback == null) yield break;
+      yield return feedback.PlayFeedbacksCoroutine(transform.position);
     }
 
     #endregion
@@ -257,12 +322,13 @@ namespace GMTK {
     //public int GetScoreAtLevelStart() => _scoreAtLevelStart;
 
     public void StartLevel() {
-      ResetTimers();
+      ResetTimersAndCounters();
       _levelStarted = true;
       _levelEnded = false;
-      StartLevelCheckpoint.enabled = false;
-      EndLevelCheckpoint.enabled = true;
-      this.Log($"LevelStarted? {_levelStarted}");
+      StartLevelCheckpoint.UpdateUI();
+      //we dont want to run the update twice if the start and end checkpoints are the same
+      if (HasEndCheckpoint && EndLevelCheckpoint != StartLevelCheckpoint) EndLevelCheckpoint.UpdateUI();
+      PlayFeedback(StartLevelFeedback);
     }
 
     public void EndLevel() {
@@ -276,7 +342,7 @@ namespace GMTK {
       }
       _levelStarted = false;
       _levelEnded = true;
-      this.Log($"LevelEnded? {_levelEnded}");
+      PlayFeedback(EndLevelFeedback);
     }
 
     /// <summary>
@@ -286,10 +352,11 @@ namespace GMTK {
     public void ResetLevel() {
       _levelStarted = false;
       _levelEnded = false;
-      StartLevelCheckpoint.enabled = true;
-      EndLevelCheckpoint.enabled = false;
-      ResetTimers();
-      //_eventChannel.Raise(GameEventType.SetScoreValue, _scoreAtLevelStart);
+      StartLevelCheckpoint.UpdateUI();
+      //we dont want to run the update twice if the start and end checkpoints are the same
+      if (HasEndCheckpoint && EndLevelCheckpoint != StartLevelCheckpoint) EndLevelCheckpoint.UpdateUI();
+      ResetTimersAndCounters();
+      PlayFeedback(ResetLevelFeedback);
     }
 
     #endregion

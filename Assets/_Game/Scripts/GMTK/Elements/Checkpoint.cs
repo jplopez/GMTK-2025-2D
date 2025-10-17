@@ -1,6 +1,7 @@
 using Ameba;
 using MoreMountains.Feedbacks;
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace GMTK {
@@ -13,9 +14,9 @@ namespace GMTK {
   public class Checkpoint : MonoBehaviour {
 
     [Flags]
-    public enum CheckpointEventTrigger { 
+    public enum CheckpointEventTrigger {
       None = 0,
-      OnEnter = 1, 
+      OnEnter = 1,
       OnExit = 2,
       Always = OnEnter | OnExit
     }
@@ -34,6 +35,8 @@ namespace GMTK {
     [SerializeField] private string checkpointID;
     [Tooltip("Optional visual cue to show when the Marble is near the checkpoint. If null, no visual cue will be shown.")]
     public GameObject VisualCuePrefab;
+    [Tooltip("If the checkpoint should be hidden (active=false) upon initialization. Combine this with initializating upon an event, to reveal itself")]
+    public bool HideOnInitialization = true;
     [Tooltip("If the Visual Cue should be active at the start of the game. Typically true for Start checkpoints, false for End checkpoints")]
     public bool VisualCueActiveAtStart = false;
     [Tooltip("When the Checkpoint should be trigger its event logic: OnEnter, OnExit. Typically a Start checkpoint is on exit, and an End checkpoint is on enter, while middle game are both")]
@@ -58,8 +61,10 @@ namespace GMTK {
     protected GameEventChannel _eventsChannel;
     protected GameStateMachine _stateMachine;
 
+    private bool _handlingTrigger = false;
+
     private void Awake() {
-      
+
       if (!TryGetComponent<Collider2D>(out var col)) {
         this.LogError($"No Collider2D found on {gameObject.name}. Please add one and set it as Trigger.");
       }
@@ -67,102 +72,152 @@ namespace GMTK {
         this.LogWarning($"Collider2D on {gameObject.name} is not set as Trigger. Trigger events may not fire.");
       }
 
-      if(_eventsChannel == null) {
-        _eventsChannel = ServiceLocator.Get<GameEventChannel>();
-      }
-      if (_stateMachine == null) {
-        _stateMachine = ServiceLocator.Get<GameStateMachine>();
-      }
+      EnsureDependencies();
 
       EnsureCheckpointID();
     }
 
     private void Start() {
+      gameObject.SetActive(!HideOnInitialization);
+
       //initial state of the visual cue depends on the flags in EventTrigger mode
       //if it has both OnEnter and OnExit, it starts active
-      if(VisualCuePrefab != null) {
-        ActivateVisualCue(VisualCueActiveAtStart || EventTrigger.HasFlag(CheckpointEventTrigger.Always));
+      ToggleVisualCue( (VisualCueActiveAtStart || EventTrigger.HasFlag(CheckpointEventTrigger.Always)));
+
+    }
+    private void Update() {
+      if (_stateMachine.Current == GameStates.Playing && !_handlingTrigger) {
+        ToggleVisualCue(ShowVisualCue.HasFlag(ShowVisualCueModes.NoCollision) || ShowVisualCue.HasFlag(ShowVisualCueModes.Always));
       }
+    }
+
+    private void OnDisable() {
+      //disable visual cue and stop feedbacks
+      ToggleVisualCue(false);
+      StopAllFeedbacks();
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
+      if (!isActiveAndEnabled || !gameObject.activeInHierarchy) return;
       bool showCue = ShowVisualCue.HasFlag(ShowVisualCueModes.OnEnter) || ShowVisualCue.HasFlag(ShowVisualCueModes.Always);
-      HandleTrigger(other, GameEventType.EnterCheckpoint, EventTrigger.HasFlag(CheckpointEventTrigger.OnExit), showCue, OnEnterFeedback);
+      StartCoroutine(HandleTriggerCoroutine(other, GameEventType.EnterCheckpoint, EventTrigger.HasFlag(CheckpointEventTrigger.OnEnter), showCue, OnEnterFeedback));
     }
 
     private void OnTriggerExit2D(Collider2D other) {
+      if(!isActiveAndEnabled || !gameObject.activeInHierarchy) return;
       bool showCue = ShowVisualCue.HasFlag(ShowVisualCueModes.OnExit) || ShowVisualCue.HasFlag(ShowVisualCueModes.Always);
-      HandleTrigger(other, GameEventType.ExitCheckpoint, EventTrigger.HasFlag(CheckpointEventTrigger.OnEnter), showCue, OnExitFeedback);
+      StartCoroutine(HandleTriggerCoroutine(other, GameEventType.ExitCheckpoint, EventTrigger.HasFlag(CheckpointEventTrigger.OnExit), showCue, OnExitFeedback));
     }
 
     /// <summary>
-    /// Common method to handle OnTrigger events.<br/>
-    /// This will check if the collider belongs to a <see cref="PlayableMarbleController"/>, and if so, raise the appropriate event with <see cref="MarbleEventArgs"/>.<br/>
+    /// Coroutine version of HandleTrigger that properly waits for feedback completion
     /// </summary>
-    /// <param name="other">the Collider2D passed from the OnTrigger event methods</param>
-    /// <param name="eventType"><see cref="GameEventType.EnterCheckpoint"/> or <see cref="GameEventType.ExitCheckpoint"/> </param>
-    /// <param name="triggerEvent">If the event should be raised or not, based on EventTrigger flags. Typically true, unless you want to only play feedbacks and show visual cue.</param>
-    /// <param name="visualCue">If the visual cue should be shown or not, based on ShowVisualCue flags. Typically is shown if the flag opposite of the eventType is present.</param>
-    /// <param name="feedback">the <see cref="MMF_Player"/> feedback (if defined) </param>
-    private void HandleTrigger(Collider2D other, GameEventType eventType, bool triggerEvent = true, bool visualCue = false, MMF_Player feedback = null ) {
+    private IEnumerator HandleTriggerCoroutine(Collider2D other, GameEventType eventType, bool triggerEvent = true, bool visualCue = false, MMF_Player feedback = null) {
       //ignore collision if the game isn't on playing state
-      if (other == null || (_stateMachine.Current != GameStates.Playing)) return;
-
+      if (other == null || (_stateMachine.Current != GameStates.Playing)) yield break;
+      
+      _handlingTrigger = true;
+      this.Log($"Checkpoint {checkpointID} triggered {eventType}");
+      
       if (TryGetPlayableMarble(other, out PlayableMarbleController marble)) {
-        this.LogDebug($"Checkpoint {checkpointID} triggered {eventType} by marble {marble.name}");
-        if (triggerEvent) {
-          var eventArgs = new MarbleEventArgs() {
-            EventType = eventType,
-            Position = new Vector2(other.transform.position.x, other.transform.position.y),
-            Marble = marble,
-            HitCheckpoint = this
-          };
-          _eventsChannel.Raise<EventArgs>(eventType, eventArgs);
-        } else {
-          this.Log($"Checkpoint {checkpointID} triggered {eventType} but event raising is disabled.");
+        
+        // Play feedback and wait for it to complete
+        if (feedback != null) {
+          this.Log($"Playing feedback for {eventType} on checkpoint {checkpointID}");
+          yield return feedback.PlayFeedbacksCoroutine(transform.position, 1f, false);
+          this.Log($"Feedback completed for {eventType} on checkpoint {checkpointID}");
         }
 
-        this.LogDebug($"Playing feedback for {eventType} on checkpoint {checkpointID}");
-        feedback?.PlayFeedbacks();
+        // Set visual cue after feedback completes
+        ToggleVisualCue(visualCue);
 
-        this.LogDebug($"Setting visual cue for checkpoint {checkpointID} to {visualCue}");
-        ActivateVisualCue(visualCue);
-        
-        this.LogDebug($"Checkpoint {checkpointID} trigger complete");
-      } else {
+        // Now trigger the event after feedback has finished
+        this.Log($"Checkpoint {checkpointID} triggered {eventType} by marble {marble.name}");
+        if (triggerEvent) RaiseCheckpointEvent(eventType, marble);
+        else this.LogWarning($"Checkpoint {checkpointID} {eventType} ignored");
+      }
+      else {
         this.LogDebug($"Checkpoint {checkpointID} triggered by non-marble object {other.name}, ignoring.");
       }
+      
+      _handlingTrigger = false;
     }
 
     private bool TryGetPlayableMarble(Collider2D other, out PlayableMarbleController marble) {
       //first check if the collider itself is the marble
       if (!other.TryGetComponent(out marble)) {
         //check if the parent is the marble 
-        if(!other.transform.parent.TryGetComponent(out marble)) {
+        if (other.transform.parent != null && !other.transform.parent.TryGetComponent(out marble)) {
           return false;
         }
       }
       return (marble != null && marble.isActiveAndEnabled);
     }
 
+
     /// <summary>
     /// This methods updates the Visual Cue based on the game state and the ShowVisualCue flags.<br/>
     /// </summary>
     public void UpdateUI() {
+      EnsureDependencies();
       bool showCue = false;
-      if ( _stateMachine.Current == GameStates.Reset
-            || _stateMachine.Current == GameStates.Preparation) {
-        showCue = VisualCueActiveAtStart || EventTrigger.HasFlag(CheckpointEventTrigger.Always);
+      //ensure reset stops any feedbacks
+      if (_stateMachine.Current == GameStates.Reset) {
+        StopAllFeedbacks();
       }
+      //check initial states of checkpoint like hide it or play the cue
+      if (_stateMachine.Current == GameStates.Reset
+            || _stateMachine.Current == GameStates.Preparation) {
+        if(HideOnInitialization) {
+          showCue = false;
+          gameObject.SetActive(false);
+        }
+        else {
+          showCue = VisualCueActiveAtStart || EventTrigger.HasFlag(CheckpointEventTrigger.Always);
+        }
+      }
+      // check if visual cue should be shown during playing state. This check also happens in Update()
       else if (_stateMachine.Current == GameStates.Playing) {
         showCue = ShowVisualCue.HasFlag(ShowVisualCueModes.NoCollision) || ShowVisualCue.HasFlag(ShowVisualCueModes.Always);
       }
-      ActivateVisualCue(showCue);
+      ToggleVisualCue(showCue);
     }
 
-    private void ActivateVisualCue(bool active = true) {
-      if (VisualCuePrefab == null) return;
-      VisualCuePrefab.SetActive(active);
+    private void RaiseCheckpointEvent(GameEventType eventType, PlayableMarbleController marble) {
+      var eventArgs = new MarbleEventArgs() {
+        EventType = eventType,
+        Position = new Vector2(transform.position.x, transform.position.y),
+        Marble = marble,
+        HitCheckpoint = this
+      };
+      ////wait for feedbacks to stop
+      //bool stillPlaying = waitForFeedbacks;
+      //while(stillPlaying) {
+      //  stillPlaying = (GameStateFeedback != null && GameStateFeedback.IsPlaying)
+      //              || (OnExitFeedback != null && OnExitFeedback.IsPlaying); 
+      //  if (stillPlaying) System.Threading.Thread.Sleep(10);
+      //}
+      _eventsChannel.Raise<EventArgs>(eventType, eventArgs);
+    }
+
+    private void ToggleVisualCue(bool active = true) {
+      //play feedback if defined, otherwise just toggle the prefab active state
+      if (VisualCueFeedback != null) {
+        if (active) VisualCueFeedback.PlayFeedbacks();
+        else VisualCueFeedback.StopFeedbacks();
+      }
+
+      if (VisualCuePrefab != null) VisualCuePrefab.SetActive(active);
+
+    }
+
+    private void EnsureDependencies() {
+      if (_eventsChannel == null) {
+        _eventsChannel = ServiceLocator.Get<GameEventChannel>();
+      }
+      if (_stateMachine == null) {
+        _stateMachine = ServiceLocator.Get<GameStateMachine>();
+      }
     }
 
     /// <summary>
@@ -174,6 +229,12 @@ namespace GMTK {
         checkpointID = "Checkpoint_" + Guid.NewGuid().ToString();
         this.LogWarning($"Checkpoint on {gameObject.name} had no ID assigned. Generated ID: {checkpointID}");
       }
+    }
+
+    private void StopAllFeedbacks() {
+      if(OnEnterFeedback!=null) OnEnterFeedback.StopFeedbacks();
+      if(OnExitFeedback!=null) OnExitFeedback.StopFeedbacks();
+      if(VisualCueFeedback!=null) VisualCueFeedback.StopFeedbacks();
     }
 
   }

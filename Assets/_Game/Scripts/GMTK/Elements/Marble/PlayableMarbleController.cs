@@ -17,6 +17,7 @@ namespace GMTK {
 
     [Header("Model")]
     public GameObject Model;
+    public bool HideAtInitialization = true;
 
     [Header("Movement and Speed")]
     [Tooltip("The maximum linear speed the Marble can reach")]
@@ -141,7 +142,7 @@ namespace GMTK {
 
       _rb = Model.GetComponent<Rigidbody2D>();
       _sr = Model.GetComponent<SpriteRenderer>();
-      Spawn();
+      Spawn(hidden:HideAtInitialization);
     }
 
     protected void Update() {
@@ -178,7 +179,7 @@ namespace GMTK {
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
-      this.Log($"Collision entered with {collision.gameObject.name}");
+      this.LogDebug($"Collision entered with {collision.gameObject.name}");
       if (!_activeCollisions.Contains(collision)) {
         _activeCollisions.Add(collision);
       }
@@ -188,7 +189,7 @@ namespace GMTK {
     }
 
     private void OnCollisionExit2D(Collision2D collision) {
-      this.Log($"Collision exited with {collision.gameObject.name}");
+      this.LogDebug($"Collision exited with {collision.gameObject.name}");
       _activeCollisions.Remove(collision);
     }
 
@@ -227,7 +228,7 @@ namespace GMTK {
     protected virtual void UpdateMovementSounds() {
 
       float speed = _rb.linearVelocity.magnitude;
-      this.Log($"linearVelocity: {_rb.linearVelocity}, speed: {speed}");
+      //this.Log($"linearVelocity: {_rb.linearVelocity}, speed: {speed}");
       bool longWhoosh = false;
       bool shortWhoosh = false;
       if (speed > MinLinearSpeedForRollingSound) {
@@ -235,11 +236,11 @@ namespace GMTK {
         longWhoosh = LinearSpeedToRollingVolume.Evaluate(speedToVolume) > 0.1f;
         shortWhoosh = !longWhoosh;
       }
-      this.Log($"Speed: {speed:F2}, LongWhoosh: {longWhoosh}, ShortWhoosh: {shortWhoosh}");
+      //this.Log($"Speed: {speed:F2}, LongWhoosh: {longWhoosh}, ShortWhoosh: {shortWhoosh}");
       // Adjust audio feedback chances based on speed
       var audioFeedbacks = CollisionFeedback.GetFeedbacksOfType<MMF_MMSoundManagerSound>();
       foreach (var audioFeedback in audioFeedbacks) {
-        this.Log($"Adjusting Audio Feedback '{audioFeedback.GetLabel()}'");
+        //this.Log($"Adjusting Audio Feedback '{audioFeedback.GetLabel()}'");
         if (audioFeedback.GetLabel() == "Whoosh-Long") {
           audioFeedback.Active = longWhoosh;
         }
@@ -305,7 +306,7 @@ namespace GMTK {
       _lastFeedbackTime = Time.time;
 
       // Log collision for debugging
-      this.Log($"Collision with {collision.gameObject.name} - Intensity: {intensity:F2}, " +
+      this.LogDebug($"Collision with {collision.gameObject.name} - Intensity: {intensity:F2}, " +
                    $"Velocity: {context.Velocity:F2}, Fall: {context.FallDistance:F2}, " +
                    $"Angle: {context.CollisionAngle:F2}, Type: {context.CollisionType}");
     }
@@ -642,11 +643,13 @@ namespace GMTK {
 
     #region Public API
 
-    public void Spawn() {
+    public void Spawn(bool hidden=false) {
       if (SpawnTransform != null) {
         Model.transform.position = SpawnTransform.position;
       }
       else { Model.transform.position = Vector3.zero; }
+
+      StopMarble();
 
       // Reset collision tracking
       _lastGroundedPosition = Model.transform.position;
@@ -655,8 +658,7 @@ namespace GMTK {
       _activeCollisions.Clear();
       _collisionHistory.Clear();
 
-      Model.SetActive(true);
-      StopMarble();
+      Model.SetActive(!hidden);
     }
 
     public void StopMarble() {
