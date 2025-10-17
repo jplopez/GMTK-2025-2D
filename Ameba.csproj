@@ -62,39 +62,53 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IServiceLocalable.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\Pointer\Pointable.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\ScoreCalculationStrategy.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\ISelectable.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\AmebaController.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Events\Enhanced\EnhancedEventSystemExample.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeVariableAttribute.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\IHover.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Events\EventChannel.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\MoreMountains\Feedbacks\DynamicValueFeedback\FeedbackValueAcquisition.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\IDraggable.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\HelpAttribute\HelpAttribute.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\IHoverable.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\MoreMountains\Feedbacks\DynamicValueFeedback\IValueReceiver.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\DraggingController.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Events\Enhanced\EnhancedEventListener.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\GameState.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\StateChangePayload.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\IGameStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\ScoreKeeperController.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Events\Enhanced\EnhancedEventTrigger.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RegistryPool.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeVariableBinder.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\ServiceRegistry.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Events\Enhanced\EnhancedEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeVariable.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\MoreMountains\Feedbacks\DynamicValueFeedback\ValueHolderFeedback.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\MoreMountains\Feel\BaseIntensityCalculator.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\TimeBasedScoreCalculator.cs" />
-    <Compile Include="Assets\_Game\Scripts\Ameba\Input\Pointer.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeMap.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\MoreMountains\Feedbacks\EventChannelFeedback.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\AmebaStateMachine.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\MoreMountains\Feel\IFeedbackIntensityCalculator.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\MoreMountains\Feel\Factors\TweenFactor.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\Attributes\InputHandlerAttribute.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\ISelector.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Events\Enhanced\EventIdentifier.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\ScoreGateKeeper.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\HandlerRegistry.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Score\DistanceBasedScoreCalculator.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\ServiceLocator.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Events\EventCallback.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\MoreMountains\Feel\ICalculationFactor.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Events\IEventCallback.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\StateMachine\StateMachine.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IEventChannelListener.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\ThirdParty\MoreMountains\Feel\Factors\ClampedFactor.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Core\Interfaces\IPoolable.cs" />
+    <Compile Include="Assets\_Game\Scripts\Ameba\Input\Pointer\Pointer.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Pool\AudioSourcePool.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Runtime\RuntimeRegistry.cs" />
     <Compile Include="Assets\_Game\Scripts\Ameba\Input\IDragger.cs" />
@@ -1193,6 +1207,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="MoreMountains.Tools.csproj">
+      <Project>{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}</Project>
+      <Name>MoreMountains.Tools</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
