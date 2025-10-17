@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayableMarble: {fileID: 0}
-  MarbleInitialForce: {x: 150, y: 0}
-  StartLevelCheckpoint: {fileID: 455447951424056109, guid: 3f7278b7aec69944595ede41778ab697, type: 3}
+  MarbleInitialForce: {x: 100, y: 0}
+  StartLevelCheckpoint: {fileID: 0}
   EndLevelCheckpoint: {fileID: 0}
   StaleTimeThreshold: 5
   RestartOnStale: 1
@@ -55,4 +55,7 @@ MonoBehaviour:
   ScoreMultiplier: 1000
   CheckpointsToWin: 1
   CheckpointsReached: 0
-  Extensions: []
+  StartLevelFeedback: {fileID: 0}
+  EndLevelFeedback: {fileID: 0}
+  ResetLevelFeedback: {fileID: 0}
+  WaitForFeedbacks: 0

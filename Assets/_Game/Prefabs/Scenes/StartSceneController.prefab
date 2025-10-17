@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7315526985751518439}
   - component: {fileID: 2505816176993346491}
+  - component: {fileID: 3150750306552774682}
   m_Layer: 0
   m_Name: StartSceneController
   m_TagString: Untagged
@@ -76,8 +77,27 @@ MonoBehaviour:
     HasLevelCompleteScene: 0
     LevelCompleteSceneName: LevelComplete
     isExpanded: 1
-  OnSceneLoadEvents: 17000000
+  OnSceneLoadEvents: 
   LoadingPrefab: {fileID: 0}
   LoadingParent: {fileID: 0}
   LoadingHideDelay: 0.5
   EnableDebugLogging: 0
+--- !u!114 &3150750306552774682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9161413106561426056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c06d5be4071f440a878b87b4552690, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _scoreKeeper: {fileID: 11400000, guid: 584c2a77812de864c8cc37435490bfef, type: 2}
+  CalculationStrategy: {fileID: 0}
+  PlayerTransform: {fileID: 0}
+  PauseScore: 1
+  ResetOnStart: 1
+  StartingScore: 0
+  SetStartingScoreOnStart: 0

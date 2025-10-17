@@ -49,6 +49,15 @@ MonoBehaviour:
     HasLevelCompleteScene: 0
     LevelCompleteSceneName: LevelComplete
     isExpanded: 0
+  - ConfigName: AdditiveLoadingScreen
+    SetStateOnLoad: 0
+    InitialGameState: 1
+    CanRestart: 0
+    CanSkip: 0
+    LoadDelay: 0
+    HasLevelCompleteScene: 0
+    LevelCompleteSceneName: LevelComplete
+    isExpanded: 0
   startSceneConfigSource: 0
   StartSceneName: Start
   StartSceneConfig:
