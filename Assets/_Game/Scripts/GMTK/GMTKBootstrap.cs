@@ -26,21 +26,21 @@ namespace GMTK {
 
 #if UNITY_EDITOR
     private void OnValidate() {
-      this.Log("=== UE: SERVICES INITIALIZATION START ===");
+      this.LogDebug("=== UE: SERVICES INITIALIZATION START ===");
       InitializeAllServices();
-      this.Log("=== UE: SERVICES INITIALIZATION COMPLETE ===");
+      this.LogDebug("=== UE: SERVICES INITIALIZATION COMPLETE ===");
     }
 #endif
 
 
     private void Awake() {
-      this.Log("=== SERVICES INITIALIZATION START ===");
+      this.LogDebug("=== SERVICES INITIALIZATION START ===");
       InitializeAllServices();
 
       if (ConnectGameStateMachineEvents) {
         InitializeGameStateIntegration();
       }
-      this.Log("=== SERVICES INITIALIZATION COMPLETE ===");
+      this.LogDebug("=== SERVICES INITIALIZATION COMPLETE ===");
     }
     /// <summary>
     /// Initializes the ServiceLocator and all registered services
@@ -118,7 +118,7 @@ namespace GMTK {
       this.Log($"Registered services ({registeredTypes.Length}):");
 
       foreach (var type in registeredTypes) {
-        this.Log($"  - {type.Name}");
+        this.LogDebug($"  - {type.Name}");
       }
     }
 

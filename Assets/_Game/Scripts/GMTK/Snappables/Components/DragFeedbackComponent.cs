@@ -18,7 +18,7 @@ namespace GMTK {
     public float DragAlpha = 0.7f;
 
     [Header("Animation Settings")]
-    [Tooltip("Speed of color transitions")]
+    [Tooltip("Velocity of color transitions")]
     public float ColorTransitionSpeed = 5f;
 
     [Tooltip("Pulse effect during dragging")]
@@ -42,7 +42,7 @@ namespace GMTK {
     protected override void Initialize() {
       _renderer = _snappable.Model.GetComponent<SpriteRenderer>();
       if (_renderer == null) {
-        Debug.LogWarning($"[DragFeedbackComponent] No SpriteRenderer found on {_snappable.name}");
+        Debug.LogWarning($"[_dragFeedbackComponent] No SpriteRenderer found on {_snappable.name}");
         return;
       }
 
@@ -159,7 +159,7 @@ namespace GMTK {
       // Start with neutral dragging color
       SetNeutralDragging();
 
-      //Debug.Log($"[DragFeedbackComponent] Started drag feedback for {_snappable.name}");
+      //Debug.Log($"[_dragFeedbackComponent] Started drag feedback for {_snappable.name}");
     }
 
     public void StopDragFeedback() {
@@ -169,7 +169,7 @@ namespace GMTK {
       _targetColor = _originalColor;
       _targetColor.a = 1f;
 
-      //Debug.Log($"[DragFeedbackComponent] Stopped drag feedback for {_snappable.name}");
+      //Debug.Log($"[_dragFeedbackComponent] Stopped drag feedback for {_snappable.name}");
     }
 
     #endregion

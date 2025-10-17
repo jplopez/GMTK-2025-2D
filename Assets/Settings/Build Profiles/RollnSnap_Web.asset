@@ -87,6 +87,18 @@ MonoBehaviour:
     m_path: Assets/Scenes/LevelComplete.unity
   - m_enabled: 1
     m_path: Assets/Scenes/End.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/Tutorial.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/Loading.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/AdditiveLoadingScreen.unity
+  - m_enabled: 1
+    m_path: Assets/Feel/MMTools/Demos/MMSceneLoading/MMSceneLoadingDemoSceneA.unity
+  - m_enabled: 1
+    m_path: Assets/Feel/MMTools/Demos/MMSceneLoading/MMSceneLoadingDemoSceneB.unity
+  - m_enabled: 1
+    m_path: Assets/Feel/MMTools/Core/MMSceneLoading/LoadingScreens/MMAdditiveLoadingScreenSimple.unity
   m_ScriptingDefines:
   - MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED
   m_PlayerSettingsYaml:

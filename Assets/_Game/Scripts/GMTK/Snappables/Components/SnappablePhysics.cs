@@ -113,8 +113,10 @@ namespace GMTK {
       transform.localScale = _initialScale;
       transform.rotation = _initialRotation;
       _currentRotation = _initialRotation.eulerAngles.z;
-      _rigidbody2D.linearVelocity = Vector2.zero;
-      _rigidbody2D.angularVelocity = 0f;
+      if (_rigidbody2D.bodyType != RigidbodyType2D.Static) {
+        _rigidbody2D.linearVelocity = Vector2.zero;
+        _rigidbody2D.angularVelocity = 0f;
+      }
     }
 
     private void ApplyMovementControl() {

@@ -396,9 +396,9 @@ Material:
     - _SineGlowMax: 3
     - _SineGlowMin: 0
     - _SineMoveFade: 1
-    - _SineRotateAngle: 15
-    - _SineRotateFade: 1
-    - _SineRotateFrequency: 1
+    - _SineRotateAngle: 60
+    - _SineRotateFade: 0.43
+    - _SineRotateFrequency: 7
     - _SineScaleFrequency: 2
     - _SmokeAlpha: 1
     - _SmokeDarkEdge: 1
@@ -462,7 +462,7 @@ Material:
     - _ToggleUnscaledTime: 0
     - _UVDistortFade: 1
     - _UVDistortMaskToggle: 0
-    - _UVRotateSpeed: 1
+    - _UVRotateSpeed: 2
     - _VertexTintFirst: 0
     - _VibrateFade: 1
     - _VibrateFrequency: 100
@@ -597,9 +597,9 @@ Material:
     - _ShiftingColorB: {r: 0.064524725, g: 0.54716974, b: 0.11882767, a: 0}
     - _ShineColor: {r: 11.98431, g: 11.98431, b: 11.98431, a: 0}
     - _SineGlowColor: {r: 1.962264, g: 1.4250084, b: 0.39800638, a: 0}
-    - _SineMoveFrequency: {r: 1, g: 1, b: 0, a: 0}
-    - _SineMoveOffset: {r: 0, g: 0.5, b: 0, a: 0}
-    - _SineRotatePivot: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - _SineMoveFrequency: {r: 1, g: 5, b: 0, a: 0}
+    - _SineMoveOffset: {r: 0, g: 0.1, b: 0, a: 0}
+    - _SineRotatePivot: {r: -0.5, g: 0.5, b: 0, a: 0}
     - _SineScaleFactor: {r: 0.2, g: 0.2, b: 0, a: 0}
     - _SourceAlphaDissolveNoiseScale: {r: 0.3, g: 0.3, b: 0, a: 0}
     - _SourceAlphaDissolvePosition: {r: 0, g: 0, b: 0, a: 0}
@@ -624,7 +624,7 @@ Material:
     - _UVDistortNoiseScale: {r: 0.1, g: 0.1, b: 0, a: 0}
     - _UVDistortSpeed: {r: 2, g: 2, b: 0, a: 0}
     - _UVDistortTo: {r: 0.02, g: 0.02, b: 0, a: 0}
-    - _UVRotatePivot: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - _UVRotatePivot: {r: 1, g: 0, b: 0, a: 0}
     - _UVScalePivot: {r: 0.5, g: 0.5, b: 0, a: 0}
     - _UVScaleScale: {r: 1, g: 1, b: 0, a: 0}
     - _UVScrollSpeed: {r: 0.2, g: 0, b: 0, a: 0}
