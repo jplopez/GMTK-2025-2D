@@ -4,7 +4,7 @@ using UnityEngine;
 namespace GMTK {
 
   [CustomEditor(typeof(PlayableElementInputHandler))]
-  public class SnappableInputHandlerEditor : Editor {
+  public class PlayableElementInputHandlerEditor : Editor {
 
     private SerializedProperty pointerWorldPosProp;
     private bool showTransformFoldout = true;
@@ -41,7 +41,7 @@ namespace GMTK {
       using (new EditorGUI.IndentLevelScope()) {
         EditorGUILayout.LabelField("Is Moving", handler.IsMoving.ToString());
 
-        GridSnappable current = handler.Current;
+        PlayableElement current = handler.CurrentElement;
         string currentName = current != null ? current.name : "(None)";
         EditorGUILayout.LabelField("Current Element", currentName);
 
@@ -71,7 +71,7 @@ namespace GMTK {
         EditorGUILayout.LabelField("Is Over Element", handler.IsOverElement.ToString());
 
         //GridSnappable lastOver = GetLastElementOver(handler);
-        GridSnappable lastOver = handler.LastOnOver;
+        PlayableElement lastOver = handler.LastElementOver;
         string lastName = lastOver != null ? lastOver.name : "(None)";
         EditorGUILayout.LabelField("Last Element Over", lastName);
       }
@@ -80,8 +80,8 @@ namespace GMTK {
     private void DrawEventButtons(PlayableElementInputHandler handler) {
       EditorGUILayout.LabelField("Manual Event Triggers", EditorStyles.boldLabel);
 
-      GridSnappable current = handler.Current;
-      Vector2 pointerPos = GetPointerWorldPosition();
+      PlayableElement current = handler.CurrentElement;
+      //Vector2 pointerPos = GetPointerWorldPosition();
 
       GUI.enabled = current != null;
 

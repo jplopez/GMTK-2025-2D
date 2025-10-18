@@ -11,7 +11,7 @@ namespace GMTK {
 
     private readonly int maxOccupants;
     private readonly CellLayeringOrder mode;
-    private readonly LinkedList<GridSnappable> occupants = new();
+    private readonly LinkedList<PlayableElement> occupants = new();
     public int Count => occupants.Count;
 
     public OccupancyCell(int maxOccupants=1, CellLayeringOrder mode=CellLayeringOrder.LastToFirst) {
@@ -25,7 +25,7 @@ namespace GMTK {
     public bool HasAnyOccupant => occupants.Count > 0;
     public bool IsEmpty => occupants.Count == 0;
 
-    public void Add(GridSnappable snappable) {
+    public void Add(PlayableElement snappable) {
       if (HasReachedMaxOccupancy) return;
 
       switch (mode) {
@@ -38,19 +38,19 @@ namespace GMTK {
       }
     }
 
-    public bool Contains(GridSnappable snappable) => occupants.Contains(snappable);
-    public void Remove(GridSnappable snappable) => occupants.Remove(snappable);
+    public bool Contains(PlayableElement snappable) => occupants.Contains(snappable);
+    public void Remove(PlayableElement snappable) => occupants.Remove(snappable);
 
-    public IEnumerable<GridSnappable> GetOccupants() => occupants;
+    public IEnumerable<PlayableElement> GetOccupants() => occupants;
 
-    public GridSnappable PeekTop() => occupants.First?.Value;
+    public PlayableElement PeekTop() => occupants.First?.Value;
 
     public override string ToString() {
       StringBuilder sb = new();
       sb.Append($"maxOccupants:{maxOccupants} ");
       sb.Append($"LayerOrder:{mode} ");
       sb.Append($"Occupants({Count}): [");
-      sb.AppendJoin<GridSnappable>(',', occupants.ToArray());
+      sb.AppendJoin<PlayableElement>(',', occupants.ToArray());
       sb.AppendLine(" ]");
       return sb.ToString();
     }

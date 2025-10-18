@@ -19,14 +19,21 @@ namespace GMTK {
   /// </summary>
   public class GridOccupancyMap {
 
+    //
     protected readonly Dictionary<Vector2Int, OccupancyCell> _occupancy = new();
-    protected readonly Dictionary<GridSnappable, List<Vector2Int>> _occupantFootprint = new();
+
+    protected readonly Dictionary<PlayableElement, List<Vector2Int>> _occupantFootprint = new();
+    protected int _occupantsCount = 0;
 
     protected readonly float _cellSize;
     protected readonly Vector2 _gridOrigin;
     protected readonly int _maxOccupantsPerCell;
     protected readonly CellLayeringOrder _mode;
 
+    /// <summary>
+    /// Returns all cells in the map (occupied or not)
+    /// </summary>
+    /// <returns></returns>
     public Dictionary<Vector2Int, OccupancyCell> GetAllCells() => _occupancy;
 
     public GridOccupancyMap(float cellSize, Vector2 gridOrigin, int maxOccupantsPerCell = 1, CellLayeringOrder mode = CellLayeringOrder.LastToFirst) {
@@ -38,52 +45,68 @@ namespace GMTK {
 
     #region Register/Unregister
 
-    public virtual bool Register(GridSnappable snappable, Vector2Int origin) {
+    /// <summary>
+    /// Adds the specified occupant into the grid, using the occupant's world position to calculate the Grid cell.<br/>
+    /// This methods takes into consideration the occupant footprint (how many cells needs to fit), and if the cells
+    /// have room left.
+    /// 
+    /// </summary>
+    /// <param name="occupant"></param>
+    /// <param name="origin">The grid position of grid cell (0,0)</param>
+    /// <returns>True if the occupant is placed into the grid. False otherwise</returns>
+    public virtual bool Register(PlayableElement occupant, Vector2Int origin) {
       List<OccupancyCell> cells = new();
-      foreach (Vector2Int snappableIndex in snappable.GetWorldOccupiedCells(origin)) {
+      foreach (Vector2Int occupantCellIndex in occupant.GetWorldOccupiedCells(origin)) {
 
-        if (!_occupancy.TryGetValue(snappableIndex, out OccupancyCell occupancyCell)) {
+        if (!_occupancy.TryGetValue(occupantCellIndex, out OccupancyCell occupancyCell)) {
           occupancyCell = new OccupancyCell(_maxOccupantsPerCell, _mode);
-          _occupancy[snappableIndex] = occupancyCell;
+          _occupancy[occupantCellIndex] = occupancyCell;
         }
         if (occupancyCell.HasReachedMaxOccupancy) return false;
         cells.Add(occupancyCell);
       }
-      //if foreach finishes, it means all cellsToRemove are available so we assign the snappable to them
-      cells.ForEach(c => c.Add(snappable));
-      _occupantFootprint.Add(snappable, snappable.GetFootprint());
+      //if foreach finishes, it means all cellsToRemove are available so we assign the element to them
+      cells.ForEach(c => c.Add(occupant));
+      _occupantFootprint.Add(occupant, occupant.GetFootprint());
+      _occupantsCount++;
       return true;
     }
 
-    public virtual void Unregister(GridSnappable snappable, Vector2Int origin) {
+    public virtual void Unregister(PlayableElement occupant, Vector2Int origin) {
       List<OccupancyCell> cellsToRemove = new();
-      var occupiedCells = //snappable.GetWorldOccupiedCells(origin);
-                            _occupancy.Where(cell => cell.Value.Count > 0 && cell.Value.Contains(snappable)).Select(pair => pair.Key).ToList();
+      var occupiedCells = //element.GetWorldOccupiedCells(origin);
+                            _occupancy.Where(cell => cell.Value.Count > 0 && cell.Value.Contains(occupant)).Select(pair => pair.Key).ToList();
       foreach (Vector2Int snappableIndex in occupiedCells) {
        if(_occupancy.TryGetValue(snappableIndex, out OccupancyCell occupancyCell)) {
           cellsToRemove.Add(occupancyCell);
         }
       }
-      if(cellsToRemove.Count != snappable.GetFootprint().Count) {
-        Debug.LogWarning($"Unregister: number of cellsToRemove to remove doesn't match snappable footprint: {cellsToRemove.Count} != {snappable.GetFootprint().Count}");
+      if(cellsToRemove.Count != occupant.GetFootprint().Count) {
+        Debug.LogWarning($"Unregister: number of cellsToRemove to remove doesn't match element footprint: {cellsToRemove.Count} != {occupant.GetFootprint().Count}");
       }
-      cellsToRemove.ForEach(c => c.Remove(snappable));
-      _occupantFootprint.Remove(snappable);
-      //Debug.Log($"Snappable {snappable.name} unregistered:");
+      cellsToRemove.ForEach(c => c.Remove(occupant));
+      _occupantFootprint.Remove(occupant);
+      _occupantsCount--;
+      //Debug.Log($"Snappable {element.name} unregistered:");
       //cellsToRemove.ForEach(c => Debug.Log($"  {c}"));
     }
 
     #endregion
 
     #region Occupancy
-    public bool ContainsSnappable(GridSnappable snappable) => _occupancy.Values.Any(cell => cell.Contains(snappable));
+    public bool ContainsElement(PlayableElement element) => _occupancy.Values.Any(cell => cell.Contains(element));
+
+    /// <summary>
+    /// How many occupants (elements) are registered in the grid
+    /// </summary>
+    public int OccupantsCount => _occupantsCount;
 
     /// <summary>
     /// Does it have any elements on that world position
     /// </summary>
     /// <param name="worldPosition"></param>
     /// <returns></returns>
-    public virtual bool HasAnyOccupants(Vector2 worldPosition) {
+    public virtual bool HasAnyOccupantsInWorldPosition(Vector2 worldPosition) {
       var index = WorldToGrid(worldPosition);
       return _occupancy.ContainsKey(index) && _occupancy[index].HasAnyOccupant;
     }
@@ -93,22 +116,22 @@ namespace GMTK {
     /// </summary>
     /// <param name="worldPosition"></param>
     /// <returns></returns>
-    public virtual bool HasReachedMaxOccupancy(Vector2 worldPosition) {
+    public virtual bool HasWorldPositionReachedMaxOccupancy(Vector2 worldPosition) {
       var index = WorldToGrid(worldPosition);
       return HasCellReachedMaxOccupancy(index);
     }
 
-    public virtual IEnumerable<GridSnappable> GetOccupants(Vector2 worldPosition) {
+    public virtual IEnumerable<PlayableElement> GetOccupantsInWorldPosition(Vector2 worldPosition) {
       var index = WorldToGrid(worldPosition);
-      return _occupancy.TryGetValue(index, out var cell) ? cell.GetOccupants() : new List<GridSnappable>();
+      return _occupancy.TryGetValue(index, out var cell) ? cell.GetOccupants() : new List<PlayableElement>();
     }
 
-    public int OccupantsCount(Vector2 worldPosition) {
+    public int OccupantsCountByWorldPosition(Vector2 worldPosition) {
       var index = WorldToGrid(worldPosition);
       return _occupancy.TryGetValue(index, out var cell) ? cell.Count : 0;
     }
 
-    public virtual GridSnappable PeekTop(Vector2 worldPosition) {
+    public virtual PlayableElement PeekTopByWorldPosition(Vector2 worldPosition) {
       var index = WorldToGrid(worldPosition);
       return _occupancy.TryGetValue(index, out var cell) ? cell.PeekTop() : null;
     }

@@ -71,13 +71,14 @@ namespace GMTK {
     private void Start() => InitializeAllPlayableElementComponents();
 
     private void Update() {
-      _components.ForEach(component => component.RunBeforeUpdate());
-      _components.ForEach(c => c.RunOnUpdate());
+      if(_components?.Count == 0) return;
+      _components.ForEach(c => { if (c != null) c.RunBeforeUpdate(); });
+      _components.ForEach(c => { if (c != null) c.RunOnUpdate(); });
     }
 
-    private void LateUpdate() => _components.ForEach(c => c.RunAfterUpdate());
+    private void LateUpdate() => _components?.ForEach(c => { if(c != null)c.RunAfterUpdate();});
 
-    private void OnDestroy() => _components.ForEach(c => c.RunFinalize());
+    private void OnDestroy() => _components?.ForEach(c => { if(c != null)c.RunFinalize();});
 
     #endregion
 
@@ -85,8 +86,8 @@ namespace GMTK {
 
     public virtual void Initialize() {
       // Default assignments
-      if (SnapTransform == null) SnapTransform = this.transform;
-      if (Model == null) Model = this.transform;
+      if (SnapTransform == null) SnapTransform = transform;
+      if (Model == null) Model = transform;
 
       // Get GameEventChannel from ServiceLocator
       _gameEventChannel = ServiceLocator.Get<GameEventChannel>();
@@ -101,9 +102,9 @@ namespace GMTK {
     }
 
     private void InitializeAllPlayableElementComponents() {
-      _components.Clear();
-      _components.AddRange(GetComponents<PlayableElementComponent>());
-      _components.ForEach(comp => comp.TryInitialize());
+      _components?.Clear();
+      _components?.AddRange(GetComponents<PlayableElementComponent>());
+      _components?.ForEach(c => { if (c != null) c.TryInitialize(); });
 
       // Cache the PointerElementComponent reference
       _pointerComponent = GetComponent<PointerElementComponent>();
@@ -118,7 +119,7 @@ namespace GMTK {
       else {
         SpriteRenderer[] renderers = Model.GetComponentsInChildren<SpriteRenderer>();
         if (renderers == null || renderers.Length == 0) {
-          this.LogWarning($"[PlayableElement] No SpriteRenderer found on {Model.name}.");
+          this.LogWarning($"No SpriteRenderer found on {Model.name}.");
         }
       }
       return false;
@@ -132,7 +133,7 @@ namespace GMTK {
         _collider = collider;
       }
       else {
-        this.LogWarning($"[PlayableElement] No PolygonCollider2D found on {Model.gameObject.name}. Adding one.");
+        this.LogWarning($"No PolygonCollider2D found on {Model.gameObject.name}. Adding one.");
         _collider = Model.gameObject.AddComponent<PolygonCollider2D>();
       }
     }
@@ -308,6 +309,7 @@ namespace GMTK {
     #endregion
 
     public override string ToString() => name;
+   
   }
 
   #region Casting to GridSnappable (for compatibility)
@@ -331,7 +333,7 @@ namespace GMTK {
         snappable.Draggable = element.Draggable;
         snappable.Flippable = element.Flippable;
         snappable.CanRotate = element.CanRotate;
-        snappable.transform.parent = null;
+        snappable.transform.parent = element.transform.parent;
         GameObject.Destroy(snappable, ttl); // destroy after ttl seconds to avoid cluttering the scene
         return snappable;
       }

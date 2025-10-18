@@ -100,8 +100,8 @@ namespace GMTK {
     private bool _isInGhostMode = false;
 
     protected override void Initialize() {
-      // Override PlayableElement dragging capability
-      _playableElement.Draggable = true;
+      // Override PlayableElement dragging capability if is active
+      _playableElement.Draggable = IsActive;
 
       // Get the original renderer for ghost functionality
       if (EnableGhost) {

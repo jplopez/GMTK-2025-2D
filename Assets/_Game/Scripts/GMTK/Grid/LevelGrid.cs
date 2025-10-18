@@ -1,6 +1,8 @@
 using Ameba;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -10,6 +12,8 @@ using UnityEngine;
 namespace GMTK {
 
   public enum GridOriginSources { GameObject, Custom }
+
+
   public class LevelGrid : MonoBehaviour {
 
     [Header("Grid Dimensions")]
@@ -59,7 +63,7 @@ namespace GMTK {
     private bool _isInitialized = false;
     protected Vector2 _gridOrigin = Vector2.zero;
     protected GridOccupancyMap _occupancyMap;
-    protected GridSnappable _currentSelected;
+    protected PlayableElement _currentSelected;
     protected Vector2 _elementOriginalWorldPosition;
     protected Vector2Int _elementOriginalGridPosition;
     protected bool _elementWasInGrid;
@@ -131,20 +135,25 @@ namespace GMTK {
         maxOccupantsPerCell: 3,
         mode: CellLayeringOrder.LastToFirst);
 
-      var allSnappables = FindObjectsByType<GridSnappable>(FindObjectsSortMode.None);
-      //Snappables in the playing area at the time of initializing the grid
+      var allOccupants = FindObjectsByType<PlayableElement>(FindObjectsSortMode.None);
+      //Elements in the playing area at the time of initializing the grid
       //are considered non-draggable -> player cannot move them
-      foreach (var snappable in allSnappables) {
-        if (IsInsidePlayableArea(snappable.transform.position)) {
-          snappable.transform.position = SnapToGrid(snappable.transform.position);
-          snappable.Draggable = false;
-          var gridOrigin = WorldToGrid(snappable.transform.position);
-          _occupancyMap.Register(snappable, gridOrigin);
+      this.Log($"Initializing Grid for {allOccupants.Length} occupants");
+      foreach (var occupant in allOccupants) {
+        if (IsInsidePlayableArea(occupant.transform.position)) {
+          occupant.transform.position = SnapToGrid(occupant.transform.position);
+          occupant.Draggable = false;
+          var gridOrigin = WorldToGrid(occupant.transform.position);
+          _occupancyMap.Register(occupant, gridOrigin);
         }
       }
+      this.Log($"Grid Initialized with {_occupancyMap.OccupantsCount} occupants");
       _gridSprite = (_gridSprite == null) ? GetComponent<SpriteRenderer>() : _gridSprite;
     }
 
+    #endregion
+
+    #region Grid Bounds
     protected virtual void InitializeAllEdgeColliderBounds() {
       if (GridSize.x <= 0 || GridSize.y <= 0) {
         this.LogError($"GridSize must be a positive number: {GridSize}");
@@ -213,8 +222,9 @@ namespace GMTK {
       boundCollider.SetPoints(points);
       return boundCollider;
     }
-
     #endregion
+
+   
 
     #region Event Listeners
 
@@ -222,30 +232,29 @@ namespace GMTK {
       if (_eventsChannel == null) return;
       
       // Change from EventArgs to specific types
-      _eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
-      _eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
-      _eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
-      _eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
+      //_eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
+      //_eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
+      //_eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
+      //_eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
 
-      // Change from EventArgs to InventoryEventData
-      _eventsChannel.AddListener<InventoryEventData>(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
-      _eventsChannel.AddListener<InventoryEventData>(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
-      _eventsChannel.AddListener<InventoryEventData>(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
-      _eventsChannel.AddListener<InventoryEventData>(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
+      _eventsChannel.AddListener<PlayableElementEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
+      _eventsChannel.AddListener<PlayableElementEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
+      _eventsChannel.AddListener<PlayableElementEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
+      _eventsChannel.AddListener<PlayableElementEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
     }
 
     private void RemoveInputListeners() {
       if (_eventsChannel == null) return;
       
-      _eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
-      _eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
-      _eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
-      _eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
+      //_eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
+      //_eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
+      //_eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
+      //_eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
 
-      _eventsChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryElementAdded, HandleInventoryElementAddedWrapper);
-      _eventsChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryElementRetrieved, HandleInventoryElementRetrievedWrapper);
-      _eventsChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryOperationFailed, HandleInventoryOperationFailedWrapper);
-      _eventsChannel.RemoveListener<InventoryEventData>(GameEventType.InventoryUpdated, HandleInventoryUpdatedWrapper);
+      _eventsChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
+      _eventsChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
+      _eventsChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
+      _eventsChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
     }
 
     #endregion
@@ -254,8 +263,8 @@ namespace GMTK {
 
     private void TrackElementMovement() {
       // Check if input handler has an element moving
-      if (_inputHandler.Current != null && _inputHandler.IsMoving) {
-        var currentElement = _inputHandler.Current;
+      if (_inputHandler.CurrentElement != null && _inputHandler.IsMoving) {
+        var currentElement = _inputHandler.CurrentElement;
 
         // If this is a new element being tracked, stop tracking current
         // and begin tracking new
@@ -274,22 +283,22 @@ namespace GMTK {
       }
     }
 
-    private void StartTrackingElement(GridSnappable element) {
+    private void StartTrackingElement(PlayableElement element) {
       _currentSelected = element;
       _isTrackingMovement = true;
 
       // Store original position and check if it was in the grid
       var currentPosition = element.transform.position;
-      _elementWasInGrid = _occupancyMap.ContainsSnappable(element);
+      _elementWasInGrid = _occupancyMap.ContainsElement(element);
 
       if (_elementWasInGrid) {
         _elementOriginalGridPosition = WorldToGrid(currentPosition);
         // Unregister from grid while moving to avoid conflicts
         _occupancyMap.Unregister(element, _elementOriginalGridPosition);
-        this.LogDebug($"Started tracking '{element.name}' - unregistered from ({_elementOriginalGridPosition})");
+        this.Log($"Started tracking '{element.name}' - unregistered from ({_elementOriginalGridPosition})");
       }
       else {
-        this.LogDebug($"Started tracking '{element.name}' - was not in grid");
+        this.Log($"Started tracking '{element.name}' - was not in grid");
       }
 
       // Notify _dragFeedbackComponent to start visual feedback
@@ -312,173 +321,27 @@ namespace GMTK {
 
     #endregion
 
-    #region Event Handler Wrappers (EventArgs -> InventoryEventData)
-
-    private void HandleInventoryElementAddedWrapper(EventArgs args) {
-      if (args is InventoryEventData inventoryData) {
-        HandleInventoryElementAdded(inventoryData);
-      }
-    }
-
-    private void HandleInventoryElementRetrievedWrapper(EventArgs args) {
-      if (args is InventoryEventData inventoryData) {
-        HandleInventoryElementRetrieved(inventoryData);
-      }
-    }
-
-    private void HandleInventoryOperationFailedWrapper(EventArgs args) {
-      if (args is InventoryEventData inventoryData) {
-        HandleInventoryOperationFailed(inventoryData);
-      }
-    }
-
-    private void HandleInventoryUpdatedWrapper(EventArgs args) {
-      if (args is InventoryEventData inventoryData) {
-        HandleInventoryUpdated(inventoryData);
-      }
-    }
-
-    #endregion
-
-    #region Inventory Event Handlers
-
-    // Enhanced HandleElementReturnToInventory with richer context
-    protected virtual void HandleElementReturnToInventory(GridSnappable element) {
-
-      // Create rich event data with context
-      var eventData = InventoryEventData.CreateAddRequest(element, "LevelGrid")
-          .WithContext(
-              wasInGrid: _occupancyMap.ContainsSnappable(element),
-              wasInInventory: false  // We know it's coming from grid
-          );
-
-      // Request inventory to add this element
-      _eventsChannel.Raise(GameEventType.InventoryAddRequest, eventData);
-      this.LogDebug($"Requested inventory to add {element.name} with context");
-
-      //else {
-      //  // Fallback to old positioning system
-      //  HandleElementReturnToInventoryFallback(element);
-      //}
-    }
-
-    private void HandleElementReturnToInventoryFallback(GridSnappable element) {
-      var inventoryZone = GameObject.Find("InventoryZone");
-      if (inventoryZone != null) {
-        var bounds = new Bounds(inventoryZone.transform.position, Vector3.one);
-        if (inventoryZone.TryGetComponent<Collider2D>(out var collider)) {
-          bounds = collider.bounds;
-        }
-        var randomOffset = new Vector3(
-            UnityEngine.Random.Range(-bounds.size.x * 0.4f, bounds.size.x * 0.4f),
-            UnityEngine.Random.Range(-bounds.size.y * 0.4f, bounds.size.y * 0.4f),
-            0);
-        element.transform.position = bounds.center + randomOffset;
-        this.LogDebug($"Used fallback positioning for {element.name}");
-      }
-      else {
-        element.transform.position = ELEMENT_DEFAULT_POSITION;
-      }
-    }
-
-    protected virtual void HandleInventoryElementAdded(InventoryEventData data) {
-      if (data.Success) {
-        this.LogDebug($"Element successfully added to inventory: {data.ElementName} " +
-                 $"(Available: {data.AvailableQuantity}/{data.TotalQuantity}) from {data.SourceSystem}");
-
-        // Element was successfully added to inventory and destroyed by LevelInventory
-        // We can use the rich context for additional logic
-        if (data.WasInGrid) {
-          this.LogDebug($"Element was moved from grid to inventory");
-        }
-      }
-      else {
-        this.LogWarning($"Failed to add element to inventory: {data.Message}");
-        // Fallback to old positioning if inventory add failed
-        if (data.Element != null) {
-          HandleElementReturnToInventoryFallback(data.Element);
-        }
-      }
-    }
-
-    protected virtual void HandleInventoryElementRetrieved(InventoryEventData data) {
-      if (data.Success && data.Element != null) {
-        this.LogDebug($"Element retrieved from inventory: {data.ElementName} " +
-                 $"(Remaining: {data.AvailableQuantity}/{data.TotalQuantity}) by {data.SourceSystem}");
-
-        // Position the retrieved element based on context
-        PositionRetrievedElement(data.Element, data);
-      }
-      else {
-        this.LogWarning($"Failed to retrieve element from inventory: {data.Message}");
-      }
-    }
-
-    protected virtual void HandleInventoryOperationFailed(InventoryEventData data) {
-      this.LogWarning($"Inventory operation failed: {data.Operation} | {data.Message} | Source: {data.SourceSystem}");
-
-      // Handle specific failure cases
-      switch (data.Operation) {
-        case InventoryOperation.Add:
-          if (data.Element != null) {
-            HandleElementReturnToInventoryFallback(data.Element);
-          }
-          break;
-        case InventoryOperation.Retrieve:
-          // Maybe show UI feedback that element is not available
-          break;
-      }
-    }
-
-    protected virtual void HandleInventoryUpdated(InventoryEventData data) {
-      this.LogDebug($"Inventory updated: {data.Message} | Source: {data.SourceSystem}");
-      // Could trigger UI updates or other systems that care about inventory state
-    }
-
-    protected virtual void PositionRetrievedElement(GridSnappable element, InventoryEventData context) {
-      // Use context to make intelligent positioning decisions
-      Vector3 targetPosition;
-
-      if (context.WorldPosition != Vector3.zero) {
-        // Use the original world position if available
-        targetPosition = context.WorldPosition;
-      }
-      else {
-        // Fallback to inventory zone position
-        var inventoryZone = GameObject.Find("InventoryZone");
-        targetPosition = inventoryZone != null ? inventoryZone.transform.position : ELEMENT_DEFAULT_POSITION;
-      }
-
-      element.transform.position = targetPosition;
-      element.Draggable = true;
-
-      this.LogDebug($"Positioned retrieved element {element.name} at {targetPosition} " +
-               $"(Category: {context.CategoryId}, Source: {context.SourceSystem})");
-    }
-    #endregion
-
     #region Element Movement Event Handlers
 
-    protected virtual void HandleElementSelected(GridSnappableEventArgs args) {
+    protected virtual void HandleElementSelected(PlayableElementEventArgs args) {
       // This now just collects element initial world and grid positions - tracking starts in Update()
-      if (args is GridSnappableEventArgs e && e.Element != null) {
+      if (args.Element is PlayableElement element) {
+        //var element = args.Element;
         //_currentSelected = e.Element;
-        _elementOriginalWorldPosition = e.Element.transform.position;
-        _elementWasInGrid = _occupancyMap.ContainsSnappable(e.Element);
+        _elementOriginalWorldPosition = element.transform.position;
+        _elementWasInGrid = _occupancyMap.ContainsElement(element);
         if (_elementWasInGrid) {
           _elementOriginalGridPosition = WorldToGrid(_elementOriginalWorldPosition);
         }
-        this.LogDebug($"Element '{e.Element.name}' selected at {_elementOriginalWorldPosition}");
-        if (_elementWasInGrid) this.Log($"Element '{e.Element.name}' at grid {_elementOriginalGridPosition}");
-        e.Element.OnPointerOver();
+        this.Log($"Element '{element.name}' selected at {_elementOriginalWorldPosition}");
+        if (_elementWasInGrid) this.Log($"Element '{element.name}' at grid {_elementOriginalGridPosition}");
+        element.OnHover(); //OnPointerOver();
       }
     }
-    protected virtual void HandleElementDropped(GridSnappableEventArgs args) {
+    protected virtual void HandleElementDropped(PlayableElementEventArgs args) {
 
-      if (args is GridSnappableEventArgs e && e.Element != null) {
-
-
-        var element = e.Element;
+      if (args.Element is PlayableElement element) {
+        //var element = args.Element;
         var newGridOrigin = WorldToGrid(element.transform.position);
 
         // Try to place at new position
@@ -488,7 +351,7 @@ namespace GMTK {
           if (CanPlace(element, newGridOrigin)) {
             element.transform.position = SnapToGrid(newGridOrigin);
             _occupancyMap.Register(element, newGridOrigin);
-            this.LogDebug($"Placed {element.name} at {newGridOrigin}");
+            this.Log($"Placed {element.name} at {newGridOrigin}");
           }
           else {
             // Failed to place - return to original position if it was in grid
@@ -496,24 +359,24 @@ namespace GMTK {
 
               element.transform.position = SnapToGrid(_elementOriginalGridPosition);
               _occupancyMap.Register(element, _elementOriginalGridPosition);
-              this.LogDebug($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
+              this.Log($"Returned '{element.name}' to original position {_elementOriginalGridPosition}");
             }
             // Element came from outside grid - return to inventory
             else {
-              HandleElementReturnToInventory(element);
-              this.LogDebug($"Returned {element.name} to inventory");
+              //HandleElementReturnToInventory(element);
+              //this.LogDebug($"Returned {element.name} to inventory");
             }
           }
 
           // Check if this was the element we were tracking
           if (element == _currentSelected) {
-            this.LogDebug($"Dropping tracked element '{element.name}' at {newGridOrigin}");
+            this.Log($"Dropping tracked element '{element.name}' at {newGridOrigin}");
             // Clean up tracking
             StopTrackingCurrentSelected();
           }
           else {
             // Element wasn't being tracked (probably just clicked)
-            this.LogDebug($"Element '{element.name}' clicked but not moved");
+            this.Log($"Element '{element.name}' clicked but not moved");
           }
         }
       }
@@ -521,16 +384,14 @@ namespace GMTK {
 
     // To decouple GridSnappable behaviour from the grid, this method only notifies the GridSnappable to handle the 'unhover'
     //that way we prevent from polling the mouse position from snappables on Update
-    private void HandleElementUnhovered(EventArgs args) {
-      if (args is GridSnappableEventArgs e && e.Element != null)
-        e.Element.OnPointerOut();
+    private void HandleElementUnhovered(PlayableElementEventArgs args) {
+      if (args.Element is PlayableElement element) element.OnUnhover();//.OnPointerOut();
     }
 
     // This method only delegates to the GridSnappable to handle the 'hover'
     //that way we prevent from polling the mouse position from snappables on Update
-    protected virtual void HandleElementHovered(EventArgs args) {
-      if (args is GridSnappableEventArgs e && e.Element != null)
-        e.Element.OnPointerOver();
+    protected virtual void HandleElementHovered(PlayableElementEventArgs args) {
+      if (args.Element is PlayableElement element) element.OnHover(); //.OnPointerOver();
     }
 
     #endregion
@@ -548,12 +409,12 @@ namespace GMTK {
               (position.x >= GridLeftBound.bounds.min.x) &&
               (position.x <= GridRightBound.bounds.max.x);
     }
-    public bool IsOccupied(Vector2 position) => _occupancyMap.HasAnyOccupants(position);
+    public bool IsOccupied(Vector2 position) => _occupancyMap.HasAnyOccupantsInWorldPosition(position);
 
     public virtual bool CanPlace(GridSnappable snappable, Vector2Int gridOrigin) {
       if (!_isInitialized) return false;
       foreach (var cell in snappable.GetWorldOccupiedCells(gridOrigin)) {
-        if (_occupancyMap.HasAnyOccupants(cell)) return false;
+        if (_occupancyMap.HasAnyOccupantsInWorldPosition(cell)) return false;
       }
       return true;
     }
@@ -561,7 +422,7 @@ namespace GMTK {
     public virtual bool CanPlace(PlayableElement element, Vector2Int gridOrigin) {
       if (!_isInitialized) return false;
       foreach (var cell in element.GetWorldOccupiedCells(gridOrigin)) {
-        if (_occupancyMap.HasAnyOccupants(cell)) return false;
+        if (_occupancyMap.HasAnyOccupantsInWorldPosition(cell)) return false;
       }
       return true;
     }

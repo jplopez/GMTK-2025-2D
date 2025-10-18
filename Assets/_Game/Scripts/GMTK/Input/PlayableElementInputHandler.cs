@@ -27,8 +27,8 @@ namespace GMTK {
     [SerializeField] private PlayableElement _lastElementOver;
 
     // Legacy properties for compatibility
-    public GridSnappable Current => ConvertToGridSnappable(_currentElement);
-    public GridSnappable LastOnOver => ConvertToGridSnappable(_lastElementOver);
+    //public GridSnappable Current => ConvertToGridSnappable(_currentElement);
+    //public GridSnappable LastOnOver => ConvertToGridSnappable(_lastElementOver);
 
     // New properties for PlayableElement
     public PlayableElement CurrentElement => _currentElement;
