@@ -47,8 +47,10 @@ namespace GMTK {
     //Input events
     //some of these events will be triggered along the 'Element' events group below.
     //use these events if you care about the actual input being pressed.
+    InputPointerPosition, //when the pointer position is updated
     InputSelected, //when mouse left-button is clicked
     InputSecondary,//when mouse right-button is clicked
+    InputCancel,   //when the input to Cancel is pressed
     InputRotateCW, //when the input to RotateCW is pressed
     InputRotateCCW,//when the input to RotateCCW is pressed 
     InputFlippedX, //when the input to FlipX is pressed
@@ -58,20 +60,27 @@ namespace GMTK {
     OnPointerOver,
     OnPointerOut,
 
-    //Elements (GridSnappable) specific events related to Input and PointerSelection
+    //Elements specific events related to Input and PointerSelection
     //These events will send a GridSnappableEventArg as the payload.
     //Some of these events will be triggered along with some of the 'Input' group.
     //Use these events if you care about the element. 
     ElementHovered,
     ElementUnhovered,
     ElementSelected,
-    ElementDropped,
-    //Elements (GridSnappable) specific events triggered after ElementDropped
+    ElementDeselected,
+    ElementDragStart, // when an element starts being dragged
+    ElementDragging,  // while an element is being dragged
+    ElementDropped,   // when an element is dropped
+    ElementSetActive,  // when an element becomes active
+    ElementSetInactive,// when an element becomes inactive
+
+    //Elements  events triggered after ElementDropped
     ElementMovedToInventory,
     ElementMovedToGrid,
 
     //PlayableElementComponent Base Event
-    PlayableElementEvent, //when a PlayableElementComponent wants to broadcast something (PlayableElementEventArgs)
+    PlayableElementEvent,         // for generic PlayableElement events
+    PlayableElementInternalEvent, // when a PlayableElementComponent wants to broadcast events internally to other PlayableElementCompnents on the same PlayableElement
 
     // Inventory Events - using EventArgs pattern
     InventoryAddRequest,        // Request to add element (InventoryEventData)
@@ -85,6 +94,5 @@ namespace GMTK {
     InventoryOperationFailed,   // When an inventory operation fails (InventoryEventData)
     InventoryUpdated,          // When inventory state changes (InventoryEventData)
     InventoryFull,             // When inventory reaches capacity (InventoryEventData)
-    ElementDeselected,
   }
 }

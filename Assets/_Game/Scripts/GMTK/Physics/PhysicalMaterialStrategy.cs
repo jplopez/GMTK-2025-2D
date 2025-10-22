@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace GMTK {
 
-  public static class SnappableMaterialStrategy {
+  public static class PhysicalMaterialStrategy {
 
     public const string MATERIALS_PATH = "Assets/_Game/Materials/Physics";
 

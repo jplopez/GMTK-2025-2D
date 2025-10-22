@@ -66,7 +66,7 @@ namespace GMTK {
         _assignedMaterial = OverrideMaterial;
       }
       else {
-        _assignedMaterial = SnappableMaterialStrategy.GetMaterial(Friction, Bounciness);
+        _assignedMaterial = PhysicalMaterialStrategy.GetMaterial(Friction, Bounciness);
       }
 
       // Apply material to collider
@@ -162,23 +162,6 @@ namespace GMTK {
       if (_rigidbody2D != null) {
         _rigidbody2D.sharedMaterial = null;
       }
-    }
-
-    // Legacy compatibility handlers
-    protected override void HandleElementSelected(GridSnappableEventArgs evt) {
-      // Could add special material effects during selection
-    }
-
-    protected override void HandleElementDropped(GridSnappableEventArgs evt) {
-      // Could add impact effects based on material
-    }
-
-    protected override void HandleElementHovered(GridSnappableEventArgs evt) {
-      // Could add hover effects based on material
-    }
-
-    protected override void HandleElementUnhovered(GridSnappableEventArgs evt) {
-      // Could remove hover effects
     }
 
     private void DebugLog(string message) {

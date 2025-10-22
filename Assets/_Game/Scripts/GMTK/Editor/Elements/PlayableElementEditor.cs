@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -33,25 +34,65 @@ namespace GMTK {
     private SerializedProperty _canRotateProp;
     private SerializedProperty _canSelectProp;
     private SerializedProperty _flippableProp;
+    //input properties for PointerElementComponent
+    private SerializedProperty _selectionTriggerProp;
+    private SerializedProperty _accuracyProp;
+    private SerializedProperty _maxOffsetProp;
+    private SerializedProperty _hoverThresholdProp;
+    //pointer state props
+    private SerializedProperty _isSelectedProp;
+    private SerializedProperty _isHoveredProp;
+    private SerializedProperty _canHoverProp;
+    private SerializedProperty _isDraggingProp;
 
     //non-public properties
     private SerializedProperty _occupiedCells;
 
     public const int BUTTON_WIDTH = 150;
 
+    // Cached GUI content for help icons
+    private static GUIContent _helpIconContent;
+    private static GUIContent _draggingHelpIcon;
+    private static GUIContent _physicsHelpIcon;
+    private static GUIStyle HelpButtonStyle {
+      get {
+        GUIStyle style = new(GUI.skin.button) {
+          padding = new RectOffset(1, 1, 1, 1),
+          margin = new RectOffset(0, 0, 2, 1),
+          fixedWidth = 20,
+          fixedHeight = EditorGUIUtility.singleLineHeight
+        };
+        return style;
+      }
+    }
+
     private void OnEnable() {
       _element = (PlayableElement)target;
 
-      //public properties
+      //model properties
       _snapTransformProp = serializedObject.FindProperty("SnapTransform");
       _modelProp = serializedObject.FindProperty("Model");
-      _draggableProp = serializedObject.FindProperty("Draggable");
-      _canRotateProp = serializedObject.FindProperty("CanRotate");
-      _canSelectProp = serializedObject.FindProperty("_canSelect");
+      //input actions
       _flippableProp = serializedObject.FindProperty("Flippable");
-
-      //non-public properties
+      _canRotateProp = serializedObject.FindProperty("CanRotate");
+      _draggableProp = serializedObject.FindProperty("Draggable");
+      _isDraggingProp = serializedObject.FindProperty("_isDragging");
+      //occupancy properties
       _occupiedCells = serializedObject.FindProperty("OccupiedCells");
+      //pointer state props
+      _canSelectProp = serializedObject.FindProperty("_canSelect");
+      _isSelectedProp = serializedObject.FindProperty("_isSelected");
+      _canHoverProp = serializedObject.FindProperty("_canHover");
+      _isHoveredProp = serializedObject.FindProperty("_isHovered");
+      //selection properties
+      _selectionTriggerProp = serializedObject.FindProperty("SelectionTriggers");
+      _accuracyProp = serializedObject.FindProperty("Accuracy");
+      _maxOffsetProp = serializedObject.FindProperty("MaxOffset");
+      //hovering properties
+      _hoverThresholdProp = serializedObject.FindProperty("HoverThreshold");
+
+      // Initialize help icons
+      InitializeHelpIcons();
 
       // Register gizmo settings with the drawer
       RegisterGizmoSettings();
@@ -61,6 +102,37 @@ namespace GMTK {
       // Unregister gizmo settings when editor is disabled
       if (_element != null) {
         PlayableElementOccupancyGizmo.UnregisterGizmoSettings(_element);
+      }
+    }
+
+    private static void InitializeHelpIcons() {
+      if (_helpIconContent == null) {
+        // Try to get Unity's built-in help icon
+        _helpIconContent = EditorGUIUtility.IconContent("_Help");
+        if (_helpIconContent?.image == null) {
+          // Fallback to question mark text if icon is not available
+          _helpIconContent = new GUIContent("?", "Help");
+        }
+      }
+
+      if (_draggingHelpIcon == null) {
+        _draggingHelpIcon = new GUIContent(_helpIconContent.image,
+          "DraggingElementComponent provides drag behavior settings such as:\n" +
+          "• Drag threshold distance\n" +
+          "• Drag constraints (horizontal/vertical only)\n" +
+          "• Visual feedback during dragging\n" +
+          "• Snap-to-grid behavior\n" +
+          "• Event callbacks for drag start/end");
+      }
+
+      if (_physicsHelpIcon == null) {
+        _physicsHelpIcon = new GUIContent(_helpIconContent.image,
+          "PhysicsElementComponent provides physics-based rotation settings such as:\n" +
+          "• Custom rotation behavior overrides\n" +
+          "• Physics-based rotation constraints\n" +
+          "• Rotation damping and limits\n" +
+          "• Integration with Unity's physics system\n" +
+          "• Advanced rotation event handling");
       }
     }
 
@@ -82,10 +154,68 @@ namespace GMTK {
     public override void OnInspectorGUI() {
       serializedObject.Update();
 
+      /*
+       * TODO
+       * Model
+       * Occupancy
+       * Selection
+       * Dragging
+       * Movement (rotate, flip)
+       * Events
+      */
+      DrawCurrentStatesProperties();
+
       DrawModelAndOccupancyProperties();
+
+      DrawPointerProperties();
+
       DrawMovementProperties();
 
+      DrawUnityEvents();
+
       serializedObject.ApplyModifiedProperties();
+    }
+
+    private void DrawCurrentStatesProperties() {
+      EditorGUILayout.LabelField("Current State", EditorStyles.boldLabel);
+      if (Application.isPlaying) {
+        using (new EditorGUI.DisabledGroupScope(true)) {
+          EditorGUILayout.PropertyField(_isSelectedProp);
+          EditorGUILayout.PropertyField(_isHoveredProp);
+          EditorGUILayout.PropertyField(_isDraggingProp);
+        }
+      }
+      EditorGUILayout.Space();
+    }
+
+    private void DrawPointerProperties() {
+      //selection
+      EditorGUILayout.LabelField("Pointer Settings", EditorStyles.boldLabel);
+      EditorGUILayout.Space();
+      using (new EditorGUI.IndentLevelScope()) {
+        EditorGUILayout.PropertyField(_canSelectProp);
+        EditorGUILayout.PropertyField(_selectionTriggerProp);
+        EditorGUILayout.PropertyField(_accuracyProp);
+        EditorGUILayout.PropertyField(_maxOffsetProp);
+        EditorGUILayout.Space();
+        using (new EditorGUI.DisabledGroupScope(true)) {
+          EditorGUILayout.PropertyField(_canHoverProp);
+        }
+        EditorGUILayout.PropertyField(_hoverThresholdProp);
+      }
+      EditorGUILayout.Space();
+    }
+
+    private void DrawUnityEvents() {
+      EditorGUILayout.LabelField("UnityEvents", EditorStyles.boldLabel);
+      EditorGUILayout.Space();
+      EditorGUILayout.HelpBox("UnityEvents to add additional behaviors to PlayableElements. PlayableElementComponent-derived components attached to the same GameObject subscribe to this events automatically", MessageType.Info);
+      EditorGUILayout.Space();
+
+      using (new EditorGUI.IndentLevelScope()) {
+        DrawPropertiesExcluding(serializedObject, "Script", "HighlightModel", "SnapTransform", "Model", "Draggable", "_canRotate", "_canSelect", "Flippable", "OccupiedCells", "_isHovered", "_canHover", "_isSelected", "_isDragging", "SelectionTriggers", "Accuracy", "MaxOffset", "HoverThreshold");
+      }
+
     }
 
     private void DrawModelAndOccupancyProperties() {
@@ -115,61 +245,72 @@ namespace GMTK {
     }
 
     private void DrawMovementProperties() {
+      int maxWidth = 200;
       EditorGUILayout.LabelField("Movement", EditorStyles.boldLabel);
       using (new EditorGUI.IndentLevelScope()) {
-        EditorGUILayout.PropertyField(_flippableProp);
-        EditorGUILayout.Space();
+        using (new EditorGUILayout.VerticalScope()) {
 
-        EditorGUILayout.PropertyField(_draggableProp);
-        if (_draggableProp.boolValue) DrawDraggableProperties();
+          EditorGUILayout.PropertyField(_flippableProp);
+          EditorGUILayout.Space();
 
-        EditorGUILayout.PropertyField(_canRotateProp);
-        CheckRotationOverride();
+          using (new EditorGUILayout.HorizontalScope(GUILayout.MaxWidth(maxWidth))) {
+            EditorGUILayout.PropertyField(_draggableProp);
+            if (_draggableProp.boolValue) DrawDraggableProperties();
+          }
 
-        EditorGUILayout.PropertyField(_canSelectProp);
-
+          using (new EditorGUILayout.HorizontalScope(GUILayout.MaxWidth(maxWidth))) {
+            EditorGUILayout.PropertyField(_canRotateProp);
+            CheckRotationOverride();
+          }
+        }
       }
       EditorGUILayout.Space();
     }
 
     private void DrawDraggableProperties() {
-      using (new EditorGUI.IndentLevelScope()) {
-        if (_element.TryGetComponent<DraggingElementComponent>(out var draggingComponent)) {
-          EditorGUILayout.HelpBox("See DraggingElementComponent component for Dragging settings", MessageType.Info);
-          //link to component
-          if (GUILayout.Button("Go To Dragging Component", GUILayout.Width(250))) {
-            Selection.activeGameObject = draggingComponent.gameObject;
-          }
+      const int buttonWidth = 150;
+      const int helpButtonWidth = 20;
+
+      if (_element.TryGetComponent(out DraggingElementComponent draggingComponent)) {
+        //link to component
+        if (GUILayout.Button("Dragging Component", GUILayout.Width(buttonWidth))) {
+          Selection.activeGameObject = draggingComponent.gameObject;
         }
-        else {
-          EditorGUILayout.HelpBox("No DraggingElementComponent component found. Add one to configure dragging settings.", MessageType.Warning);
-          if (GUILayout.Button("Add DraggingElementComponent Component", GUILayout.Width(250))) {
-            _element.gameObject.AddComponent<DraggingElementComponent>();
-          }
+        if (GUILayout.Button(_draggingHelpIcon, HelpButtonStyle, GUILayout.Width(helpButtonWidth), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
+          EditorUtility.DisplayDialog("Dragging Component Help", _draggingHelpIcon.tooltip, "OK");
+        }
+      }
+      else {
+        //EditorGUILayout.HelpBox("No DraggingElementComponent component found. Add one to configure dragging settings.", MessageType.Warning);
+        if (GUILayout.Button("Add Dragging Component", GUILayout.Width(buttonWidth))) {
+          draggingComponent = _element.gameObject.AddComponent<DraggingElementComponent>();
+          Debug.Log($"Added DraggingElementComponent ({draggingComponent.name}) to {_element.name}");
+        }
+        if (GUILayout.Button(_draggingHelpIcon, HelpButtonStyle, GUILayout.Width(helpButtonWidth), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
+          EditorUtility.DisplayDialog("Add Dragging Component Help", _draggingHelpIcon.tooltip, "OK");
         }
       }
       EditorGUILayout.Space();
     }
 
     private void CheckRotationOverride() {
-      using (new EditorGUI.IndentLevelScope()) {
-        PhysicsElementComponent physicsComponent = _element.GetComponent<PhysicsElementComponent>();
-        bool hasRotationOverride = physicsComponent != null && physicsComponent.ChangeRotationOnCollision;
-        // Show info message if rotation is overridden
-        string helpBoxMessage = hasRotationOverride ?
-            "Rotation is managed by the PhysicsElementComponent." :
-            "Rotation is not managed by the PhysicsElementComponent.";
-        EditorGUILayout.HelpBox(helpBoxMessage, MessageType.Info);
+      const int buttonWidth = 150;
 
-        if (physicsComponent != null) {
-          if (GUILayout.Button("Go To Physics Component", GUILayout.Width(250))) {
-            Selection.activeGameObject = physicsComponent.gameObject;
-          }
+      if (_element.TryGetComponent(out PhysicsElementComponent physicsComponent)) {
+        if (GUILayout.Button("Physics Component", GUILayout.Width(buttonWidth))) {
+          Selection.activeGameObject = physicsComponent.gameObject;
         }
-        else {
-          if (GUILayout.Button("Add PhysicsElementComponent", GUILayout.Width(250))) {
-            _element.gameObject.AddComponent<PhysicsElementComponent>();
-          }
+        if (GUILayout.Button(_physicsHelpIcon, HelpButtonStyle, GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
+          EditorUtility.DisplayDialog("Physics Component Help", _physicsHelpIcon.tooltip, "OK");
+        }
+      }
+      else {
+        if (GUILayout.Button("Add Physics Component", GUILayout.Width(buttonWidth))) {
+          physicsComponent = _element.gameObject.AddComponent<PhysicsElementComponent>();
+          Debug.Log($"Added PhysicsElementComponent ({physicsComponent.name}) to {_element.name}");
+        }
+        if (GUILayout.Button(_physicsHelpIcon, HelpButtonStyle, GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
+          EditorUtility.DisplayDialog("Add Physics Component Help", _physicsHelpIcon.tooltip, "OK");
         }
       }
     }

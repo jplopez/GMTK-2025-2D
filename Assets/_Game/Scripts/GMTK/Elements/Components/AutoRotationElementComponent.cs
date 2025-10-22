@@ -204,23 +204,6 @@ namespace GMTK {
       EnableAutoRotation = false;
     }
 
-    // Legacy compatibility handlers
-    protected override void HandleElementSelected(GridSnappableEventArgs evt) {
-      // Handle legacy selection events for compatibility
-    }
-
-    protected override void HandleElementDropped(GridSnappableEventArgs evt) {
-      // Handle legacy drop events for compatibility
-    }
-
-    protected override void HandleElementHovered(GridSnappableEventArgs evt) {
-      // Handle legacy hover events for compatibility
-    }
-
-    protected override void HandleElementUnhovered(GridSnappableEventArgs evt) {
-      // Handle legacy unhover events for compatibility
-    }
-
     // Gizmos for debugging auto rotation
     void OnDrawGizmosSelected() {
       if (_playableElement == null || !EnableAutoRotation) return;

@@ -338,33 +338,6 @@ namespace GMTK {
 
     #endregion
 
-    #region Event Handlers (PlayableElementComponent)
-
-    protected override void HandleElementDropped(GridSnappableEventArgs evt) {
-      // Reset acceleration timers when element is moved
-      if (evt.Element != null && evt.Element.gameObject == _playableElement.gameObject) {
-        _accelerationTimers.Clear();
-        this.LogDebug("Element dropped - reset acceleration timers");
-      }
-    }
-
-    protected override void HandleElementHovered(GridSnappableEventArgs evt) {
-      // Could add hover effects showing magnetic field
-    }
-
-    protected override void HandleElementSelected(GridSnappableEventArgs evt) {
-      // Could pause magnetic effects while being dragged
-      if (evt.Element != null && evt.Element.gameObject == _playableElement.gameObject) {
-        this.LogDebug("Magnetic element selected");
-      }
-    }
-
-    protected override void HandleElementUnhovered(GridSnappableEventArgs evt) {
-      // Remove hover effects
-    }
-
-    #endregion
-
     #region Public API
 
     /// <summary>

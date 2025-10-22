@@ -9,11 +9,13 @@ namespace GMTK {
   /// </summary>
   public partial class PlayableElement : IDraggable {
 
+    [Tooltip("If true, this element is currently being dragged by a pointer")]
+    [SerializeField] protected bool _isDragging = false;
+
     // IDraggable interface properties
     public bool IsDraggable => Draggable;
-
-    [Header("Dragging Debug")]
-    [DisplayWithoutEdit] public bool IsBeingDragged { get; private set; }
+    public bool IsBeingDragged { get => _isDragging; private set => _isDragging = value; }
+    
     [DisplayWithoutEdit] public bool IsActive { get; set; }
 
     public Transform DragTransform => SnapTransform != null ? SnapTransform : transform;
@@ -21,32 +23,35 @@ namespace GMTK {
 
     #region IDraggable Implementation
 
-
-
     public virtual void OnDragStart() {
       IsBeingDragged = true;
+      RaiseGameEvent(GameEventType.ElementDragStart, PlayableElementEventType.DragStart);
       RaisePlayableElementEvent(PlayableElementEventType.DragStart);
     }
 
     public virtual void OnDragUpdate(Vector3 worldPosition) {
       if (IsBeingDragged) {
         UpdatePosition(worldPosition);
-        RaisePlayableElementEvent(PlayableElementEventType.DragUpdate, worldPosition);
+        RaiseGameEvent(GameEventType.ElementDragging, PlayableElementEventType.DragUpdate);
+        RaisePlayableElementEvent(PlayableElementEventType.DragUpdate);
       }
     }
 
     public virtual void OnDragEnd() {
       IsBeingDragged = false;
+      RaiseGameEvent(GameEventType.ElementDropped, PlayableElementEventType.DragEnd);
       RaisePlayableElementEvent(PlayableElementEventType.DragEnd);
     }
 
     public virtual void OnBecomeActive() {
       IsActive = true;
+      RaiseGameEvent(GameEventType.ElementSetActive, PlayableElementEventType.BecomeActive);
       RaisePlayableElementEvent(PlayableElementEventType.BecomeActive);
     }
 
     public virtual void OnBecomeInactive() {
       IsActive = false;
+      RaiseGameEvent(GameEventType.ElementSetInactive, PlayableElementEventType.BecomeInactive);
       RaisePlayableElementEvent(PlayableElementEventType.BecomeInactive);
     }
 

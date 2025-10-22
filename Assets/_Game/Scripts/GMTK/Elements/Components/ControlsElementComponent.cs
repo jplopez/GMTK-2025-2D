@@ -29,7 +29,7 @@ namespace GMTK {
 
     protected override bool Validate() => ControlsPrefab != null;
 
-    public void OnSelected(PlayableElementEventArgs evt) {
+    public override void OnSelected(PlayableElementEventArgs evt) {
       if (evt.Element == _playableElement && ControlsPrefab != null) {
         if (_controls == null) {
           _controls = Instantiate(ControlsPrefab, _playableElement.transform);
@@ -40,7 +40,7 @@ namespace GMTK {
       }
     }
 
-    public void OnDeselected(PlayableElementEventArgs evt) {
+    public override void OnDeselected(PlayableElementEventArgs evt) {
       if (evt.Element == _playableElement && _controls != null) {
         _controls.SetActive(false);
         _inUse = false;
@@ -53,11 +53,6 @@ namespace GMTK {
         _controls.transform.position = (Vector2)_playableElement.transform.position + PrefabOffset;
       }
     }
-
-    protected override void HandleElementDropped(GridSnappableEventArgs evt) { }
-    protected override void HandleElementHovered(GridSnappableEventArgs evt) { }
-    protected override void HandleElementSelected(GridSnappableEventArgs evt) { }
-    protected override void HandleElementUnhovered(GridSnappableEventArgs evt) { }
 
   }
 }

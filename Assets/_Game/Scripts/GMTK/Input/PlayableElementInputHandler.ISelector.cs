@@ -1,12 +1,11 @@
 using Ameba;
-using Unity.Android.Gradle;
 using UnityEngine;
 
 namespace GMTK {
 
   /// <summary>
-  /// PlayableElementInputHandler partial class implementing ISelector interface functionality.
-  /// Handles selection logic and element selection state management.
+  /// ISelector interface implementation designed to handle Input Events related to selecting PlayableElement.
+  /// Handles OnElementSelected and deselection input events.
   /// </summary>
   public partial class PlayableElementInputHandler : ISelector<PlayableElement> {
 
@@ -30,13 +29,16 @@ namespace GMTK {
       if (!CanSelect) return false;
 
       // Find element at world position using raycast
-      Vector2 worldPos2D = new Vector2(worldPosition.x, worldPosition.y);
+      Vector2 worldPos2D = new(worldPosition.x, worldPosition.y);
       RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
 
       if (hit && hit.collider != null) {
         if (hit.collider.gameObject.TryGetComponent(out PlayableElement foundElement)) {
-          element = foundElement;
-          return TrySelect(foundElement);
+          //validates click using the element accuracy parameters
+          if (IsValidClickPosition(element, worldPosition)) {
+            element = foundElement;
+            return TrySelect(foundElement);
+          }
         }
       }
 
@@ -60,38 +62,23 @@ namespace GMTK {
     }
 
     public bool TrySelect(PlayableElement element) {
-      if (!CanSelect || element == null) return false;
+      if (!CanSelect || element == null || !element.CanSelect) return false;
       this.LogDebug($"Attempting to select element: {element.name} CanSelect: {element.CanSelect}");
       this.LogDebug($"IsSelecting: {IsSelecting} CanSelect {CanSelect}");
+      this.LogDebug("_selectedElement: " + ((_selectedElement == null) ? "null" : _selectedElement.name));
 
-      if (_selectedElement != null)
-        this.LogDebug($"_selectedElement: {_selectedElement.name}");
-      else this.LogDebug($"_selectedElement: null");
-
-      // Check if element can be selected
-      if (!element.CanSelect) return false;
-
-      // If we already have a selected element, deselect it first
+      // deselect current if different than new
       if (_selectedElement != null && _selectedElement != element) {
         this.LogDebug($"Deselecting current element");
         DeselectCurrentElement();
       }
 
-      // if selected is null (first time) or different from the new element, select it
-      if (_selectedElement == null || _selectedElement != element) {
-        _selectedElement = element;
+      this.LogDebug($"Marking element: {element.name}");
+      element.MarkSelected(true);
+      _selectedElement = element;
 
-        this.LogDebug($"Marking element: {element.name}");
-        element.MarkSelected(true);
-
-        // Trigger selection events
-        _eventsChannel.Raise(GameEventType.ElementSelected,
-            new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
-        this.LogDebug($"Selected element: {element.name}");
-        return true;
-      }
-
-      return false;
+      this.LogDebug($"Selected element: {element.name}");
+      return true;
     }
 
     public bool TryDeselect() {
@@ -106,39 +93,33 @@ namespace GMTK {
         _selectedElement = null;
         elementToDeselect.MarkSelected(false);
 
-        //legacy event for GridSnappable
-        _eventsChannel.Raise(GameEventType.ElementDeselected,
-            new GridSnappableEventArgs(ConvertToGridSnappable(elementToDeselect), _pointerScreenPos, _pointerWorldPos));
-
         this.LogDebug($"Deselected element: {elementToDeselect.name}");
       }
     }
 
-    #endregion
+    private bool IsValidClickPosition(PlayableElement elem, Vector3 worldPosition) {
+      if (elem.InteractionCollider == null) return true;
 
-    #region Public Selection API
+      // Calculate effective offset based on accuracy
+      float effectiveOffset = elem.MaxOffset * (1f - elem.Accuracy);
 
-    /// <summary>
-    /// Programmatically select an element
-    /// </summary>
-    public bool SelectElement(PlayableElement element) {
-      return TrySelect(element);
-    }
+      // Check if position is within collider bounds
+      bool withinCollider = elem.InteractionCollider.bounds.Contains(worldPosition);
 
-    /// <summary>
-    /// Programmatically deselect the current element
-    /// </summary>
-    public void DeselectElement() {
-      DeselectCurrentElement();
-    }
+      // Always valid if within collider
+      if (withinCollider) return true;
 
-    /// <summary>
-    /// Check if an element is currently selected
-    /// </summary>
-    public bool IsElementSelected(PlayableElement element) {
-      return _selectedElement == element;
+      // Strict accuracy, must be within collider
+      if (effectiveOffset <= 0f) return false;
+
+      // Check if within offset distance
+      Vector3 closestPoint = elem.InteractionCollider.ClosestPoint(worldPosition);
+      float distance = Vector3.Distance(worldPosition, closestPoint);
+
+      return distance <= effectiveOffset;
     }
 
     #endregion
+
   }
 }

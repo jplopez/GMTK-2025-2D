@@ -163,7 +163,7 @@ namespace GMTK {
         this.Log("LevelPlay event raised");
       }
       else {
-        this.LogError("EventsChannel is null - cannot raise LevelPlay");
+        this.LogError("_eventChannel is null - cannot raise LevelPlay");
       }
     }
 
@@ -174,7 +174,7 @@ namespace GMTK {
         this.Log("LevelReset event raised");
       }
       else {
-        this.LogError("EventsChannel is null - cannot raise LevelReset");
+        this.LogError("_eventChannel is null - cannot raise LevelReset");
       }
     }
 

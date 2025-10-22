@@ -2075,7 +2075,7 @@ PrefabInstance:
     - target: {fileID: 7279300561277649045, guid: eafcce31942a70742be26b1dcc1024fe, type: 3}
       propertyPath: _inputHandler
       value: 
-      objectReference: {fileID: 1122994608}
+      objectReference: {fileID: 1003061420}
     - target: {fileID: 7279300561277649045, guid: eafcce31942a70742be26b1dcc1024fe, type: 3}
       propertyPath: _spriteOffset.x
       value: 0
@@ -2089,12 +2089,20 @@ PrefabInstance:
       value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 7279300561277649045, guid: eafcce31942a70742be26b1dcc1024fe, type: 3}
+      propertyPath: enableDebugWindow
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7279300561277649045, guid: eafcce31942a70742be26b1dcc1024fe, type: 3}
       propertyPath: occupancyOffset.x
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7279300561277649045, guid: eafcce31942a70742be26b1dcc1024fe, type: 3}
       propertyPath: occupancyOffset.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7279300561277649045, guid: eafcce31942a70742be26b1dcc1024fe, type: 3}
+      propertyPath: useGridValuesForGizmo
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7647606430595874830, guid: eafcce31942a70742be26b1dcc1024fe, type: 3}
       propertyPath: m_Name
@@ -2158,6 +2166,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6da43522623d4704e979466dc7650b65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1003061415 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8591980362614832061, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
+  m_PrefabInstance: {fileID: 1122994606}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1003061419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1003061415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f423f664d86fe3c44b7368989a9b12bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _eventChannel: {fileID: 11400000, guid: 95a9f7bb01a666548ba38fda71806925, type: 2}
+  _pointerScreenPosition: {x: 0, y: 0}
+  _pointerWorldPoition: {x: 0, y: 0, z: 0}
+  PointerMoveThreshold: 0.1
+  PointerEventFrequency: 0.02
+--- !u!114 &1003061420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1003061415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 033d703a44b5db749a6387d1d1fdec66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enableInput: 1
+  _debugLogging: 0
+  _currentElement: {fileID: 0}
+  _lastElementOver: {fileID: 0}
+  _pointerScreenPos: {x: 0, y: 0}
+  _pointerWorldPos: {x: 0, y: 0, z: 0}
+  _canDrag: 1
+  _draggedElement: {fileID: 0}
+  _canHover: 1
+  _hoveredElement: {fileID: 0}
+  _canSelect: 1
+  _selectedElement: {fileID: 0}
 --- !u!1001 &1062701601
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3203,26 +3257,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8922303786927127830, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8591980362614832061, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1003061420}
+    - targetCorrespondingSourceObject: {fileID: 8591980362614832061, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1003061419}
   m_SourcePrefab: {fileID: 100100000, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
 --- !u!20 &1122994607 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 324727064011554559, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
   m_PrefabInstance: {fileID: 1122994606}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1122994608 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9039005500664263651, guid: 1143356df3df7a144941ae1924aa8ade, type: 3}
-  m_PrefabInstance: {fileID: 1122994606}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 033d703a44b5db749a6387d1d1fdec66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1179587949 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8640411528628209826, guid: 6911c55dddfc8514ab41980735d72fe8, type: 3}
@@ -3979,7 +4029,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7956316667899920837, guid: e7880ef4935c18c449f85384848dc52a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6.8999996
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 7956316667899920837, guid: e7880ef4935c18c449f85384848dc52a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -8371,7 +8421,7 @@ PrefabInstance:
     - target: {fileID: 704296872338430122, guid: 7e726a39a1a069045b11e170c03e6f16, type: 3}
       propertyPath: snappableInput
       value: 
-      objectReference: {fileID: 1122994608}
+      objectReference: {fileID: 0}
     - target: {fileID: 785825614823988690, guid: 7e726a39a1a069045b11e170c03e6f16, type: 3}
       propertyPath: marble
       value: 

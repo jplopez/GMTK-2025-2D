@@ -50,12 +50,12 @@ namespace Ameba {
     /// <summary>
     /// Called when the pointer enters the object (hover start).
     /// </summary>
-    void OnPointerEnter();
+    void OnPointerOver();
 
     /// <summary>
     /// Called when the pointer exits the object (hover end).
     /// </summary>
-    void OnPointerExit();
+    void OnPointerOut();
 
     /// <summary>
     /// Called when the object becomes active/selected.

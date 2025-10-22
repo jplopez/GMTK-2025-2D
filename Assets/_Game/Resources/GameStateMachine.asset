@@ -50,4 +50,4 @@ MonoBehaviour:
     TargetState: 6
   HistoryLength: 3
   _internalEventChannel: {fileID: 0}
-  EnableDebugLogging: 1
+  EnableDebugLogging: 0

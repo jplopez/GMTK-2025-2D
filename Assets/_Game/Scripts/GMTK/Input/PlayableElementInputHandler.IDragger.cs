@@ -4,8 +4,12 @@ using UnityEngine;
 namespace GMTK {
 
   /// <summary>
-  /// PlayableElementInputHandler partial class implementing IDragger interface functionality.
-  /// Handles dragging logic and element movement.
+  /// IDragger interface implementation designed to handle Input Events related to dragging PlayableElement.
+  /// Is used to handle the changes of the dragging state of PlayableElement:
+  /// <list type="bullet">
+  ///   <item><b>PrimaryButtonDown</b>: Pointer is acting on an element (click or touch)</item>
+  ///   <item><b>PrimaryButtonUp</b>: Pointer stops acting on an element (click release or stop touch)</item>
+  /// </list>
   /// </summary>
   public partial class PlayableElementInputHandler : IDragger<PlayableElement> {
 
@@ -46,10 +50,6 @@ namespace GMTK {
       // Notify the element
       element.OnDragStart();
 
-      // Trigger events
-      _eventsChannel.Raise(GameEventType.ElementSelected,
-          new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
-
       this.LogDebug($"Started dragging element: {element.name}");
       return true;
     }
@@ -60,7 +60,7 @@ namespace GMTK {
       if (!CanDrag) return false;
 
       // Find element at world position
-      Vector2 worldPos2D = new Vector2(worldPosition.x, worldPosition.y);
+      Vector2 worldPos2D = new(worldPosition.x, worldPosition.y);
       RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
 
       if (hit && hit.collider != null) {
@@ -113,10 +113,6 @@ namespace GMTK {
 
       // Notify the element
       elementToStop.OnDragEnd();
-
-      // Trigger events
-      _eventsChannel.Raise(GameEventType.ElementDropped,
-          new GridSnappableEventArgs(ConvertToGridSnappable(elementToStop), _pointerScreenPos, _pointerWorldPos));
 
       this.LogDebug($"Stopped dragging element: {elementToStop.name}");
       return true;

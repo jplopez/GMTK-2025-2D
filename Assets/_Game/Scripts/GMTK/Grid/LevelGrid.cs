@@ -1,4 +1,4 @@
-using Ameba;
+﻿using Ameba;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,6 @@ using UnityEngine;
 namespace GMTK {
 
   public enum GridOriginSources { GameObject, Custom }
-
 
   public class LevelGrid : MonoBehaviour {
 
@@ -58,6 +57,16 @@ namespace GMTK {
     [SerializeField] private float gizmoSize = 0.9f;
     [SerializeField] private Vector2 occupancyOffset = new(0, 0);
 
+    [Header("Debug Window")]
+    [SerializeField] private bool enableDebugWindow = true;
+    [SerializeField] private bool showDebugWindowInGame = false;
+    [SerializeField] private Vector2 debugWindowPosition = new(10, 10);
+    [SerializeField] private float debugWindowWidth = 400f;
+    [SerializeField] private int debugWindowMaxElements = 20;
+    [SerializeField] private Color debugWindowBackgroundColor = new(0.1f, 0.1f, 0.1f, 0.8f);
+    [SerializeField] private Color debugWindowTextColor = Color.white;
+    [SerializeField] private Color debugWindowHeaderColor = Color.cyan;
+
     public Vector2 GridOrigin => _gridOrigin;
 
     private bool _isInitialized = false;
@@ -70,6 +79,12 @@ namespace GMTK {
     protected bool _isTrackingMovement;
 
     protected GameEventChannel _eventsChannel;
+
+    // Debug window GUI styles
+    private GUIStyle _debugWindowStyle;
+    private GUIStyle _debugHeaderStyle;
+    private GUIStyle _debugTextStyle;
+    private bool _debugStylesInitialized = false;
 
     const string TOP_BOUND_TAG = "TopBound";
     const string BOTTOM_BOUND_TAG = "BottomBound";
@@ -100,6 +115,15 @@ namespace GMTK {
     private void Update() {
       TrackElementMovement();
     }
+
+#if UNITY_EDITOR
+    private void OnGUI() {
+      if (enableDebugWindow && (Application.isEditor || showDebugWindowInGame)) {
+        InitializeDebugWindowStyles();
+        DrawDebugWindow();
+      }
+    }
+#endif
 
     #endregion
 
@@ -230,13 +254,6 @@ namespace GMTK {
 
     private void AddInputListeners() {
       if (_eventsChannel == null) return;
-      
-      // Change from EventArgs to specific types
-      //_eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
-      //_eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
-      //_eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
-      //_eventsChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
-
       _eventsChannel.AddListener<PlayableElementEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
       _eventsChannel.AddListener<PlayableElementEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
       _eventsChannel.AddListener<PlayableElementEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
@@ -245,12 +262,6 @@ namespace GMTK {
 
     private void RemoveInputListeners() {
       if (_eventsChannel == null) return;
-      
-      //_eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
-      //_eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
-      //_eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
-      //_eventsChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleElementUnhovered);
-
       _eventsChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.ElementSelected, HandleElementSelected);
       _eventsChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.ElementDropped, HandleElementDropped);
       _eventsChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.ElementHovered, HandleElementHovered);
@@ -301,19 +312,19 @@ namespace GMTK {
         this.Log($"Started tracking '{element.name}' - was not in grid");
       }
 
-      // Notify _dragFeedbackComponent to start visual feedback
-      if (element.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
-        dragFeedback.StartDragFeedback();
-      }
+      //// Notify _dragFeedbackComponent to start visual feedback
+      //if (element.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
+      //  dragFeedback.StartDragFeedback();
+      //}
     }
 
     private void StopTrackingCurrentSelected() {
       // Notify _dragFeedbackComponent to stop visual feedback
-      if (_currentSelected != null) {
-        if (_currentSelected.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
-          dragFeedback.StopDragFeedback();
-        }
-      }
+      //if (_currentSelected != null) {
+      //  if (_currentSelected.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
+      //    dragFeedback.StopDragFeedback();
+      //  }
+      //}
       _currentSelected = null;
       _isTrackingMovement = false;
       _elementWasInGrid = false;
@@ -411,14 +422,6 @@ namespace GMTK {
     }
     public bool IsOccupied(Vector2 position) => _occupancyMap.HasAnyOccupantsInWorldPosition(position);
 
-    public virtual bool CanPlace(GridSnappable snappable, Vector2Int gridOrigin) {
-      if (!_isInitialized) return false;
-      foreach (var cell in snappable.GetWorldOccupiedCells(gridOrigin)) {
-        if (_occupancyMap.HasAnyOccupantsInWorldPosition(cell)) return false;
-      }
-      return true;
-    }
-
     public virtual bool CanPlace(PlayableElement element, Vector2Int gridOrigin) {
       if (!_isInitialized) return false;
       foreach (var cell in element.GetWorldOccupiedCells(gridOrigin)) {
@@ -462,6 +465,134 @@ namespace GMTK {
       int y = Mathf.RoundToInt((position.y - _gridOrigin.y) / CellSize);
       return new Vector2Int(x, y);
     }
+    #endregion
+
+    #region Debug Window
+
+#if UNITY_EDITOR
+    private void InitializeDebugWindowStyles() {
+      if (_debugStylesInitialized) return;
+
+      _debugWindowStyle = new GUIStyle(GUI.skin.box) {
+        normal = { background = MakeTex(2, 2, debugWindowBackgroundColor) },
+        padding = new RectOffset(10, 10, 10, 10)
+      };
+
+      _debugHeaderStyle = new GUIStyle(GUI.skin.label) {
+        fontStyle = FontStyle.Bold,
+        fontSize = 14,
+        normal = { textColor = debugWindowHeaderColor },
+        alignment = TextAnchor.MiddleLeft
+      };
+
+      _debugTextStyle = new GUIStyle(GUI.skin.label) {
+        fontSize = 12,
+        normal = { textColor = debugWindowTextColor },
+        alignment = TextAnchor.MiddleLeft,
+        wordWrap = false
+      };
+
+      _debugStylesInitialized = true;
+    }
+
+    private void DrawDebugWindow() {
+      if (!_isInitialized || _occupancyMap == null) return;
+
+      // Calculate window height based on content
+      var registeredElements = GetRegisteredElements();
+      int displayCount = Mathf.Min(registeredElements.Count, debugWindowMaxElements);
+      float windowHeight = 120f + (displayCount * 20f) + (registeredElements.Count > debugWindowMaxElements ? 20f : 0f);
+
+      Rect windowRect = new Rect(
+        debugWindowPosition.x,
+        debugWindowPosition.y,
+        debugWindowWidth,
+        windowHeight
+      );
+
+      GUI.Box(windowRect, "", _debugWindowStyle);
+
+      GUILayout.BeginArea(new Rect(windowRect.x + 10, windowRect.y + 10, windowRect.width - 20, windowRect.height - 20));
+
+      // Header
+      GUILayout.Label("LevelGrid Debug Info", _debugHeaderStyle);
+      GUILayout.Space(5);
+
+      // Grid info
+      GUILayout.Label($"Grid Size: {GridSize.x} × {GridSize.y}", _debugTextStyle);
+      GUILayout.Label($"Cell Size: {CellSize:F1}", _debugTextStyle);
+      GUILayout.Label($"Grid Origin: ({_gridOrigin.x:F1}, {_gridOrigin.y:F1})", _debugTextStyle);
+      GUILayout.Label($"Total Registered Elements: {_occupancyMap.OccupantsCount}", _debugTextStyle);
+
+      if (_currentSelected != null) {
+        GUILayout.Label($"Currently Tracking: {_currentSelected.name}", _debugTextStyle);
+      }
+
+      GUILayout.Space(10);
+      GUILayout.Label("Registered PlayableElements:", _debugHeaderStyle);
+      GUILayout.Space(5);
+
+      // Show registered elements
+      if (registeredElements.Count == 0) {
+        GUILayout.Label("No elements registered", _debugTextStyle);
+      }
+      else {
+        for (int i = 0; i < displayCount; i++) {
+          var kvp = registeredElements[i];
+          Vector2Int cell = kvp.Key;
+          var elements = kvp.Value;
+
+          string elementNames = string.Join(", ", elements.Select(e => e.name));
+          Vector2 worldPos = GridToWorld(cell);
+          
+          GUILayout.Label($"Cell ({cell.x:+00;-00}, {cell.y:+00;-00}) → World ({worldPos.x:F1}, {worldPos.y:F1}): {elementNames}", _debugTextStyle);
+        }
+
+        if (registeredElements.Count > debugWindowMaxElements) {
+          GUILayout.Label($"... and {registeredElements.Count - debugWindowMaxElements} more elements", _debugTextStyle);
+        }
+      }
+
+      GUILayout.EndArea();
+    }
+
+    private List<KeyValuePair<Vector2Int, List<PlayableElement>>> GetRegisteredElements() {
+      var result = new List<KeyValuePair<Vector2Int, List<PlayableElement>>>();
+      
+      if (_occupancyMap?.GetAllCells() == null) return result;
+
+      foreach (var kvp in _occupancyMap.GetAllCells()) {
+        var cell = kvp.Key;
+        var occupancyCell = kvp.Value;
+        
+        if (occupancyCell.HasAnyOccupant) {
+          var elements = occupancyCell.GetOccupants().ToList();
+          result.Add(new KeyValuePair<Vector2Int, List<PlayableElement>>(cell, elements));
+        }
+      }
+
+      // Sort by grid coordinates for consistent display
+      result.Sort((a, b) => {
+        int yCompare = b.Key.y.CompareTo(a.Key.y); // Sort by Y descending (top to bottom)
+        return yCompare != 0 ? yCompare : a.Key.x.CompareTo(b.Key.x); // Then by X ascending (left to right)
+      });
+
+      return result;
+    }
+
+    private Texture2D MakeTex(int width, int height, Color col) {
+      Color[] pix = new Color[width * height];
+      for (int i = 0; i < pix.Length; i++) {
+        pix[i] = col;
+      }
+      
+      Texture2D result = new Texture2D(width, height);
+      result.SetPixels(pix);
+      result.Apply();
+      return result;
+    }
+#endif
+
     #endregion
 
     #region Gizmos
@@ -513,7 +644,6 @@ namespace GMTK {
 #endif
       }
     }
-
 
 
 

@@ -121,23 +121,6 @@ namespace GMTK {
       }
     }
 
-    // Legacy compatibility handlers
-    protected override void HandleElementSelected(GridSnappableEventArgs evt) {
-      // No special handling needed for gravity during selection
-    }
-
-    protected override void HandleElementDropped(GridSnappableEventArgs evt) {
-      // No special handling needed for gravity during drop
-    }
-
-    protected override void HandleElementHovered(GridSnappableEventArgs evt) {
-      // No special handling needed for gravity during hover
-    }
-
-    protected override void HandleElementUnhovered(GridSnappableEventArgs evt) {
-      // No special handling needed for gravity during unhover
-    }
-
     // Gizmos for debugging gravity
     void OnDrawGizmosSelected() {
       if (_playableElement == null || !HasGravity) return;

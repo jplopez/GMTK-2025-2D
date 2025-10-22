@@ -4,8 +4,8 @@ using UnityEngine;
 namespace GMTK {
 
   /// <summary>
-  /// PlayableElementInputHandler partial class implementing IHover interface functionality.
-  /// Handles hover detection and hover state management.
+  /// IHover interface implementation designed to handle Input Events related to hovering over PlayableElement.
+  /// Handles input events for OnElementHovered, OnElementUnhovered
   /// </summary>
   public partial class PlayableElementInputHandler : IHover<PlayableElement> {
 
@@ -29,7 +29,7 @@ namespace GMTK {
       if (!CanHover) return false;
 
       // Find hoverable element at world position
-      Vector2 worldPos2D = new Vector2(worldPosition.x, worldPosition.y);
+      Vector2 worldPos2D = new(worldPosition.x, worldPosition.y);
       RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
 
       if (hit && hit.collider != null) {
@@ -80,10 +80,6 @@ namespace GMTK {
       // Notify the element
       element.MarkHovered(true);
 
-      // Trigger events
-      _eventsChannel.Raise(GameEventType.ElementHovered,
-          new GridSnappableEventArgs(ConvertToGridSnappable(element), _pointerScreenPos, _pointerWorldPos));
-
       this.LogDebug($"Started hovering over element: {element.name}");
     }
 
@@ -101,10 +97,6 @@ namespace GMTK {
 
       // Notify the element
       elementToStop.MarkHovered(false);
-
-      // Trigger events
-      _eventsChannel.Raise(GameEventType.ElementUnhovered,
-          new GridSnappableEventArgs(ConvertToGridSnappable(elementToStop), _pointerScreenPos, _pointerWorldPos));
 
       this.LogDebug($"Stopped hovering over element: {elementToStop.name}");
     }
@@ -131,41 +123,6 @@ namespace GMTK {
           StopHover();
         }
       }
-    }
-
-    #endregion
-
-    #region Legacy Hover Detection Method
-
-    private void UpdateHoverDetection() {
-      // Legacy method maintained for compatibility
-      // Now delegates to the new UpdateHover method
-      UpdateHover();
-    }
-
-    #endregion
-
-    #region Public Hover API
-
-    /// <summary>
-    /// Check if an element is currently hovered
-    /// </summary>
-    public bool IsElementHovered(PlayableElement element) {
-      return _hoveredElement == element;
-    }
-
-    /// <summary>
-    /// Programmatically start hovering over an element
-    /// </summary>
-    public void StartHoverElement(PlayableElement element) {
-      StartHover(element);
-    }
-
-    /// <summary>
-    /// Programmatically stop hovering
-    /// </summary>
-    public void StopHoverElement() {
-      StopHover();
     }
 
     #endregion

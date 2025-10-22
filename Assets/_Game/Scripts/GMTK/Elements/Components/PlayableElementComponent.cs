@@ -22,12 +22,44 @@ namespace GMTK {
     [Tooltip("Delay in seconds before executing the OnDelayedUpdateRun logic")]
     public float InitialDelay = 0.1f;
 
+    [Header("Exclude Events")]
+
+    [Tooltip("Excludes BeforeInitialize and AfterInitialize")]
+    public bool ExcludeInitializeEvents = false;
+    [Tooltip("Excludes OnSelected and OnDeselected")]
+    public bool ExcludeSelectionEvents = false;
+    [Tooltip("Excludes OnHovered and OnUnhovered")]
+    public bool ExcludeHoverEvents = false;
+    [Tooltip("Excludes BeforeDragStart and AfterDragStart")]
+    public bool ExcludeDragStartEvents = false;
+    [Tooltip("Excludes DuringDragging")]
+    public bool ExcludeDuringDraggingEvents = false;
+    [Tooltip("Excludes BeforeDragEnd and AfterDragEnd")]
+    public bool ExcludeDragEndEvents = false;
+    [Tooltip("Excludes BeforeInput and AfterInput")]
+    public bool ExcludeInputControlsEvents = false;
+
+    [Header("Inner Events")]
+    [Tooltip("If true, this component will raise a PlayableElementInnerEvent after handling an event, relaying the same event args")]
+    public bool TriggersInnerEvent = false;
+
     protected PlayableElement _playableElement;
     protected LevelGrid _levelGrid;
     protected GameEventChannel _gameEventChannel;
 
     protected bool isInitialized = false;
     private Coroutine _delayedUpdateCoroutine;
+
+    public void ExcludeAllEvents(bool exclude = true) {
+      ExcludeInitializeEvents = exclude;
+      ExcludeSelectionEvents = exclude;
+      ExcludeHoverEvents = exclude;
+      ExcludeDragStartEvents = exclude;
+      ExcludeDuringDraggingEvents = exclude;
+      ExcludeDragEndEvents = exclude;
+      ExcludeInputControlsEvents = exclude;
+    }
+
 
     private void OnValidate() => InitDependencies();
 
@@ -37,15 +69,16 @@ namespace GMTK {
 
     private void OnDestroy() => RemoveListeners();
 
+    #region Initialization
+
     public void TryInitialize() {
       if (isInitialized) return;
       InitDependencies();
-      AddListeners();
       Initialize();
+      AddListeners();
       isInitialized = true;
     }
-
-    private void InitDependencies() {
+    protected virtual void InitDependencies() {
       _playableElement = (_playableElement == null) ? gameObject.GetComponent<PlayableElement>() : _playableElement;
       if (_playableElement == null) Debug.LogWarning($"PlayableElementComponent {name} is missing PlayableElement. This component will not function");
 
@@ -55,20 +88,30 @@ namespace GMTK {
       if (_gameEventChannel == null) Debug.LogWarning($"PlayableElementComponent {name} can't find GameEventChannel. This component won't listen or trigger game events");
     }
 
-    private void AddListeners() {
-      if (_gameEventChannel == null) return;
+    #endregion
 
-      // Listen to global game events
-      _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleGlobalElementSelected);
-      _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleGlobalElementDropped);
-      _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleGlobalElementHovered);
-      _gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleGlobalElementUnhovered);
+    #region Event Handling
 
-      // Listen to PlayableElement events through the GameEventChannel
-      _gameEventChannel.AddListener<PlayableElementEventArgs>(GameEventType.PlayableElementEvent, HandlePlayableElementEvent);
-      
-      // Listen to direct PlayableElement events
-      if (_playableElement != null) _playableElement.AddComponentListener(this);
+    /// <summary>
+    /// Handles an event related to the current playable element.<br/>
+    /// <para>
+    /// This method processes the event only if the <see cref="PlayableElementEventArgs.Element"/> matches the current playable element.<br/> 
+    /// It also broadcasts the event internally through the game event channel for other components to listen and handles the event locally (chain events).
+    /// </para>
+    /// </summary>
+    /// <param name="eventArgs">The event data containing information about the playable element and the event.</param>
+    public virtual void OnPlayableElementEvent(PlayableElementEventArgs eventArgs) {
+      if (eventArgs.Element != _playableElement) return;
+
+      //// Broadcast the event internally over GameEventChannel for other components to listen
+      //_gameEventChannel.Raise(GameEventType.PlayableElementInternalEvent, eventArgs);
+
+      // Handle the event locally using reflection
+      HandlePlayableElementEvent(eventArgs);
+
+      if (TriggersInnerEvent) {
+        _gameEventChannel.Raise(GameEventType.PlayableElementInternalEvent, eventArgs);
+      }
     }
 
     /// <summary>
@@ -82,7 +125,7 @@ namespace GMTK {
     /// </para>
     /// </summary>
     /// <param name="args"></param>
-    protected virtual void HandlePlayableElementEvent(PlayableElementEventArgs args) {
+    private void HandlePlayableElementEvent(PlayableElementEventArgs args) {
       // Only handle events for our own PlayableElement
       if (args.Element != _playableElement) return;
 
@@ -90,7 +133,7 @@ namespace GMTK {
       // For example OnDragStart for PlayableElementEventType.DragStart, that receives a PlayableElementEventArgs argument
       string methodName = "On" + args.EventType.ToString();
       System.Reflection.MethodInfo method = GetType().GetMethod(methodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-      
+      this.LogDebug($"handling event '{args.EventType}' using method '{methodName}'");
       if (method != null) {
         try {
           method.Invoke(this, new object[] { args });
@@ -105,54 +148,103 @@ namespace GMTK {
       }
     }
 
-    private void RemoveListeners() {
+    #endregion
+
+    #region Event Listeners
+
+    protected virtual void AddListeners() {
       if (_gameEventChannel == null) return;
 
-      _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleGlobalElementSelected);
-      _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleGlobalElementDropped);
-      _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleGlobalElementHovered);
-      _gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleGlobalElementUnhovered);
+      // Listen to PlayableElement events through the GameEventChannel
+      _gameEventChannel.AddListener<PlayableElementEventArgs>(GameEventType.PlayableElementInternalEvent, OnPlayableElementEvent);
 
-      _gameEventChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.PlayableElementEvent, HandlePlayableElementEvent);
+      //// Listen to global game events
+      //_gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleGlobalElementSelected);
+      //_gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleGlobalElementDropped);
+      //_gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleGlobalElementHovered);
+      //_gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleGlobalElementUnhovered);
 
-      if (_playableElement != null) _playableElement.RemoveComponentListener(this);
+      //Add UnityEvents subscription to PlayableElement
+      if (_playableElement == null) return;
+      int listenersAdded = 0;
+      if (!ExcludeInitializeEvents) {
+        _playableElement.BeforeInitialize.AddListener(OnPlayableElementEvent);
+        _playableElement.AfterInitialize.AddListener(OnPlayableElementEvent);
+        listenersAdded += 2;
+      }
+
+      if (!ExcludeSelectionEvents) {
+        _playableElement.OnSelected.AddListener(OnPlayableElementEvent);
+        _playableElement.OnDeselected.AddListener(OnPlayableElementEvent);
+        listenersAdded += 2;
+      }
+
+      if (!ExcludeHoverEvents) {
+        _playableElement.OnHovered.AddListener(OnPlayableElementEvent);
+        _playableElement.OnUnhovered.AddListener(OnPlayableElementEvent);
+        listenersAdded += 2;
+      }
+
+      if (!ExcludeDragStartEvents) {
+        _playableElement.BeforeDragStart.AddListener(OnPlayableElementEvent);
+        _playableElement.AfterDragStart.AddListener(OnPlayableElementEvent);
+        listenersAdded += 2;
+      }
+
+      if (!ExcludeDuringDraggingEvents) {
+        _playableElement.DuringDragging.AddListener(OnPlayableElementEvent);
+        listenersAdded++;
+      }
+
+      if (!ExcludeDragEndEvents) {
+        _playableElement.BeforeDragEnd.AddListener(OnPlayableElementEvent);
+        _playableElement.AfterDragEnd.AddListener(OnPlayableElementEvent);
+        listenersAdded += 2;
+      }
+
+      if (!ExcludeInputControlsEvents) {
+        _playableElement.BeforeInput.AddListener(OnPlayableElementEvent);
+        _playableElement.AfterInput.AddListener(OnPlayableElementEvent);
+        listenersAdded += 2;
+      }
+      this.Log($" Added {listenersAdded} UnityEvent Listeners to '{_playableElement.name}'");
     }
 
-    // Bridge methods for backward compatibility with GridSnappable events
-    private void HandleGlobalElementSelected(GridSnappableEventArgs evt) {
-      // Convert to PlayableElement events if this component's element was selected
-      // This is for backward compatibility during transition
-      HandleElementSelected(evt);
+    protected virtual void RemoveListeners() {
+      if (_gameEventChannel == null) return;
+
+      //_gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleGlobalElementSelected);
+      //_gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleGlobalElementDropped);
+      //_gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleGlobalElementHovered);
+      //_gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleGlobalElementUnhovered);
+
+      _gameEventChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.PlayableElementInternalEvent, OnPlayableElementEvent);
+
+      //remove UnityEvents subscription to PlayableElement
+      if (_playableElement != null) {
+        _playableElement.BeforeInitialize.RemoveListener(OnPlayableElementEvent);
+        _playableElement.AfterInitialize.RemoveListener(OnPlayableElementEvent);
+
+        _playableElement.OnSelected.RemoveListener(OnPlayableElementEvent);
+        _playableElement.OnDeselected.RemoveListener(OnPlayableElementEvent);
+
+        _playableElement.OnHovered.RemoveListener(OnPlayableElementEvent);
+        _playableElement.OnUnhovered.RemoveListener(OnPlayableElementEvent);
+
+        _playableElement.BeforeDragStart.RemoveListener(OnPlayableElementEvent);
+        _playableElement.AfterDragStart.RemoveListener(OnPlayableElementEvent);
+
+        _playableElement.DuringDragging.RemoveListener(OnPlayableElementEvent);
+
+        _playableElement.BeforeDragEnd.RemoveListener(OnPlayableElementEvent);
+        _playableElement.AfterDragEnd.RemoveListener(OnPlayableElementEvent);
+
+        _playableElement.BeforeInput.RemoveListener(OnPlayableElementEvent);
+        _playableElement.AfterInput.RemoveListener(OnPlayableElementEvent);
+      }
     }
 
-    private void HandleGlobalElementDropped(GridSnappableEventArgs evt) {
-      HandleElementDropped(evt);
-    }
-
-    private void HandleGlobalElementHovered(GridSnappableEventArgs evt) {
-      HandleElementHovered(evt);
-    }
-
-    private void HandleGlobalElementUnhovered(GridSnappableEventArgs evt) {
-      HandleElementUnhovered(evt);
-    }
-
-    // PlayableElement event handler - now broadcasts to GameEventChannel and uses reflection
-    public virtual void OnPlayableElementEvent(PlayableElementEventArgs eventArgs) {
-      if (eventArgs.Element != _playableElement) return;
-
-      // Broadcast the event through GameEventChannel for other components to listen
-      _gameEventChannel?.Raise(GameEventType.PlayableElementEvent, eventArgs);
-
-      // Handle the event locally using reflection
-      HandlePlayableElementEvent(eventArgs);
-    }
-
-    // Abstract methods for legacy compatibility - these still need to be implemented
-    protected abstract void HandleElementSelected(GridSnappableEventArgs evt);
-    protected abstract void HandleElementDropped(GridSnappableEventArgs evt);
-    protected abstract void HandleElementHovered(GridSnappableEventArgs evt);
-    protected abstract void HandleElementUnhovered(GridSnappableEventArgs evt);
+    #endregion
 
     #region Component Lifecycle
 
@@ -202,16 +294,16 @@ namespace GMTK {
     /// null safe method to play a MMF_Player feedback
     /// </summary>
     /// <param name="feedback"></param>
-    protected virtual void PlayFeedback(MMF_Player feedback, bool playInReverse=false) {
+    protected virtual void PlayFeedback(MMF_Player feedback, bool playInReverse = false) {
       if (feedback != null && feedback.gameObject.activeInHierarchy) {
         if (playInReverse) {
           feedback.PlayFeedbacksInReverse();
-        } else {
+        }
+        else {
           feedback.PlayFeedbacks();
         }
       }
     }
-
     protected virtual void StopFeedback(MMF_Player feedback) {
       if (feedback != null && feedback.gameObject.activeInHierarchy) {
         feedback.StopFeedbacks();
@@ -224,5 +316,64 @@ namespace GMTK {
     }
 
     #endregion
+
+    #region UnityEvent Handlers
+
+    public virtual void OnBeforeInitialize(PlayableElementEventArgs args) { }
+    public virtual void OnAfterInitialize(PlayableElementEventArgs args) { }
+    public virtual void OnSelected(PlayableElementEventArgs args) { }
+    public virtual void OnDeselected(PlayableElementEventArgs args) { }
+    public virtual void OnHovered(PlayableElementEventArgs args) { }
+    public virtual void OnUnhovered(PlayableElementEventArgs args) { }
+    public virtual void OnBeforeDragStart(PlayableElementEventArgs args) { }
+    public virtual void OnAfterDragStart(PlayableElementEventArgs args) { }
+    public virtual void OnBeforeDragEnd(PlayableElementEventArgs args) { }
+    public virtual void OnAfterDragEnd(PlayableElementEventArgs args) { }
+    public virtual void OnBeforeInput(PlayableElementEventArgs args) { }
+    public virtual void OnAfterInput(PlayableElementEventArgs args) { }
+
+    internal void SetPlayableElement(PlayableElement playableElement) {
+      _playableElement = playableElement;
+    }
+
+    #endregion
+
+    #region Obsolete
+
+    //// Bridge methods for backward compatibility with GridSnappable events
+    //[Obsolete("Use UnityEvents instead")]
+    //private void HandleGlobalElementSelected(GridSnappableEventArgs evt) {
+    //  // Convert to PlayableElement events if this component's element was selected
+    //  // This is for backward compatibility during transition
+    //  HandleElementSelected(evt);
+    //}
+
+    //[Obsolete("Use UnityEvents instead")]
+    //private void HandleGlobalElementDropped(GridSnappableEventArgs evt) {
+    //  HandleElementDropped(evt);
+    //}
+
+    //[Obsolete("Use UnityEvents instead")]
+    //private void HandleGlobalElementHovered(GridSnappableEventArgs evt) {
+    //  HandleElementHovered(evt);
+    //}
+
+    //[Obsolete("Use UnityEvents instead")]
+    //private void HandleGlobalElementUnhovered(GridSnappableEventArgs evt) {
+    //  HandleElementUnhovered(evt);
+    //}
+
+    // Abstract methods for legacy compatibility - these still need to be implemented
+    //[Obsolete("Use UnityEvents instead")]
+    //protected virtual void HandleElementSelected(GridSnappableEventArgs evt) { }
+    //[Obsolete("Use UnityEvents instead")]
+    //protected virtual void HandleElementDropped(GridSnappableEventArgs evt) { }
+    //[Obsolete("Use UnityEvents instead")]
+    //protected virtual void HandleElementHovered(GridSnappableEventArgs evt) { }
+    //[Obsolete("Use UnityEvents instead")]
+    //protected virtual void HandleElementUnhovered(GridSnappableEventArgs evt) { }
+
+    #endregion
+
   }
 }

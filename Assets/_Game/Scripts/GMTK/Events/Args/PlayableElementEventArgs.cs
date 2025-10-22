@@ -36,6 +36,12 @@ namespace GMTK {
     public bool Handled { get; set; } = false;
 
     /// <summary>
+    /// Gets or sets the <see cref="PlayableElementComponent"/> associated with the current instance.
+    /// This property can be used to reference the component that raised the event, if applicable.
+    /// </summary>
+    public PlayableElementComponent ElementComponent { get; set; }
+
+    /// <summary>
     /// Constructor for PlayableElementEventArgs.
     /// </summary>
     /// <param name="element">The element that triggered the event</param>

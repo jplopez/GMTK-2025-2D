@@ -28,9 +28,9 @@ namespace GMTK {
     public MMF_Player ToLevelCompleteFeedback;
 
     //snappables the player can interact with
-    protected List<GridSnappable> _draggableSnappables = new();
+    protected List<PlayableElement> _draggableElements = new();
     //snappables already in the level
-    protected List<GridSnappable> _staticSnappables = new();
+    protected List<PlayableElement> _staticElements = new();
     private void OnEnable() {
       Priority = 200;
       HandlerName = name;
@@ -42,9 +42,9 @@ namespace GMTK {
       InitServices();
 
       //find all snappables and assigned them if they're draggables or not
-      var snappables = FindObjectsByType<GridSnappable>(FindObjectsSortMode.None).ToList();
-      _draggableSnappables = snappables.Where(s => s.Draggable).ToList();
-      _staticSnappables = snappables.Where(s => !s.Draggable).ToList();
+      var snappables = FindObjectsByType<PlayableElement>(FindObjectsSortMode.None).ToList();
+      _draggableElements = snappables.Where(s => s.Draggable).ToList();
+      _staticElements = snappables.Where(s => !s.Draggable).ToList();
 
       //Ensure the Marble has a place to start
       if (Marble.SpawnTransform == null) {
@@ -132,15 +132,15 @@ namespace GMTK {
     }
 
 
-    private void SetDraggableSnappables(bool enabled) => _draggableSnappables.ForEach(s => s.Draggable = enabled);
+    private void SetDraggableSnappables(bool enabled) => _draggableElements.ForEach(elem => elem.Draggable = enabled);
 
     private void ResetSnappables(bool draggables=true, bool nonDraggables=true) {
       this.LogDebug("ResetSnappables");
       if (draggables) {
-        _draggableSnappables.ForEach(s => s.ResetSnappable());
+        _draggableElements.ForEach(elem => elem.ResetTransform());
       }
       if (nonDraggables) {
-        _staticSnappables.ForEach(s => s.ResetSnappable());
+        _staticElements.ForEach(elem => elem.ResetTransform());
       }
     }
   }

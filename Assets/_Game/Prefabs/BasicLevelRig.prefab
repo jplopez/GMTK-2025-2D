@@ -1218,6 +1218,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6099585740067810328}
     m_Modifications:
+    - target: {fileID: 3695790266787744221, guid: 856e6dfc469d834428295c3dbd369844, type: 3}
+      propertyPath: _eventChannel
+      value: 
+      objectReference: {fileID: 11400000, guid: 95a9f7bb01a666548ba38fda71806925, type: 2}
     - target: {fileID: 8962115518929029186, guid: 856e6dfc469d834428295c3dbd369844, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1264,7 +1268,7 @@ PrefabInstance:
       objectReference: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
     - target: {fileID: 9045615520726610499, guid: 856e6dfc469d834428295c3dbd369844, type: 3}
       propertyPath: m_Name
-      value: SnappableInputHandler
+      value: InputHandler
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

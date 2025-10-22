@@ -275,6 +275,14 @@ MonoBehaviour:
   textColor: {r: 1, g: 1, b: 1, a: 1}
   gizmoSize: 0.9
   occupancyOffset: {x: 0, y: 0}
+  enableDebugWindow: 1
+  showDebugWindowInGame: 0
+  debugWindowPosition: {x: 10, y: 10}
+  debugWindowWidth: 400
+  debugWindowMaxElements: 20
+  debugWindowBackgroundColor: {r: 0.1, g: 0.1, b: 0.1, a: 0.8}
+  debugWindowTextColor: {r: 1, g: 1, b: 1, a: 1}
+  debugWindowHeaderColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1 &7782059431654826959
 GameObject:
   m_ObjectHideFlags: 0

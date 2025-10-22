@@ -3,8 +3,18 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using GMTK.Extensions;
+using UnityEngine.Events;
 
 namespace GMTK {
+
+  [Flags]
+  public enum SelectionTrigger {
+    None = 0,
+    OnHover = 1,
+    OnClick = 2,
+    OnDoubleClick = 4,
+
+  }
 
   /// <summary>
   /// Represents any object in the game that can be snapped into a LevelGrid and dragged by the player.
@@ -15,8 +25,6 @@ namespace GMTK {
   [RequireComponent(typeof(PointerElementComponent))]
   public partial class PlayableElement : MonoBehaviour, IDraggable, ISelectable, IHoverable {
 
-    public enum SnappableBodyType { Static, Interactive }
-
     [Header("Model Settings")]
     [Tooltip("If set, this transform will be used for snapping instead of the GameObject's transform.")]
     public Transform SnapTransform; // if null, uses this.transform
@@ -24,7 +32,6 @@ namespace GMTK {
     public Transform Model;
     [Tooltip("(Optional) highlight model to show when hovering or dragging.")]
     public GameObject HighlightModel;
-
     [Tooltip("If true, the object can be dragged. Set it to false for elements that you want static in the playable area")]
     public bool Draggable = true;
 
@@ -36,6 +43,42 @@ namespace GMTK {
     public bool Flippable = false;
     [Tooltip("If true, the object can be rotated in its Z axis")]
     public bool CanRotate = false;
+    [Space(10)]
+
+    //UnityEvents
+    //[Help("UnityEvents to add additional behaviors to PlayableElements. PlayableElementComponent-derived components attached to the same GameObject subscribe to this events automatically")]
+    [Header("Initialize")]
+    public UnityEvent<PlayableElementEventArgs> BeforeInitialize = new();
+    public UnityEvent<PlayableElementEventArgs> AfterInitialize = new();
+    [Space]
+    [Header("Selection")]
+    public UnityEvent<PlayableElementEventArgs> OnSelected = new();
+    public UnityEvent<PlayableElementEventArgs> OnDeselected = new();
+    [Space]
+    [Header("Hovering")]
+    public UnityEvent<PlayableElementEventArgs> OnHovered = new();
+    public UnityEvent<PlayableElementEventArgs> OnUnhovered = new();
+    [Space]
+    [Header("Drag Start")]
+    public UnityEvent<PlayableElementEventArgs> BeforeDragStart = new();
+    public UnityEvent<PlayableElementEventArgs> AfterDragStart = new();
+    [Space]
+    [Header("During Dragging")]
+    public UnityEvent<PlayableElementEventArgs> DuringDragging = new();
+    [Tooltip("The minimum distance the element needs to be dragged to notify 'DuringDragging'")]
+    [Range(0.01f, 0.1f)]
+    public float DragMinDistance = 0.02f;
+    [Tooltip("The time in seconds in between notification of 'DuringDragging' ")]
+    [Range(0.1f, 1f)]
+    public float DragCooldown = 0.1f;
+    [Space]
+    [Header("Drag End")]
+    public UnityEvent<PlayableElementEventArgs> BeforeDragEnd = new();
+    public UnityEvent<PlayableElementEventArgs> AfterDragEnd = new();
+    [Space]
+    [Header("Input Controls (rotate, flip)")]
+    public UnityEvent<PlayableElementEventArgs> BeforeInput = new();
+    public UnityEvent<PlayableElementEventArgs> AfterInput = new();
 
 
     // Public properties for compatibility with existing code
@@ -55,6 +98,8 @@ namespace GMTK {
 
     private PointerElementComponent _pointerComponent;
 
+    private bool HasSelectionTrigger(SelectionTrigger trigger) => (SelectionTriggers & trigger) != 0;
+
     // Events for components to listen to
     [Obsolete("Use RaisePlayableElementEvent instead")]
     public event Action<PlayableElementEventArgs> OnPlayableElementEvent;
@@ -71,14 +116,14 @@ namespace GMTK {
     private void Start() => InitializeAllPlayableElementComponents();
 
     private void Update() {
-      if(_components?.Count == 0) return;
+      if (_components?.Count == 0) return;
       _components.ForEach(c => { if (c != null) c.RunBeforeUpdate(); });
       _components.ForEach(c => { if (c != null) c.RunOnUpdate(); });
     }
 
-    private void LateUpdate() => _components?.ForEach(c => { if(c != null)c.RunAfterUpdate();});
+    private void LateUpdate() => _components?.ForEach(c => { if (c != null) c.RunAfterUpdate(); });
 
-    private void OnDestroy() => _components?.ForEach(c => { if(c != null)c.RunFinalize();});
+    private void OnDestroy() => _components?.ForEach(c => { if (c != null) c.RunFinalize(); });
 
     #endregion
 
@@ -104,10 +149,13 @@ namespace GMTK {
     private void InitializeAllPlayableElementComponents() {
       _components?.Clear();
       _components?.AddRange(GetComponents<PlayableElementComponent>());
+      _components?.ForEach(c => { c.SetPlayableElement(this); });
       _components?.ForEach(c => { if (c != null) c.TryInitialize(); });
 
       // Cache the PointerElementComponent reference
       _pointerComponent = GetComponent<PointerElementComponent>();
+      this.Log($"PlayableElement '{name}' initialized with {_components.Count} PlayableElementComponents");
+
     }
 
     private bool CheckForRenderers() {
@@ -156,7 +204,6 @@ namespace GMTK {
         }
       }
     }
-
     private Vector2Int TransformLocalCell(Vector2Int cell, bool flipX, bool flipY, int rotation) {
       int x = flipX ? -cell.x : cell.x;
       int y = flipY ? -cell.y : cell.y;
@@ -174,39 +221,93 @@ namespace GMTK {
 
     #region Event System
 
-    [Obsolete("Use RaisePlayableElementEvent instead")]
-    public void AddComponentListener(PlayableElementComponent component) => OnPlayableElementEvent += component.OnPlayableElementEvent;
-
-    [Obsolete("Use RaisePlayableElementEvent instead")]
-    public void RemoveComponentListener(PlayableElementComponent component) => OnPlayableElementEvent -= component.OnPlayableElementEvent;
-
-    [Obsolete("Use RaisePlayableElementEvent instead")]
-    public void InvokePlayableElementEvent(PlayableElementEventArgs eventArgs) => OnPlayableElementEvent?.Invoke(eventArgs);
-
     /// <summary>
-    /// Helper method to raise PlayableElement events and reduce code duplication.
+    /// Helper method to raise PlayableElement events.<br/>
+    /// These are intended to be used by PlayableElementComponents to notify about events related to this PlayableElement.<br/>
+    /// 
+    /// TODO: replace with UnityEvents?
+    /// 
     /// </summary>
     /// <param name="eventType">The type of event to raise</param>
     /// <param name="worldPosition">The world position for the event (uses transform.position if not provided)</param>
-    protected virtual PlayableElementEventArgs RaisePlayableElementEvent(PlayableElementEventType eventType, Vector3? worldPosition = null) {
-      var eventArgs = BuildEventArgs(eventType);
-      _gameEventChannel.Raise(GameEventType.PlayableElementEvent, eventArgs);
-      OnPlayableElementEvent?.Invoke(eventArgs);
+    protected virtual PlayableElementEventArgs RaisePlayableElementEvent(PlayableElementEventType eventType, Vector3? worldPosition = null) =>
+      RaiseGameEvent(GameEventType.PlayableElementEvent, eventType, worldPosition);
 
-      this.LogDebug($"PlayableElementEvent {eventType} started on {name}");
+    /// <summary>
+    /// <para>
+    /// Raises a game event through the game event channel, using the specified parameters to construct the event arguments.
+    /// Subclasses can override this method to customize event handling behavior.
+    /// </para>
+    /// <para>
+    /// The returned <see cref="PlayableElementEventArgs"/> instance contains the details of the raised event.
+    /// Also informs it the event has already been handled by a <see cref="PlayableElementComponent"/>.
+    /// </para>
+    /// <para>
+    /// <see cref="PlayableElementComponent"/> can mark the event as handled by setting the Handled property to true.
+    /// This is useful to chain handlers or preventing further default processing.
+    /// </para>
+    /// </summary>
+    /// <param name="gameEvent">The type of game event to raise. This determines the category of the event.</param>
+    /// <param name="eventType">The specific type of playable element event to include in the raised event.</param>
+    /// <param name="worldPosition">An optional world position associated with the event. If not provided, the event will not include positional
+    /// data.</param>
+    /// <returns>A <see cref="PlayableElementEventArgs"/> instance containing the details of the raised event.</returns>
+    protected virtual PlayableElementEventArgs RaiseGameEvent(GameEventType gameEvent, PlayableElementEventType eventType, Vector3? worldPosition = null) {
+
+      var eventArgs = BuildEventArgs(gameEvent, eventType, worldPosition);
+      _gameEventChannel.Raise(gameEvent, eventArgs);
+
+      //this.LogDebug($"{name} raised a GameEvent: PlayableElementEventType:'{eventType}'\t" +
+      //    (gameEvent != GameEventType.PlayableElementEvent ? $"  GameEventType:'{gameEvent}'" : ""));
+
       return eventArgs;
     }
 
-    protected PlayableElementEventArgs BuildEventArgs(PlayableElementEventType eventType, Vector3? worldPosition = null) {
-      var position = worldPosition ?? transform.position;
-      return new PlayableElementEventArgs(this, position, eventType);
+    /// <summary>
+    /// Utility method to build PlayableElementEventArgs instances.
+    /// </summary>
+    protected PlayableElementEventArgs BuildEventArgs(GameEventType gameEvent, PlayableElementEventType eventType, Vector3? worldPosition = null) =>
+       new(this, worldPosition ?? transform.position, eventType);
+
+    /// <summary>
+    /// This methods invokes the PlayableElementEvent handlers for the PointerElementComponent, if it exists.<br/>
+    /// The purpose is to prioritize the handling by that component, before raising the event to other listeners.
+    /// </summary>
+    /// <param name="eventArgs"></param>
+    /// <returns>true if the event was handled by the PointerElementComponent. false otherwise</returns>
+    private bool TryDelegateToPointerComponent(PlayableElementEventArgs eventArgs) {
+      if (_pointerComponent == null) return false;
+
+      this.LogDebug($"Delegating {eventArgs.EventType} event to PointerElementComponent on {name}");
+      switch (eventArgs.EventType) {
+        case PlayableElementEventType.Selected:
+          _pointerComponent.OnSelected(eventArgs);
+          break;
+        case PlayableElementEventType.Deselected:
+          _pointerComponent.OnDeselected(eventArgs);
+          break;
+        case PlayableElementEventType.PointerOver:
+          _pointerComponent.OnHovered(eventArgs);
+          break;
+        case PlayableElementEventType.PointerOut:
+          _pointerComponent.OnUnhovered(eventArgs);
+          break;
+        default:
+          this.LogWarning($"{eventArgs.EventType} not handled in TryDelegateToPointerComponent for {name}");
+          return false;
+      }
+      return true;
     }
+
 
     #endregion
 
-
-
     #region Transformation methods
+
+    public void ResetTransform() {
+      SnapTransform.SetPositionAndRotation(_initialPosition, _initialRotation);
+      SnapTransform.localScale = _initialScale;
+    }
 
     /// <summary>
     /// Updates the position on the Transform specified in SnapTransform
@@ -246,13 +347,14 @@ namespace GMTK {
 
       // Notify components first - they might handle the rotation
       var eventArgs = new PlayableElementEventArgs(this, transform.position, eventType);
-      OnPlayableElementEvent?.Invoke(eventArgs);
+      RaisePlayableElementEvent(eventType);
 
       // If no component handled it, do the default rotation using extension methods
       if (!eventArgs.Handled) {
         if (eventType == PlayableElementEventType.RotateCW) {
           SnapTransform.RotateClockwise();
-        } else {
+        }
+        else {
           SnapTransform.RotateCounterClockwise();
         }
 
@@ -297,47 +399,10 @@ namespace GMTK {
       }
     }
 
-    /// <summary>
-    /// Resets the PlayableElement transform specified in SnapTransform to the initial position and rotation at the time of initialization
-    /// </summary>
-    public virtual void ResetSnaggable() {
-      SnapTransform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
-      SnapTransform.localScale = _initialScale;
-      _components.ForEach(c => c.RunResetComponent());
-    }
-
     #endregion
 
     public override string ToString() => name;
-   
+
   }
 
-  #region Casting to GridSnappable (for compatibility)
-
-  public static class PlayableElementExtensions {
-    public static GridSnappable ToGridSnappable(this PlayableElement element, float ttl = 0.2f) {
-      if (element.TryGetComponent(out GridSnappable existing)) {
-        return existing;
-      }
-      else {
-
-        //instance a GridSnappable and copy properties
-        GridSnappable snappable = element.gameObject.AddComponent<GridSnappable>();
-        snappable.transform.parent = null;
-
-        snappable.gameObject.name = element.gameObject.name; // keep the name
-        snappable.BehaviourDelegate = GridSnappable.BehaviourDelegateType.Components;
-        snappable.SnapTransform = element.SnapTransform;
-        snappable.Model = element.Model;
-        snappable.HighlightModel = element.HighlightModel;
-        snappable.Draggable = element.Draggable;
-        snappable.Flippable = element.Flippable;
-        snappable.CanRotate = element.CanRotate;
-        snappable.transform.parent = element.transform.parent;
-        GameObject.Destroy(snappable, ttl); // destroy after ttl seconds to avoid cluttering the scene
-        return snappable;
-      }
-    }
-  }
-  #endregion
 }

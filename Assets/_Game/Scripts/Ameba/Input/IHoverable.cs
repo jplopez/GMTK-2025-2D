@@ -16,9 +16,9 @@ namespace Ameba {
 
     public void MarkHovered(bool hovered = true);
 
-    public void OnPointerEnter();
+    public void OnPointerOver();
 
-    public void OnPointerExit();
+    public void OnPointerOut();
 
     public void OnHover();
     public void OnHoverUpdate();

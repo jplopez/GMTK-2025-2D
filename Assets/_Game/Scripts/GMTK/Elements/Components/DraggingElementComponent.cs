@@ -589,23 +589,6 @@ namespace GMTK {
       DestroyOriginalPlaceholder();
     }
 
-    // Legacy compatibility handlers - still required by abstract base class
-    protected override void HandleElementSelected(GridSnappableEventArgs evt) {
-      // Handle legacy selection events for compatibility
-    }
-
-    protected override void HandleElementDropped(GridSnappableEventArgs evt) {
-      // Handle legacy drop events for compatibility
-    }
-
-    protected override void HandleElementHovered(GridSnappableEventArgs evt) {
-      // Handle legacy hover events for compatibility
-    }
-
-    protected override void HandleElementUnhovered(GridSnappableEventArgs evt) {
-      // Handle legacy unhover events for compatibility
-    }
-
     // Gizmos for debugging drag constraints
     void OnDrawGizmosSelected() {
       if (!ConstrainHorizontal && !ConstrainVertical) return;

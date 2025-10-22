@@ -23,5 +23,7 @@ namespace GMTK {
     Selected, Deselected,
     
     CollisionStart, CollisionEnd, Collisioning,
+    HoverStart,
+    HoverEnd,
   }
 }

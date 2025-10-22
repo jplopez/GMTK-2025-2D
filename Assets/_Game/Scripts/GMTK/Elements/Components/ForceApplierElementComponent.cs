@@ -514,32 +514,6 @@ namespace GMTK {
 
     #endregion
 
-    #region Event Handlers (PlayableElementComponent)
-
-    protected override void HandleElementDropped(GridSnappableEventArgs evt) {
-      // Reset force application when element is moved
-      if (evt.Element != null && evt.Element.gameObject == _playableElement.gameObject) {
-        ResetComponent();
-        this.Log("Element dropped - reset force application state");
-      }
-    }
-
-    protected override void HandleElementHovered(GridSnappableEventArgs evt) {
-      // Could add hover effects showing force field
-    }
-
-    protected override void HandleElementSelected(GridSnappableEventArgs evt) {
-      // Could pause force effects while being dragged
-      if (evt.Element != null && evt.Element.gameObject == _playableElement.gameObject) {
-        this.Log("Force applier element selected");
-      }
-    }
-    protected override void HandleElementUnhovered(GridSnappableEventArgs evt) {
-      // Remove hover effects
-    }
-
-    #endregion
-
     #region Public API
 
     /// <summary>

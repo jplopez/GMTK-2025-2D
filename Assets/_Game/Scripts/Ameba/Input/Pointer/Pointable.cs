@@ -34,8 +34,8 @@ namespace Ameba {
     public abstract void OnHoverDisabled();
     public abstract void OnHoverEnabled();
     public abstract void OnHoverUpdate();
-    public abstract void OnPointerEnter();
-    public abstract void OnPointerExit();
+    public abstract void OnPointerOver();
+    public abstract void OnPointerOut();
     public abstract void OnSelect();
     public abstract void OnSelectDisabled();
     public abstract void OnSelectEnabled();
