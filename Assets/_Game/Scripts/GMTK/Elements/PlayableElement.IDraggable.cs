@@ -26,15 +26,21 @@ namespace GMTK {
     public virtual void DragStart() {
       IsBeingDragged = true;
       RaiseGameEvent(GameEventType.ElementDragStart, PlayableElementEventType.DragStart);
-      RaisePlayableElementEvent(PlayableElementEventType.DragStart);
+      //RaisePlayableElementEvent(PlayableElementEventType.DragStart);
       OnDragStart?.Invoke(BuildEventArgs(GameEventType.ElementDragStart, PlayableElementEventType.DragStart));
     }
 
     public virtual void DraggingUpdate(Vector3? worldPosition) {
-      if (IsBeingDragged && worldPosition.HasValue) {
+      worldPosition = worldPosition ?? GetPosition();
+      if (IsBeingDragged) {
         UpdatePosition(worldPosition.Value);
-        RaiseGameEvent(GameEventType.ElementDragging, PlayableElementEventType.DragUpdate);
-        RaisePlayableElementEvent(PlayableElementEventType.DragUpdate);
+        if(CanDoDraggingUpdate) {
+          this.Log($"PlayableElement '{name}' raising dragging update event");
+          RaiseGameEvent(GameEventType.ElementDragging, PlayableElementEventType.DragUpdate);
+          //RaisePlayableElementEvent(PlayableElementEventType.DragUpdate);
+          OnDragging?.Invoke(BuildEventArgs(GameEventType.ElementDragging, PlayableElementEventType.DragUpdate));
+          ResetDraggingUpdateTimer();
+        }
       }
     }
 
@@ -43,6 +49,7 @@ namespace GMTK {
       RaiseGameEvent(GameEventType.ElementDropped, PlayableElementEventType.DragEnd);
       //RaisePlayableElementEvent(PlayableElementEventType.DragEnd);
       OnDragEnd?.Invoke(BuildEventArgs(GameEventType.ElementDropped, PlayableElementEventType.DragEnd));
+      _canDoDraggingUpdate = true;
     }
 
     #endregion

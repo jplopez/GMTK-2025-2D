@@ -325,13 +325,6 @@ namespace GMTK {
       }
     }
 
-    //protected virtual void InitRotationOverrides() {
-    //  // If AllowsRotationChanges is enabled, override PlayableElement rotation capabilities
-    //  if (AllowsRotationChanges) {
-    //    _playableElement.CanRotate = AllowRotation; // Use our rotation setting instead
-    //  }
-    //}
-
     /// <summary>
     /// Process collisions added to the _currentCollisionState during the frame.
     /// </summary>
@@ -483,16 +476,28 @@ namespace GMTK {
     #region Event Handlers 
     public override void OnDragStart(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
-
+      if (evt.Handled) return;
       //_isDragOverride = true;
       InitMovementControls(); // Update rigidbody settings for dragging
     }
 
     public override void OnDragEnd(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
-
+      if (evt.Handled) return;
       //_isDragOverride = false;
       InitMovementControls(); // Restore normal rigidbody settings
+    }
+
+    public override void OnRotate(PlayableElementEventArgs args) {
+      if (args.Element != _playableElement) return;
+      if (args.Handled) return;
+      // this event responds to player input, so is only relevant to know 
+      // if playableElement.CanRotate == true
+      if (_playableElement.CanRotate) {
+        bool clockwise = args.EventType == PlayableElementEventType.RotateCW;
+        ApplyExtensionRotation(clockwise);
+        args.Handled = true; // Prevent default rotation behavior
+      }
     }
 
     // Enhanced collision handling - these methods now prime the component for processing
@@ -534,18 +539,18 @@ namespace GMTK {
       }
     }
 
-    protected void OnRotateCW(PlayableElementEventArgs evt) {
-      if (AllowsRotationChanges) {
-        ApplyExtensionRotation(true); // Use extension method for clockwise rotation
-        evt.Handled = true; // Prevent default rotation behavior
-      }
-    }
-    protected void OnRotateCCW(PlayableElementEventArgs evt) {
-      if (AllowsRotationChanges) {
-        ApplyExtensionRotation(false); // Use extension method for counter-clockwise rotation
-        evt.Handled = true; // Prevent default rotation behavior
-      }
-    }
+    //protected void OnRotateCW(PlayableElementEventArgs evt) {
+    //  if (AllowsRotationChanges) {
+    //    ApplyExtensionRotation(true); // Use extension method for clockwise rotation
+    //    evt.Handled = true; // Prevent default rotation behavior
+    //  }
+    //}
+    //protected void OnRotateCCW(PlayableElementEventArgs evt) {
+    //  if (AllowsRotationChanges) {
+    //    ApplyExtensionRotation(false); // Use extension method for counter-clockwise rotation
+    //    evt.Handled = true; // Prevent default rotation behavior
+    //  }
+    //}
 
     #endregion
 
@@ -748,11 +753,7 @@ namespace GMTK {
 
     #region Rotation
 
-    private void RestoreLastValidRotation() {
-      //this.Log($"Restoring rotation from {_rigidbody2D.rotation} to {_lastValidRotation.z}");
-
-      SetRotation(_lastValidRotation.z, true); // Force restore the rotation
-    }
+    protected virtual void RestoreLastValidRotation() => SetRotation(_lastValidRotation.z, true); // Force restore the rotation
 
     /// <summary>
     /// Applies rotation using the TransformGameExtensions with flip-state awareness.
@@ -800,7 +801,7 @@ namespace GMTK {
         _currentRotation = newRotation;
         _lastValidRotation = new Vector3(0, 0, newRotation);
 
-        //this.Log($"Applied extension rotation {(clockwise ? "CW" : "CCW")} to {newRotation}° with step {RotationStep}° (flippedX: {_playableElement.SnapTransform.IsFlippedX()}, flippedY: {_playableElement.SnapTransform.IsFlippedY()})");
+        this.LogDebug($"Applied extension rotation {(clockwise ? "CW" : "CCW")} to {newRotation}° with step {RotationStep}° (flippedX: {_playableElement.SnapTransform.IsFlippedX()}, flippedY: {_playableElement.SnapTransform.IsFlippedY()})");
 
         // Feel integration - provide rotation feedback
         if (RotationChangeFeedback != null && newRotation != previousRotation) {
@@ -829,12 +830,12 @@ namespace GMTK {
         float currentAngle = _rigidbody2D.rotation;
         float targetAngle = currentAngle + degrees;
 
-        //this.Log($"Applying rotation change: {degrees} degrees (current: {currentAngle}, target: {targetAngle})");
+        this.LogDebug($"Applying rotation change: {degrees} degrees (current: {currentAngle}, target: {targetAngle})");
 
         // Apply limits if enabled
         if (LimitRotationAngle) {
           targetAngle = Mathf.Clamp(targetAngle, MinRotationAngle, MaxRotationAngle);
-          //this.Log($"Clamped to {targetAngle} due to rotation limits ({MinRotationAngle}, {MaxRotationAngle})");
+
         }
 
         // Apply the rotation using centralized method
@@ -862,7 +863,7 @@ namespace GMTK {
       _currentRotation = angle;
       _lastValidRotation = new Vector3(0, 0, angle);
 
-      //this.Log($"Set rotation to {angle} degrees");
+      this.LogDebug($"Set rotation to {angle} degrees");
     }
 
     #endregion

@@ -81,7 +81,8 @@ namespace GMTK {
     private Quaternion _initialRotation;
     private Vector3 _initialScale;
     protected bool _isRegistered = false;
-    //protected SnappableBodyType _bodyType = SnappableBodyType.Static;
+    private float _lastDragUpdateTime = 0f;
+    private bool _canDoDraggingUpdate = true;
     protected SpriteRenderer _modelRenderer;
     protected PolygonCollider2D _collider;
     protected List<PlayableElementComponent> _components = new();
@@ -107,6 +108,14 @@ namespace GMTK {
       if (_components?.Count == 0) return;
       _components.ForEach(c => { if (c != null) c.RunBeforeUpdate(); });
       _components.ForEach(c => { if (c != null) c.RunOnUpdate(); });
+
+      // Dragging update cooldown check
+      // draggable time + cooldown should be less than current time to allow dragging update
+      // remember: newer time is less than older time.
+      if (_lastDragUpdateTime + DragCooldown < Time.time && IsBeingDragged) {
+        this.Log($"PlayableElement '{name}' can do dragging update again");
+        _canDoDraggingUpdate = true;
+      }
     }
 
     private void LateUpdate() => _components?.ForEach(c => { if (c != null) c.RunAfterUpdate(); });
@@ -284,6 +293,12 @@ namespace GMTK {
       return true;
     }
 
+    protected bool CanDoDraggingUpdate => _canDoDraggingUpdate;
+
+    protected void ResetDraggingUpdateTimer() {
+      _lastDragUpdateTime = Time.time;
+      _canDoDraggingUpdate = false;
+    }
 
     #endregion
 
@@ -332,7 +347,8 @@ namespace GMTK {
 
       // Notify components first - they might handle the rotation
       var eventArgs = new PlayableElementEventArgs(this, transform.position, eventType);
-      RaisePlayableElementEvent(eventType);
+      //RaisePlayableElementEvent(eventType);
+      OnRotate?.Invoke(eventArgs);
 
       // If no component handled it, do the default rotation using extension methods
       if (!eventArgs.Handled) {
@@ -365,12 +381,13 @@ namespace GMTK {
     /// <param name="flipY"></param>
     private void InnerFlip(bool flipX = false, bool flipY = false) {
       if (!Flippable || (!flipX && !flipY)) return;
-      this.Log($"Flipping {(flipX ? "X" : "")} {(flipY ? "Y" : "")} on {name}");
+      this.LogDebug($"Flipping {(flipX ? "X" : "")} {(flipY ? "Y" : "")} on {name}");
 
       PlayableElementEventType eventType = flipX ? PlayableElementEventType.FlippedX : PlayableElementEventType.FlippedY;
 
       // Notify components first - they might handle the flip
-      PlayableElementEventArgs eventArgs = RaisePlayableElementEvent(eventType);
+      PlayableElementEventArgs eventArgs = new(this, transform.position, eventType); 
+      OnFlip?.Invoke(eventArgs);
 
       // If no component handled it, do the default flip using extension methods
       if (eventArgs != null && eventArgs.Handled) return;

@@ -163,7 +163,7 @@ namespace GMTK {
 
     #endregion
 
-    #region Component Lifecycle
+    #region Lifecycle
 
     public void RunBeforeUpdate() { if (CommonSettings.IsActive && isInitialized) BeforeUpdate(); }
     public void RunOnUpdate() {
@@ -199,7 +199,7 @@ namespace GMTK {
 
     #endregion
 
-    #region Event Listeners
+    #region EventListeners
 
     protected virtual void AddListeners() {
       if (_gameEventChannel == null) return;
