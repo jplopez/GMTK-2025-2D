@@ -6,16 +6,23 @@ using UnityEngine;
 
 namespace GMTK {
   [CustomEditor(typeof(PlayableElement))]
-  public class PlayableElementEditor : Editor {
+  public class PlayableElementEditor : UnityEditor.Editor {
 
     private PlayableElement _element;
+
+    [SerializeField] private CommonComponentSettings _commonSettings = new();
 
     // Gizmo visualization settings
     [SerializeField] private float _gizmoCellSize = 1.0f;
     [SerializeField] private float _gizmoTolerance = 0.4f;
     [SerializeField] private Color _gizmoColor = Color.yellow;
-    [SerializeField] private bool _gizmoFoldoutOpen = false;
+    //[SerializeField] private bool _gizmoFoldoutOpen = false;
     //[SerializeField] private bool _showOccupiedCells = true;
+
+    [SerializeField] private bool _occupancyFoldoutOpen = false;
+    [SerializeField] private bool _pointerFoldoutOpen = false;
+    [SerializeField] private bool _movementFoldoutOpen = false;
+    [SerializeField] private bool _eventsFoldoutOpen = false;
 
     protected static Dictionary<PlayableElement, bool> _showOccupiedCells = new();
 
@@ -61,6 +68,20 @@ namespace GMTK {
           margin = new RectOffset(0, 0, 2, 1),
           fixedWidth = 20,
           fixedHeight = EditorGUIUtility.singleLineHeight
+        };
+        return style;
+      }
+    }
+
+    private static GUIStyle FoldoutHeaderStyle {
+      get {
+        GUIStyle style = new(EditorStyles.foldout) {
+          fontStyle = FontStyle.Bold,
+          alignment = TextAnchor.MiddleLeft,
+          padding = new RectOffset(15, 6, 4, 4),
+          border = new RectOffset(2, 0, 0, 0),
+          fixedHeight = EditorGUIUtility.singleLineHeight,
+          stretchWidth = true,       
         };
         return style;
       }
@@ -147,7 +168,6 @@ namespace GMTK {
         tolerance = _gizmoTolerance,
         color = _gizmoColor
       };
-      //Debug.Log($"RegisterGizmoSettings for {_element.name}: showGizmos={settings.showGizmos}, cellSize={settings.cellSize}, tolerance={settings.tolerance}, color={settings.color}");
       PlayableElementOccupancyGizmo.RegisterGizmoSettings(_element, settings);
     }
 
@@ -190,7 +210,8 @@ namespace GMTK {
 
     private void DrawPointerProperties() {
       //selection
-      EditorGUILayout.LabelField("Pointer Settings", EditorStyles.boldLabel);
+      _pointerFoldoutOpen = EditorGUILayout.Foldout(_pointerFoldoutOpen, "Pointer Settings", true, FoldoutHeaderStyle);
+      if (!_pointerFoldoutOpen) return;
       EditorGUILayout.Space();
       using (new EditorGUI.IndentLevelScope()) {
         EditorGUILayout.PropertyField(_canSelectProp);
@@ -207,13 +228,38 @@ namespace GMTK {
     }
 
     private void DrawUnityEvents() {
-      EditorGUILayout.LabelField("UnityEvents", EditorStyles.boldLabel);
-      EditorGUILayout.Space();
-      EditorGUILayout.HelpBox("UnityEvents to add additional behaviors to PlayableElements. PlayableElementComponent-derived components attached to the same GameObject subscribe to this events automatically", MessageType.Info);
-      EditorGUILayout.Space();
+      _eventsFoldoutOpen = EditorGUILayout.Foldout(_eventsFoldoutOpen, "Unity Events", true, FoldoutHeaderStyle);
+      if (!_eventsFoldoutOpen) return;
+
+      string[] eventProps = new string[] {
+        "BeforeInitialize",
+        "AfterInitialize",
+        "OnSelect",
+        "OnDeselected",
+        "OnHovered",
+        "OnUnhovered",
+        "BeforeDragStart",
+        "DragStart",
+        "OnDragging",
+        "BeforeDragEnd",
+        "DragEnd",
+        "BeforeInput",
+        "PlayerInput",
+      };
 
       using (new EditorGUI.IndentLevelScope()) {
-        DrawPropertiesExcluding(serializedObject, "Script", "HighlightModel", "SnapTransform", "Model", "Draggable", "_canRotate", "_canSelect", "Flippable", "OccupiedCells", "_isHovered", "_canHover", "_isSelected", "_isDragging", "SelectionTriggers", "Accuracy", "MaxOffset", "HoverThreshold");
+        foreach (string eventPropName in eventProps) {
+          if (serializedObject.FindProperty(eventPropName) is SerializedProperty eventProp) {
+            EditorGUILayout.PropertyField(eventProp);
+            if (eventPropName == "OnDragging") {
+              if (serializedObject.FindProperty("DragMinDistance") is var dragMinDistanceProp)
+                EditorGUILayout.PropertyField(dragMinDistanceProp);
+              if (serializedObject.FindProperty("DragCooldown") is var dragCooldownProp)
+                EditorGUILayout.PropertyField(dragCooldownProp);
+            }
+            EditorGUILayout.Space();
+          }
+        }
       }
 
     }
@@ -227,7 +273,10 @@ namespace GMTK {
       }
       EditorGUILayout.Space();
 
-      EditorGUILayout.LabelField("Occupancy", EditorStyles.boldLabel);
+      //EditorGUILayout.LabelField("Occupancy", EditorStyles.boldLabel);
+      _occupancyFoldoutOpen = EditorGUILayout.Foldout(_occupancyFoldoutOpen, "Occupancy", true, FoldoutHeaderStyle);
+      if (!_occupancyFoldoutOpen) return;
+
       using (new EditorGUILayout.HorizontalScope(GUILayout.Width(200))) {
         //button to auto-fill it using integrated helper methods
         if (GUILayout.Button("Auto-Fill Occupied Cells", EditorStyles.miniButtonLeft)) {
@@ -246,7 +295,10 @@ namespace GMTK {
 
     private void DrawMovementProperties() {
       int maxWidth = 200;
-      EditorGUILayout.LabelField("Movement", EditorStyles.boldLabel);
+      //EditorGUILayout.LabelField("Movement", EditorStyles.boldLabel);
+      _movementFoldoutOpen = EditorGUILayout.Foldout(_movementFoldoutOpen, "Movement", true, FoldoutHeaderStyle);
+      if (!_movementFoldoutOpen) return;
+
       using (new EditorGUI.IndentLevelScope()) {
         using (new EditorGUILayout.VerticalScope()) {
 
@@ -424,8 +476,8 @@ namespace GMTK {
     /// <summary>
     /// Calculates occupied cells using SnapTransform as the source of truth.
     /// </summary>
-    private System.Collections.Generic.List<Vector2Int> CalculateOccupiedCells(SpriteRenderer spriteRenderer, Transform snapTransform, float cellSize, float tolerance) {
-      var occupiedCells = new System.Collections.Generic.List<Vector2Int>();
+    private List<Vector2Int> CalculateOccupiedCells(SpriteRenderer spriteRenderer, Transform snapTransform, float cellSize, float tolerance) {
+      var occupiedCells = new List<Vector2Int>();
       Sprite sprite = spriteRenderer.sprite;
 
       // Get sprite bounds in local space

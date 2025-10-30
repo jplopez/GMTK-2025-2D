@@ -48,7 +48,7 @@ namespace GMTK {
       _dragOffset = element.GetPosition() - _pointerWorldPos;
 
       // Notify the element
-      element.OnDragStart();
+      element.DragStart();
 
       this.LogDebug($"Started dragging element: {element.name}");
       return true;
@@ -96,7 +96,7 @@ namespace GMTK {
       Vector3 targetPosition = worldPosition + _dragOffset;
 
       // Update the dragged element
-      _draggedElement.OnDragUpdate(targetPosition);
+      _draggedElement.DraggingUpdate(targetPosition);
     }
 
     public bool TryStopDrag() {
@@ -112,7 +112,7 @@ namespace GMTK {
       }
 
       // Notify the element
-      elementToStop.OnDragEnd();
+      elementToStop.DragEnd();
 
       this.LogDebug($"Stopped dragging element: {elementToStop.name}");
       return true;

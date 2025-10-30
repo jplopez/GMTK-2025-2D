@@ -9,7 +9,7 @@ namespace GMTK {
   /// This custom editor will show the configuration found for the Scene based on LevelService, the overrides done in the specific SceneController, and the effective values, to validate the results
   /// </summary>
   [CustomEditor(typeof(SceneTransitionConfig), true)]
-  public class SceneTransitionConfigEditor : Editor {
+  public class SceneTransitionConfigEditor : UnityEditor.Editor {
 
     private SerializedProperty _transitionConfigProp;
     private SerializedProperty _transitionSceneNameProp;

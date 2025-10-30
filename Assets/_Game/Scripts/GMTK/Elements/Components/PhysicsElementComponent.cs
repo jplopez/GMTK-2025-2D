@@ -7,28 +7,28 @@ using System.Linq;
 
 namespace GMTK {
 
-
-  // Collision state tracking
-  public struct CollisionState {
-    public bool hasValidPositionCollision;
-    public bool hasValidRotationCollision;
-    public Vector3 accumulatedForce;
-    public float accumulatedTorque;
-    public int collisionCount;
-
-    public void Reset() {
-      hasValidPositionCollision = false;
-      hasValidRotationCollision = false;
-      accumulatedForce = Vector3.zero;
-      accumulatedTorque = 0f;
-      collisionCount = 0;
-    }
-  }
   public enum CollisionSourceFilter { Everything, MarbleOnly, ElementsOnly }
+
+  [Flags]
+  public enum TransformChangeSource { None = 0, OnCollision = 1, OnDrag = 2  }
 
   /// <summary>
   /// Physics component for PlayableElement that handles rotation, movement, and collision behavior.
   /// Auto Rotation, Gravity and Material properties are now handled by separate components.
+  /// 
+  /// <para>Implemented Lifecycle methods:</para>
+  ///   1. Initialize<br/>
+  ///   2. Validate<br/>
+  ///   3. OnUpdate<br/>
+  ///   4. ResetComponent<br/>
+  ///   5. FinalizeComponent
+  /// 
+  /// <para>Implemented Event Listeners:</para>
+  ///   1. OnDragStart - UnityEvent<br/>
+  ///   2. OnDragEnd - UnityEvent<br/>
+  ///   3. OnCollisionEnter2D - Physics<br/>
+  ///   4. OnCollisionStay2D - Physics<br/>
+  ///   5. OnCollisionExit2D - Physics<br/>
   /// </summary>
   [AddComponentMenu("GMTK/Playable Element Components/Physics Element Component")]
   public class PhysicsElementComponent : PlayableElementComponent {
@@ -36,46 +36,93 @@ namespace GMTK {
     #region Serialized Fields
 
     [Header("Collision Settings")]
-    [Tooltip("Whether this element changes its position when colliding with other elements. If true, other elements can move it when colliding (eg: push). If false, collision with other elements will not move it")]
-    [Help("By enabling 'ChangePositionOnCollision', this element will change its position when colliding with other elements. If false, collisions with other elements will not move it", UnityEditor.MessageType.Info)]
-    public bool ChangePositionOnCollision = false;
-    [Tooltip("Determines which objects can move this element through collision")]
-    public CollisionSourceFilter CanBeMovedBy = CollisionSourceFilter.Everything;
-    [Space(10)]
-    [Tooltip("Whether this element changes its angle when colliding with other elements. If true, other elements can rotate it when colliding. If false, collision with other elements will not rotate it. NOTE: This will override the CanRotate setting from PlayableElement")]
-    [Help("By enabling 'ChangeRotationOnCollision', this element will change its angle when colliding with other elements. If false, collisions with other elements will not rotate it. NOTE: If true, this will override the 'CanRotate' setting from PlayableElement", UnityEditor.MessageType.Info)]
-    public bool ChangeRotationOnCollision = false;
-    [Tooltip("Determines which objects can rotate this element through collision")]
-    public CollisionSourceFilter CanBeRotatedBy = CollisionSourceFilter.Everything;
+    [Space]
+    public bool DisableAllCollisions = false;
+    [Space]
+    [Tooltip("If true, the element will dispatch GameEvents on collisions. Otherwise, collisions won't be notified. Set it to false if the element will be static in the level.")]
+    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
+    public bool TriggerCollisionEvents = true;
 
-    [Space(5)]
+    [Space(10)]
+    [Header("Movement Settings")]
+    [Space]
+
+    [Tooltip("Whether this element can change its position when colliding (default) with other element, while dragging when overlaping with other elements, both or none.")]
+    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
+    public TransformChangeSource PositionChanges = TransformChangeSource.None;
+    [Tooltip("Determines which objects can move this element on collisions")]
+    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
+    public CollisionSourceFilter CanBeMovedBy = CollisionSourceFilter.Everything;
+    [Tooltip("MMF Player for collision feedback")]
+    public MMF_Player PositionChangeFeedback;
+
     [Header("Movement Constraints")]
+
+    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.None)]
+    [Help("Add a Position Change condition to enable movement constrains",UnityEditor.MessageType.None)]
+    [DisplayWithoutEdit] public string NoMovementConstrains = string.Empty;
+
+    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("If true, the element's movement will be constrained vertically (Y axis)")]
     public bool ConstrainVerticalMovement = false;
+    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("If true, the element's movement will be constrained horizontally (X axis)")]
     public bool ConstrainHorizontalMovement = false;
+    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("Minimum position bounds for the element")]
     public Vector2Int MinPosition = new(-100, -100);
+    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("Maximum position bounds for the element")]
     public Vector2Int MaxPosition = new(100, 100);
+    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("If true, the element's movement will be constrained to a grid (eg: only move in increments of grid cell size)")]
     public bool SnapToGridOnMove = true;
+    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("If true, the element will not be able to move through other elements (eg: will collide and stop)")]
     public bool SolidOnCollision = true;
-
+  
+    [Space(10)]
     [Header("Rotation Settings")]
-    [Tooltip("Whether this element can rotate")]
-    public bool AllowRotation = false;
+    [Space]
+
+    [Tooltip("Whether this element can change its rotation when colliding (default) with other element, while dragging when overlaping with other elements, both or none.")]
+    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
+    public TransformChangeSource RotationChanges = TransformChangeSource.None;
+    [Tooltip("Determines which objects can rotate this element through collision")]
+    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
+    public CollisionSourceFilter CanBeRotatedBy = CollisionSourceFilter.Everything;
+    [Tooltip("MMF Player for rotation feedback")]
+    public MMF_Player RotationChangeFeedback;
+    
+    [Header("Rotation Constrains")]
+
+    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.None)]
+    [Help("Add a Rotation Change condition to enable rotation constrains", UnityEditor.MessageType.None)]
+    [DisplayWithoutEdit] public string NoRotationConstrains = string.Empty;
+
+    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("How many degrees the element will rotate every time is requested. Uses extension methods that handle flip state automatically.")]
     public float RotationStep = 90;
+    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("If true, you can limit the rotation angle using MinRotationAngle and MaxRotationAngle")]
     public bool LimitRotationAngle = false;
+    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("The min and max angle the element can rotate")]
     [Range(-180f, 180f)]
     public float MinRotationAngle = -45f;
+    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Range(-180f, 180f)]
     public float MaxRotationAngle = 45f;
 
+    [Space(10)]
+    [Header("Feedbacks")]
+    [Tooltip("Collision intensity calculator to use for this object. If null, no collision intensity will be calculated.")]
+    public CollisionIntensityCalculator IntensityCalculator;
+    [Space(5)]
+    [Tooltip("MMF Player for constraint violation feedback")]
+    public MMF_Player ConstraintViolationFeedback;
+
+    [Space(10)]
     [Header("Debug")]
     [SerializeField, DisplayWithoutEdit] private Rigidbody2D _rigidbody2D;
     [SerializeField, DisplayWithoutEdit] private PolygonCollider2D _collider2D;
@@ -84,17 +131,6 @@ namespace GMTK {
     [SerializeField, DisplayWithoutEdit] private bool _pendingRotationCollision = false;
     [SerializeField, DisplayWithoutEdit] private Vector3 _pendingCollisionForce = Vector3.zero;
     [SerializeField, DisplayWithoutEdit] private float _pendingRotationForce = 0f;
-
-    [Header("Feedbacks")]
-    [Tooltip("Collision intensity calculator to use for this object. If null, no collision intensity will be calculated.")]
-    public CollisionIntensityCalculator IntensityCalculator;
-    [Space(5)]
-    [Tooltip("MMF Player for collision feedback")]
-    public MMF_Player CollisionFeedback;
-    [Tooltip("MMF Player for rotation feedback")]
-    public MMF_Player RotationFeedback;
-    [Tooltip("MMF Player for constraint violation feedback")]
-    public MMF_Player ConstraintViolationFeedback;
 
     #endregion
 
@@ -106,7 +142,7 @@ namespace GMTK {
     private Vector3 _lastValidPosition;
     private Vector3 _lastValidRotation;
     private bool _isValidatingMovement = false;
-    private bool _isDragOverride = false; // Track when dragging should override collision settings
+    //private bool _isDragOverride = false; // Track when dragging should override collision settings
 
     // Component references
     private GravityElementComponent _gravityComponent;
@@ -115,6 +151,42 @@ namespace GMTK {
 
     private CollisionState _currentCollisionState;
 
+    #endregion
+
+    #region Public fields
+
+    /*
+     * TODO
+     * flag methods for rigidbody
+     * test component
+     * reduce boilerplate
+     */
+
+    // rigidbody constrains
+    public bool RigidbodyCanRotate => _rigidbody2D != null && _rigidbody2D.bodyType != RigidbodyType2D.Static && !_rigidbody2D.constraints.HasFlag(RigidbodyConstraints2D.FreezeRotation);
+
+    public bool RigidbodyCanMove => _rigidbody2D != null && _rigidbody2D.bodyType != RigidbodyType2D.Static && !_rigidbody2D.constraints.HasFlag(RigidbodyConstraints2D.FreezePosition);
+
+    public bool RigidBodyCanMoveAndRotate => RigidbodyCanMove && RigidbodyCanRotate;
+
+    // position change flags
+    public bool AllowsPositionChanges => PositionChanges != TransformChangeSource.None;
+    public bool PositionChangesDisabled => !AllowsPositionChanges;
+    public bool AllowsPositionChangesOnCollision => AllowsPositionChanges && PositionChanges.HasFlag(TransformChangeSource.OnCollision);
+    public bool AllowsPositionChangesWhileDragging => AllowsPositionChanges && PositionChanges.HasFlag(TransformChangeSource.OnDrag) && _playableElement.IsDraggable;
+
+    // rotation change flags
+    public bool AllowsRotationChanges => RotationChanges != TransformChangeSource.None && _playableElement.CanRotate;
+    public bool RotationChangesDisabled => !AllowsRotationChanges;
+    public bool AllowsRotationChangesOnCollision => AllowsRotationChanges && RotationChanges.HasFlag(TransformChangeSource.OnCollision);
+    public bool AllowsRotationChangesWhileDragging => AllowsRotationChanges && RotationChanges.HasFlag(TransformChangeSource.OnDrag);
+    // combo flags
+    public bool AllowsPositionAndRotationChanges => AllowsPositionChanges && AllowsRotationChanges;
+    public bool AllowsAllOnCollision => AllowsPositionChangesOnCollision && AllowsRotationChangesOnCollision;
+    public bool AllowsAllWhileDragging => AllowsPositionChangesWhileDragging && AllowsRotationChangesWhileDragging;
+
+    // all transform and rigidbody flags are disabbled
+    public bool IsStaticElement => !AllowsPositionAndRotationChanges && !RigidBodyCanMoveAndRotate;
     #endregion
 
     #region Component Methods
@@ -154,8 +226,8 @@ namespace GMTK {
 
       _currentRotation = _initialRotation.eulerAngles.z;
 
-      // Handle rotation override
-      InitRotationOverrides();
+      //// Handle rotation override
+      //InitRotationOverrides();
 
       // Apply initial movement control
       InitMovementControls();
@@ -172,7 +244,7 @@ namespace GMTK {
       }
       _lastValidPosition = _initialPosition;
       _lastValidRotation = _initialRotation.eulerAngles;
-      _isDragOverride = false;
+      //_isDragOverride = false;
       _currentCollisionState.Reset();
     }
 
@@ -208,10 +280,10 @@ namespace GMTK {
     #region Initialize/OnUpdate Methods
     protected virtual void InitMovementControls() {
       // Determine what movements are allowed
-      bool canMoveFromCollision = ChangePositionOnCollision;
-      bool canMoveFromDrag = _playableElement.IsBeingDragged || _isDragOverride;
-      bool canRotateFromCollision = ChangeRotationOnCollision;
-      bool canRotateFromInput = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
+      bool canMoveFromCollision = AllowsPositionChangesOnCollision && RigidbodyCanMove;
+      bool canMoveFromDrag = AllowsPositionChangesWhileDragging;
+      bool canRotateFromCollision = AllowsRotationChangesOnCollision && RigidbodyCanRotate;
+      bool canRotateFromInput = _playableElement.CanRotate;
       bool needsGravity = _gravityComponent != null && _gravityComponent.IsAffectedByGravity();
       bool hasAutoRotation = _autoRotationComponent != null && _autoRotationComponent.IsCurrentlyRotating();
 
@@ -245,7 +317,7 @@ namespace GMTK {
       _rigidbody2D.constraints = constraints;
 
       // Special handling for immovable objects that need to remain kinematic for collision detection
-      if (!ChangePositionOnCollision && !_isDragOverride && !canRotateFromInput && !ChangeRotationOnCollision && !hasAutoRotation) {
+      if (PositionChangesDisabled && !canRotateFromInput && RotationChangesDisabled && !hasAutoRotation) {
         // For truly static elements, we can make them kinematic to ensure they never move
         // but still participate in collision detection
         _rigidbody2D.bodyType = RigidbodyType2D.Kinematic;
@@ -253,19 +325,19 @@ namespace GMTK {
       }
     }
 
-    protected virtual void InitRotationOverrides() {
-      // If ChangeRotationOnCollision is enabled, override PlayableElement rotation capabilities
-      if (ChangeRotationOnCollision) {
-        _playableElement.CanRotate = AllowRotation; // Use our rotation setting instead
-      }
-    }
+    //protected virtual void InitRotationOverrides() {
+    //  // If AllowsRotationChanges is enabled, override PlayableElement rotation capabilities
+    //  if (AllowsRotationChanges) {
+    //    _playableElement.CanRotate = AllowRotation; // Use our rotation setting instead
+    //  }
+    //}
 
     /// <summary>
     /// Process collisions added to the _currentCollisionState during the frame.
     /// </summary>
     private void UpdatePendingCollisions() {
       // Process position collision if valid
-      if (_currentCollisionState.hasValidPositionCollision && ChangePositionOnCollision) {
+      if (_currentCollisionState.hasValidPositionCollision && AllowsPositionChanges) {
         ApplyPositionCollisionForce(_currentCollisionState.accumulatedForce);
         _pendingPositionCollision = true;
       }
@@ -274,7 +346,7 @@ namespace GMTK {
       }
 
       // Process rotation collision if valid
-      if (_currentCollisionState.hasValidRotationCollision && ChangeRotationOnCollision) {
+      if (_currentCollisionState.hasValidRotationCollision && AllowsRotationChangesOnCollision) {
         ApplyRotationCollisionForce(_currentCollisionState.accumulatedTorque);
         _pendingRotationCollision = true;
       }
@@ -309,13 +381,10 @@ namespace GMTK {
       }
     }
 
-
     protected virtual void UpdateRotationControls() {
       // Auto rotation is now handled by AutoRotationElementComponent
       // Only apply manual rotation limits here
-
-      bool rotationAllowed = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
-      if (!rotationAllowed && !ChangeRotationOnCollision) return;
+      if (RotationChangesDisabled) return;
 
       // Apply rotation limits by stopping angular velocity at limits
       if (LimitRotationAngle) {
@@ -330,7 +399,7 @@ namespace GMTK {
 
     protected virtual void UpdateMovementConstraints() {
       // Only apply constraints if movement is allowed or element is being dragged
-      if (!ChangePositionOnCollision && !_isDragOverride) return;
+      if (!AllowsPositionChanges) return;
 
       Vector3 currentPos = _playableElement.SnapTransform.position;
       Vector3 constrainedPos = ApplyPositionConstraints(currentPos);
@@ -348,7 +417,7 @@ namespace GMTK {
 
     protected virtual void UpdateCollisionRules() {
       // Enforce position collision rules
-      if (!ChangePositionOnCollision && !_isDragOverride) {
+      if (AllowsPositionChangesOnCollision) {
         Vector3 currentPos = _playableElement.SnapTransform.position;
         if (Vector3.Distance(currentPos, _lastValidPosition) > 0.01f) {
           RestoreLastValidPosition();
@@ -360,8 +429,8 @@ namespace GMTK {
       }
 
       // Enforce rotation collision rules
-      bool rotationAllowed = ChangeRotationOnCollision || _isDragOverride;
-      if (!rotationAllowed) {
+      //bool rotationAllowed = AllowsRotationChangesOnCollision || AllowsRotationChangesWhileDragging; 
+      if (RotationChangesDisabled) {
         // Check if rotation has changed when it shouldn't have
         float currentRotationZ = _rigidbody2D.rotation;
         float lastValidRotationZ = _lastValidRotation.z;
@@ -379,8 +448,8 @@ namespace GMTK {
 
     protected virtual void UpdateRotationLimits() {
       // Only validate if rotation limits are enabled and rotation is allowed in some form
-      bool rotationAllowed = AllowRotation || ChangeRotationOnCollision || _isDragOverride;
-      if (!LimitRotationAngle || !rotationAllowed) return;
+      //bool rotationAllowed = AllowRotation || ChangeRotationOnCollision || _playableElement.IsDraggable; // ? why draggable is included
+      if (!LimitRotationAngle || RotationChangesDisabled) return;
 
       // Get the current rotation from rigidbody (single source of truth)
       float currentRotation = _rigidbody2D.rotation;
@@ -412,17 +481,17 @@ namespace GMTK {
     #endregion
 
     #region Event Handlers 
-    protected void OnDragStart(PlayableElementEventArgs evt) {
+    public override void OnDragStart(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
 
-      _isDragOverride = true;
+      //_isDragOverride = true;
       InitMovementControls(); // Update rigidbody settings for dragging
     }
 
-    protected void OnDragEnd(PlayableElementEventArgs evt) {
+    public override void OnDragEnd(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
 
-      _isDragOverride = false;
+      //_isDragOverride = false;
       InitMovementControls(); // Restore normal rigidbody settings
     }
 
@@ -431,9 +500,9 @@ namespace GMTK {
       PrimeCollisionProcessing(collision);
 
       // Feel integration - play collision feedback based on force
-      if (CollisionFeedback != null) {
+      if (PositionChangeFeedback != null) {
         float intensity = CalculateCollisionIntensity(collision);
-        CollisionFeedback.PlayFeedbacks(transform.position, intensity);
+        PositionChangeFeedback.PlayFeedbacks(transform.position, intensity);
       }
       RaiseCollisionEvent(PlayableElementEventType.CollisionStart, collision);
     }
@@ -452,7 +521,11 @@ namespace GMTK {
       }
       RaiseCollisionEvent(PlayableElementEventType.Collisioning, collision);
     }
-   private void RaiseCollisionEvent(PlayableElementEventType eventType, Collision2D collision) {
+
+    private void RaiseCollisionEvent(PlayableElementEventType eventType, Collision2D collision) {
+      // handle when collision events are disabled
+      if (!TriggerCollisionEvents) return;
+
       List<ContactPoint2D> collisionPoints = new();
       if (collision.GetContacts(collisionPoints) > 0) {
         var otherObject = collision.gameObject;
@@ -462,16 +535,13 @@ namespace GMTK {
     }
 
     protected void OnRotateCW(PlayableElementEventArgs evt) {
-      bool canRotate = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
-      if (canRotate) {
+      if (AllowsRotationChanges) {
         ApplyExtensionRotation(true); // Use extension method for clockwise rotation
         evt.Handled = true; // Prevent default rotation behavior
       }
     }
-
     protected void OnRotateCCW(PlayableElementEventArgs evt) {
-      bool canRotate = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
-      if (canRotate) {
+      if (AllowsRotationChanges) {
         ApplyExtensionRotation(false); // Use extension method for counter-clockwise rotation
         evt.Handled = true; // Prevent default rotation behavior
       }
@@ -482,7 +552,7 @@ namespace GMTK {
     #region Collision
 
     private void ApplyPositionCollisionForce(Vector3 force) {
-      if (!ChangePositionOnCollision && !_isDragOverride) return;
+      if (!AllowsPositionChangesOnCollision) return;
 
       // Apply the accumulated force from collisions
       if (force.magnitude > 0.001f) {
@@ -498,7 +568,7 @@ namespace GMTK {
     }
 
     private void ApplyRotationCollisionForce(float torque) {
-      if (!ChangeRotationOnCollision && !_isDragOverride) return;
+      if (!AllowsRotationChangesOnCollision) return;
 
       // Apply the accumulated torque from collisions
       if (Mathf.Abs(torque) > 0.001f) {
@@ -551,7 +621,7 @@ namespace GMTK {
       GameObject collisionObject = collision.gameObject;
 
       // Check if this collision should affect position
-      if (ChangePositionOnCollision && IsCollisionSourceValid(collisionObject, CanBeMovedBy)) {
+      if (AllowsPositionChangesOnCollision && IsCollisionSourceValid(collisionObject, CanBeMovedBy)) {
         _currentCollisionState.hasValidPositionCollision = true;
 
         // Calculate collision force based on contact points
@@ -560,7 +630,7 @@ namespace GMTK {
       }
 
       // Check if this collision should affect rotation
-      if (ChangeRotationOnCollision && IsCollisionSourceValid(collisionObject, CanBeRotatedBy)) {
+      if (AllowsRotationChangesOnCollision && IsCollisionSourceValid(collisionObject, CanBeRotatedBy)) {
         _currentCollisionState.hasValidRotationCollision = true;
 
         // Calculate collision torque based on contact points
@@ -611,11 +681,11 @@ namespace GMTK {
         _isValidatingMovement = true;
         _playableElement.SnapTransform.position = _lastValidPosition;
         _rigidbody2D.position = _lastValidPosition;
-        _rigidbody2D.linearVelocity = Vector2.zero; // Stop any movement
+        if(_rigidbody2D.bodyType != RigidbodyType2D.Static) _rigidbody2D.linearVelocity = Vector2.zero; // Stop any movement
         _isValidatingMovement = false;
+        //this.Log($"RestoreLastValidPosition {_playableElement.name} : {_lastValidPosition}");
       }
     }
-
 
     private Vector3 ApplyPositionConstraints(Vector3 position) {
       Vector3 constrainedPos = position;
@@ -634,8 +704,8 @@ namespace GMTK {
 
       // Apply grid snapping if enabled
       if (SnapToGridOnMove && _levelGrid != null) {
-        Vector2Int gridPos = _levelGrid.WorldToGrid(constrainedPos);
-        constrainedPos = _levelGrid.SnapToGrid(gridPos);
+        //Vector2Int gridPos = _levelGrid.WorldToGrid(constrainedPos);
+        constrainedPos = _levelGrid.SnapToGrid(constrainedPos);
       }
 
       return constrainedPos;
@@ -691,53 +761,51 @@ namespace GMTK {
     /// <param name="clockwise">If true, rotates clockwise; otherwise counter-clockwise</param>
     /// <param name="skipPermissionCheck">If true, applies rotation regardless of permissions</param>
     private void ApplyExtensionRotation(bool clockwise, bool skipPermissionCheck = false) {
-      if (!skipPermissionCheck) {
-        bool canRotate = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
-        if ((!canRotate && !ChangeRotationOnCollision && !_isDragOverride) || _rigidbody2D.bodyType == RigidbodyType2D.Static)
-          return;
-      }
+      // apply them only if allows rotation or skipping permission check
+      if (!skipPermissionCheck || (AllowsRotationChanges && _rigidbody2D.bodyType != RigidbodyType2D.Static)) {
 
-      // Store current rotation for validation
-      float previousRotation = _rigidbody2D.rotation;
+        // Store current rotation for validation
+        float previousRotation = _rigidbody2D.rotation;
 
-      // Apply the rotation using extension methods with RotationStep parameter
-      if (clockwise) {
-        _playableElement.SnapTransform.RotateClockwise(RotationStep);
-      }
-      else {
-        _playableElement.SnapTransform.RotateCounterClockwise(RotationStep);
-      }
-
-      // Get the new rotation after applying extension method
-      float newRotation = _playableElement.SnapTransform.eulerAngles.z;
-
-      // Apply rotation limits if enabled
-      if (LimitRotationAngle) {
-        // Normalize to -180 to 180 range for comparison
-        float normalizedRotation = newRotation;
-        if (normalizedRotation > 180f) normalizedRotation -= 360f;
-        if (normalizedRotation < -180f) normalizedRotation += 360f;
-
-        if (normalizedRotation < MinRotationAngle || normalizedRotation > MaxRotationAngle) {
-          // Revert to previous rotation if it exceeds limits
-          SetRotation(previousRotation, true);
-          return;
+        // Apply the rotation using extension methods with RotationStep parameter
+        if (clockwise) {
+          _playableElement.SnapTransform.RotateClockwise(RotationStep);
         }
-      }
+        else {
+          _playableElement.SnapTransform.RotateCounterClockwise(RotationStep);
+        }
 
-      // Sync the rigidbody rotation with transform
-      _rigidbody2D.MoveRotation(newRotation);
-      _rigidbody2D.angularVelocity = 0f; // Stop any ongoing rotation
+        // Get the new rotation after applying extension method
+        float newRotation = _playableElement.SnapTransform.eulerAngles.z;
 
-      // Update tracking variables
-      _currentRotation = newRotation;
-      _lastValidRotation = new Vector3(0, 0, newRotation);
+        // Apply rotation limits if enabled
+        if (LimitRotationAngle) {
+          // Normalize to -180 to 180 range for comparison
+          float normalizedRotation = newRotation;
+          if (normalizedRotation > 180f) normalizedRotation -= 360f;
+          if (normalizedRotation < -180f) normalizedRotation += 360f;
 
-      //this.Log($"Applied extension rotation {(clockwise ? "CW" : "CCW")} to {newRotation}° with step {RotationStep}° (flippedX: {_playableElement.SnapTransform.IsFlippedX()}, flippedY: {_playableElement.SnapTransform.IsFlippedY()})");
+          if (normalizedRotation < MinRotationAngle || normalizedRotation > MaxRotationAngle) {
+            // Revert to previous rotation if it exceeds limits
+            SetRotation(previousRotation, true);
+            return;
+          }
+        }
 
-      // Feel integration - provide rotation feedback
-      if (RotationFeedback != null && newRotation != previousRotation) {
-        RotationFeedback.PlayFeedbacks(transform.position, 1f);
+        // Sync the rigidbody rotation with transform
+        _rigidbody2D.MoveRotation(newRotation);
+        _rigidbody2D.angularVelocity = 0f; // Stop any ongoing rotation
+
+        // Update tracking variables
+        _currentRotation = newRotation;
+        _lastValidRotation = new Vector3(0, 0, newRotation);
+
+        //this.Log($"Applied extension rotation {(clockwise ? "CW" : "CCW")} to {newRotation}° with step {RotationStep}° (flippedX: {_playableElement.SnapTransform.IsFlippedX()}, flippedY: {_playableElement.SnapTransform.IsFlippedY()})");
+
+        // Feel integration - provide rotation feedback
+        if (RotationChangeFeedback != null && newRotation != previousRotation) {
+          RotationChangeFeedback.PlayFeedbacks(transform.position, 1f);
+        }
       }
     }
 
@@ -748,32 +816,30 @@ namespace GMTK {
     /// <param name="degrees">Degrees to rotate by</param>
     /// <param name="skipPermissionCheck">If true, applies rotation regardless of permissions (used for corrections)</param>
     private void ApplyRotationChange(float degrees, bool skipPermissionCheck = false) {
-      if (!skipPermissionCheck) {
-        bool canRotate = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
-        if ((!canRotate && !ChangeRotationOnCollision && !_isDragOverride) || _rigidbody2D.bodyType == RigidbodyType2D.Static)
+      // apply them only if allows rotation or skipping permission check
+      if (!skipPermissionCheck || (AllowsRotationChanges && _rigidbody2D.bodyType != RigidbodyType2D.Static)) {
+
+        // If the rotation amount matches our RotationStep, use extension methods for flip-state awareness
+        if (Mathf.Approximately(Mathf.Abs(degrees), RotationStep)) {
+          ApplyExtensionRotation(degrees < 0, skipPermissionCheck);
           return;
+        }
+
+        // Fall back to traditional rotation for non-standard angles
+        float currentAngle = _rigidbody2D.rotation;
+        float targetAngle = currentAngle + degrees;
+
+        //this.Log($"Applying rotation change: {degrees} degrees (current: {currentAngle}, target: {targetAngle})");
+
+        // Apply limits if enabled
+        if (LimitRotationAngle) {
+          targetAngle = Mathf.Clamp(targetAngle, MinRotationAngle, MaxRotationAngle);
+          //this.Log($"Clamped to {targetAngle} due to rotation limits ({MinRotationAngle}, {MaxRotationAngle})");
+        }
+
+        // Apply the rotation using centralized method
+        SetRotation(targetAngle);
       }
-
-      // If the rotation amount matches our RotationStep, use extension methods for flip-state awareness
-      if (Mathf.Approximately(Mathf.Abs(degrees), RotationStep)) {
-        ApplyExtensionRotation(degrees < 0, skipPermissionCheck);
-        return;
-      }
-
-      // Fall back to traditional rotation for non-standard angles
-      float currentAngle = _rigidbody2D.rotation;
-      float targetAngle = currentAngle + degrees;
-
-      //this.Log($"Applying rotation change: {degrees} degrees (current: {currentAngle}, target: {targetAngle})");
-
-      // Apply limits if enabled
-      if (LimitRotationAngle) {
-        targetAngle = Mathf.Clamp(targetAngle, MinRotationAngle, MaxRotationAngle);
-        //this.Log($"Clamped to {targetAngle} due to rotation limits ({MinRotationAngle}, {MaxRotationAngle})");
-      }
-
-      // Apply the rotation using centralized method
-      SetRotation(targetAngle);
     }
 
     /// <summary>
@@ -878,100 +944,11 @@ namespace GMTK {
       _lastValidRotation = new Vector3(0, 0, newRotation);
     }
 
-    /// <summary>
-    /// Checks if the element is currently flipped on the X-axis.
-    /// </summary>
-    /// <returns>True if flipped on X-axis, false otherwise</returns>
-    public bool IsFlippedX() {
-      return _playableElement.SnapTransform.IsFlippedX();
-    }
-
-    /// <summary>
-    /// Checks if the element is currently flipped on the Y-axis.
-    /// </summary>
-    /// <returns>True if flipped on Y-axis, false otherwise</returns>
-    public bool IsFlippedY() {
-      return _playableElement.SnapTransform.IsFlippedY();
-    }
-
-    public void CancelRotation() {
-      SetRotation(0f, true);
-    }
-
-    public void EnableRotation(bool enabled) {
-      AllowRotation = enabled;
-      InitRotationOverrides();
-      InitMovementControls();
-    }
-
-    public void EnablePositionChangeOnCollision(bool enabled) {
-      ChangePositionOnCollision = enabled;
-      InitMovementControls();
-    }
-
-    public void EnableRotationChangeOnCollision(bool enabled) {
-      ChangeRotationOnCollision = enabled;
-      InitRotationOverrides();
-      InitMovementControls();
-    }
-
-    public void SetCanBeMovedBy(CollisionSourceFilter filter) {
-      CanBeMovedBy = filter;
-    }
-
-    public void SetCanBeRotatedBy(CollisionSourceFilter filter) {
-      CanBeRotatedBy = filter;
-    }
-
-    public void SetMovementConstraints(bool constrainHorizontal, bool constrainVertical) {
-      ConstrainHorizontalMovement = constrainHorizontal;
-      ConstrainVerticalMovement = constrainVertical;
-      InitMovementControls();
-    }
-
-    public void SetPositionBounds(Vector2Int min, Vector2Int max) {
-      MinPosition = min;
-      MaxPosition = max;
-    }
-
-    public void SetSnapToGridOnMove(bool enabled) {
-      SnapToGridOnMove = enabled;
-    }
-
-    public void SetSolidCollision(bool enabled) {
-      SolidOnCollision = enabled;
-      if (_collider2D != null) {
-        _collider2D.isTrigger = !enabled;
-      }
-    }
-
-    public void SetRotationRange(float minAngle, float maxAngle) {
-      MinRotationAngle = minAngle;
-      MaxRotationAngle = maxAngle;
-    }
-
-    /// <summary>
-    /// Sets the rotation step amount used by the extension methods.
-    /// </summary>
-    /// <param name="step">The rotation step in degrees</param>
-    public void SetRotationStep(float step) {
-      RotationStep = step;
-    }
-
     // Integration methods for other components
     public void OnGravityChanged(bool hasGravity, float multiplier) {
       // Called by GravityElementComponent when gravity settings change
       InitMovementControls(); // Update rigidbody type if needed
     }
-
-    public void OnAutoRotationChanged(bool isRotating) {
-      // Called by AutoRotationElementComponent when auto rotation state changes
-      InitMovementControls(); // Update rigidbody type if needed
-    }
-
-    // Query methods for other components
-    public bool IsRotationOverridden() => ChangeRotationOnCollision;
-    public bool CanCurrentlyRotate() => ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
 
     #endregion
 
@@ -983,8 +960,8 @@ namespace GMTK {
       Vector3 pos = _playableElement.SnapTransform.position;
 
       // Show rotation limits
-      bool rotationAllowed = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
-      if ((rotationAllowed || ChangeRotationOnCollision) && LimitRotationAngle) {
+      //bool rotationAllowed = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
+      if (AllowsRotationChanges && LimitRotationAngle) {
         float zRotation = _playableElement.SnapTransform.rotation.eulerAngles.z;
         Gizmos.color = Color.red;
         Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, zRotation + MinRotationAngle) * Vector3.right * 2f);
@@ -992,7 +969,9 @@ namespace GMTK {
       }
 
       // Show rotation step visualization
-      if (rotationAllowed || ChangeRotationOnCollision) {
+
+      //if (rotationAllowed || ChangeRotationOnCollision) {
+      if (AllowsRotationChanges) { 
         Gizmos.color = Color.cyan;
         float currentRotation = _playableElement.SnapTransform.eulerAngles.z;
         // Show current rotation direction
@@ -1012,7 +991,7 @@ namespace GMTK {
       }
 
       // Show position bounds
-      if (ChangePositionOnCollision) {
+      if (AllowsPositionChanges) {
         Gizmos.color = Color.yellow;
         Vector3 boundsSize = new Vector3(MaxPosition.x - MinPosition.x, MaxPosition.y - MinPosition.y, 0);
         Vector3 boundsCenter = new Vector3(
@@ -1048,12 +1027,29 @@ namespace GMTK {
       }
 
       // Show immovable status
-      if (!ChangePositionOnCollision && !ChangeRotationOnCollision) {
+      if (PositionChangesDisabled && RotationChangesDisabled) {
         Gizmos.color = Color.gray;
         Gizmos.DrawWireCube(pos, _collider2D != null ? _collider2D.bounds.size : Vector3.one);
       }
     }
 
     #endregion
+  }
+
+  // Collision state tracking
+  public struct CollisionState {
+    public bool hasValidPositionCollision;
+    public bool hasValidRotationCollision;
+    public Vector3 accumulatedForce;
+    public float accumulatedTorque;
+    public int collisionCount;
+
+    public void Reset() {
+      hasValidPositionCollision = false;
+      hasValidRotationCollision = false;
+      accumulatedForce = Vector3.zero;
+      accumulatedTorque = 0f;
+      collisionCount = 0;
+    }
   }
 }

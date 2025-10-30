@@ -127,7 +127,7 @@ namespace GMTK {
 
       if (Model == null) { Model = this.gameObject; }
 
-      // Auto-populate IntensityCalculator if not assigned
+      // Auto-populate RotationIntensityCalculator if not assigned
       if (IntensityCalculator == null) {
         IntensityCalculator = GetComponent<MarbleCollisionIntensityCalculator>();
         if (IntensityCalculator == null) {
@@ -287,7 +287,7 @@ namespace GMTK {
 
       // Ensure we have an intensity calculator
       if (IntensityCalculator == null) {
-        this.LogWarning("No IntensityCalculator assigned. Cannot calculate collision intensity.");
+        this.LogWarning("No RotationIntensityCalculator assigned. Cannot calculate collision intensity.");
         return;
       }
 
@@ -725,7 +725,7 @@ namespace GMTK {
         this.Log($"  Intensity Range: {IntensityCalculator.CollisionIntensityRange.x:F2} - {IntensityCalculator.CollisionIntensityRange.y:F2}");
       }
       else {
-        this.LogWarning("No IntensityCalculator assigned!");
+        this.LogWarning("No RotationIntensityCalculator assigned!");
       }
 
       // Check all PlayableElements

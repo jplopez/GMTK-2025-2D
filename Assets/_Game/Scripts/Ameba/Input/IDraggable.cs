@@ -34,37 +34,18 @@ namespace Ameba {
     /// <summary>
     /// Called when the object starts being dragged.
     /// </summary>
-    void OnDragStart();
+    void DragStart();
 
     /// <summary>
     /// Called continuously while the object is being dragged.
     /// </summary>
     /// <param name="worldPosition">Current world position of the pointer</param>
-    void OnDragUpdate(Vector3 worldPosition);
+    void DraggingUpdate(Vector3? worldPosition);
 
     /// <summary>
     /// Called when the object stops being dragged.
     /// </summary>
-    void OnDragEnd();
+    void DragEnd();
 
-    /// <summary>
-    /// Called when the pointer enters the object (hover start).
-    /// </summary>
-    void OnPointerOver();
-
-    /// <summary>
-    /// Called when the pointer exits the object (hover end).
-    /// </summary>
-    void OnPointerOut();
-
-    /// <summary>
-    /// Called when the object becomes active/selected.
-    /// </summary>
-    void OnBecomeActive();
-
-    /// <summary>
-    /// Called when the object loses active/selected status.
-    /// </summary>
-    void OnBecomeInactive();
   }
 }

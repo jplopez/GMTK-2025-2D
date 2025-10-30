@@ -46,13 +46,13 @@ namespace GMTK {
     #region Event Listeners
 
     /// <summary>
-    /// Event handler for PlayableElementEventType.OnPointerOver events.
+    /// Event handler for PlayableElementEventType.OnHovered events.
     /// </summary>
     /// <param name="evt"></param>
     public void OnPointerOver(PlayableElementEventArgs evt) => ToggleHover(evt, true);
 
     /// <summary>
-    /// Event handler for PlayableElementEventType.OnPointerOut events.
+    /// Event handler for PlayableElementEventType.OnUnhovered events.
     /// </summary>
     /// <param name="evt"></param>
     public void OnPointerOut(PlayableElementEventArgs evt) => ToggleHover(evt, false);
@@ -68,7 +68,7 @@ namespace GMTK {
 
         // check if hover triggers selection
         if (HasSelectionTrigger(SelectionTrigger.OnHover) && _playableElement.CanSelect) {
-            this.LogDebug($"Element {_playableElement.name} selected by hover, delegating to " + (toggle ? "OnSelected" : "OnDeselected"));
+            this.LogDebug($"Element {_playableElement.name} selected by hover, delegating to " + (toggle ? "OnSelect" : "OnDeselected"));
           //we check if toggle matches element.IsSelected, because
           //that change occurs in the PlayableElement before raising the event
           if (toggle && _playableElement.IsSelected) {
@@ -104,7 +104,7 @@ namespace GMTK {
     public override void OnUnhovered(PlayableElementEventArgs args) => OnPointerOut(args);
 
     /// <summary>
-    /// Event handler for PlayableElementEventType.OnSelected events.
+    /// Event handler for PlayableElementEventType.OnSelect events.
     /// </summary>
     /// <param name="evt"></param>
     public override void OnSelected(PlayableElementEventArgs evt) => ToggleSelected(evt, true);

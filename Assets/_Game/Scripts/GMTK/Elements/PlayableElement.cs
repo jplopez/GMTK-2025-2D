@@ -47,9 +47,6 @@ namespace GMTK {
 
     //UnityEvents
     //[Help("UnityEvents to add additional behaviors to PlayableElements. PlayableElementComponent-derived components attached to the same GameObject subscribe to this events automatically")]
-    [Header("Initialize")]
-    public UnityEvent<PlayableElementEventArgs> BeforeInitialize = new();
-    public UnityEvent<PlayableElementEventArgs> AfterInitialize = new();
     [Space]
     [Header("Selection")]
     public UnityEvent<PlayableElementEventArgs> OnSelected = new();
@@ -60,25 +57,20 @@ namespace GMTK {
     public UnityEvent<PlayableElementEventArgs> OnUnhovered = new();
     [Space]
     [Header("Drag Start")]
-    public UnityEvent<PlayableElementEventArgs> BeforeDragStart = new();
-    public UnityEvent<PlayableElementEventArgs> AfterDragStart = new();
-    [Space]
-    [Header("During Dragging")]
-    public UnityEvent<PlayableElementEventArgs> DuringDragging = new();
-    [Tooltip("The minimum distance the element needs to be dragged to notify 'DuringDragging'")]
+    public UnityEvent<PlayableElementEventArgs> OnDragStart = new();
+    public UnityEvent<PlayableElementEventArgs> OnDragging = new();
+    [Tooltip("The minimum distance the element needs to be dragged to notify 'OnDragging'")]
     [Range(0.01f, 0.1f)]
     public float DragMinDistance = 0.02f;
-    [Tooltip("The time in seconds in between notification of 'DuringDragging' ")]
+    [Tooltip("The time in seconds in between notification of 'OnDragging' ")]
     [Range(0.1f, 1f)]
     public float DragCooldown = 0.1f;
-    [Space]
-    [Header("Drag End")]
-    public UnityEvent<PlayableElementEventArgs> BeforeDragEnd = new();
-    public UnityEvent<PlayableElementEventArgs> AfterDragEnd = new();
+    public UnityEvent<PlayableElementEventArgs> OnDragEnd = new();
     [Space]
     [Header("Input Controls (rotate, flip)")]
-    public UnityEvent<PlayableElementEventArgs> BeforeInput = new();
-    public UnityEvent<PlayableElementEventArgs> AfterInput = new();
+    public UnityEvent<PlayableElementEventArgs> OnPlayerInput = new();
+    public UnityEvent<PlayableElementEventArgs> OnFlip = new();
+    public UnityEvent<PlayableElementEventArgs> OnRotate = new();
 
 
     // Public properties for compatibility with existing code
@@ -99,10 +91,6 @@ namespace GMTK {
     private PointerElementComponent _pointerComponent;
 
     private bool HasSelectionTrigger(SelectionTrigger trigger) => (SelectionTriggers & trigger) != 0;
-
-    // Events for components to listen to
-    [Obsolete("Use RaisePlayableElementEvent instead")]
-    public event Action<PlayableElementEventArgs> OnPlayableElementEvent;
 
     #region MonoBehaviour Methods
 
@@ -155,7 +143,6 @@ namespace GMTK {
       // Cache the PointerElementComponent reference
       _pointerComponent = GetComponent<PointerElementComponent>();
       this.Log($"PlayableElement '{name}' initialized with {_components.Count} PlayableElementComponents");
-
     }
 
     private bool CheckForRenderers() {
@@ -189,8 +176,6 @@ namespace GMTK {
     #endregion
 
     #region Occupancy (Grid System Compatibility)
-
-    public List<Vector2Int> GetFootprint() => OccupiedCells;
 
     public IEnumerable<Vector2Int> GetWorldOccupiedCells(Vector2Int gridOrigin, bool flippedX = false, bool flippedY = false, int rotation = 0) {
       // Patch while we fill occupied cells for all snappables.
@@ -402,7 +387,6 @@ namespace GMTK {
     #endregion
 
     public override string ToString() => name;
-
   }
 
 }

@@ -10,7 +10,7 @@ namespace GMTK {
   /// This custom editor will show the configuration found for the Scene based on LevelService, the overrides done in the specific SceneController, and the effective values, to validate the results
   /// </summary>
   [CustomEditor(typeof(SceneController), true)]
-  public class SceneControllerEditor : Editor {
+  public class SceneControllerEditor : UnityEditor.Editor {
 
     private SerializedProperty _configSourceProp;
     private SerializedProperty _selectedConfigNameProp;

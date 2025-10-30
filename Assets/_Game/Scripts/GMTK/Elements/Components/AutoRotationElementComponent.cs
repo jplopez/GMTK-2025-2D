@@ -2,8 +2,25 @@ using UnityEngine;
 
 namespace GMTK {
   /// <summary>
+  /// <para>
   /// Auto rotation component for PlayableElement that handles automatic continuous rotation.
   /// This component provides independent automatic rotation functionality separate from manual rotation controls.
+  /// </para>
+  /// <para>
+  /// <para>Implemented Lifecycle methods:</para>
+  ///   1. Initialize<br/>
+  ///   2. Validate<br/>
+  ///   3. OnUpdate<br/>
+  ///   4. ResetComponent<br/>
+  ///   5. FinalizeComponent
+  /// </para>
+  /// <para>
+  /// <para>Implemented Event Listeners:</para>
+  ///   1. OnDragStart<br/>
+  ///   2. OnDragEnd<br/>
+  ///   3. OnHovered<br/>
+  ///   4. OnUnhovered
+  /// </para>
   /// </summary>
   [AddComponentMenu("GMTK/Playable Element Components/Element Auto-Rotation Component")]
   public class AutoRotationElementComponent : PlayableElementComponent {
@@ -96,7 +113,7 @@ namespace GMTK {
 
     private void ApplyIntegratedRotation() {
       // Use the physics component's rotation method if available and rotation limits should be respected
-      if (RespectRotationLimits && _physicsComponent.AllowRotation) {
+      if (RespectRotationLimits && _physicsComponent.AllowsRotationChanges) {
         float speedAndDirection = (AutoRotationDirection == RotationDirections.Clockwise) ?
                                   -AutoRotationSpeed : AutoRotationSpeed;
         _physicsComponent.RotateBy(Time.deltaTime * speedAndDirection);
@@ -108,23 +125,23 @@ namespace GMTK {
     }
 
     // Handle drag events
-    protected void OnDragStart(PlayableElementEventArgs evt) {
+    public override void OnDragStart(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       _isDragging = true;
     }
 
-    protected void OnDragEnd(PlayableElementEventArgs evt) {
+    public override void OnDragEnd(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       _isDragging = false;
     }
 
     // Handle hover events
-    protected void OnPointerOver(PlayableElementEventArgs evt) {
+    public override void OnHovered(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       _isHovering = true;
     }
 
-    protected void OnPointerOut(PlayableElementEventArgs evt) {
+    public override void OnUnhovered(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
       _isHovering = false;
     }

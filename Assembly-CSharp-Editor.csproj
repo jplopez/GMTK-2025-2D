@@ -81,12 +81,6 @@
     <Compile Include="Assets\ThirdParty\Textures\Sprite Shaders Ultimate\Scripts\Editor\CodingHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\_Game\Editor\GMTK_USS.uss" />
-    <None Include="Assets\_Game\Editor\PlayablePhysics.uss" />
-    <None Include="Assets\_Game\Editor\GMTK_UXML.uxml" />
-    <None Include="Assets\_Game\Editor\AmebaStateMachine_UXML.uxml" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -577,6 +571,10 @@
     </Reference>
     <Reference Include="UnityEditor.WindowsStandalone.Extensions">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor.UWP.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\PlaybackEngines\MetroSupport\UnityEditor.UWP.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.Android.Extensions">

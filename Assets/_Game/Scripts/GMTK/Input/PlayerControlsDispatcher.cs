@@ -90,6 +90,7 @@ namespace GMTK {
         if(CanRaisePointerEvent) {
           RaiseEvent(GameEventType.InputPointerPosition, context);
           _timeSinceLastPointerEvent = 0f;
+          this.LogDebug($"Input Pointer Position event raised.");
         }
       }
     }
@@ -109,6 +110,7 @@ namespace GMTK {
           var camWorldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPosition);
           _pointerWorldPoition = new(camWorldPos.x, camWorldPos.y, 0f);
         }
+        this.LogDebug($"Pointer position updated. ScreenPos: {_pointerScreenPosition} | WorldPos: {_pointerWorldPoition}");
         return true;
       }
       return false;

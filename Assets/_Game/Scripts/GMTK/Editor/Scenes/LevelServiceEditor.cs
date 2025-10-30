@@ -10,7 +10,7 @@ using UnityEngine;
 namespace GMTK {
 
   [CustomEditor(typeof(LevelService))]
-  public class LevelServiceEditor : Editor {
+  public class LevelServiceEditor : UnityEditor.Editor {
 
     protected LevelService _targetService;
 

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GMTK {
   [CustomEditor(typeof(RaiseGameEventConfig), true)]
-  public class RaiseGameEventConfigEditor : Editor {
+  public class RaiseGameEventConfigEditor : UnityEditor.Editor {
 
     //cached list of GameEventTypes
     protected static GameEventType[] _gameEventTypes;

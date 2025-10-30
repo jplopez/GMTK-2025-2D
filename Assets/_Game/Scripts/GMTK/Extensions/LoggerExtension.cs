@@ -17,7 +17,7 @@ namespace GMTK {
       { LoggerLevels.Warning, true },
       { LoggerLevels.Error, true },
       { LoggerLevels.Exception, true },
-      { LoggerLevels.Debug, true }
+      { LoggerLevels.Debug, false }
     };
 
     public static string DateFormat = "HH:mm:ss";

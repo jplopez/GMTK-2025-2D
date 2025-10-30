@@ -52,8 +52,10 @@ namespace GMTK {
       if (!TryDelegateToPointerComponent(eventArgs)) {
         this.LogWarning($"No PointerElementComponent found on {name} to handle hover event");
       }
-      //raise internal event
-      RaisePlayableElementEvent(peEvent);
+      //unity event
+      var unityEvent = hovered ? OnHovered : OnUnhovered;
+      unityEvent?.Invoke(eventArgs);
+      //RaisePlayableElementEvent(peEvent);
     }
 
     public void EnableHovering(bool enable=true) {

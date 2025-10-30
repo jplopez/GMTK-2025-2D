@@ -67,7 +67,7 @@ namespace GMTK {
       }
       //if foreach finishes, it means all cellsToRemove are available so we assign the element to them
       cells.ForEach(c => c.Add(occupant));
-      _occupantFootprint.Add(occupant, occupant.GetFootprint());
+      _occupantFootprint.Add(occupant, occupant.OccupiedCells);
       _occupantsCount++;
       return true;
     }
@@ -81,8 +81,8 @@ namespace GMTK {
           cellsToRemove.Add(occupancyCell);
         }
       }
-      if(cellsToRemove.Count != occupant.GetFootprint().Count) {
-        Debug.LogWarning($"Unregister: number of cellsToRemove to remove doesn't match element footprint: {cellsToRemove.Count} != {occupant.GetFootprint().Count}");
+      if(cellsToRemove.Count != occupant.OccupiedCells.Count) {
+        Debug.LogWarning($"Unregister: number of cellsToRemove to remove doesn't match element footprint: {cellsToRemove.Count} != {occupant.OccupiedCells.Count}");
       }
       cellsToRemove.ForEach(c => c.Remove(occupant));
       _occupantFootprint.Remove(occupant);

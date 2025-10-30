@@ -4,7 +4,7 @@ using UnityEngine;
 namespace GMTK {
 
   [CustomEditor(typeof(PlayableElementInputHandler))]
-  public class PlayableElementInputHandlerEditor : Editor {
+  public class PlayableElementInputHandlerEditor : UnityEditor.Editor {
 
     private SerializedProperty pointerWorldPosProp;
     private bool showTransformFoldout = true;
@@ -91,7 +91,7 @@ namespace GMTK {
       if (GUILayout.Button("Trigger OnElementUnhovered"))
         handler.TriggerUnhoveredEvent();
 
-      if (GUILayout.Button("Trigger OnElementSelected"))
+      if (GUILayout.Button("Trigger OnSelect"))
         handler.TriggerSelectedEvent();
 
       if (GUILayout.Button("Trigger OnElementDropped"))

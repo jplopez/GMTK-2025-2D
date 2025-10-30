@@ -308,7 +308,7 @@ MonoBehaviour:
         AlwaysNewMaterial: 1
         InitialIndex: 0
         Materials:
-        - {fileID: 2100000, guid: e60111874b0291e4aa50e9db67a66c24, type: 2}
+        - {fileID: 2100000, guid: bb0eea3421e1bb54eae075df4df4454c, type: 2}
         InterpolateTransition: 0
         TransitionDuration: 1
         TransitionCurve:

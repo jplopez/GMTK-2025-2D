@@ -131,9 +131,9 @@ namespace GMTK {
       UpdateGhostVisuals();
     }
 
-    #region New On* Event Handlers (using reflection-based system)
+    #region Event Handlers
 
-    protected virtual void OnDragStart(PlayableElementEventArgs evt) {
+    public override void OnDragStart(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement) return;
 
       _isDragging = true;
@@ -157,7 +157,7 @@ namespace GMTK {
       this.LogDebug($"Drag started on {_playableElement.name}");
     }
 
-    protected virtual void OnDragUpdate(PlayableElementEventArgs evt) {
+    public override void OnDragging(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || !_isDragging) return;
       if (evt.Handled) return; // Allow other components to override behavior
 
@@ -181,7 +181,7 @@ namespace GMTK {
 
         // Trigger event if Event flag is set
         if (HasFlag(PositionChangeFlags.Event)) {
-          TriggerPositionChangeEvent(targetPosition, true, "DragUpdate");
+          TriggerPositionChangeEvent(targetPosition, true, "DraggingUpdate");
         }
 
         // TODO: while dragging, if the position doesnt change, we should avoid triggering feedbacks and events
@@ -206,7 +206,7 @@ namespace GMTK {
       }
     }
 
-    protected virtual void OnDragEnd(PlayableElementEventArgs evt) {
+    public override void OnDragEnd(PlayableElementEventArgs evt) {
       if (evt.Element != _playableElement || !_isDragging) return;
       if (evt.Handled) return; // Allow other components to override behavior
 
@@ -433,12 +433,10 @@ namespace GMTK {
     }
 
     private Vector3 ApplyGridSnapping(Vector3 worldPosition) {
-      if (_levelGrid == null) return worldPosition;
-
-      Vector2Int gridPos = _levelGrid.WorldToGrid(worldPosition);
-      var ret = _levelGrid.SnapToGrid(gridPos);
-
-      return ret;
+      //if (_levelGrid == null) return worldPosition;
+      //Vector2Int gridPos = _levelGrid.WorldToGrid(worldPosition);
+      //var ret = _levelGrid.SnapToGrid(gridPos);
+      return (_levelGrid == null) ? worldPosition : _levelGrid.SnapToGrid(worldPosition);
     }
 
     private bool IsValidDropLocation(Vector3 worldPosition) {

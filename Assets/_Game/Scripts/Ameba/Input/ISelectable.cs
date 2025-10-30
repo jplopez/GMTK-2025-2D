@@ -20,7 +20,6 @@ namespace Ameba {
 
     public void EnableSelectable(bool selectable = true);
 
-
     public void OnSelect();
     public void OnSelectUpdate();
     public void OnDeselect();

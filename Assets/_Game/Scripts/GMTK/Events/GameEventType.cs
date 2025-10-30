@@ -82,6 +82,12 @@ namespace GMTK {
     PlayableElementEvent,         // for generic PlayableElement events
     PlayableElementInternalEvent, // when a PlayableElementComponent wants to broadcast events internally to other PlayableElementCompnents on the same PlayableElement
 
+    //Level Grid
+    GridTrackingStart, 
+    GridTrackingEnd,
+    GridPlacement,
+    GridRemoval,
+
     // Inventory Events - using EventArgs pattern
     InventoryAddRequest,        // Request to add element (InventoryEventData)
     InventoryRetrieveRequest,   // Request to retrieve element (InventoryEventData)  

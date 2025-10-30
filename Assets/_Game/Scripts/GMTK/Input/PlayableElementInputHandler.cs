@@ -245,29 +245,29 @@ namespace GMTK {
     /// </summary>
     /// <remarks>This method ensures that only one <see cref="PlayableElement"/> is active at a time. If the
     /// specified element is already active, no changes are made. When an element is activated, its <see
-    /// cref="PlayableElement.OnBecomeActive"/> method is invoked. Similarly, when an element is deactivated, its <see
-    /// cref="PlayableElement.OnBecomeInactive"/> method is invoked.</remarks>
+    /// cref="PlayableElement.OnSelected"/> method is invoked. Similarly, when an element is deactivated, its <see
+    /// cref="PlayableElement.OnElementDeselected"/> method is invoked.</remarks>
     /// <param name="element">The <see cref="PlayableElement"/> to activate. If <c>null</c>, the currently active element will be deactivated.</param>
     protected virtual void SetActiveElement(PlayableElement element) {
       if (element != null) {
         // Deactivate previous
         if (_currentElement != null && _currentElement != element) {
           _currentElement.IsActive = false;
-          _currentElement.OnBecomeInactive();
+          _currentElement.OnDeselect();
         }
 
         // Activate new
         _currentElement = element;
         if (_currentElement != null) {
           _currentElement.IsActive = true;
-          _currentElement.OnBecomeActive();
+          _currentElement.OnSelect();
         }
       }
       else {
         // Deactivate current
         if (_currentElement != null) {
           _currentElement.IsActive = false;
-          _currentElement.OnBecomeInactive();
+          _currentElement.OnDeselect();
           _currentElement = null;
         }
       }

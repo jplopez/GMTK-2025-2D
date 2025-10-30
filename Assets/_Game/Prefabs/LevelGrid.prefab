@@ -265,6 +265,15 @@ MonoBehaviour:
   _gridSprite: {fileID: 7785299759478851614}
   _spriteOffset: {x: 0, y: 0}
   _inputHandler: {fileID: 0}
+  OnElementTrackingStart:
+    m_PersistentCalls:
+      m_Calls: []
+  OnElementTrackingEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  OnElementPlaced:
+    m_PersistentCalls:
+      m_Calls: []
   enableGizmos: 1
   useGridValuesForGizmo: 1
   gizmoCellSize: 1

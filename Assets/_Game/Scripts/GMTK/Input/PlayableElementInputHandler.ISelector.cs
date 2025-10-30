@@ -5,7 +5,7 @@ namespace GMTK {
 
   /// <summary>
   /// ISelector interface implementation designed to handle Input Events related to selecting PlayableElement.
-  /// Handles OnElementSelected and deselection input events.
+  /// Handles OnSelect and deselection input events.
   /// </summary>
   public partial class PlayableElementInputHandler : ISelector<PlayableElement> {
 

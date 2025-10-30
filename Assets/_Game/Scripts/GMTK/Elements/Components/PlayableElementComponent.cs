@@ -5,67 +5,80 @@ using System.Collections;
 using UnityEngine;
 
 namespace GMTK {
+
   /// <summary>
-  /// Base class for components that extend PlayableElement functionality.
-  /// This is the new component system that works with PlayableElement.
+  /// <para>
+  /// Base class to implement components that enhance <see cref="PlayableElement"/> functionality (Physics, Controls, Pointer, etc).<br/>
+  /// <see cref="PlayableElementComponent"/> (PEC) integrates into the PlayableElement lifecycle and event system.
+  /// </para>
+  /// <para>
+  /// <b>How to use it:</b><br/>
+  ///     1. Create a new class that inherits from <see cref="PlayableElementComponent"/>.<br/>
+  ///     2. Override the lifecycle methods needed to implement custom behavior.<br/>
+  ///     3. Implement event handlers for UnityEvents if needed.<br/>
+  ///     4. Add the new component to a GameObject with a <see cref="PlayableElement"/> component.
+  /// </para>
+  /// <para>
+  /// <b>Life cycle methods</b><br/>
+  /// The following methods can be override to customize the PEC:
+  /// <list type="bullet">
+  ///     <item><c>Initialize()</c>: called once when the component is initialized.</item>
+  ///     <item><c>Validate()</c>: called before each update to check if the component is ready to run.</item>
+  ///     <item><c>BeforeUpdate()</c></item>
+  ///     <item><c>OnUpdate()</c></item>
+  ///     <item><c>OnDelayedUpdate()</c>: called instead of OnUpdate, if the component has an initial delay</item>
+  ///     <item><c>AfterUpdate()</c></item>
+  ///     <item><c>FinalizeComponent()</c>: called when the PlayableElement is destroyed</item>
+  ///     <item><c>ResetComponent()</c>: called when the PlayableElement is reseted</item>
+  /// </list>
+  /// </para>
+  /// <para>
+  /// <b>UnityEvents hooks</b><br/>
+  /// The following methods can be used to hook into UnityEvents triggered by a <see cref="PlayableElement"/>:
+  /// <list type="bullet">
+  ///     <item><c>OnSelected(PlayableElementEventArgs args)</c></item>
+  ///     <item><c>OnDeselected(PlayableElementEventArgs args)</c></item>
+  ///     <item><c>OnHovered(PlayableElementEventArgs args) </c></item>
+  ///     <item><c>OnUnhovered(PlayableElementEventArgs args) </c></item>
+  ///     <item><c>OnDragStart(PlayableElementEventArgs args) </c></item>
+  ///     <item><c>OnDragging(PlayableElementEventArgs args) </c></item>
+  ///     <item><c>OnDragEnd(PlayableElementEventArgs args) </c></item>
+  ///     <item><c>OnPlayerInput(PlayableElementEventArgs args) </c></item>
+  ///     <item><c>OnRotate(PlayableElementEventArgs args) </c></item>
+  ///     <item><c>OnFlip(PlayableElementEventArgs args) </c></item>
+  /// </list>
+  /// </para>
   /// </summary>
   [RequireComponent(typeof(PlayableElement))]
   public abstract class PlayableElementComponent : MonoBehaviour {
 
-    [Header("Playable Element Component")]
-    [Tooltip("Main switch to turn on/off a Component. Useful for debugging")]
-    public bool IsActive = true;
+    [Header("Common Component Settings")]
+    // this object is to group common settings in a foldable section in the inspector <see cref="CommonComponentSettings"/>
+    public CommonComponentSettings CommonSettings = new();
 
-    [Header("Delay Run")]
-    [Tooltip("if true, this component will run on a coroutine, executing the logic on OnDelayedUpdateRun ")]
-    public bool DelayRun = false;
-    [Tooltip("Delay in seconds before executing the OnDelayedUpdateRun logic")]
-    public float InitialDelay = 0.1f;
-
-    [Header("Exclude Events")]
-
-    [Tooltip("Excludes BeforeInitialize and AfterInitialize")]
-    public bool ExcludeInitializeEvents = false;
-    [Tooltip("Excludes OnSelected and OnDeselected")]
-    public bool ExcludeSelectionEvents = false;
-    [Tooltip("Excludes OnHovered and OnUnhovered")]
-    public bool ExcludeHoverEvents = false;
-    [Tooltip("Excludes BeforeDragStart and AfterDragStart")]
-    public bool ExcludeDragStartEvents = false;
-    [Tooltip("Excludes DuringDragging")]
-    public bool ExcludeDuringDraggingEvents = false;
-    [Tooltip("Excludes BeforeDragEnd and AfterDragEnd")]
-    public bool ExcludeDragEndEvents = false;
-    [Tooltip("Excludes BeforeInput and AfterInput")]
-    public bool ExcludeInputControlsEvents = false;
-
-    [Header("Inner Events")]
-    [Tooltip("If true, this component will raise a PlayableElementInnerEvent after handling an event, relaying the same event args")]
-    public bool TriggersInnerEvent = false;
+    public bool IsActive => CommonSettings.IsActive;
 
     protected PlayableElement _playableElement;
     protected LevelGrid _levelGrid;
     protected GameEventChannel _gameEventChannel;
-
     protected bool isInitialized = false;
     private Coroutine _delayedUpdateCoroutine;
 
-    public void ExcludeAllEvents(bool exclude = true) {
-      ExcludeInitializeEvents = exclude;
-      ExcludeSelectionEvents = exclude;
-      ExcludeHoverEvents = exclude;
-      ExcludeDragStartEvents = exclude;
-      ExcludeDuringDraggingEvents = exclude;
-      ExcludeDragEndEvents = exclude;
-      ExcludeInputControlsEvents = exclude;
-    }
+    internal void SetPlayableElement(PlayableElement playableElement) => _playableElement = playableElement;
 
+    public void ExcludeAllEvents(bool exclude = true) {
+      CommonSettings.ExcludeInitializeEvents = exclude;
+      CommonSettings.ExcludeSelectionEvents = exclude;
+      CommonSettings.ExcludeHoverEvents = exclude;
+      CommonSettings.ExcludeDragStartEvents = exclude;
+      CommonSettings.ExcludeDuringDraggingEvents = exclude;
+      CommonSettings.ExcludeDragEndEvents = exclude;
+      CommonSettings.ExcludeInputControlsEvents = exclude;
+    }
 
     private void OnValidate() => InitDependencies();
 
-    private void Awake() {
-      TryInitialize();
-    }
+    private void Awake() => TryInitialize();
 
     private void OnDestroy() => RemoveListeners();
 
@@ -90,7 +103,7 @@ namespace GMTK {
 
     #endregion
 
-    #region Event Handling
+    #region EventChannel
 
     /// <summary>
     /// Handles an event related to the current playable element.<br/>
@@ -109,7 +122,7 @@ namespace GMTK {
       // Handle the event locally using reflection
       HandlePlayableElementEvent(eventArgs);
 
-      if (TriggersInnerEvent) {
+      if (CommonSettings.TriggersInnerEvent) {
         _gameEventChannel.Raise(GameEventType.PlayableElementInternalEvent, eventArgs);
       }
     }
@@ -121,7 +134,7 @@ namespace GMTK {
     /// </para>
     /// <para>
     /// To handle a <c>PlayableElementEvent</c> the <see cref="PlayableElementComponent"/> must have a method named as "On" + PlayableElementEventType name in args.<br/>
-    /// For example, the method <c>OnDragStart</c> handles <c>PlayableElementEventType.DragStart</c> events. The method must receive a single <see cref="PlayableElementEventArgs"/> argument.
+    /// For example, the method <c>DragStart</c> handles <c>PlayableElementEventType.DragStart</c> events. The method must receive a single <see cref="PlayableElementEventArgs"/> argument.
     /// </para>
     /// </summary>
     /// <param name="args"></param>
@@ -130,7 +143,7 @@ namespace GMTK {
       if (args.Element != _playableElement) return;
 
       // Use reflection to look for a method named as "On" + PlayableElementEventType name in args
-      // For example OnDragStart for PlayableElementEventType.DragStart, that receives a PlayableElementEventArgs argument
+      // For example DragStart for PlayableElementEventType.DragStart, that receives a PlayableElementEventArgs argument
       string methodName = "On" + args.EventType.ToString();
       System.Reflection.MethodInfo method = GetType().GetMethod(methodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
       this.LogDebug($"handling event '{args.EventType}' using method '{methodName}'");
@@ -150,6 +163,42 @@ namespace GMTK {
 
     #endregion
 
+    #region Component Lifecycle
+
+    public void RunBeforeUpdate() { if (CommonSettings.IsActive && isInitialized) BeforeUpdate(); }
+    public void RunOnUpdate() {
+      if (!CommonSettings.IsActive || !isInitialized || !Validate()) return;
+      if (CommonSettings.DelayRun) {
+        RunDelayOnUpdate();
+      }
+      else {
+        OnUpdate();
+      }
+    }
+    public void RunAfterUpdate() { if (CommonSettings.IsActive && isInitialized) AfterUpdate(); }
+    public void RunFinalize() { if (CommonSettings.IsActive && isInitialized) FinalizeComponent(); }
+
+    public void RunDelayOnUpdate() {
+      if (!CommonSettings.IsActive || !isInitialized || !Validate()) return;
+      if (_delayedUpdateCoroutine != null)
+        StopCoroutine(_delayedUpdateCoroutine);
+
+      _delayedUpdateCoroutine = StartCoroutine(DelayedUpdateRoutine(CommonSettings.InitialDelay));
+    }
+
+    public void RunResetComponent() { if (CommonSettings.IsActive) ResetComponent(); }
+
+    protected virtual IEnumerator DelayedUpdateRoutine(float delay) {
+      yield return new WaitForSeconds(delay);
+      OnDelayedUpdate();
+    }
+
+    public void CancelDelayRun() {
+      if (CommonSettings.IsActive && isInitialized) StopAllCoroutines();
+    }
+
+    #endregion
+
     #region Event Listeners
 
     protected virtual void AddListeners() {
@@ -158,54 +207,42 @@ namespace GMTK {
       // Listen to PlayableElement events through the GameEventChannel
       _gameEventChannel.AddListener<PlayableElementEventArgs>(GameEventType.PlayableElementInternalEvent, OnPlayableElementEvent);
 
-      //// Listen to global game events
-      //_gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleGlobalElementSelected);
-      //_gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleGlobalElementDropped);
-      //_gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleGlobalElementHovered);
-      //_gameEventChannel.AddListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleGlobalElementUnhovered);
-
       //Add UnityEvents subscription to PlayableElement
       if (_playableElement == null) return;
       int listenersAdded = 0;
-      if (!ExcludeInitializeEvents) {
-        _playableElement.BeforeInitialize.AddListener(OnPlayableElementEvent);
-        _playableElement.AfterInitialize.AddListener(OnPlayableElementEvent);
+
+      if (!CommonSettings.ExcludeSelectionEvents) {
+        _playableElement.OnSelected.AddListener(OnSelected);
+        _playableElement.OnDeselected.AddListener(OnDeselected);
         listenersAdded += 2;
       }
 
-      if (!ExcludeSelectionEvents) {
-        _playableElement.OnSelected.AddListener(OnPlayableElementEvent);
-        _playableElement.OnDeselected.AddListener(OnPlayableElementEvent);
+      if (!CommonSettings.ExcludeHoverEvents) {
+        _playableElement.OnHovered.AddListener(OnHovered);
+        _playableElement.OnUnhovered.AddListener(OnUnhovered);
         listenersAdded += 2;
       }
 
-      if (!ExcludeHoverEvents) {
-        _playableElement.OnHovered.AddListener(OnPlayableElementEvent);
-        _playableElement.OnUnhovered.AddListener(OnPlayableElementEvent);
-        listenersAdded += 2;
-      }
-
-      if (!ExcludeDragStartEvents) {
-        _playableElement.BeforeDragStart.AddListener(OnPlayableElementEvent);
-        _playableElement.AfterDragStart.AddListener(OnPlayableElementEvent);
-        listenersAdded += 2;
-      }
-
-      if (!ExcludeDuringDraggingEvents) {
-        _playableElement.DuringDragging.AddListener(OnPlayableElementEvent);
+      if (!CommonSettings.ExcludeDragStartEvents) {
+        _playableElement.OnDragStart.AddListener(OnDragStart);
         listenersAdded++;
       }
 
-      if (!ExcludeDragEndEvents) {
-        _playableElement.BeforeDragEnd.AddListener(OnPlayableElementEvent);
-        _playableElement.AfterDragEnd.AddListener(OnPlayableElementEvent);
-        listenersAdded += 2;
+      if (!CommonSettings.ExcludeDuringDraggingEvents) {
+        _playableElement.OnDragging.AddListener(OnDragging);
+        listenersAdded++;
       }
 
-      if (!ExcludeInputControlsEvents) {
-        _playableElement.BeforeInput.AddListener(OnPlayableElementEvent);
-        _playableElement.AfterInput.AddListener(OnPlayableElementEvent);
-        listenersAdded += 2;
+      if (!CommonSettings.ExcludeDragEndEvents) {
+        _playableElement.OnDragEnd.AddListener(OnDragEnd);
+        listenersAdded++;
+      }
+
+      if (!CommonSettings.ExcludeInputControlsEvents) {
+        _playableElement.OnPlayerInput.AddListener(OnPlayerInput);
+        _playableElement.OnFlip.AddListener(OnFlip);
+        _playableElement.OnRotate.AddListener(OnRotate);
+        listenersAdded += 3;
       }
       this.Log($" Added {listenersAdded} UnityEvent Listeners to '{_playableElement.name}'");
     }
@@ -213,74 +250,28 @@ namespace GMTK {
     protected virtual void RemoveListeners() {
       if (_gameEventChannel == null) return;
 
-      //_gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementSelected, HandleGlobalElementSelected);
-      //_gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementDropped, HandleGlobalElementDropped);
-      //_gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementHovered, HandleGlobalElementHovered);
-      //_gameEventChannel.RemoveListener<GridSnappableEventArgs>(GameEventType.ElementUnhovered, HandleGlobalElementUnhovered);
-
       _gameEventChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.PlayableElementInternalEvent, OnPlayableElementEvent);
 
       //remove UnityEvents subscription to PlayableElement
       if (_playableElement != null) {
-        _playableElement.BeforeInitialize.RemoveListener(OnPlayableElementEvent);
-        _playableElement.AfterInitialize.RemoveListener(OnPlayableElementEvent);
 
-        _playableElement.OnSelected.RemoveListener(OnPlayableElementEvent);
-        _playableElement.OnDeselected.RemoveListener(OnPlayableElementEvent);
+        _playableElement.OnSelected.RemoveListener(OnSelected);
+        _playableElement.OnDeselected.RemoveListener(OnDeselected);
+        _playableElement.OnHovered.RemoveListener(OnHovered);
+        _playableElement.OnUnhovered.RemoveListener(OnUnhovered);
+        _playableElement.OnDragStart.RemoveListener(OnDragStart);
+        _playableElement.OnDragging.RemoveListener(OnDragging);
+        _playableElement.OnDragEnd.RemoveListener(OnDragEnd);
+        _playableElement.OnPlayerInput.RemoveListener(OnPlayerInput);
+        _playableElement.OnFlip.RemoveListener(OnFlip);
+        _playableElement.OnRotate.RemoveListener(OnRotate);
 
-        _playableElement.OnHovered.RemoveListener(OnPlayableElementEvent);
-        _playableElement.OnUnhovered.RemoveListener(OnPlayableElementEvent);
-
-        _playableElement.BeforeDragStart.RemoveListener(OnPlayableElementEvent);
-        _playableElement.AfterDragStart.RemoveListener(OnPlayableElementEvent);
-
-        _playableElement.DuringDragging.RemoveListener(OnPlayableElementEvent);
-
-        _playableElement.BeforeDragEnd.RemoveListener(OnPlayableElementEvent);
-        _playableElement.AfterDragEnd.RemoveListener(OnPlayableElementEvent);
-
-        _playableElement.BeforeInput.RemoveListener(OnPlayableElementEvent);
-        _playableElement.AfterInput.RemoveListener(OnPlayableElementEvent);
       }
     }
 
     #endregion
 
-    #region Component Lifecycle
-
-    public void RunBeforeUpdate() { if (IsActive && isInitialized) BeforeUpdate(); }
-    public void RunOnUpdate() {
-      if (!IsActive || !isInitialized || !Validate()) return;
-      if (DelayRun) {
-        RunDelayOnUpdate();
-      }
-      else {
-        OnUpdate();
-      }
-    }
-    public void RunAfterUpdate() { if (IsActive && isInitialized) AfterUpdate(); }
-    public void RunFinalize() { if (IsActive && isInitialized) FinalizeComponent(); }
-
-    public void RunDelayOnUpdate() {
-      if (!IsActive || !isInitialized || !Validate()) return;
-      if (_delayedUpdateCoroutine != null)
-        StopCoroutine(_delayedUpdateCoroutine);
-
-      _delayedUpdateCoroutine = StartCoroutine(DelayedUpdateRoutine(InitialDelay));
-    }
-
-    public void RunResetComponent() { if (IsActive) ResetComponent(); }
-
-    protected virtual IEnumerator DelayedUpdateRoutine(float delay) {
-      yield return new WaitForSeconds(delay);
-      OnDelayedUpdate();
-    }
-
-    public void CancelDelayRun() {
-      if (IsActive && isInitialized) StopAllCoroutines();
-    }
-
-    // Lifecycle hooks
+    #region Lifecycle hooks
     protected abstract void Initialize();
     protected virtual void BeforeUpdate() { }
     protected abstract bool Validate(); // Return true if component is ready to run on Update
@@ -290,6 +281,24 @@ namespace GMTK {
     protected virtual void OnDelayedUpdate() { }
     protected virtual void ResetComponent() { }
 
+    #endregion
+
+    #region UnityEvent Hooks
+
+    public virtual void OnSelected(PlayableElementEventArgs args) { }
+    public virtual void OnDeselected(PlayableElementEventArgs args) { }
+    public virtual void OnHovered(PlayableElementEventArgs args) { }
+    public virtual void OnUnhovered(PlayableElementEventArgs args) { }
+    public virtual void OnDragStart(PlayableElementEventArgs args) { }
+    public virtual void OnDragging(PlayableElementEventArgs args) { }
+    public virtual void OnDragEnd(PlayableElementEventArgs args) { }
+    public virtual void OnPlayerInput(PlayableElementEventArgs args) { }
+    public virtual void OnRotate(PlayableElementEventArgs args) { }
+    public virtual void OnFlip(PlayableElementEventArgs args) { }
+
+    #endregion
+
+    #region UTILS
     /// <summary>
     /// null safe method to play a MMF_Player feedback
     /// </summary>
@@ -316,64 +325,41 @@ namespace GMTK {
     }
 
     #endregion
-
-    #region UnityEvent Handlers
-
-    public virtual void OnBeforeInitialize(PlayableElementEventArgs args) { }
-    public virtual void OnAfterInitialize(PlayableElementEventArgs args) { }
-    public virtual void OnSelected(PlayableElementEventArgs args) { }
-    public virtual void OnDeselected(PlayableElementEventArgs args) { }
-    public virtual void OnHovered(PlayableElementEventArgs args) { }
-    public virtual void OnUnhovered(PlayableElementEventArgs args) { }
-    public virtual void OnBeforeDragStart(PlayableElementEventArgs args) { }
-    public virtual void OnAfterDragStart(PlayableElementEventArgs args) { }
-    public virtual void OnBeforeDragEnd(PlayableElementEventArgs args) { }
-    public virtual void OnAfterDragEnd(PlayableElementEventArgs args) { }
-    public virtual void OnBeforeInput(PlayableElementEventArgs args) { }
-    public virtual void OnAfterInput(PlayableElementEventArgs args) { }
-
-    internal void SetPlayableElement(PlayableElement playableElement) {
-      _playableElement = playableElement;
-    }
-
-    #endregion
-
-    #region Obsolete
-
-    //// Bridge methods for backward compatibility with GridSnappable events
-    //[Obsolete("Use UnityEvents instead")]
-    //private void HandleGlobalElementSelected(GridSnappableEventArgs evt) {
-    //  // Convert to PlayableElement events if this component's element was selected
-    //  // This is for backward compatibility during transition
-    //  HandleElementSelected(evt);
-    //}
-
-    //[Obsolete("Use UnityEvents instead")]
-    //private void HandleGlobalElementDropped(GridSnappableEventArgs evt) {
-    //  HandleElementDropped(evt);
-    //}
-
-    //[Obsolete("Use UnityEvents instead")]
-    //private void HandleGlobalElementHovered(GridSnappableEventArgs evt) {
-    //  HandleElementHovered(evt);
-    //}
-
-    //[Obsolete("Use UnityEvents instead")]
-    //private void HandleGlobalElementUnhovered(GridSnappableEventArgs evt) {
-    //  HandleElementUnhovered(evt);
-    //}
-
-    // Abstract methods for legacy compatibility - these still need to be implemented
-    //[Obsolete("Use UnityEvents instead")]
-    //protected virtual void HandleElementSelected(GridSnappableEventArgs evt) { }
-    //[Obsolete("Use UnityEvents instead")]
-    //protected virtual void HandleElementDropped(GridSnappableEventArgs evt) { }
-    //[Obsolete("Use UnityEvents instead")]
-    //protected virtual void HandleElementHovered(GridSnappableEventArgs evt) { }
-    //[Obsolete("Use UnityEvents instead")]
-    //protected virtual void HandleElementUnhovered(GridSnappableEventArgs evt) { }
-
-    #endregion
-
   }
+
+  [Serializable]
+  /// <summary>
+  /// Common settings for all PlayableElement components. Encapsulated in this class for UnityEditor to show it as a foldable section
+  /// </summary>
+  public class CommonComponentSettings {
+    [Tooltip("Main switch to turn on/off a Component. Useful for debugging")]
+    public bool IsActive = true;
+
+    [Header("Delay Run")]
+    [Tooltip("if true, this component will run on a coroutine, executing the logic on OnDelayedUpdateRun ")]
+    public bool DelayRun = false;
+    [Tooltip("Delay in seconds before executing the OnDelayedUpdateRun logic")]
+    public float InitialDelay = 0.1f;
+
+    [Header("Exclude Events")]
+    [Tooltip("Excludes BeforeInitialize and AfterInitialize")]
+    public bool ExcludeInitializeEvents = false;
+    [Tooltip("Excludes OnSelect and OnDeselected")]
+    public bool ExcludeSelectionEvents = false;
+    [Tooltip("Excludes OnHovered and OnUnhovered")]
+    public bool ExcludeHoverEvents = false;
+    [Tooltip("Excludes BeforeDragStart and DragStart")]
+    public bool ExcludeDragStartEvents = false;
+    [Tooltip("Excludes OnDragging")]
+    public bool ExcludeDuringDraggingEvents = false;
+    [Tooltip("Excludes BeforeDragEnd and DragEnd")]
+    public bool ExcludeDragEndEvents = false;
+    [Tooltip("Excludes BeforeInput and PlayerInput")]
+    public bool ExcludeInputControlsEvents = false;
+
+    [Header("Inner Events")]
+    [Tooltip("If true, this component will raise a PlayableElementInnerEvent after handling an event, relaying the same event args")]
+    public bool TriggersInnerEvent = false;
+  }
+
 }

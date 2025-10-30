@@ -23,36 +23,26 @@ namespace GMTK {
 
     #region IDraggable Implementation
 
-    public virtual void OnDragStart() {
+    public virtual void DragStart() {
       IsBeingDragged = true;
       RaiseGameEvent(GameEventType.ElementDragStart, PlayableElementEventType.DragStart);
       RaisePlayableElementEvent(PlayableElementEventType.DragStart);
+      OnDragStart?.Invoke(BuildEventArgs(GameEventType.ElementDragStart, PlayableElementEventType.DragStart));
     }
 
-    public virtual void OnDragUpdate(Vector3 worldPosition) {
-      if (IsBeingDragged) {
-        UpdatePosition(worldPosition);
+    public virtual void DraggingUpdate(Vector3? worldPosition) {
+      if (IsBeingDragged && worldPosition.HasValue) {
+        UpdatePosition(worldPosition.Value);
         RaiseGameEvent(GameEventType.ElementDragging, PlayableElementEventType.DragUpdate);
         RaisePlayableElementEvent(PlayableElementEventType.DragUpdate);
       }
     }
 
-    public virtual void OnDragEnd() {
+    public virtual void DragEnd() {
       IsBeingDragged = false;
       RaiseGameEvent(GameEventType.ElementDropped, PlayableElementEventType.DragEnd);
-      RaisePlayableElementEvent(PlayableElementEventType.DragEnd);
-    }
-
-    public virtual void OnBecomeActive() {
-      IsActive = true;
-      RaiseGameEvent(GameEventType.ElementSetActive, PlayableElementEventType.BecomeActive);
-      RaisePlayableElementEvent(PlayableElementEventType.BecomeActive);
-    }
-
-    public virtual void OnBecomeInactive() {
-      IsActive = false;
-      RaiseGameEvent(GameEventType.ElementSetInactive, PlayableElementEventType.BecomeInactive);
-      RaisePlayableElementEvent(PlayableElementEventType.BecomeInactive);
+      //RaisePlayableElementEvent(PlayableElementEventType.DragEnd);
+      OnDragEnd?.Invoke(BuildEventArgs(GameEventType.ElementDropped, PlayableElementEventType.DragEnd));
     }
 
     #endregion

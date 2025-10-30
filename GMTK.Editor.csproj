@@ -67,13 +67,14 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\LevelServiceEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Elements\PlayableElementEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\EditorUtils.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameEventChannelDebugWindow.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Input\PlayableElementInputHandlerEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\DisplayWithoutEditDrawer.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\LevelConfigDrawer.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Elements\Gizmos\PlayableElementOccupancyGizmo.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateMachineEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Scenes\RaiseGameEventConfigEditor.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Editor\GameStateTransitionDrawer.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Editor\Input\SnappableInputHandlerEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_Game\Scripts\GMTK\Editor\GMTK.Editor.asmdef" />
@@ -569,6 +570,10 @@
     </Reference>
     <Reference Include="UnityEditor.WindowsStandalone.Extensions">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor.UWP.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\PlaybackEngines\MetroSupport\UnityEditor.UWP.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.Android.Extensions">
@@ -1187,6 +1192,10 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Xml.XPath.XDocument.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
       <Private>False</Private>
@@ -1205,6 +1214,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="GMTK.csproj">
+      <Project>{F1EF9DBB-0766-2ED7-8397-D963BF4EB548}</Project>
+      <Name>GMTK</Name>
+    </ProjectReference>
     <ProjectReference Include="Ameba.csproj">
       <Project>{F97F3A6D-A0F1-7173-1E81-B24F74982E3B}</Project>
       <Name>Ameba</Name>
@@ -1212,10 +1225,6 @@
     <ProjectReference Include="Ameba.Editor.csproj">
       <Project>{9221C05C-856E-BDBC-9B62-082573738239}</Project>
       <Name>Ameba.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="GMTK.csproj">
-      <Project>{F1EF9DBB-0766-2ED7-8397-D963BF4EB548}</Project>
-      <Name>GMTK</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

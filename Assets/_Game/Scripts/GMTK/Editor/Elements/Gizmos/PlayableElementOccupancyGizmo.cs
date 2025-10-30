@@ -97,7 +97,7 @@ namespace GMTK {
       gizmoData.spriteBounds = spriteRenderer.sprite.bounds;
 
       // Get the base footprint (non-rotated cells)
-      var baseFootprint = new List<Vector2Int>(element.GetFootprint());
+      var baseFootprint = new List<Vector2Int>(element.OccupiedCells);
       gizmoData.occupiedCells = baseFootprint;
 
       // Calculate the current world occupied cells considering the actual rotation

@@ -57,8 +57,10 @@ namespace GMTK {
           this.LogWarning($"No PointerElementComponent found on {name} to handle selection event");
         }
 
-        // inner event 
-        RaisePlayableElementEvent(peEvent);
+        // unity event 
+        var unityEvent = selected ? OnSelected : OnDeselected;
+        unityEvent?.Invoke(eventArgs);
+        //RaisePlayableElementEvent(peEvent);
       }
       else {
         //in the future maybe there's value on capturing a click over a non-selectable object

@@ -257,7 +257,7 @@ public class CollisionIntensityCalculator : MonoBehaviour, IIntensityCalculator 
   private float GetAngleFactor() {
     if (!ConsiderAngle
       || _rigidbody2D == null
-      || !_physicsElementComponent.CanCurrentlyRotate()) return DefaultIntensity;
+      || !_physicsElementComponent.AllowsRotationChanges) return DefaultIntensity;
 
     // read rotation angle from PlayableElement, clamp to AngleRange and eval with AngleCurve
     float rawAngle = _playableElement.SnapTransform.rotation.eulerAngles.z;
