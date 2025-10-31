@@ -4713,6 +4713,10 @@ PrefabInstance:
       propertyPath: Flippable
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6806016553035810237, guid: 094f76d67fab4404d9d71c43b940b5df, type: 3}
+      propertyPath: SelectionTriggers
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6807082416150413325, guid: 094f76d67fab4404d9d71c43b940b5df, type: 3}
       propertyPath: FeedbacksList.Array.size
       value: 2
@@ -4949,6 +4953,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 657386138}
     m_Modifications:
+    - target: {fileID: 409210705373837270, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
+      propertyPath: m_TagString
+      value: Input_FlipY
+      objectReference: {fileID: 0}
+    - target: {fileID: 2136411594004611607, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
+      propertyPath: m_TagString
+      value: Input_RotateCW
+      objectReference: {fileID: 0}
+    - target: {fileID: 2451942214077632867, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
+      propertyPath: m_TagString
+      value: Input_FlipX
+      objectReference: {fileID: 0}
     - target: {fileID: 2573488966547228767, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 1
@@ -5003,7 +5019,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3151795147647775937, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -1.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3151795147647775937, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -5031,7 +5047,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3457628937150877732, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 3457628937150877732, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5097,6 +5113,10 @@ PrefabInstance:
       propertyPath: m_SortingLayerID
       value: -1840816107
       objectReference: {fileID: 0}
+    - target: {fileID: 7232124659665023027, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
+      propertyPath: m_TagString
+      value: Input_RotateCCW
+      objectReference: {fileID: 0}
     - target: {fileID: 7820387152778107145, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
       propertyPath: m_Name
       value: Platform_YengaThin (2)
@@ -5112,8 +5132,21 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7820387152778107145, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7956316667570961194}
   m_SourcePrefab: {fileID: 100100000, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
+--- !u!1 &115834511691437936 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3507542519206988018, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
+  m_PrefabInstance: {fileID: 115834511691437935}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &115834511691437937 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7820387152778107145, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
+  m_PrefabInstance: {fileID: 115834511691437935}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3300265632235931978
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9003,6 +9036,32 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4192506296788606022, guid: 1287593d3664180478ddc246a1bd0a17, type: 3}
   m_PrefabInstance: {fileID: 115834511691437935}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7956316667570961194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115834511691437937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23986130a87ced941bce646a4f62cfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CommonSettings:
+    IsActive: 1
+    DelayRun: 0
+    InitialDelay: 0.1
+    ExcludeInitializeEvents: 0
+    ExcludeSelectionEvents: 0
+    ExcludeHoverEvents: 0
+    ExcludeDragStartEvents: 0
+    ExcludeDuringDraggingEvents: 0
+    ExcludeDragEndEvents: 0
+    ExcludeInputControlsEvents: 0
+    TriggersInnerEvent: 0
+  ControlsPrefab: {fileID: 115834511691437936}
+  PrefabOffset: {x: -1.5, y: 0}
 --- !u!1001 &8445786855354942285
 PrefabInstance:
   m_ObjectHideFlags: 0
