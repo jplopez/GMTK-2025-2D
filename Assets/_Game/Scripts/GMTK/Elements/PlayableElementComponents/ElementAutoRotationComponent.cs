@@ -23,7 +23,7 @@ namespace GMTK {
   /// </para>
   /// </summary>
   [AddComponentMenu("GMTK/Playable Element Components/Element Auto-Rotation Component")]
-  public class AutoRotationElementComponent : PlayableElementComponent {
+  public class ElementAutoRotationComponent : PlayableElementComponent {
 
     // Move the enum here since it's only used by auto rotation
     public enum RotationDirections { Clockwise, Counterclockwise }
@@ -37,7 +37,7 @@ namespace GMTK {
     public RotationDirections AutoRotationDirection = RotationDirections.Clockwise;
 
     [Header("Auto Rotation Constraints")]
-    [Tooltip("If true, auto rotation will respect the rotation limits from PhysicsElementComponent")]
+    [Tooltip("If true, auto rotation will respect the rotation limits from ElementPhysicsComponent")]
     public bool RespectRotationLimits = true;
     [Tooltip("If true, auto rotation will pause when the element is being dragged")]
     public bool PauseOnDrag = true;
@@ -49,7 +49,7 @@ namespace GMTK {
     [SerializeField, DisplayWithoutEdit] private bool _isRotating = false;
     [SerializeField, DisplayWithoutEdit] private bool _isPaused = false;
 
-    private PhysicsElementComponent _physicsComponent;
+    private ElementPhysicsComponent _physicsComponent;
     private bool _isDragging = false;
     private bool _isHovering = false;
 
@@ -57,12 +57,12 @@ namespace GMTK {
       // Get required components
       _rigidbody2D = _playableElement.GetComponent<Rigidbody2D>();
       if (_rigidbody2D == null) {
-        Debug.LogWarning($"[AutoRotationElementComponent] No Rigidbody2D found on {_playableElement.name}. Auto rotation requires Rigidbody2D to function.");
+        Debug.LogWarning($"[ElementAutoRotationComponent] No Rigidbody2D found on {_playableElement.name}. Auto rotation requires Rigidbody2D to function.");
         return;
       }
 
       // Try to get the physics component for integration
-      _physicsComponent = _playableElement.GetComponent<PhysicsElementComponent>();
+      _physicsComponent = _playableElement.GetComponent<ElementPhysicsComponent>();
 
       // Initialize rotation state
       UpdateRotationState();

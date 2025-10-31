@@ -19,8 +19,8 @@ namespace GMTK {
   /// area.  The magnetic force can be configured to accelerate over time, and feedback mechanisms can be triggered 
   /// based on the magnetic interactions. The behavior of the magnetic force and feedbacks can be customized  using the
   /// provided settings.</remarks>
-  [AddComponentMenu("GMTK/Playable Element Components/Magnetic Field")]
-  public class MagneticElementComponent : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Element Magnetic Component")]
+  public class ElementMagneticComponent : PlayableElementComponent {
 
     [Header("Magnetic Field Settings")]
     [Tooltip("The force of the magnetism, positive values attract, negative values repel")]
@@ -116,7 +116,7 @@ namespace GMTK {
       _currentState = MagneticFieldState.Idle;
       PlayFeedback(IdleFeedback);
 
-      this.LogDebug("MagneticElementComponent initialized");
+      this.LogDebug("ElementMagneticComponent initialized");
     }
 
     protected override bool Validate() {

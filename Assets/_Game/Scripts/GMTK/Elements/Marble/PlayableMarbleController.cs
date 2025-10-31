@@ -397,7 +397,7 @@ namespace GMTK {
 
       // Check for PlayableElement with material properties
       if (collision.gameObject.TryGetComponent<PlayableElement>(out var playableElement)) {
-        if (playableElement.TryGetComponent<PhysicalMaterialsElementComponent>(out var physicalMaterial)) {
+        if (playableElement.TryGetComponent<ElementPhysicalMaterialComponent>(out var physicalMaterial)) {
           properties.Friction = physicalMaterial.Friction;
           properties.Bounciness = physicalMaterial.Bounciness;
           properties.HasCustomProperties = true;

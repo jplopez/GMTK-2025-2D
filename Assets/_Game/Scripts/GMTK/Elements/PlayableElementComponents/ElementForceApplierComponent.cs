@@ -18,8 +18,8 @@ namespace GMTK {
   /// Forces can be applied either instantaneously via collision events or continuously while the Marble or other entities are in the trigger area.<br/>
   /// Use this component to create boosters or wind zones, among other effects.
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Force Applier")]
-  public class ForceApplierElementComponent : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Element Force Applier Component")]
+  public class ElementForceApplierComponent : PlayableElementComponent {
 
     [Header("Force Applier Settings")]
     public ForceType AppliedForces = ForceType.Linear;
@@ -112,7 +112,7 @@ namespace GMTK {
         ForceTriggerArea.isTrigger = true;
         this.LogWarning($"ForceTriggerArea on {_playableElement.name} was not set as trigger. Fixed automatically.");
       }
-      this.Log("ForceApplierElementComponent initialized");
+      this.Log("ElementForceApplierComponent initialized");
     }
 
     protected override bool Validate() {
@@ -120,7 +120,7 @@ namespace GMTK {
       bool hasValidSetup = HasTriggerArea || TriggerOnCollision;
 
       if (!hasValidSetup) {
-        Debug.LogWarning($"[ForceApplierElementComponent] {_playableElement.name} has no triggering area and collision triggering is disabled. This component will not work.");
+        Debug.LogWarning($"[ElementForceApplierComponent] {_playableElement.name} has no triggering area and collision triggering is disabled. This component will not work.");
         return false;
       }
 

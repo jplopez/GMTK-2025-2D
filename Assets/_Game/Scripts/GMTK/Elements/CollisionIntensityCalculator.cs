@@ -58,8 +58,8 @@ public class CollisionIntensityCalculator : MonoBehaviour, IIntensityCalculator 
     } }
 
   protected PlayableElement _playableElement;
-  protected PhysicsElementComponent _physicsElementComponent;
-  protected PhysicalMaterialsElementComponent _physicalMaterialsElementComponent;
+  protected ElementPhysicsComponent _physicsElementComponent;
+  protected ElementPhysicalMaterialComponent _physicalMaterialsElementComponent;
   protected Rigidbody2D _rigidbody2D;
 
   private CollisionIntensityContext _lastCalculatedContext;
@@ -292,10 +292,10 @@ public class CollisionIntensityCalculator : MonoBehaviour, IIntensityCalculator 
       _playableElement = pe;
 
       // Get other components only if PlayableElement is present
-      if (TryGetComponent<PhysicsElementComponent>(out var physComp)) {
+      if (TryGetComponent<ElementPhysicsComponent>(out var physComp)) {
         _physicsElementComponent = physComp;
       }
-      if (TryGetComponent<PhysicalMaterialsElementComponent>(out var matComp)) {
+      if (TryGetComponent<ElementPhysicalMaterialComponent>(out var matComp)) {
         _physicalMaterialsElementComponent = matComp;
       }
       if (TryGetComponent<Rigidbody2D>(out var rb)) {
@@ -315,7 +315,7 @@ public class CollisionIntensityCalculator : MonoBehaviour, IIntensityCalculator 
     }
 
     if (_physicalMaterialsElementComponent == null && ConsiderMaterial) {
-      this.LogWarning($"ConsiderMaterial is enabled but not PhysicalMaterialsElementComponent was found on {_playableElement.name}. ConsiderMaterial will be set to false");
+      this.LogWarning($"ConsiderMaterial is enabled but not ElementPhysicalMaterialComponent was found on {_playableElement.name}. ConsiderMaterial will be set to false");
       ConsiderMaterial = false; //disable to avoid confusion
     }
 

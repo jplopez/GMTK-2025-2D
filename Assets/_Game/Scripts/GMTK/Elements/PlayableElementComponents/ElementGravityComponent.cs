@@ -5,8 +5,8 @@ namespace GMTK {
   /// Gravity component for PlayableElement that handles gravity effects.
   /// This component manages gravity scale and provides runtime control over gravitational forces.
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Gravity Element Component")]
-  public class GravityElementComponent : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Element Gravity Component")]
+  public class ElementGravityComponent : PlayableElementComponent {
 
     [Header("Gravity Settings")]
     [Tooltip("If true, the element is affected by gravity")]
@@ -25,7 +25,7 @@ namespace GMTK {
     [SerializeField, DisplayWithoutEdit] private Rigidbody2D _rigidbody2D;
     [SerializeField, DisplayWithoutEdit] private float _currentGravityScale;
 
-    private PhysicsElementComponent _physicsComponent;
+    private ElementPhysicsComponent _physicsComponent;
 
     protected override void Initialize() {
       // Get required components
@@ -36,7 +36,7 @@ namespace GMTK {
       }
 
       // Try to get the physics component for integration
-      _physicsComponent = _playableElement.GetComponent<PhysicsElementComponent>();
+      _physicsComponent = _playableElement.GetComponent<ElementPhysicsComponent>();
 
       // Apply initial gravity settings
       UpdateGravity();

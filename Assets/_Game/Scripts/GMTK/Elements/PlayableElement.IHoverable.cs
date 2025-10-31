@@ -32,30 +32,30 @@ namespace GMTK {
       
       if (_isHovered == hovered) return;
       _isHovered = hovered && CanHover;
-      this.LogDebug($"Element {name} marked as {(hovered ? "Hovered" : "Unhovered")}");
+      this.LogDebug($"[Begin MarkHovered:{(hovered ? "Hovered" : "Unhovered")}] '{name}'");
 
       // PlayableElement event type
       var peEvent = hovered ? PlayableElementEventType.PointerOver : PlayableElementEventType.PointerOut;
       var gameEvent = hovered ? GameEventType.ElementHovered : GameEventType.ElementUnhovered;
 
-      // Raise main hover/unhover event
+      // Raise game event
       var eventArgs = RaiseGameEvent(gameEvent, peEvent);
-
+      
       //if selection is trigger on hover, raise selected/unselected event as well
       if (HasSelectionTrigger(SelectionTrigger.OnHover)) {
-        var selectionEvent = hovered ? GameEventType.ElementSelected : GameEventType.ElementDeselected;
-        _isSelected = hovered; //directly set selected state to avoid redundant checks
-        RaiseGameEvent(selectionEvent, peEvent);
+        MarkSelected(hovered);
       }
 
       //Call pointer component, if present, to handle the hovered event effects
       if (!TryDelegateToPointerComponent(eventArgs)) {
-        this.LogWarning($"No PointerElementComponent found on {name} to handle hover event");
+        this.LogWarning($"No ElementPointerComponent found on {name} to handle hover event");
       }
+
       //unity event
       var unityEvent = hovered ? OnHovered : OnUnhovered;
       unityEvent?.Invoke(eventArgs);
-      //RaisePlayableElementEvent(peEvent);
+
+      this.LogDebug($"[End MarkHovered:{IsHovered}] '{name}'");
     }
 
     public void EnableHovering(bool enable=true) {
@@ -78,7 +78,6 @@ namespace GMTK {
 
     public void OnHoverEnabled() => EnableHovering(true);
     public void OnHoverDisabled() => EnableHovering(false);
-
     public void OnPointerOver() => OnHover();
     public void OnPointerOut() => OnUnhover();
 

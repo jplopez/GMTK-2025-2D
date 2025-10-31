@@ -9,8 +9,8 @@ namespace GMTK {
   /// Component that enhances the PlayableElement with pointer-based selection functionality.<br/>
   /// This component enables interactions when the element is selected, hovered or dragged (mouse, touch input or both) as well as playing feedbacks.<br/>
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Pointer Element Component")]
-  public class PointerElementComponent : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Element Pointer Component")]
+  public class ElementPointerComponent : PlayableElementComponent {
 
     [Header("Select Feedbacks")]
     public MMF_Player OnSelectedFeedback;

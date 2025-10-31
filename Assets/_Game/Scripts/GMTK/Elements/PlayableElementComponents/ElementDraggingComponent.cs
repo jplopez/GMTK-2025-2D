@@ -8,8 +8,8 @@ namespace GMTK {
   /// Dragging component for PlayableElement that handles drag behavior and constraints.
   /// This component provides pure drag functionality without any feedback - feedback should be handled by separate components.
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Dragging Element Component")]
-  public class DraggingElementComponent : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Element Dragging Component")]
+  public class ElementDraggingComponent : PlayableElementComponent {
 
     [Header("Snapping")]
     [Tooltip("If true, position at drop will be constrained to the grid")]
@@ -107,7 +107,7 @@ namespace GMTK {
       if (EnableGhost) {
         _originalRenderer = _playableElement.Model.GetComponent<SpriteRenderer>();
         if (_originalRenderer == null) {
-          Debug.LogError($"[DraggingElementComponent] No SpriteRenderer found on {_playableElement.name} - Ghost functionality disabled");
+          Debug.LogError($"[ElementDraggingComponent] No SpriteRenderer found on {_playableElement.name} - Ghost functionality disabled");
           EnableGhost = false;
         }
         else {
@@ -148,11 +148,6 @@ namespace GMTK {
         StartGhostMode();
         PlayFeedback(OnGhostModeStartFeedback);
       }
-
-      // Trigger event if Event flag is set
-      if (HasFlag(PositionChangeFlags.Event)) {
-        TriggerPositionChangeEvent(evt.WorldPosition, true, "DragStart");
-      }
       PlayFeedback(OnDragStartFeedback);
       this.LogDebug($"Drag started on {_playableElement.name}");
     }
@@ -177,11 +172,6 @@ namespace GMTK {
         // Handle position updates during drag
         if (HasFlag(PositionChangeFlags.DuringDrag)) {
           ApplyPositionUpdate(targetPosition);
-        }
-
-        // Trigger event if Event flag is set
-        if (HasFlag(PositionChangeFlags.Event)) {
-          TriggerPositionChangeEvent(targetPosition, true, "DraggingUpdate");
         }
 
         // TODO: while dragging, if the position doesnt change, we should avoid triggering feedbacks and events
@@ -266,25 +256,9 @@ namespace GMTK {
         EndGhostMode();
         PlayFeedback(OnGhostModeEndFeedback);
       }
-
-      // Trigger event if Event flag is set
-      if (HasFlag(PositionChangeFlags.Event)) {
-        TriggerPositionChangeEvent(finalPosition, false, "DragEnd");
-      }
-
-      // Always trigger drop success/failure events
-      if (isValidDrop) {
-        TriggerDropSuccessEvent(finalPosition);
-        this.LogDebug($"Valid drop at {finalPosition}");
-      }
-      else {
-        TriggerDropInvalidEvent(evt.WorldPosition);
-        this.LogDebug($"Invalid drop location, element at {finalPosition}");
-      }
-
       PlayFeedback(OnDragEndFeedback);
 
-      this.LogDebug($"Drag ended on {_playableElement.name}");
+      this.LogDebug($"Drag ended on {_playableElement.name}. Valid? {isValidDrop}");
     }
 
     #endregion
@@ -454,55 +428,7 @@ namespace GMTK {
 
     #endregion
 
-    #region Event Triggering
-
-    private void TriggerPositionChangeEvent(Vector3 position, bool isDuringDrag, string eventContext) {
-      // Check if current position is valid for contextual events
-      bool isValidPosition = IsValidDropLocation(position);
-
-      // Track validation state changes
-      if (isValidPosition != _lastPlacementWasValid || isDuringDrag) {
-        _lastPlacementWasValid = isValidPosition;
-
-        this.LogDebug($"Position change event [{eventContext}]: {position}, Valid: {isValidPosition}, Durante Drag: {isDuringDrag}");
-
-        // Here you could trigger custom PlayableElementEventType events if needed
-        // For example: TriggerCustomPositionChangeEvent(position, isValidPosition, isDuringDrag, eventContext);
-      }
-    }
-
-    private void TriggerDropSuccessEvent(Vector3 position) {
-      var successArgs = new PlayableElementEventArgs(_playableElement, position, PlayableElementEventType.DropSuccess);
-      _gameEventChannel.Raise(GameEventType.PlayableElementEvent, successArgs);
-    }
-
-    private void TriggerDropInvalidEvent(Vector3 position) {
-      var invalidArgs = new PlayableElementEventArgs(_playableElement, position, PlayableElementEventType.DropInvalid);
-      _gameEventChannel.Raise(GameEventType.PlayableElementEvent, invalidArgs);
-    }
-
-    #endregion
-
     #region Public API
-
-    public void SetDragConstraints(bool horizontal, bool vertical) {
-      ConstrainHorizontal = horizontal;
-      ConstrainVertical = vertical;
-    }
-
-    public void SetDragBounds(Vector2 min, Vector2 max) {
-      MinPosition = min;
-      MaxPosition = max;
-    }
-
-    public void SetSnapToGrid(bool snapToGrid, bool snapDuringDrag = false) {
-      SnapOnDrop = snapToGrid;
-      SnapDuringDrag = snapDuringDrag;
-    }
-
-    public void SetPositionChangeSettings(PositionChangeFlags changeUpdate) {
-      ChangeUpdate = changeUpdate;
-    }
 
     /// <summary>
     /// Set the ghost appearance settings
@@ -526,43 +452,6 @@ namespace GMTK {
       OnInvalidPlacementFeedback = invalidPlacement;
     }
 
-    /// <summary>
-    /// Add a flag to the current PositionChangeFlags
-    /// </summary>
-    public void AddFlag(PositionChangeFlags flag) {
-      ChangeUpdate |= flag;
-    }
-
-    /// <summary>
-    /// Remove a flag from the current PositionChangeFlags
-    /// </summary>
-    public void RemoveFlag(PositionChangeFlags flag) {
-      ChangeUpdate &= ~flag;
-    }
-
-    /// <summary>
-    /// Check if a specific flag is set
-    /// </summary>
-    public bool HasPositionChangeFlag(PositionChangeFlags flag) {
-      return HasFlag(flag);
-    }
-
-    public bool IsDragging => _isDragging;
-
-    /// <summary>
-    /// Get the current valid position (useful when ChangeUpdate includes Event)
-    /// </summary>
-    public Vector3 GetLastValidPosition() => _lastValidPosition;
-
-    /// <summary>
-    /// Check if a specific world position would be a valid drop location
-    /// </summary>
-    public bool IsValidPosition(Vector3 worldPosition) => IsValidDropLocation(worldPosition);
-
-    /// <summary>
-    /// Check if ghost mode is currently active
-    /// </summary>
-    public bool IsInGhostMode => _isInGhostMode;
 
     #endregion
 

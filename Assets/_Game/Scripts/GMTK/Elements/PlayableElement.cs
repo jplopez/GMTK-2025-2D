@@ -22,7 +22,7 @@ namespace GMTK {
   /// Additional abilities are provided by PlayableElementComponent-derived classes.
   /// </summary>
   [AddComponentMenu("GMTK/Playable Element")]
-  [RequireComponent(typeof(PointerElementComponent))]
+  [RequireComponent(typeof(ElementPointerComponent))]
   public partial class PlayableElement : MonoBehaviour, IDraggable, ISelectable, IHoverable {
 
     [Header("Model Settings")]
@@ -89,7 +89,7 @@ namespace GMTK {
 
     protected GameEventChannel _gameEventChannel;
 
-    private PointerElementComponent _pointerComponent;
+    private ElementPointerComponent _pointerComponent;
 
     private bool HasSelectionTrigger(SelectionTrigger trigger) => (SelectionTriggers & trigger) != 0;
 
@@ -149,8 +149,8 @@ namespace GMTK {
       _components?.ForEach(c => { c.SetPlayableElement(this); });
       _components?.ForEach(c => { if (c != null) c.TryInitialize(); });
 
-      // Cache the PointerElementComponent reference
-      _pointerComponent = GetComponent<PointerElementComponent>();
+      // Cache the ElementPointerComponent reference
+      _pointerComponent = GetComponent<ElementPointerComponent>();
       this.Log($"PlayableElement '{name}' initialized with {_components.Count} PlayableElementComponents");
     }
 
@@ -216,18 +216,6 @@ namespace GMTK {
     #region Event System
 
     /// <summary>
-    /// Helper method to raise PlayableElement events.<br/>
-    /// These are intended to be used by PlayableElementComponents to notify about events related to this PlayableElement.<br/>
-    /// 
-    /// TODO: replace with UnityEvents?
-    /// 
-    /// </summary>
-    /// <param name="eventType">The type of event to raise</param>
-    /// <param name="worldPosition">The world position for the event (uses transform.position if not provided)</param>
-    protected virtual PlayableElementEventArgs RaisePlayableElementEvent(PlayableElementEventType eventType, Vector3? worldPosition = null) =>
-      RaiseGameEvent(GameEventType.PlayableElementEvent, eventType, worldPosition);
-
-    /// <summary>
     /// <para>
     /// Raises a game event through the game event channel, using the specified parameters to construct the event arguments.
     /// Subclasses can override this method to customize event handling behavior.
@@ -247,13 +235,8 @@ namespace GMTK {
     /// data.</param>
     /// <returns>A <see cref="PlayableElementEventArgs"/> instance containing the details of the raised event.</returns>
     protected virtual PlayableElementEventArgs RaiseGameEvent(GameEventType gameEvent, PlayableElementEventType eventType, Vector3? worldPosition = null) {
-
       var eventArgs = BuildEventArgs(gameEvent, eventType, worldPosition);
       _gameEventChannel.Raise(gameEvent, eventArgs);
-
-      //this.LogDebug($"{name} raised a GameEvent: PlayableElementEventType:'{eventType}'\t" +
-      //    (gameEvent != GameEventType.PlayableElementEvent ? $"  GameEventType:'{gameEvent}'" : ""));
-
       return eventArgs;
     }
 
@@ -264,15 +247,15 @@ namespace GMTK {
        new(this, worldPosition ?? transform.position, eventType);
 
     /// <summary>
-    /// This methods invokes the PlayableElementEvent handlers for the PointerElementComponent, if it exists.<br/>
+    /// This methods invokes the PlayableElementEvent handlers for the ElementPointerComponent, if it exists.<br/>
     /// The purpose is to prioritize the handling by that component, before raising the event to other listeners.
     /// </summary>
     /// <param name="eventArgs"></param>
-    /// <returns>true if the event was handled by the PointerElementComponent. false otherwise</returns>
+    /// <returns>true if the event was handled by the ElementPointerComponent. false otherwise</returns>
     private bool TryDelegateToPointerComponent(PlayableElementEventArgs eventArgs) {
       if (_pointerComponent == null) return false;
 
-      this.LogDebug($"Delegating {eventArgs.EventType} event to PointerElementComponent on {name}");
+      this.LogDebug($"Delegating {eventArgs.EventType} event to ElementPointerComponent on {name}");
       switch (eventArgs.EventType) {
         case PlayableElementEventType.Selected:
           _pointerComponent.OnSelected(eventArgs);

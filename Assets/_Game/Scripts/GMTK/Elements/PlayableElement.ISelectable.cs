@@ -6,7 +6,7 @@ namespace GMTK {
 
   /// <summary>
   /// PlayableElement partial class implementing ISelectable interface functionality.
-  /// Handles selection behavior and delegates to PointerElementComponent, if present.
+  /// Handles selection behavior and delegates to ElementPointerComponent, if present.
   /// </summary>
   public partial class PlayableElement : ISelectable {
 
@@ -41,31 +41,26 @@ namespace GMTK {
 
     public void MarkSelected(bool selected = true) {
       
-      if (IsSelected == selected || !CanSelect) return; //avoid redundant state change
+      if (IsSelected == selected || !CanSelect || !HasAnySelectionTrigger) return; //avoid redundant state change
       IsSelected = selected;
-      this.LogDebug($"Element {name} marked as {(IsSelected ? "Selected" : "Deselected")}");
+      this.LogDebug($"[Begin MarkSelected:{(selected ? "Selected" : "Deselected")}] '{name}'");
 
       var peEvent = selected ? PlayableElementEventType.Selected : PlayableElementEventType.Deselected;
       var gameEvent = selected ? GameEventType.ElementSelected : GameEventType.ElementDeselected;
 
       // If selection is triggered on click, raise selected or unselected event
-      if (HasSelectionTrigger(SelectionTrigger.OnClick)) {
-        var eventArgs = RaiseGameEvent(gameEvent, peEvent);
+      var eventArgs = RaiseGameEvent(gameEvent, peEvent);
 
-        // call pointer component - if present - to handle the selection event effects
-        if (!TryDelegateToPointerComponent(eventArgs)) {
-          this.LogWarning($"No PointerElementComponent found on {name} to handle selection event");
-        }
+      // call pointer component - if present - to handle the selection event effects
+      if (!TryDelegateToPointerComponent(eventArgs)) {
+        this.LogWarning($"No ElementPointerComponent found on {name} to handle selection event");
+      }
 
-        // unity event 
-        var unityEvent = selected ? OnSelected : OnDeselected;
-        unityEvent?.Invoke(eventArgs);
-        //RaisePlayableElementEvent(peEvent);
-      }
-      else {
-        //in the future maybe there's value on capturing a click over a non-selectable object
-        this.LogWarning($"Selection event raised on {name} but SelectionTrigger does not include OnClick");
-      }
+      // unity event 
+      var unityEvent = selected ? OnSelected : OnDeselected;
+      unityEvent?.Invoke(eventArgs);
+
+      this.LogDebug($"[End MarkSelected:{IsSelected}] '{name}'");
     }
 
     public void EnableSelectable(bool selectable = true) {

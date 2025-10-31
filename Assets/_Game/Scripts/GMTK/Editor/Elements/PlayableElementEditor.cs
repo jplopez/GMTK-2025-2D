@@ -41,7 +41,7 @@ namespace GMTK {
     private SerializedProperty _canRotateProp;
     private SerializedProperty _canSelectProp;
     private SerializedProperty _flippableProp;
-    //input properties for PointerElementComponent
+    //input properties for ElementPointerComponent
     private SerializedProperty _selectionTriggerProp;
     private SerializedProperty _accuracyProp;
     private SerializedProperty _maxOffsetProp;
@@ -138,7 +138,7 @@ namespace GMTK {
 
       if (_draggingHelpIcon == null) {
         _draggingHelpIcon = new GUIContent(_helpIconContent.image,
-          "DraggingElementComponent provides drag behavior settings such as:\n" +
+          "ElementDraggingComponent provides drag behavior settings such as:\n" +
           "• Drag threshold distance\n" +
           "• Drag constraints (horizontal/vertical only)\n" +
           "• Visual feedback during dragging\n" +
@@ -148,7 +148,7 @@ namespace GMTK {
 
       if (_physicsHelpIcon == null) {
         _physicsHelpIcon = new GUIContent(_helpIconContent.image,
-          "PhysicsElementComponent provides physics-based rotation settings such as:\n" +
+          "ElementPhysicsComponent provides physics-based rotation settings such as:\n" +
           "• Custom rotation behavior overrides\n" +
           "• Physics-based rotation constraints\n" +
           "• Rotation damping and limits\n" +
@@ -323,7 +323,7 @@ namespace GMTK {
       const int buttonWidth = 150;
       const int helpButtonWidth = 20;
 
-      if (_element.TryGetComponent(out DraggingElementComponent draggingComponent)) {
+      if (_element.TryGetComponent(out ElementDraggingComponent draggingComponent)) {
         //link to component
         if (GUILayout.Button("Dragging Component", GUILayout.Width(buttonWidth))) {
           Selection.activeGameObject = draggingComponent.gameObject;
@@ -333,10 +333,10 @@ namespace GMTK {
         }
       }
       else {
-        //EditorGUILayout.HelpBox("No DraggingElementComponent component found. Add one to configure dragging settings.", MessageType.Warning);
+        //EditorGUILayout.HelpBox("No ElementDraggingComponent component found. Add one to configure dragging settings.", MessageType.Warning);
         if (GUILayout.Button("Add Dragging Component", GUILayout.Width(buttonWidth))) {
-          draggingComponent = _element.gameObject.AddComponent<DraggingElementComponent>();
-          Debug.Log($"Added DraggingElementComponent ({draggingComponent.name}) to {_element.name}");
+          draggingComponent = _element.gameObject.AddComponent<ElementDraggingComponent>();
+          Debug.Log($"Added ElementDraggingComponent ({draggingComponent.name}) to {_element.name}");
         }
         if (GUILayout.Button(_draggingHelpIcon, HelpButtonStyle, GUILayout.Width(helpButtonWidth), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
           EditorUtility.DisplayDialog("Add Dragging Component Help", _draggingHelpIcon.tooltip, "OK");
@@ -348,7 +348,7 @@ namespace GMTK {
     private void CheckRotationOverride() {
       const int buttonWidth = 150;
 
-      if (_element.TryGetComponent(out PhysicsElementComponent physicsComponent)) {
+      if (_element.TryGetComponent(out ElementPhysicsComponent physicsComponent)) {
         if (GUILayout.Button("Physics Component", GUILayout.Width(buttonWidth))) {
           Selection.activeGameObject = physicsComponent.gameObject;
         }
@@ -358,8 +358,8 @@ namespace GMTK {
       }
       else {
         if (GUILayout.Button("Add Physics Component", GUILayout.Width(buttonWidth))) {
-          physicsComponent = _element.gameObject.AddComponent<PhysicsElementComponent>();
-          Debug.Log($"Added PhysicsElementComponent ({physicsComponent.name}) to {_element.name}");
+          physicsComponent = _element.gameObject.AddComponent<ElementPhysicsComponent>();
+          Debug.Log($"Added ElementPhysicsComponent ({physicsComponent.name}) to {_element.name}");
         }
         if (GUILayout.Button(_physicsHelpIcon, HelpButtonStyle, GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
           EditorUtility.DisplayDialog("Add Physics Component Help", _physicsHelpIcon.tooltip, "OK");

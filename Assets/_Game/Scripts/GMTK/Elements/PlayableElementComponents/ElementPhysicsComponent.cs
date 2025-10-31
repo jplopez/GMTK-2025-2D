@@ -30,8 +30,8 @@ namespace GMTK {
   ///   4. OnCollisionStay2D - Physics<br/>
   ///   5. OnCollisionExit2D - Physics<br/>
   /// </summary>
-  [AddComponentMenu("GMTK/Playable Element Components/Physics Element Component")]
-  public class PhysicsElementComponent : PlayableElementComponent {
+  [AddComponentMenu("GMTK/Playable Element Components/Element Physics Component")]
+  public class ElementPhysicsComponent : PlayableElementComponent {
 
     #region Serialized Fields
 
@@ -145,9 +145,9 @@ namespace GMTK {
     //private bool _isDragOverride = false; // Track when dragging should override collision settings
 
     // Component references
-    private GravityElementComponent _gravityComponent;
-    private PhysicalMaterialsElementComponent _materialComponent;
-    private AutoRotationElementComponent _autoRotationComponent;
+    private ElementGravityComponent _gravityComponent;
+    private ElementPhysicalMaterialComponent _materialComponent;
+    private ElementAutoRotationComponent _autoRotationComponent;
 
     private CollisionState _currentCollisionState;
 
@@ -205,9 +205,9 @@ namespace GMTK {
         _rigidbody2D = _playableElement.gameObject.AddComponent<Rigidbody2D>();
 
       // Get optional component references
-      _gravityComponent = _playableElement.GetComponent<GravityElementComponent>();
-      _materialComponent = _playableElement.GetComponent<PhysicalMaterialsElementComponent>();
-      _autoRotationComponent = _playableElement.GetComponent<AutoRotationElementComponent>();
+      _gravityComponent = _playableElement.GetComponent<ElementGravityComponent>();
+      _materialComponent = _playableElement.GetComponent<ElementPhysicalMaterialComponent>();
+      _autoRotationComponent = _playableElement.GetComponent<ElementAutoRotationComponent>();
 
       // Initialize with default gravity (will be overridden by gravity component if present)
       if (_gravityComponent == null) {
@@ -375,7 +375,7 @@ namespace GMTK {
     }
 
     protected virtual void UpdateRotationControls() {
-      // Auto rotation is now handled by AutoRotationElementComponent
+      // Auto rotation is now handled by ElementAutoRotationComponent
       // Only apply manual rotation limits here
       if (RotationChangesDisabled) return;
 
@@ -602,7 +602,7 @@ namespace GMTK {
         case CollisionSourceFilter.ElementsOnly:
           // Check if the colliding object is another playable element
           return collisionObject.GetComponent<PlayableElement>() != null ||
-                 collisionObject.GetComponent<PhysicsElementComponent>() != null;
+                 collisionObject.GetComponent<ElementPhysicsComponent>() != null;
 
         default:
           return false;
@@ -740,7 +740,7 @@ namespace GMTK {
       foreach (var collider in overlapping) {
         if (collider != _collider2D && collider.gameObject != _playableElement.gameObject) {
           // Check if the overlapping object also has solid collision
-          var otherPhysics = collider.GetComponent<PhysicsElementComponent>();
+          var otherPhysics = collider.GetComponent<ElementPhysicsComponent>();
           if (otherPhysics != null && otherPhysics.SolidOnCollision) {
             return true;
           }
@@ -947,7 +947,7 @@ namespace GMTK {
 
     // Integration methods for other components
     public void OnGravityChanged(bool hasGravity, float multiplier) {
-      // Called by GravityElementComponent when gravity settings change
+      // Called by ElementGravityComponent when gravity settings change
       InitMovementControls(); // Update rigidbody type if needed
     }
 

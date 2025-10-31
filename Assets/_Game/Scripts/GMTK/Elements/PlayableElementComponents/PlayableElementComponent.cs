@@ -113,19 +113,16 @@ namespace GMTK {
     /// </para>
     /// </summary>
     /// <param name="eventArgs">The event data containing information about the playable element and the event.</param>
-    public virtual void OnPlayableElementEvent(PlayableElementEventArgs eventArgs) {
-      if (eventArgs.Element != _playableElement) return;
+    //public virtual void OnPlayableElementEvent(PlayableElementEventArgs eventArgs) {
+    //  if (eventArgs.Element != _playableElement) return;
 
-      //// Broadcast the event internally over GameEventChannel for other components to listen
-      //_gameEventChannel.Raise(GameEventType.PlayableElementInternalEvent, eventArgs);
+    //  // Handle the event locally using reflection
+    //  HandlePlayableElementEvent(eventArgs);
 
-      // Handle the event locally using reflection
-      HandlePlayableElementEvent(eventArgs);
-
-      if (CommonSettings.TriggersInnerEvent) {
-        _gameEventChannel.Raise(GameEventType.PlayableElementInternalEvent, eventArgs);
-      }
-    }
+    //  if (CommonSettings.TriggersInnerEvent) {
+    //    _gameEventChannel.Raise(GameEventType.PlayableElementInternalEvent, eventArgs);
+    //  }
+    //}
 
     /// <summary>
     /// <para>
@@ -138,28 +135,28 @@ namespace GMTK {
     /// </para>
     /// </summary>
     /// <param name="args"></param>
-    private void HandlePlayableElementEvent(PlayableElementEventArgs args) {
-      // Only handle events for our own PlayableElement
-      if (args.Element != _playableElement) return;
+    //private void HandlePlayableElementEvent(PlayableElementEventArgs args) {
+    //  // Only handle events for our own PlayableElement
+    //  if (args.Element != _playableElement) return;
 
-      // Use reflection to look for a method named as "On" + PlayableElementEventType name in args
-      // For example DragStart for PlayableElementEventType.DragStart, that receives a PlayableElementEventArgs argument
-      string methodName = "On" + args.EventType.ToString();
-      System.Reflection.MethodInfo method = GetType().GetMethod(methodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-      this.LogDebug($"handling event '{args.EventType}' using method '{methodName}'");
-      if (method != null) {
-        try {
-          method.Invoke(this, new object[] { args });
-        }
-        catch (Exception ex) {
-          this.LogError($"Error invoking method {methodName}: {ex.Message}");
-        }
-      }
-      else {
-        // Optional: Log when no handler method is found (useful for debugging)
-        // this.LogWarning($"No handler method found for {methodName}");
-      }
-    }
+    //  // Use reflection to look for a method named as "On" + PlayableElementEventType name in args
+    //  // For example DragStart for PlayableElementEventType.DragStart, that receives a PlayableElementEventArgs argument
+    //  string methodName = "On" + args.EventType.ToString();
+    //  System.Reflection.MethodInfo method = GetType().GetMethod(methodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+    //  this.LogDebug($"handling event '{args.EventType}' using method '{methodName}'");
+    //  if (method != null) {
+    //    try {
+    //      method.Invoke(this, new object[] { args });
+    //    }
+    //    catch (Exception ex) {
+    //      this.LogError($"Error invoking method {methodName}: {ex.Message}");
+    //    }
+    //  }
+    //  else {
+    //    // Optional: Log when no handler method is found (useful for debugging)
+    //    // this.LogWarning($"No handler method found for {methodName}");
+    //  }
+    //}
 
     #endregion
 
@@ -205,7 +202,7 @@ namespace GMTK {
       if (_gameEventChannel == null) return;
 
       // Listen to PlayableElement events through the GameEventChannel
-      _gameEventChannel.AddListener<PlayableElementEventArgs>(GameEventType.PlayableElementInternalEvent, OnPlayableElementEvent);
+      //_gameEventChannel.AddListener<PlayableElementEventArgs>(GameEventType.PlayableElementInternalEvent, OnPlayableElementEvent);
 
       //Add UnityEvents subscription to PlayableElement
       if (_playableElement == null) return;
@@ -250,7 +247,7 @@ namespace GMTK {
     protected virtual void RemoveListeners() {
       if (_gameEventChannel == null) return;
 
-      _gameEventChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.PlayableElementInternalEvent, OnPlayableElementEvent);
+      //_gameEventChannel.RemoveListener<PlayableElementEventArgs>(GameEventType.PlayableElementInternalEvent, OnPlayableElementEvent);
 
       //remove UnityEvents subscription to PlayableElement
       if (_playableElement != null) {
