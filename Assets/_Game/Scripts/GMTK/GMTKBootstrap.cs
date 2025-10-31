@@ -24,12 +24,44 @@ namespace GMTK {
     [Tooltip("Automatically connect GameStateMachine to external events")]
     public bool ConnectGameStateMachineEvents = true;
 
+    [Header("Log Levels")]
+    [Help("Configure which log levels are enabled for this component")]
+    [Tooltip("Be cautious this is very verbose and can impact performance")]
+    public bool LogDebug = false;
+    public bool LogInfo = true;
+    [Tooltip("Heads up on edge cases that do not impact the game flow")]
+    public bool LogWarning = true;
+    [Tooltip("Unexpected situations that will impact the game flow")]
+    public bool LogError = true;
+    [Tooltip("The code trace from Unity about an error")]
+    public bool LogExceptions = true;
+
 #if UNITY_EDITOR
     private void OnValidate() {
+      SetLogLevels();
       this.LogDebug("=== UE: SERVICES INITIALIZATION START ===");
       InitializeAllServices();
       this.LogDebug("=== UE: SERVICES INITIALIZATION COMPLETE ===");
     }
+
+    private void SetLogLevels() {
+      //update log levels only if they have changed
+      if(LogDebug != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Debug])
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Debug, LogDebug);
+
+      if(LogInfo != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Info])
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Info, LogInfo);
+
+      if(LogWarning != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Warning])
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Warning, LogWarning);
+
+      if(LogError != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Error])
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Error, LogError);
+
+      if(LogExceptions != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Exception])
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Exception, LogExceptions);
+    }
+
 #endif
 
 

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace GMTK.Extensions {
@@ -6,6 +8,56 @@ namespace GMTK.Extensions {
   /// These methods provide pure transformation logic without game-specific event handling.
   /// </summary>
   public static class TransformGameExtensions {
+
+
+    /// <summary>
+    /// Find the first child Transform (excluding the parent itself) that has the specified tag.
+    /// </summary>
+    /// <param name="transform"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public static Transform FindChildWithTag(this Transform transform, string tag) {
+      return FindChildrenWithAnyTag(transform, new string[] { tag }).FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Finds all child Transform (excluding the parent itself) that have the specified tag.
+    /// </summary>
+    /// <param name="transform"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public static List<Transform> FindChildsWithTag(this Transform transform, string tag) {
+      var tags = new string[] { tag };
+      return FindChildrenWithAnyTag(transform, tags);
+    }
+
+    /// <summary>
+    /// Finds the first child Transform (excluding the parent itself) that has any of the specified tags.
+    /// </summary>
+    /// <param name="transform"></param>
+    /// <param name="tags"></param>
+    /// <returns></returns>
+    public static Transform FindChildWithAnyTag(this Transform transform, string[] tags) {
+      return FindChildrenWithAnyTag(transform, tags).FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Finds all child Transforms (excluding the parent itself) that have any of the specified tags.
+    /// </summary>
+    /// <param name="transform"></param>
+    /// <param name="tags"></param>
+    /// <returns></returns>
+    public static List<Transform> FindChildrenWithAnyTag(this Transform transform, string[] tags) {
+      // Get all Transform components in children (including the parent itself)
+      Transform[] allChildrenTransforms = transform.GetComponentsInChildren<Transform>();
+
+      // Filter for GameObjects with the target tag and exclude the parent itself
+      List<Transform> foundChildren = allChildrenTransforms
+          .Where(t => tags.Contains(t.tag) && t.gameObject != transform.gameObject).ToList();
+
+      return foundChildren;
+    }
+
     /// <summary>
     /// Rotates the transform clockwise by 90 degrees on the Z-axis.
     /// Accounts for existing flipped state to maintain consistent visual rotation.

@@ -36,27 +36,39 @@ namespace GMTK {
       }
     }
 
-    public static void DoLog(LoggerLevels level, string message) {
+    public static void DoLog(LoggerLevels level, string objName, string message) {
       if (CanLog(level)) {
+        string prefix = $"<b>[{GetTimestamp()}] " + 
+          (string.IsNullOrEmpty(objName) ? "" : $"[{objName}]") + "</b> ";
+        string formattedMessage;
+
         switch (level) {
           case LoggerLevels.Info:
-            Debug.Log($"[{GetTimestamp()}] {message}");
+            formattedMessage = $"<color=white>{prefix}</color> {message}";
+            Debug.Log(formattedMessage);
             break;
           case LoggerLevels.Warning:
-            Debug.LogWarning($"[{GetTimestamp()}] {message}");
+            formattedMessage = $"<color=yellow>{prefix}</color> {message}";
+            Debug.LogWarning(formattedMessage);
             break;
           case LoggerLevels.Error:
-            Debug.LogError($"[{GetTimestamp()}] {message}");
+            formattedMessage = $"<color=red>{prefix}</color> {message} ";
+            Debug.LogError(formattedMessage);
             break;
           case LoggerLevels.Exception:
-            Debug.LogError($"[{GetTimestamp()}] [EXCEPTION] {message}");
+            formattedMessage = $"<b><color=red>{prefix} [EXCEPTION]</color></b> {message}";
+            Debug.LogError(formattedMessage);
             break;
           case LoggerLevels.Debug:
-            Debug.Log($"[{GetTimestamp()}] [DEBUG] {message}");
+            formattedMessage = $"<color=cyan>{prefix} [DEBUG]</color> {message}";
+            Debug.Log(formattedMessage);
             break;
         }
       }
+
     }
+
+    public static void DoLog(LoggerLevels level, string message) => DoLog(level, "", message);
 
     private static Dictionary<string, string> _stackedLogs = new();
 
@@ -93,21 +105,21 @@ namespace GMTK {
     }
 
     public static void Log(this MonoBehaviour obj, string message) {
-      LoggerExtension.DoLog(LoggerLevels.Info, $"[{obj.GetType().Name}] {message}");
+      LoggerExtension.DoLog(LoggerLevels.Info, obj.GetType().Name, message);
     }
     public static void LogWarning(this MonoBehaviour obj, string message) {
-      LoggerExtension.DoLog(LoggerLevels.Warning, $"[{obj.GetType().Name}] {message}");
+      LoggerExtension.DoLog(LoggerLevels.Warning, obj.GetType().Name, message);
     }
     public static void LogError(this MonoBehaviour obj, string message) {
-      LoggerExtension.DoLog(LoggerLevels.Error, $"[{obj.GetType().Name}] {message}");
+      LoggerExtension.DoLog(LoggerLevels.Error, obj.GetType().Name, message);
     }
     
     public static void LogException(this MonoBehaviour obj, Exception ex) {
-      LoggerExtension.DoLog(LoggerLevels.Exception, $"[{obj.GetType().Name}] Exception: {ex.Message}\n{ex.StackTrace}");
+      LoggerExtension.DoLog(LoggerLevels.Exception,obj.GetType().Name, $"Exception: {ex.Message}\n{ex.StackTrace}");
     }
 
     public static void LogDebug(this MonoBehaviour obj, string message) {
-      LoggerExtension.DoLog(LoggerLevels.Debug, $"[{obj.GetType().Name}] {message}");
+      LoggerExtension.DoLog(LoggerLevels.Debug, obj.GetType().Name, message);
     }
 
     #endregion
@@ -115,22 +127,22 @@ namespace GMTK {
     #region ScriptableObject Logger Extensions
 
     public static void Log(this ScriptableObject obj, string message) {
-      LoggerExtension.DoLog(LoggerLevels.Info, $"[{obj.GetType().Name}] {message}");
+      LoggerExtension.DoLog(LoggerLevels.Info, obj.GetType().Name, message);
     }
     public static void LogWarning(this ScriptableObject obj, string message) {
-      LoggerExtension.DoLog(LoggerLevels.Warning, $"[{obj.GetType().Name}] {message}");
+      LoggerExtension.DoLog(LoggerLevels.Warning, obj.GetType().Name, message);
     }
 
     public static void LogError(this ScriptableObject obj, string message) {
-      LoggerExtension.DoLog(LoggerLevels.Error, $"[{obj.GetType().Name}] {message}");
+      LoggerExtension.DoLog(LoggerLevels.Error, obj.GetType().Name, message);
     }
 
     public static void LogException(this ScriptableObject obj, Exception ex) {
-      LoggerExtension.DoLog(LoggerLevels.Exception, $"[{obj.GetType().Name}] Exception: {ex.Message}\n{ex.StackTrace}");
+      LoggerExtension.DoLog(LoggerLevels.Exception,obj.GetType().Name, $"Exception: {ex.Message}\n{ex.StackTrace}");
     }
 
     public static void LogDebug(this ScriptableObject obj, string message) {
-      LoggerExtension.DoLog(LoggerLevels.Debug, $"[{obj.GetType().Name}] {message}"); 
+      LoggerExtension.DoLog(LoggerLevels.Debug, obj.GetType().Name, message);
     }
 
     #endregion

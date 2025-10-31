@@ -137,9 +137,6 @@ namespace GMTK {
       UpdateAllEdgeColliderBoundPoints();
     }
 
-    //private void Update() {
-    //  TrackElementMovement();
-    //}
     private void Update() {
       switch (_currentState) {
         case LevelGridState.Idle:
@@ -337,28 +334,6 @@ namespace GMTK {
 
     #region Track Element Movements
 
-    //private void TrackElementMovement() {
-    //  // Check if input handler has an element moving
-    //  if (_inputHandler.CurrentElement != null && _inputHandler.IsMoving) {
-    //    var currentElement = _inputHandler.CurrentElement;
-
-    //    // If this is a new element being tracked, stop tracking current
-    //    // and begin tracking new
-    //    // otherwise, we are still tracking the same Element
-    //    if (_trackedElement == null || _trackedElement != currentElement) {
-    //      StopTrackingCurrentSelected();
-    //      StartTrackingElement(currentElement);
-    //    }
-
-    //  }
-    //  else {
-    //    //inputhandler is not moving and we are tracking -> we need to stop tracking currentSelected
-    //    if (_isTrackingMovement) {
-    //      StopTrackingCurrentSelected();
-    //    }
-    //  }
-    //}
-
     private void StartTrackingElement(PlayableElement element) {
       _trackedElement = element;
       _isTrackingMovement = true;
@@ -371,29 +346,13 @@ namespace GMTK {
         _elementOriginalGridPosition = WorldToGrid(currentPosition);
         // Unregister from grid while moving to avoid conflicts
         _occupancyMap.Unregister(element, _elementOriginalGridPosition);
-        this.Log($"Started tracking '{element.name}' - unregistered from ({_elementOriginalGridPosition})");
+        this.LogDebug($"Started tracking '{element.name}' - unregistered from ({_elementOriginalGridPosition})");
       }
       else {
-        this.Log($"Started tracking '{element.name}' - was not in grid");
+        this.LogDebug($"Started tracking '{element.name}' - was not in grid");
       }
 
-      //// Notify _dragFeedbackComponent to start visual feedback
-      //if (element.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
-      //  dragFeedback.StartDragFeedback();
-      //}
     }
-
-    //private void StopTrackingCurrentSelected() {
-    //  // Notify _dragFeedbackComponent to stop visual feedback
-    //  //if (_trackedElement != null) {
-    //  //  if (_trackedElement.TryGetComponent<DragFeedbackComponent>(out var dragFeedback)) {
-    //  //    dragFeedback.StopDragFeedback();
-    //  //  }
-    //  //}
-    //  _trackedElement = null;
-    //  _isTrackingMovement = false;
-    //  _elementWasInGrid = false;
-    //}
 
     #endregion
 
@@ -414,7 +373,7 @@ namespace GMTK {
           _elementOriginalGridPosition = WorldToGrid(_elementOriginalWorldPosition);
         }
 
-        this.Log($"Element '{element.name}' selected at {_elementOriginalWorldPosition}");
+        this.LogDebug($"Element '{element.name}' selected at {_elementOriginalWorldPosition}");
         element.OnSelect();
 
         // State remains Idle until dragging begins
@@ -433,7 +392,7 @@ namespace GMTK {
             // Success - place at new worldPosition
             elemModel.position = GridToWorld(newGridOrigin);
             _occupancyMap.Register(element, newGridOrigin);
-            this.Log($"Placed {element.name} at {newGridOrigin}");
+            this.LogDebug($"Placed {element.name} at {newGridOrigin}");
             OnElementPlaced?.Invoke(element);
           }
           else {
@@ -451,73 +410,6 @@ namespace GMTK {
         ChangeState(LevelGridState.Idle);
       }
     }
-    //protected virtual void HandleElementSelected(PlayableElementEventArgs args) {
-    //  // This now just collects element initial world and grid positions - tracking starts in Update()
-    //  if (args.Element is PlayableElement element) {
-    //    //var element = args.Element;
-    //    //_trackedElement = e.Element;
-    //    _elementOriginalWorldPosition = element.transform.worldPosition;
-    //    _elementWasInGrid = _occupancyMap.ContainsElement(element);
-    //    if (_elementWasInGrid) {
-    //      _elementOriginalGridPosition = WorldToGrid(_elementOriginalWorldPosition);
-    //    }
-    //    this.Log($"Element '{element.name}' selected at {_elementOriginalWorldPosition}");
-    //    if (_elementWasInGrid) this.Log($"Element '{element.name}' at grid {_elementOriginalGridPosition}");
-    //    element.OnSelect();
-    //  }
-    //}
-    //protected virtual void HandleElementDropped(PlayableElementEventArgs args) {
-
-    //  if (args.Element is PlayableElement element) {
-    //    //var element = args.Element;
-    //    var newGridOrigin = WorldToGrid(element.transform.worldPosition);
-
-    //    // Try to place at new worldPosition
-    //    if (IsInsidePlayableArea(element.transform.worldPosition)) {
-
-    //      // Success - place at new worldPosition
-    //      if (CanPlace(element, newGridOrigin)) {
-    //        element.transform.worldPosition = SnapToGrid(newGridOrigin);
-    //        _occupancyMap.Register(element, newGridOrigin);
-    //        this.Log($"Placed {element.name} at {newGridOrigin}");
-    //      }
-    //      else {
-    //        // Failed to place - return to original worldPosition if it was in grid
-    //        if (_occupancyMap.ContainsElement(element)) {
-
-    //          element.transform.worldPosition = SnapToGrid(_elementOriginalGridPosition);
-    //          _occupancyMap.Register(element, _elementOriginalGridPosition);
-    //          this.Log($"Returned '{element.name}' to original worldPosition {_elementOriginalGridPosition}");
-    //        }
-    //        // Element came from outside grid - return to inventory
-    //        else {
-    //          //HandleElementReturnToInventory(element);
-    //          this.LogDebug($"Returned {element.name} to inventory");
-    //          element.transform.worldPosition = SnapToGrid(_elementOriginalGridPosition);
-    //        }
-    //      }
-
-    //      // Check if this was the element we were tracking
-    //      if (element == _trackedElement) {
-    //        this.Log($"Dropping tracked element '{element.name}' at {newGridOrigin}");
-    //        // Clean up tracking
-    //        StopTrackingCurrentSelected();
-    //      }
-    //      else {
-    //        // Element wasn't being tracked (probably just clicked)
-    //        this.Log($"Element '{element.name}' clicked but not moved");
-    //      }
-    //    }
-    //  }
-    //}
-
-    //private void HandleElementUnhovered(PlayableElementEventArgs args) {
-    //  if (args.Element is PlayableElement element) element.OnUnhover();//.OnUnhovered();
-    //}
-
-    //protected virtual void HandleElementHovered(PlayableElementEventArgs args) {
-    //  if (args.Element is PlayableElement element) element.OnHover(); //.OnHovered();
-    //}
 
     #endregion
 
@@ -526,7 +418,7 @@ namespace GMTK {
     private void ChangeState(LevelGridState newState) {
       if (_currentState == newState) return;
 
-      this.Log($"LevelGrid state changing from {_currentState} to {newState}");
+      this.LogDebug($"LevelGrid state changing from {_currentState} to {newState}");
       _currentState = newState;
 
       // Handle state-specific setup
@@ -593,12 +485,12 @@ namespace GMTK {
       if (_elementWasInGrid) {
         element.SnapTransform.position = SnapToGrid(_elementOriginalGridPosition);
         _occupancyMap.Register(element, _elementOriginalGridPosition);
-        this.Log($"Returned '{element.name}' to original worldPosition {_elementOriginalGridPosition}");
+        this.LogDebug($"Returned '{element.name}' to original worldPosition {_elementOriginalGridPosition}");
       }
       else {
         // Element came from outside grid - return to original world worldPosition
         element.transform.position = _elementOriginalWorldPosition;
-        this.Log($"Returned '{element.name}' to default worldPosition");
+        this.LogDebug($"Returned '{element.name}' to default worldPosition");
       }
     }
     private void CleanupTracking() {
