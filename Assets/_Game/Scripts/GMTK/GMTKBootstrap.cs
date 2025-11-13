@@ -27,7 +27,7 @@ namespace GMTK {
     [Header("Log Levels")]
     [Help("Configure which log levels are enabled for this component")]
     [Tooltip("Be cautious this is very verbose and can impact performance")]
-    public bool LogDebug = false;
+    public bool LogDebug = true;
     public bool LogInfo = true;
     [Tooltip("Heads up on edge cases that do not impact the game flow")]
     public bool LogWarning = true;

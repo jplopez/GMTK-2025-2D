@@ -61,33 +61,33 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\WarningIfNullPropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\PopupList\PopupListPropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\MinMaxIntPropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\DummyPorpertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\Internal\StringExtensions.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\NonNegativePropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\PopupList\IntPopupPropertyDrawer.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\Internal\GLEditor.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\HighlightPropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\LabelFieldPropertyDrawer.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\Internal\EditorUtils.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\CommentPropertyDrawer.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\InspectorFlagsPropertyDrawer.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\ValidationPropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\Internal\GLMenu.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\PositivePropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\ReadonlyPropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\Internal\Asset.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\OptionalPropertyDrawer.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\InspectorListPropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\GLMonoBehaviourEditor.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\PopupList\ColorPopupDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\GLEditorGUI.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\MinMaxFloatPropertyDrawer.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\GLSerializedProperty.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\SeparatorPropertyDrawer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\PopupList\StringPopupPropertyDrawer.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\WarningIfNullPropertyDrawer.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\Internal\GLEditor.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\HighlightPropertyDrawer.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\Internal\EditorUtils.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\CommentPropertyDrawer.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\InspectorFlagsPropertyDrawer.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\ValidationPropertyDrawer.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\InspectorListPropertyDrawer.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\PopupList\ColorPopupDrawer.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\PropertyDrawers\MinMaxFloatPropertyDrawer.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Editor\GLSerializedProperty.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\za.co.gamelogic.extensions\Editor\Gamelogic.Extensions.Editor.asmdef" />
@@ -665,6 +665,14 @@
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.ProjectData.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="NuGetForUnity.PluginAPI">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NuGetForUnity.PluginAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
@@ -675,6 +683,10 @@
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient">
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NugetForUnity">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NugetForUnity.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet">

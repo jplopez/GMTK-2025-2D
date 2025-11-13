@@ -61,72 +61,73 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\UIStateHandler.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.IHoverable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\GameplayStateHandler.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\ISceneConfiguration.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\BaseGameStateHandler.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\GUI\ScoreTextAnimator.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\GameStateEventArgs.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\LevelManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Physics\Intensity\MarbleCollisionIntensityCalculator.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementControlsComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementAutoRotationComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\OccupancyCell.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementPhysicsComponent.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridOccupancyMap.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\PlayableElementEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Levels\LevelConfig.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\SceneTransitionConfig.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Physics\PhysicalMaterialStrategy.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.ISelector.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\LevelCompleteController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementMagneticComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementPhysicalMaterialComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.IDragger.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\PlayableElementEventType.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\PlayableElementComponent.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayerControlsDispatcher.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Enums\FrictionLevel.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\SceneController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\InputStateHandler.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\GameStateHandler.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Levels\LevelService.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Booster.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\PlayerControls.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\RaiseGameEventConfig.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementGravityComponent.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameEventChannel.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\UIStateHandler.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.IHoverable.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\ISceneConfiguration.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GUI\ScoreTextAnimator.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\GameStateEventArgs.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\LevelManager.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementControlsComponent.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Grid\GridOccupancyMap.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\PlayableElementEventArgs.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Attributes\DisplayWithoutEdit.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Extensions\TransformGameExtensions.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\ScoreConfig.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\PlayableElementEventType.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Checkpoint.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\PlayableElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.IDraggable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\CollisionIntensityCalculator.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayerControlsDispatcher.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Marble\PlayableMarbleController.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Enums\FrictionLevel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Marble\CollisionIntensityContext.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Feedbacks\GameEventFeedback.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\SceneController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Extensions\LoggerExtension.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.ISelectable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GMTKBootstrap.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\InputStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementForceApplierComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\LevelGrid.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\Handlers\GameStateHandler.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameEventType.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Levels\LevelService.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\EndSceneConfig.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateMachine.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateMachineEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\InputActionEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\GUIController.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Booster.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Enums\BouncinessLevel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\MarbleEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\FeelToEventChannel.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\PlayerControls.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.IHover.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementDraggingComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Physics\Intensity\IIntensityCalculator.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\RaiseGameEventConfig.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementGravityComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementPointerComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Events\GameEventChannel.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Grid\PlayableGrid.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_Game\Scripts\GMTK\GMTK.asmdef" />
@@ -680,6 +681,14 @@
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.ProjectData.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="NuGetForUnity.PluginAPI">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NuGetForUnity.PluginAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
@@ -690,6 +699,10 @@
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient">
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NugetForUnity">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NugetForUnity.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet">
@@ -1233,6 +1246,10 @@
     <ProjectReference Include="MoreMountains.Tools.csproj">
       <Project>{9C8D0F35-F0D7-B5ED-2B4E-A9BA2DA3DBBE}</Project>
       <Name>MoreMountains.Tools</Name>
+    </ProjectReference>
+    <ProjectReference Include="UnityEssentials.FoldoutAttribute.csproj">
+      <Project>{B3BC2EC6-480B-E202-7DE5-A9AC5A3B95DB}</Project>
+      <Name>UnityEssentials.FoldoutAttribute</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

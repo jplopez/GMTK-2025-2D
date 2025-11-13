@@ -708,9 +708,9 @@ namespace GMTK {
       constrainedPos.y = Mathf.Clamp(constrainedPos.y, MinPosition.y, MaxPosition.y);
 
       // Apply grid snapping if enabled
-      if (SnapToGridOnMove && _levelGrid != null) {
+      if (SnapToGridOnMove) { // && _levelGrid != null) {
         //Vector2Int gridPos = _levelGrid.WorldToGrid(constrainedPos);
-        constrainedPos = _levelGrid.SnapToGrid(constrainedPos);
+        constrainedPos = SnapToGrid(constrainedPos);
       }
 
       return constrainedPos;

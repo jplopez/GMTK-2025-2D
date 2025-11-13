@@ -63,75 +63,36 @@
   <ItemGroup>
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\PidController\PidController.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\PushdownAutomaton.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveSequence.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\GameObjectExtensions.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\RandomAccessPriorityQueue.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ReuseCandidateAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\Generators.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\LifeCycleEvent.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\ImplementationFactory.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Utilities\ScreenshotTaker.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveFloat.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Support\PlaceHolder.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\Buffer\BufferExtensions.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\HashFunctions\HashFunction.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\NonNegativeAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Support\Branding.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidationAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\MonoBehaviourPool.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\HelpURL.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\GLMathf.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PositiveAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\InspectableData\MinMaxInt.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\GLRandom.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\Combinatorial.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveColor.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PopupList\LayerPopupAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\AssemblyInfo.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Exceptions\ResourceNotFoundException.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Exceptions\TypeArgumentException.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\FriendAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\LabelFieldAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\SingletonSpawner.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\HashFunctions\XXHash.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveVector2.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidatePositiveAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\VersionAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\ImmutableAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurve.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\ObjectExtensions.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\InspectorFlagsAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\HashFunctions\MurmurHash.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Exceptions\NotImplementedByException.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidateNotNegativeAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PopupList\IntPopupListAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\HighlightAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Support\SuppressReason.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\Singleton.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\RandomAccessQueue.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\KDTree\KDNode.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\Experimental.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\LSystem.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\KDTree\MinHeap.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidateRangeAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\InspectableData\InspectorList.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\GLPlayerPrefs.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\PoolExtensions.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\GLMonoBehaviour.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\PrivateAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\CollectionExtensions.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\CommentAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\KDTree\IDistanceFunction.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\IPool.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\Buffer\IBuffer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\HashPool.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\KDTree\NearestNeighbour.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\IResponseCurve.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\TimedStateTracker.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\Buffer\Capacity2Buffer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\WarningIfNullAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ComparerExtensions.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\StateTracker.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\TransformExtensions.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidateNotNullAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\InspectableData\MinMaxFloat.cs" />
@@ -140,47 +101,86 @@
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\Clock.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\KDTree\KDTree.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Utilities\FpsCounter.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\InspectableData\MinMaxRangeAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\SeparatorAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Diagnostics\GLDebug.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidateNotEmptyAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ReadOnlyAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveBase.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PopupList\PopupListData.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\InspectorButtonAttribute.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Exceptions\ErrorMessages.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Support\PropertyDrawerData.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidateNotWhiteSpaceOrEmpty.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\ObservedValue.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\KDTree\IntervalHeap.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\Cache.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\PidController\Differentiator.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Exceptions\ThrowHelper.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidateMatchRegularExpressionAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\ImageExtensions.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\Pool.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\EditorOnly.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveVector3.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\ValueSnapShot.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\DummyAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveSequence.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\GameObjectExtensions.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ReuseCandidateAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\Generators.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\LifeCycleEvent.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Support\PlaceHolder.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\Buffer\BufferExtensions.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\HashFunctions\HashFunction.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\NonNegativeAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidationAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\GLMathf.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PositiveAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveColor.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\AssemblyInfo.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Exceptions\TypeArgumentException.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\LabelFieldAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\FriendAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\SingletonSpawner.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\HashFunctions\XXHash.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveVector2.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidatePositiveAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\ImmutableAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurve.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\HashFunctions\MurmurHash.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Exceptions\NotImplementedByException.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidateNotNegativeAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\RandomAccessQueue.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\Singleton.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\Experimental.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\LSystem.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidateRangeAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\InspectableData\InspectorList.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\GLPlayerPrefs.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\PoolExtensions.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\GLMonoBehaviour.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\CommentAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\IPool.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\KDTree\NearestNeighbour.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\StateTracker.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\InspectableData\MinMaxRangeAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\SeparatorAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ReadOnlyAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PopupList\PopupListData.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\InspectorButtonAttribute.cs" />
+    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Exceptions\ErrorMessages.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PopupList\ColorPopupAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PopupList\ValuesRetrievalMethod.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\KDTree\IntervalHeap.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\IStateToken.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\Buffer\RingBuffer.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\StateMachine.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PopupList\PopupListAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\UnsafePool.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\Cache.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\PidController\Differentiator.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\DitherResponse.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\Optional.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\VectorExtensions.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Exceptions\ThrowHelper.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\BinaryHeap\BinaryHeap.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\ValidateMatchRegularExpressionAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\IndexPriorityQueue.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\PidController\Integrator.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\Utils.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\ImageExtensions.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\Pool.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Support\Warning.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveVector4.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\UnityExtensions\ColorExtensions.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\EditorOnly.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\ResponseCurveVector3.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Internal\DocumentationAttributes\EditorInternal.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Patterns\ValueSnapShot.cs" />
-    <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\DummyAttribute.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Algorithms\ResponseCurve\StepResponse.cs" />
     <Compile Include="Packages\za.co.gamelogic.extensions\Runtime\Attributes\PopupList\StringPopupAttribute.cs" />
   </ItemGroup>
@@ -738,6 +738,14 @@
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.ProjectData.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="NuGetForUnity.PluginAPI">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NuGetForUnity.PluginAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
@@ -748,6 +756,10 @@
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient">
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NugetForUnity">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NugetForUnity.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet">
