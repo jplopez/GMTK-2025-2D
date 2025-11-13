@@ -9,7 +9,7 @@ namespace Ameba.Tests {
   /// Unit tests for AmebaGrid class testing all public methods.
   /// </summary>
   [TestFixture]
-  public class AmebaGridTests {
+  public class AmebaGridUnitTests {
 
     private AmebaGrid _grid;
     private const int TEST_ROWS = 10;

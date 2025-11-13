@@ -1,12 +1,22 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Ameba {
 
   /// <summary>
-  /// A generic 2D grid for storing and managing objects in a tile-based layout.
-  /// Supports adding, removing, and retrieving objects from specific grid positions.
+  /// <para>
+  /// A generic 2D grid to manage <see cref="UnityEngine.Object"/> in a tile-based layout.
+  /// </para>
+  /// <para>
+  /// This grid supports one object per tile. When adding an object to an occupied tile (ie: already contains an object), the existing object is replaced and returned. Similarly, when a tile is emptied, the method returns the existing object.<br/>
+  /// Use this class in conjunction with a MonoBehaviour that handles rendering and game logic for a complete tile-based system.
+  /// </para>
+  /// <para>
+  /// Tiles are identified by their (x, y) coordinates, and can be retrieved as a readonly struct  <see cref="Tile"/>.<br/>
+  /// <see cref="Tile"/> provides information about the tile's position, the object it contains and the world coordinates of its corners and center.
+  /// </para>
   /// </summary>
   public class AmebaGrid {
 
@@ -65,12 +75,27 @@ namespace Ameba {
     /// <returns>The existing object in the tile, or null if the tile was empty.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when coordinates are outside grid bounds.</exception>
     public object Add(int x, int y, object obj) {
-      ValidateCoordinates(x, y);
+      if (obj == null) return null;
+      if(TryAdd(x, y, obj, out object existingObject)) {
+        return existingObject;
+      }
+      else {
+        throw new ArgumentOutOfRangeException(
+          $"Coordinates ({x}, {y}) are outside grid bounds (0-{_columns - 1}, 0-{_rows - 1})");
+      }
+    }
+
+    public bool TryAdd(int x, int y, object obj, out object existingObject) {
+      existingObject = null;
       
-      _tiles.TryGetValue(new Vector2Int(x, y), out object existingObject);
-      _tiles[new Vector2Int(x, y)] = obj;
+      if (!IsValidCoordinate(x, y)) return false;
+      if (obj == null) return false;
+
+      Vector2Int key = new(x, y);
+      _tiles.TryGetValue(key, out existingObject);
+      _tiles[key] = obj;
       
-      return existingObject;
+      return true;
     }
 
     /// <summary>
@@ -126,7 +151,7 @@ namespace Ameba {
     /// <param name="obj">When this method returns, contains the object at the tile position cast to type T if found and castable; otherwise, default(T).</param>
     /// <returns>True if an object exists at the tile position and can be cast to type T; otherwise, false.</returns>
     public bool TryGetAs<T>(int x, int y, out T obj) where T : class {
-      obj = default(T);
+      obj = default;
       
       if (!TryGet(x, y, out object rawObj)) {
         return false;
@@ -146,7 +171,7 @@ namespace Ameba {
     public object Remove(int x, int y) {
       ValidateCoordinates(x, y);
       
-      Vector2Int key = new Vector2Int(x, y);
+      Vector2Int key = new(x, y);
       _tiles.TryGetValue(key, out object obj);
       _tiles.Remove(key);
       
@@ -186,7 +211,7 @@ namespace Ameba {
     public bool IsEmpty(int x, int y) {
       ValidateCoordinates(x, y);
       
-      Vector2Int key = new Vector2Int(x, y);
+      Vector2Int key = new(x, y);
       return !_tiles.TryGetValue(key, out object obj) || obj == null;
     }
 
@@ -201,6 +226,16 @@ namespace Ameba {
         }
       }
       return true;
+    }
+
+    public IEnumerable<Tile> GetTiles() {
+      int halfWidth = _columns / 2;
+      int halfHeight = _rows / 2;
+      for (int x =0; x < _columns; x++) {
+        for (int y = 0; y < _rows; y++) {
+          yield return new Tile(this, x, y);
+        }
+      }
     }
 
     /// <summary>
@@ -228,9 +263,9 @@ namespace Ameba {
     /// <summary>
     /// Checks if the coordinates are within grid bounds.
     /// </summary>
-    private bool IsValidCoordinate(int x, int y) {
-      return x >= 0 && x < _columns && y >= 0 && y < _rows;
-    }
+    public bool IsValidCoordinate(int x, int y) => x >= 0 && x < _columns && y >= 0 && y < _rows;
+
+    public void Clear() => _tiles?.Clear();
 
     /// <summary>
     /// Represents a read-only tile in the grid with position and object information.
@@ -245,53 +280,64 @@ namespace Ameba {
         _x = x;
         _y = y;
       }
+      /// <summary>
+      /// The <see cref="AmebaGrid"/> that owns this tile.
+      /// </summary>
+      public readonly AmebaGrid GridOwner => _grid;
+
+      /// <summary>
+      /// Gets the tile's X-coordinate. Short for <c>Coordinates.x</c>
+      /// </summary>
+      public readonly int X => _x;
+
+      /// <summary>
+      /// Gets the tile's Y-coordinate. Short for <c>Coordinates.y</c>
+      /// </summary>
+      public readonly int Y => _y;
 
       /// <summary>
       /// Gets the grid coordinates of this tile.
       /// </summary>
-      public Vector2Int Coordinates => new Vector2Int(_x, _y);
+      public Vector2Int Coordinates => new(_x, _y);
 
       /// <summary>
       /// Gets the world position of the tile's bottom-left corner.
       /// </summary>
-      public Vector2 BottomLeft => new Vector2(_x * _grid._tileSize, _y * _grid._tileSize);
+      public Vector2 BottomLeft => new(_x * _grid._tileSize, _y * _grid._tileSize);
 
       /// <summary>
       /// Gets the world position of the tile's bottom-right corner.
       /// </summary>
-      public Vector2 BottomRight => new Vector2((_x + 1) * _grid._tileSize, _y * _grid._tileSize);
+      public Vector2 BottomRight => new((_x + 1) * _grid._tileSize, _y * _grid._tileSize);
 
       /// <summary>
       /// Gets the world position of the tile's top-left corner.
       /// </summary>
-      public Vector2 TopLeft => new Vector2(_x * _grid._tileSize, (_y + 1) * _grid._tileSize);
+      public Vector2 TopLeft => new(_x * _grid._tileSize, (_y + 1) * _grid._tileSize);
 
       /// <summary>
       /// Gets the world position of the tile's top-right corner.
       /// </summary>
-      public Vector2 TopRight => new Vector2((_x + 1) * _grid._tileSize, (_y + 1) * _grid._tileSize);
+      public Vector2 TopRight => new((_x + 1) * _grid._tileSize, (_y + 1) * _grid._tileSize);
 
       /// <summary>
       /// Gets the world position of the tile's center.
       /// </summary>
-      public Vector2 Center => new Vector2((_x + 0.5f) * _grid._tileSize, (_y + 0.5f) * _grid._tileSize);
+      public Vector2 Center => new((_x + 0.5f) * _grid._tileSize, (_y + 0.5f) * _grid._tileSize);
 
       /// <summary>
       /// Gets the object stored in this tile.
       /// </summary>
       /// <returns>The object in the tile, or null if empty.</returns>
-      public object GetObject() {
-        return _grid.Get(_x, _y);
-      }
+      public object GetObject() => _grid.Get(_x, _y);
 
       /// <summary>
       /// Gets the object stored in this tile as the specified type.
       /// </summary>
       /// <typeparam name="T">The type to cast the object to.</typeparam>
       /// <returns>The object in the tile cast to type T, or default(T) if empty or not castable.</returns>
-      public T GetObjectAs<T>() where T : class {
-        return _grid.GetAs<T>(_x, _y);
-      }
+      public T GetObjectAs<T>() where T : class => _grid.GetAs<T>(_x, _y);
+
     }
   }
 }

@@ -33,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.359976, y: 3.123994, z: 1}
+  m_LocalScale: {x: 3.3599763, y: 3.1239944, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -93,10 +93,47 @@ MonoBehaviour:
   - {x: 3, y: -4}
   Flippable: 0
   CanRotate: 0
+  OnSelected:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeselected:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHovered:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUnhovered:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDragStart:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDragging:
+    m_PersistentCalls:
+      m_Calls: []
+  DragMinDistance: 0.02
+  DragCooldown: 0.1
+  OnDragEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPlayerInput:
+    m_PersistentCalls:
+      m_Calls: []
+  OnFlip:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRotate:
+    m_PersistentCalls:
+      m_Calls: []
+  _isDragging: 0
   _isHovered: 0
   _canHover: 1
+  HoverThreshold: 0.2
   _isSelected: 0
   _canSelect: 0
+  SelectionTriggers: 2
+  Accuracy: 0.8
+  MaxOffset: 2
 --- !u!212 &5159767925404240678
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -245,20 +282,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d81270cdb3f7e741a40535b81e087fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsActive: 1
-  DelayRun: 0
-  InitialDelay: 0.1
-  SelectionTriggers: 2
-  _isSelected: 0
-  _canSelect: 0
-  SyncStateWithElement: 0
-  Accuracy: 0.8
-  MaxOffset: 2
+  CommonSettings:
+    IsActive: 1
+    DelayRun: 0
+    InitialDelay: 0.1
+    ExcludeInitializeEvents: 0
+    ExcludeSelectionEvents: 0
+    ExcludeHoverEvents: 0
+    ExcludeDragStartEvents: 0
+    ExcludeDuringDraggingEvents: 0
+    ExcludeDragEndEvents: 0
+    ExcludeInputControlsEvents: 0
+    TriggersInnerEvent: 0
   OnSelectedFeedback: {fileID: 0}
   OnDeselectedFeedback: {fileID: 0}
-  HoverThreshold: 0.2
-  _isHovering: 0
-  _canHover: 1
   OnHoverFeedback: {fileID: 0}
   OnUnhoverFeedback: {fileID: 0}
 --- !u!114 &3678390924391041721
@@ -273,33 +310,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 060134c866fcd634987d051a3d91cf43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsActive: 1
-  DelayRun: 0
-  InitialDelay: 0.1
-  SnapOnDrop: 1
-  SnapDuringDrag: 1
-  SnapThreshold: 0.5
+  CommonSettings:
+    IsActive: 1
+    DelayRun: 0
+    InitialDelay: 0.1
+    ExcludeInitializeEvents: 0
+    ExcludeSelectionEvents: 0
+    ExcludeHoverEvents: 0
+    ExcludeDragStartEvents: 0
+    ExcludeDuringDraggingEvents: 0
+    ExcludeDragEndEvents: 0
+    ExcludeInputControlsEvents: 0
+    TriggersInnerEvent: 0
+  DragMinMovement: 0.5
   ConstrainHorizontal: 0
   ConstrainVertical: 0
+  RestrictPosition: 0
   MinPosition: {x: -100, y: -100}
   MaxPosition: {x: 100, y: 100}
-  ValidateDropLocation: 1
   ChangeUpdate: 1
+  OnDragStartFeedback: {fileID: 0}
+  OnDragEndFeedback: {fileID: 0}
+  OnDragUpdateFeedback: {fileID: 0}
+  DragUpdateWaitInterval: 0.2
+  OnValidPlacementFeedback: {fileID: 0}
+  OnInvalidPlacementFeedback: {fileID: 0}
   EnableGhost: 1
+  EnableGhostFeedbacks: 1
   GhostAlpha: 0.7
   GhostScale: 1.1
   ValidGhostColor: {r: 0, g: 1, b: 0, a: 1}
   InvalidGhostColor: {r: 1, g: 0, b: 0, a: 1}
   NeutralGhostColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  OnDragStartFeedback: {fileID: 0}
-  OnDragUpdateFeedback: {fileID: 0}
-  DragUpdateWaitInterval: 0.2
-  OnDragEndFeedback: {fileID: 0}
-  PositionChangeFeedback: {fileID: 0}
   OnGhostModeStartFeedback: {fileID: 0}
   OnGhostModeEndFeedback: {fileID: 0}
-  OnValidPlacementFeedback: {fileID: 0}
-  OnInvalidPlacementFeedback: {fileID: 0}
 --- !u!114 &5558685397894579633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,24 +356,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87a16cd13188ae9418051846fe5dfead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsActive: 1
-  DelayRun: 0
-  InitialDelay: 0.1
-  ChangePositionOnCollision: 0
+  CommonSettings:
+    IsActive: 1
+    DelayRun: 0
+    InitialDelay: 0.1
+    ExcludeInitializeEvents: 0
+    ExcludeSelectionEvents: 0
+    ExcludeHoverEvents: 0
+    ExcludeDragStartEvents: 0
+    ExcludeDuringDraggingEvents: 0
+    ExcludeDragEndEvents: 0
+    ExcludeInputControlsEvents: 0
+    TriggersInnerEvent: 0
+  DisableAllCollisions: 0
+  TriggerCollisionEvents: 0
+  PositionChanges: 0
   CanBeMovedBy: 0
-  ChangeRotationOnCollision: 0
-  CanBeRotatedBy: 0
+  PositionChangeFeedback: {fileID: 0}
+  NoMovementConstrains: 
   ConstrainVerticalMovement: 0
   ConstrainHorizontalMovement: 0
   MinPosition: {x: -100, y: -100}
   MaxPosition: {x: 100, y: 100}
   SnapToGridOnMove: 1
   SolidOnCollision: 1
-  AllowRotation: 1
+  RotationChanges: 0
+  CanBeRotatedBy: 0
+  RotationChangeFeedback: {fileID: 0}
+  NoRotationConstrains: 
   RotationStep: 15
   LimitRotationAngle: 0
   MinRotationAngle: -45
   MaxRotationAngle: 45
+  IntensityCalculator: {fileID: 0}
+  ConstraintViolationFeedback: {fileID: 0}
   _rigidbody2D: {fileID: 0}
   _collider2D: {fileID: 0}
   _currentRotation: 0
@@ -337,7 +397,3 @@ MonoBehaviour:
   _pendingRotationCollision: 0
   _pendingCollisionForce: {x: 0, y: 0, z: 0}
   _pendingRotationForce: 0
-  IntensityCalculator: {fileID: 0}
-  CollisionFeedback: {fileID: 0}
-  RotationFeedback: {fileID: 0}
-  ConstraintViolationFeedback: {fileID: 0}

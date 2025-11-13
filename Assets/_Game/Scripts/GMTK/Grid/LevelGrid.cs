@@ -750,14 +750,18 @@ namespace GMTK {
       int halfHeight = gizmoGridSize.y / 2;
 
       for (int x = -halfWidth; x <= halfWidth; x++) {
-        Vector3 start = new(_gridOrigin.x + x * gizmoCellSize, _gridOrigin.y - halfHeight * gizmoCellSize, 0f);
-        Vector3 end = new(_gridOrigin.x + x * gizmoCellSize, _gridOrigin.y + halfHeight * gizmoCellSize, 0f);
+        Vector3 start = new(_gridOrigin.x + x * gizmoCellSize, 
+          _gridOrigin.y - halfHeight * gizmoCellSize, 0f);
+        Vector3 end = new(_gridOrigin.x + x * gizmoCellSize, 
+          _gridOrigin.y + halfHeight * gizmoCellSize, 0f);
         Gizmos.DrawLine(gameObject.transform.position + start, gameObject.transform.position + end);
       }
 
       for (int y = -halfHeight; y <= halfHeight; y++) {
-        Vector3 start = new(_gridOrigin.x - halfWidth * gizmoCellSize, _gridOrigin.y + y * gizmoCellSize, 0f);
-        Vector3 end = new(_gridOrigin.x + halfWidth * gizmoCellSize, _gridOrigin.y + y * gizmoCellSize, 0f);
+        Vector3 start = new(_gridOrigin.x - halfWidth * gizmoCellSize, 
+          _gridOrigin.y + y * gizmoCellSize, 0f);
+        Vector3 end = new(_gridOrigin.x + halfWidth * gizmoCellSize, 
+          _gridOrigin.y + y * gizmoCellSize, 0f);
         Gizmos.DrawLine(gameObject.transform.position + start, gameObject.transform.position + end);
       }
     }

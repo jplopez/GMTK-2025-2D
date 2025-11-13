@@ -113,7 +113,7 @@ namespace GMTK {
       // draggable time + cooldown should be less than current time to allow dragging update
       // remember: newer time is less than older time.
       if (_lastDragUpdateTime + DragCooldown < Time.time && IsBeingDragged) {
-        this.Log($"PlayableElement '{name}' can do dragging update again");
+        //this.Log($"PlayableElement '{name}' can do dragging update again");
         _canDoDraggingUpdate = true;
       }
     }
