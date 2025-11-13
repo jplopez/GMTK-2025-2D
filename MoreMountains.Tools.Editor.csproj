@@ -61,82 +61,82 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMUtilities\MMScreenshotEditor.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMaintenance\MMFindPrefabsByMono.cs" />
-    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\MMFeedbacksConfiguration.cs" />
-    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\MMF_PlayerCopy.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Springs\MMSpringVector4PropertyDrawer.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMHiddenAttributeDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMCurves\MMPlotterEditor.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMEnumConditionAttributeDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMDropdownAttributeDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMGUI\MMHealthBarEditor.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMaintenance\MMGroupSelection.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMReorderableList\MMReorderableList.cs" />
-    <Compile Include="Assets\Feel\MMTools\Foundation\Editor\MMAchievements\MMAchievementMenu.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMRadio\MMPropertyPickerDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMParticles\MMRendererSortingLayerEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMColorAttributeDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMPropertyControllers\FloatControllerEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAudio\AudioAnalyzer\MMAudioAnalyzerEditor.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMovement\MMPathMovement\MMPathEditor.cs" />
-    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Springs\MMSpringVector2PropertyDrawer.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Sequencing\MMInputSequenceRecorderEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMVectorAttributeDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMParticles\MMTrailRendererSortingLayerEditor.cs" />
-    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\MMFeedbackStyling.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMReorderableList\ReorderableDrawer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMUtilities\MMDebugEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMMonoBehaviourUITKEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMCamera\MMAspectRatioSafeZonesEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMRadio\MMPropertyReceiverDrawer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMConditionAttributeDrawer.cs" />
+    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\AttributeDrawers.cs" />
+    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Sequencing\MMSequencerEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMUtilities\MMLayerPropertyDrawer.cs" />
+    <Compile Include="Assets\Feel\MMFeedbacks\Editor\FeedbackListOutputter\FeedbackListOutputer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Foundation\Editor\MMAI\AITransitionInspectorDrawer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMReadOnlyAttributeDrawer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMovement\MMPathMovement\MMPathMovementEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMPropertyControllers\ShaderControllerEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMGizmos\MMGizmoEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMInformationDrawer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMTween\MMTweenTypeDrawer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMSaveLoad\MMSaveLoadMenu.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMMenuHelp.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMProcedural\MMTilemapGeneratorEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMaintenance\MMCleanEmptyFolders.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMaintenance\MMCleanupMissingScripts.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMovement\MMAutoRotateEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMObjectPool\ObjectBoundsEditor.cs" />
+    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMUtilities\MMScreenshotEditor.cs" />
+    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\MMFeedbacksConfiguration.cs" />
+    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\MMF_PlayerCopy.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMHiddenAttributeDrawer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMReorderableList\MMReorderableList.cs" />
+    <Compile Include="Assets\Feel\MMTools\Foundation\Editor\MMAchievements\MMAchievementMenu.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMColorAttributeDrawer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAudio\AudioAnalyzer\MMAudioAnalyzerEditor.cs" />
+    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Springs\MMSpringVector2PropertyDrawer.cs" />
+    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMVectorAttributeDrawer.cs" />
+    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\MMFeedbackStyling.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMNavMeshAreaMaskAttributeDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMaintenance\MMLockInspector.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMRadio\MMPropertyEmitterDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMMonoBehaviourFieldInfo.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\MMFeedbacksEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMUtilities\MMDebugEditor.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMCollisions\MMMeshToPolygonCollider2D.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMUtilities\ManagerIconEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMMonoBehaviourUITKEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMCamera\MMAspectRatioSafeZonesEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMRadio\MMPropertyReceiverDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Foundation\Editor\MMAchievements\MMAchievementListInspector.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMConditionAttributeDrawer.cs" />
-    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\AttributeDrawers.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMRadio\MMRadioSignalGeneratorEditor.cs" />
-    <Compile Include="Assets\Feel\MMFeedbacks\Editor\Sequencing\MMSequencerEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMUtilities\MMLayerPropertyDrawer.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\UIToolkit\MMF_FeedbackPropertyDrawerUITK.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMUtilities\MMTransformRandomizerEditor.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\MMF_PlayerConfiguration.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMRadio\MMRadioSignalEditor.cs" />
-    <Compile Include="Assets\Feel\MMFeedbacks\Editor\FeedbackListOutputter\FeedbackListOutputer.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAudio\MMSoundManager\MMSoundManagerEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Foundation\Editor\MMAI\AITransitionInspectorDrawer.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\UIToolkit\MMF_PlayerEditorUITK.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Core\MMFeedbacksColors.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMaintenance\MMFindMissingScriptsRecursively.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Springs\MMSpringColorPropertyDrawer.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Springs\MMSpringVector3PropertyDrawer.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMReadOnlyAttributeDrawer.cs" />
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMovement\MMPathMovement\MMPathMovementEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMPropertyControllers\ShaderControllerEditor.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Springs\MMSpringDebugPropertyDrawer.cs" />
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMGizmos\MMGizmoEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMInformationDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMBackgroundColorAttributeDrawer.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMTween\MMTweenTypeDrawer.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMSaveLoad\MMSaveLoadMenu.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Springs\MMSpringFloatPropertyDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Foundation\Editor\MMAI\AIBrainEditor.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMVision\MMConeOfVision2DInspector.cs" />
     <Compile Include="Assets\Feel\MMFeedbacks\Editor\Shakers\MMWiggleEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMAttributes\MMMenuHelp.cs" />
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMProcedural\MMTilemapGeneratorEditor.cs" />
     <Compile Include="Assets\Feel\MMTools\Foundation\Editor\MMAI\AIActionInspectorDrawer.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMVision\MMConeOfVisionInspector.cs" />
     <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMActivation\MMTriggerAndCollisionEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMaintenance\MMCleanEmptyFolders.cs" />
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMaintenance\MMCleanupMissingScripts.cs" />
-    <Compile Include="Assets\Feel\MMTools\Accessories\Editor\MMMovement\MMAutoRotateEditor.cs" />
-    <Compile Include="Assets\Feel\MMTools\Core\Editor\MMObjectPool\ObjectBoundsEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Feel\MMTools\Foundation\Editor\MoreMountains.Tools.Foundation.Editor.asmref" />
@@ -724,6 +724,14 @@
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.ProjectData.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="NuGetForUnity.PluginAPI">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NuGetForUnity.PluginAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
@@ -734,6 +742,10 @@
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient">
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NugetForUnity">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NugetForUnity.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet">
