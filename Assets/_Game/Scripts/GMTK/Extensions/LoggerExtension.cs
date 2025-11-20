@@ -122,6 +122,10 @@ namespace GMTK {
       LoggerExtension.DoLog(LoggerLevels.Debug, obj.GetType().Name, message);
     }
 
+    public static bool CanLogDebug(this MonoBehaviour obj) => LoggerExtension.CanLog(LoggerLevels.Debug);
+
+    public static bool CanLog(this MonoBehaviour obj, LoggerLevels level) => LoggerExtension.CanLog(level);
+
     #endregion
 
     #region ScriptableObject Logger Extensions

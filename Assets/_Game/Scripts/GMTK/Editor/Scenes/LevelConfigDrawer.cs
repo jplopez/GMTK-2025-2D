@@ -21,7 +21,7 @@ namespace GMTK {
     private static readonly GUIStyle _labelHeaderStyle = new() {
       fontSize = 12,
       fontStyle = FontStyle.Bold,
-      normal = { textColor = EditorGUIUtility.isProSkin ? Color.lightCyan : Color.black },
+      normal = { textColor = EditorGUIUtility.isProSkin ? Color.cyan : Color.black },
     };
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {

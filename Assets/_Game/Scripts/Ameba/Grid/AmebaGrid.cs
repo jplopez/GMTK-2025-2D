@@ -81,7 +81,7 @@ namespace Ameba {
       }
       else {
         throw new ArgumentOutOfRangeException(
-          $"Coordinates ({x}, {y}) are outside grid bounds (0-{_columns - 1}, 0-{_rows - 1})");
+          $"Coordinates ({x}, {y}) are outside grid bounds cols:[0-{_columns-1}], rows: [0-{_rows-1}]");
       }
     }
 

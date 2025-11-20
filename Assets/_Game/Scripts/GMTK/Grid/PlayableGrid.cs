@@ -142,7 +142,7 @@ namespace GMTK {
         this.Log($"PlayableGrid initialized with {_rows}x{_columns} grid, tile size {_tileSize}");
 
         GridOrigin = GridOrigin == null ? transform.position : GridOrigin;
-
+        Empty();
         PopulateGrid(PopulateOnStart);
       }
       catch (Exception ex) {
@@ -172,7 +172,9 @@ namespace GMTK {
     /// </summary>
     /// <remarks>
     /// This methods uses PlayableElement.OccupiedCells to determine which grid tiles the element will occupy. Checks are performed to ensure all required tiles are free or that 'AllowReplaceItems' is true, and all cells are within bounds.<br/>
-    /// When 'AllowReplaceItems' is false, this methods returns an empty list. If true, it returns a list of any PlayableElements that were replaced during the addition.
+    /// When 'AllowReplaceItems' is false, this methods returns an empty list. If true, it returns a list of any PlayableElements that were replaced during the addition.<br/>
+    /// <br/>
+    /// This method now accounts for element rotation by using the element's SnapTransform rotation to calculate the rotated occupied cells.
     /// </remarks>
     /// <param name="element"></param>
     /// <param name="gridPos"></param>
@@ -180,15 +182,21 @@ namespace GMTK {
     protected virtual List<PlayableElement> AddElementToGrid(PlayableElement element, Vector2Int gridPos) {
       // list of Grid coordinates the element will occupy
       List<Vector2Int> tilesToOccupy = new();
-      foreach (var requiredTile in element.OccupiedCells) {
-        var requiredGridPos = new Vector2Int(gridPos.x + requiredTile.x, gridPos.y + requiredTile.y);
-        this.LogDebug($"{element.name} requiredTile {requiredTile} => {requiredGridPos}");
 
-        if (CanPlaceAtGridPosition(requiredGridPos)) {
-          tilesToOccupy.Add(requiredGridPos);
+      // Get the element's current rotation from SnapTransform
+      float rotationAngle = element.SnapTransform.rotation.eulerAngles.z;
+      // Normalize to 90-degree increments (0, 90, 180, 270)
+      int normalizedRotation = Mathf.RoundToInt(rotationAngle / 90f) * 90;
+
+      // Use GetWorldOccupiedCells to get rotated positions
+      // This method already handles rotation transformation
+      foreach (var worldCell in element.GetWorldOccupiedCells(gridPos, false, false, normalizedRotation)) {
+
+        if (CanPlaceAtGridPosition(worldCell)) {
+          tilesToOccupy.Add(worldCell);
         }
         else {
-          this.LogError($"'{element.name}' requested position {requiredGridPos} is invalid for placement. Element can't be added");
+          this.LogError($"'{element.name}' requested position {worldCell} is invalid for placement. Element can't be added");
           return new List<PlayableElement>();
         }
       }
@@ -203,7 +211,6 @@ namespace GMTK {
               replacedElements.Add(replacedElement as PlayableElement);
             }
           }
-          this.LogDebug($"'{element.name}' has occupied {tilePos}");
         }
         else {
           this.LogError($"'{element.name}' can't occupy {tilePos}. Rolling back");
@@ -212,8 +219,17 @@ namespace GMTK {
           return new List<PlayableElement>();
         }
       }
-      var snappedPos = SnapToGrid(gridPos);
-      element.UpdatePosition(snappedPos);
+      if (this.CanLogDebug()) {
+        string replacedNames = replacedElements.Count > 0 ? string.Join(", ", replacedElements.Select(e => e.name)) : "none";
+        string occupiedTiles = string.Join(", ", tilesToOccupy);
+        this.LogDebug($"Element '{element.name}' added to grid with rotation {rotationAngle}° (normalized: {normalizedRotation}°)\n\tTiles: {occupiedTiles}\n\tReplaced elements: {replacedNames}");
+      }
+
+      // Snap element position to grid
+      var snappedPos = GridToWorld(gridPos);
+      if (!snappedPos.Equals(element.GetPosition())) {
+        element.UpdatePosition(snappedPos);
+      }
 
       return replacedElements;
     }
@@ -228,20 +244,38 @@ namespace GMTK {
     }
 
     protected virtual void RemoveElementFromGrid(PlayableElement element, Vector2Int gridPos) {
+      // Get the element's current rotation from SnapTransform
+      float rotationAngle = element.SnapTransform.rotation.eulerAngles.z;
+      // Normalize to 90-degree increments (0, 90, 180, 270)
+      int normalizedRotation = Mathf.RoundToInt(rotationAngle / 90f) * 90;
+
+      this.LogDebug($"Removing element '{element.name}' from grid position {gridPos} with rotation {rotationAngle}° (normalized: {normalizedRotation}°)");
+
       int removedTiles = 0;
-      int expectedRemovals = element.OccupiedCells.Count + 1; // +1 for origin tile
-      foreach (var requiredTile in element.OccupiedCells) {
-        var requiredGridPos = new Vector2Int(gridPos.x + requiredTile.x, gridPos.y + requiredTile.y);
-        this.LogDebug($"REMOVE {element.name} requiredTile {requiredTile} => {requiredGridPos}");
-        if(_grid.TryGetAs(requiredGridPos.x, requiredGridPos.y, out PlayableElement occupyingElement) && occupyingElement.Equals(element)) {
+
+      // Use GetWorldOccupiedCells to get rotated positions that should be removed
+      List<Vector2Int> cellsToRemove = new();
+      foreach (var worldCell in element.GetWorldOccupiedCells(gridPos, false, false, normalizedRotation)) {
+        cellsToRemove.Add(worldCell);
+      }
+
+      int expectedRemovals = cellsToRemove.Count;
+
+      foreach (var requiredGridPos in cellsToRemove) {
+        this.LogDebug($"REMOVE {element.name} from world cell {requiredGridPos}");
+        if (_grid.TryGetAs(requiredGridPos.x, requiredGridPos.y, out PlayableElement occupyingElement) && occupyingElement.Equals(element)) {
           _grid.Remove(requiredGridPos.x, requiredGridPos.y);
           removedTiles++;
         }
       }
+
       if (removedTiles != expectedRemovals) {
         this.LogWarning($"Removed {removedTiles} tiles for '{element.name}' but expected to remove {expectedRemovals}. There may be inconsistencies in the grid state.");
         // Additional depth search. This should remove any remaining tiles occupied by the element, but is more expensive
         RemoveElementFromGrid(element);
+      }
+      else {
+        this.LogDebug($"Successfully removed {removedTiles} tiles for '{element.name}'");
       }
     }
 
@@ -386,7 +420,7 @@ namespace GMTK {
 
       var gridPos = WorldToGrid(worldPosition);
       // Check if position is within grid bounds and tile is empty
-      this.LogDebug($"CanPlaceElement: element={element.name}, worldPosition={worldPosition}, gridPos={gridPos}, AllowReplaceItems={AllowReplaceItems}");
+      //this.LogDebug($"CanPlaceElement: element={element.name}, worldPosition={worldPosition}, gridPos={gridPos}, AllowReplaceItems={AllowReplaceItems}");
       return CanPlaceAtGridPosition(gridPos);
     }
 
@@ -398,30 +432,33 @@ namespace GMTK {
     #region Coordinate Conversion
 
     /// <summary>
-    /// Converts world coordinates to grid coordinates.
+    /// Converts world coordinates to grid coordinates.<br/>
+    /// This methods calculates the absolute distance between the GridOrigin and worldPosition.
+    /// The result is then divided by tileSize and rounded to the nearing int
+    /// 
     /// </summary>
     /// <param name="worldPosition">The world position.</param>
     /// <returns>The corresponding grid coordinates.</returns>
     public Vector2Int WorldToGrid(Vector2 worldPosition) {
-      //Vector2 bottomLeft = new(GridOrigin.x - (_columns / 2f * _tileSize),
-      //  GridOrigin.y - (_rows / 2f * _tileSize));
-      var localPos = worldPosition - GridOrigin;
-      int x = Mathf.RoundToInt(localPos.x / _tileSize);
-      int y = Mathf.RoundToInt(localPos.y / _tileSize);
-      this.LogDebug($"WorldToGrid: worldPosition={worldPosition}, localPos={localPos}, gridPos={new Vector2Int(x, y)}");
+      //Absolute distance between GridOrigin and worldPosition
+      var dx = Mathf.Abs(worldPosition.x - GridOrigin.x);
+      var dy = Mathf.Abs(worldPosition.y - GridOrigin.y);
+      //Adjust values for tileSize and to to nearest int
+      int x = Mathf.RoundToInt(dx / _tileSize);
+      int y = Mathf.RoundToInt(dy / _tileSize);
       return new Vector2Int(x, y);
     }
 
     /// <summary>
-    /// Converts grid coordinates to world coordinates (bottom-left corner of tile).
+    /// Converts grid coordinates to world coordinates.<br/>
+    /// This method multiplied the gridPosition by the tileSize and adds GridOrigin
     /// </summary>
     /// <param name="gridPosition">The grid coordinates.</param>
     /// <returns>The corresponding world position.</returns>
     public Vector2 GridToWorld(Vector2Int gridPosition) {
-      Vector2 bottomLeft = new(GridOrigin.x - (_columns / 2f * _tileSize),
-        GridOrigin.y - (_rows / 2f * _tileSize));
-      float x = gridPosition.x * _tileSize + bottomLeft.x;
-      float y = gridPosition.y * _tileSize + bottomLeft.y;
+      float x = GridOrigin.x + (gridPosition.x * _tileSize);
+      float y = GridOrigin.y + (gridPosition.y * _tileSize);
+
       return new Vector2(x, y);
     }
 
@@ -460,11 +497,8 @@ namespace GMTK {
       _grid ??= new AmebaGrid(_rows, _columns, _tileSize);
 
       // Draw grid lines in bright yellow
-      Gizmos.color = Color.blueViolet;
+      Gizmos.color = Color.blue;
       // Set the boundaries' positions and sizes
-      int halfWidth = Mathf.RoundToInt(_columns / 2);
-      int halfHeight = Mathf.RoundToInt(_rows / 2);
-
       DrawGizmoGrid(0, _columns, 0, _rows);
       DrawGizmoTiles(); //occupancy and labels
 
@@ -518,7 +552,7 @@ namespace GMTK {
       // Use UnityEditor.Handles for text drawing
       //Handles.color = Color.darkB;
       GUIStyle style = new() {
-        normal = { textColor = Color.darkBlue },
+        normal = { textColor = Color.blue },
         alignment = TextAnchor.UpperLeft
       };
       string label = $"({x},{y})";
