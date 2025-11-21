@@ -1,6 +1,7 @@
-using MoreMountains.Feedbacks;
 using System;
 using UnityEngine;
+using UnityEssentials;
+using MoreMountains.Feedbacks;
 
 namespace GMTK {
 
@@ -11,27 +12,23 @@ namespace GMTK {
   [AddComponentMenu("GMTK/Playable Element Components/Element Dragging Component")]
   public class ElementDraggingComponent : PlayableElementComponent {
 
-    [Header("Snapping")]
-    [Tooltip("If true, position at drop will be constrained to the grid")]
-    public bool SnapOnDrop = true;
-    [Tooltip("If true, element will snap to grid during drag, not just on drop")]
-    public bool SnapDuringDrag = false;
-    [Tooltip("Distance threshold for snapping during drag")]
-    public float SnapThreshold = 0.5f;
-
-    [Header("Drag Constraints")]
+    [Header("Drag Settings")]
+    [Tooltip("Minimum dragged Distance for this component to act on the element")]
+    public float DragMinMovement = 0.5f;
+    [Space]
     [Tooltip("If true, dragging will be constrained to horizontal axis")]
     public bool ConstrainHorizontal = false;
     [Tooltip("If true, dragging will be constrained to vertical axis")]
     public bool ConstrainVertical = false;
+    [Space]
+    [Tooltip("If true, dragging will be restricted within defined world boundaries")]
+    public bool RestrictPosition = false;
+    [MMFCondition("RestrictPosition", true)]
     [Tooltip("Minimum world position for dragging")]
     public Vector2 MinPosition = new(-100, -100);
+    [MMFCondition("RestrictPosition", true)]
     [Tooltip("Maximum world position for dragging")]
     public Vector2 MaxPosition = new(100, 100);
-
-    [Header("Drop Validation")]
-    [Tooltip("If true, element will return to original position if dropped in invalid location")]
-    public bool ValidateDropLocation = true;
 
     [Flags]
     public enum PositionChangeFlags {
@@ -45,41 +42,58 @@ namespace GMTK {
     [Tooltip("Controls when position updates and events are triggered. OnDrop: updates position on drop, DuringDrag: updates during drag, Event: triggers events without updating the element's position")]
     public PositionChangeFlags ChangeUpdate = PositionChangeFlags.OnDrop;
 
-    [Header("Ghost Settings")]
-    [Tooltip("Enable ghost functionality during drag")]
-    public bool EnableGhost = true;
-    [Tooltip("Alpha value for the dragged element (ghost)")]
-    [Range(0.1f, 1f)]
-    public float GhostAlpha = 0.7f;
-    [Tooltip("Scale multiplier for the dragged element (ghost)")]
-    [Range(0.5f, 2f)]
-    public float GhostScale = 1.1f;
-    [Tooltip("Color tint for the ghost when placement is valid")]
-    public Color ValidGhostColor = Color.green;
-    [Tooltip("Color tint for the ghost when placement is invalid")]
-    public Color InvalidGhostColor = Color.red;
-    [Tooltip("Color tint for the ghost when placement is neutral")]
-    public Color NeutralGhostColor = Color.yellow;
-
-    [Header("Feedbacks (optionals)")]
+    [Foldout("Feedbacks (optional)")]
+    [Header("Drag Feedbacks")]
     [Tooltip("feedback to play when drag starts")]
     public MMF_Player OnDragStartFeedback;
+    [Tooltip("feedback to play when element is dropped")]
+    public MMF_Player OnDragEndFeedback;
+    [Space]
     [Tooltip("feedback to play while dragging")]
     public MMF_Player OnDragUpdateFeedback;
     [Tooltip("The waiting time en beetween OnDragUpdateFeedback plays")]
     public float DragUpdateWaitInterval = 0.2f;
-    [Tooltip("feedback to play when element is dropped")]
-    public MMF_Player OnDragEndFeedback;
-    [Tooltip("feedback to play when the element changes its position")]
-    public MMF_Player PositionChangeFeedback;
-    [Tooltip("feedback to play when ghost mode starts")]
-    public MMF_Player OnGhostModeStartFeedback;
-    [Tooltip("feedback to play when ghost mode ends")]
-    public MMF_Player OnGhostModeEndFeedback;
+    [Space]
+    [Header("Placement Feedbacks")]
     [Tooltip("feedback to play when ghost placement is valid")]
     public MMF_Player OnValidPlacementFeedback;
     [Tooltip("feedback to play when ghost placement is invalid")]
     public MMF_Player OnInvalidPlacementFeedback;
+
+    [Space(10)]
+
+    [Foldout("Ghost Settings")]
+    [Header("Ghost Settings")]
+    [Tooltip("Enable ghost functionality during drag")]
+    public bool EnableGhost = true;
+    [MMFCondition("EnableGhost", true)]
+    [Tooltip("Enable visual feedbacks for the ghost during drag")]
+    public bool EnableGhostFeedbacks = true;
+    [MMFCondition("EnableGhost", true)]
+    [Tooltip("Alpha value for the dragged element (ghost)")]
+    [Range(0.1f, 1f)]
+    public float GhostAlpha = 0.7f;
+    [MMFCondition("EnableGhost", true)]
+    [Tooltip("Scale multiplier for the dragged element (ghost)")]
+    [Range(0.5f, 2f)]
+    public float GhostScale = 1.1f;
+    [MMFCondition("EnableGhost", true)]
+    [Tooltip("Color tint for the ghost when placement is valid")]
+    public Color ValidGhostColor = Color.green;
+    [MMFCondition("EnableGhost", true)]
+    [Tooltip("Color tint for the ghost when placement is invalid")]
+    public Color InvalidGhostColor = Color.red;
+    [MMFCondition("EnableGhost", true)]
+    [Tooltip("Color tint for the ghost when placement is neutral")]
+    public Color NeutralGhostColor = Color.yellow;
+
+    [Header("Ghost Feedbacks (optionals)")]
+    [MMFCondition("EnableGhostFeedbacks", true)]
+    [Tooltip("feedback to play when ghost mode starts")]
+    public MMF_Player OnGhostModeStartFeedback;
+    [MMFCondition("EnableGhostFeedbacks", true)]
+    [Tooltip("feedback to play when ghost mode ends")]
+    public MMF_Player OnGhostModeEndFeedback;
 
     // Private state
     private Vector3 _originalPosition;
@@ -98,6 +112,9 @@ namespace GMTK {
     private Color _ghostTargetColor;
     private bool _isValidDropLocation = false;
     private bool _isInGhostMode = false;
+
+
+    #region PlayableElementComponent
 
     protected override void Initialize() {
       // Override PlayableElement dragging capability if is active
@@ -130,6 +147,24 @@ namespace GMTK {
       UpdateGhostFeedback();
       UpdateGhostVisuals();
     }
+    protected override void ResetComponent() {
+      if (_isDragging) {
+        _isDragging = false;
+      }
+
+      // End ghost mode if active
+      if (_isInGhostMode) {
+        EndGhostMode();
+      }
+
+      _lastPlacementWasValid = true;
+    }
+
+    protected override void FinalizeComponent() => DestroyOriginalPlaceholder();
+
+    private void OnDestroy() => DestroyOriginalPlaceholder();
+
+    #endregion
 
     #region Event Handlers
 
@@ -157,42 +192,33 @@ namespace GMTK {
       if (evt.Handled) return; // Allow other components to override behavior
 
       Vector3 targetPosition = evt.WorldPosition + _dragOffset;
-
       // Apply constraints
       targetPosition = ApplyConstraints(targetPosition);
 
-      // Check snap threshold
+      // Check min distance
       var distanceToLast = Vector3.Distance(targetPosition, _lastValidPosition);
-      if (distanceToLast >= SnapThreshold) {
-        // Apply grid snapping if enabled
-        if (SnapOnDrop && SnapDuringDrag && _levelGrid != null) {
-          targetPosition = ApplyGridSnapping(targetPosition);
-        }
-
+      if (distanceToLast >= DragMinMovement) {
+        this.LogDebug($"Dragging {_playableElement.name} to {targetPosition}");
         // Handle position updates during drag
         if (HasFlag(PositionChangeFlags.DuringDrag)) {
           ApplyPositionUpdate(targetPosition);
         }
 
-        // TODO: while dragging, if the position doesnt change, we should avoid triggering feedbacks and events
-        //Fires the feedback only if the time interval has passed and the feedback isn't playing
-        if (OnDragUpdateFeedback != null && DragUpdateWaitInterval > 0f) {
-          if (!OnDragUpdateFeedback.IsPlaying && Time.time - _lastDragUpdateFeedbackTime >= DragUpdateWaitInterval) {
+        //If DragUpdateFeedback is not null and isn't currently playing, should play if:
+        // time interval has passed since last play 
+        // OR interval is set to zero, which means there is no wait time
+        if (OnDragUpdateFeedback != null && !OnDragUpdateFeedback.IsPlaying) {
+          if (DragUpdateWaitInterval == 0f
+            || Time.time - _lastDragUpdateFeedbackTime >= DragUpdateWaitInterval) {
             PlayFeedback(OnDragUpdateFeedback);
             _lastDragUpdateFeedbackTime = Time.time;
           }
         }
-        else if (OnDragUpdateFeedback != null) {
-          //If no interval is set, just play the feedback
-          if (!OnDragUpdateFeedback.IsPlaying) {
-            PlayFeedback(OnDragUpdateFeedback);
-          }
+
+        // Update ghost feedback if enabled
+        if (EnableGhost && EnableGhostFeedbacks) {
+          UpdateGhostFeedback();
         }
-      }
-      else {
-        // Below threshold - do not update position or trigger events
-        this.LogDebug($"Drag update ignored, below snap threshold ({distanceToLast} < {SnapThreshold})");
-        return;
       }
     }
 
@@ -201,54 +227,23 @@ namespace GMTK {
       if (evt.Handled) return; // Allow other components to override behavior
 
       _isDragging = false;
+
       //stop Drag Update feedback in case is still running
       StopFeedback(OnDragUpdateFeedback);
 
-      Vector3 finalTargetPosition = evt.WorldPosition + _dragOffset;
-      finalTargetPosition = ApplyConstraints(finalTargetPosition);
-      if (SnapOnDrop && _levelGrid != null) {
-        finalTargetPosition = ApplyGridSnapping(finalTargetPosition);
-      }
+      // Determine final target position applying axis constraints and min distance
+      Vector3 finalTargetPosition = ApplyConstraints(evt.WorldPosition + _dragOffset);
+      finalTargetPosition = Vector3.Distance(finalTargetPosition, _lastValidPosition) >= DragMinMovement ?
+          finalTargetPosition : _lastValidPosition;
 
-      bool isValidDrop = !ValidateDropLocation || IsValidDropLocation(finalTargetPosition);
-      Vector3 finalPosition = finalTargetPosition;
+      bool isValidDrop = IsValidDropLocation(finalTargetPosition);
 
-      if (_lastValidPosition == finalTargetPosition) {
-        //it means the element never moved, so we'll skip the drop logic, to prevent unnecessary events
-        this.LogDebug($"Drag ended without movement on {_playableElement.name}");
+      // If drop is invalid, revert to last valid position
+      finalTargetPosition = isValidDrop ? _lastValidPosition : finalTargetPosition;
 
-        // Still end ghost mode
-        if (EnableGhost && _isInGhostMode) {
-          EndGhostMode();
-          PlayFeedback(OnGhostModeEndFeedback);
-        }
-        return;
-      }
-
-      // Handle position updates on drop
+      // Apply position if configured
       if (HasFlag(PositionChangeFlags.OnDrop)) {
-        if (isValidDrop) {
-          // Update position on valid drop
-          ApplyPositionUpdate(finalTargetPosition);
-        }
-        else {
-          // Return to original position on invalid drop
-          finalPosition = _originalPosition;
-          ApplyPositionUpdate(_originalPosition);
-        }
-      }
-      else if (!HasFlag(PositionChangeFlags.DuringDrag)) {
-        // If neither OnDrop nor DuringDrag is set, but position needs to be determined for events
-        if (!isValidDrop) {
-          finalPosition = _originalPosition; // Would return to original
-        }
-      }
-      else if (HasFlag(PositionChangeFlags.DuringDrag)) {
-        // Position was already updated during drag, but handle invalid drops
-        if (!isValidDrop) {
-          finalPosition = _originalPosition;
-          _playableElement.UpdatePosition(_originalPosition);
-        }
+        ApplyPositionUpdate(finalTargetPosition);
       }
 
       // End ghost mode
@@ -258,7 +253,7 @@ namespace GMTK {
       }
       PlayFeedback(OnDragEndFeedback);
 
-      this.LogDebug($"Drag ended on {_playableElement.name}. Valid? {isValidDrop}");
+      this.LogDebug($"{_playableElement.name} DragEnd at {finalTargetPosition}\t Valid? '{isValidDrop}'\t Update Position? '{HasFlag(PositionChangeFlags.OnDrop)}'");
     }
 
     #endregion
@@ -341,10 +336,9 @@ namespace GMTK {
     }
 
     private void UpdateGhostFeedback() {
-      if (!_isInGhostMode || _levelGrid == null) return;
+      if (!_isInGhostMode) return; // || _levelGrid == null) return;
 
-      Vector3 currentPosition = _playableElement.GetPosition();
-      bool isValidLocation = IsValidDropLocation(currentPosition);
+      bool isValidLocation = IsValidDropLocation(_playableElement.GetPosition());
 
       // Update visual feedback
       if (isValidLocation != _isValidDropLocation) {
@@ -375,22 +369,43 @@ namespace GMTK {
 
     #endregion
 
-    #region Helper Methods
+    #region Position Methods
 
-    private bool HasFlag(PositionChangeFlags flag) {
-      return (ChangeUpdate & flag) != 0;
+    /// <summary>
+    /// Convenience method to check if a specific PositionChangeFlag is set.
+    /// </summary>
+    private bool HasFlag(PositionChangeFlags flag) => (ChangeUpdate & flag) != 0;
+
+    /// <summary>
+    /// Applies position update to the playable element if it has changed.
+    /// </summary>
+    /// <remarks>
+    /// Triggers position change only if distance between last valid position and <c>targetPosition</c> is greater than <c>DragMinMovement</c>.
+    /// Otherwise, respects last valid position.<br/>
+    /// Triggers position change feedback if position is updated.<br/>
+    /// This method assumes the <see cref="PositionChangeFlags"/> have been checked prior to calling.
+    /// </remarks>
+    /// <param name="targetPosition"></param>
+    protected virtual void ApplyPositionUpdate(Vector3 targetPosition) {
+      // Update position only if it has changed beyond DragMinMovement
+      targetPosition = Vector3.Distance(targetPosition, _lastValidPosition) >= DragMinMovement ?
+          targetPosition : _lastValidPosition;
+
+      _playableElement.UpdatePosition(targetPosition);
+      _lastValidPosition = targetPosition;
+
     }
 
-    private void ApplyPositionUpdate(Vector3 targetPosition) {
-      // Update position only if it has changed
-      if (!targetPosition.Equals(_lastValidPosition)) {
-        _playableElement.UpdatePosition(targetPosition);
-        _lastValidPosition = targetPosition;
-        PlayFeedback(PositionChangeFeedback);
-      }
-    }
-
-    private Vector3 ApplyConstraints(Vector3 position) {
+    /// <summary>
+    /// Apply the movement constraints to the given position.
+    /// </summary>
+    /// <remarks>
+    /// Checks <c>ConstrainHorizontal</c> and <c>ConstrainVertical</c> fields 
+    /// to apply axis and <c>RestrictPosition</c> field for boundary constraints.
+    /// </remarks>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    protected virtual Vector3 ApplyConstraints(Vector3 position) {
       // Apply axis constraints
       if (ConstrainHorizontal) {
         position.x = _originalPosition.x;
@@ -400,81 +415,21 @@ namespace GMTK {
       }
 
       // Apply boundary constraints
-      position.x = Mathf.Clamp(position.x, MinPosition.x, MaxPosition.x);
-      position.y = Mathf.Clamp(position.y, MinPosition.y, MaxPosition.y);
-
+      if (RestrictPosition) {
+        position.x = Mathf.Clamp(position.x, MinPosition.x, MaxPosition.x);
+        position.y = Mathf.Clamp(position.y, MinPosition.y, MaxPosition.y);
+      }
       return position;
     }
 
     private Vector3 ApplyGridSnapping(Vector3 worldPosition) {
-      //if (_levelGrid == null) return worldPosition;
-      //Vector2Int gridPos = _levelGrid.WorldToGrid(worldPosition);
-      //var ret = _levelGrid.SnapToGrid(gridPos);
-      return (_levelGrid == null) ? worldPosition : _levelGrid.SnapToGrid(worldPosition);
+      //      return (_levelGrid == null) ? worldPosition : _levelGrid.SnapToGrid(worldPosition);
+      return SnapToGrid(worldPosition);
     }
 
-    private bool IsValidDropLocation(Vector3 worldPosition) {
-      if (_levelGrid == null) return true;
-
-      // Check if position is inside playable area
-      if (!_levelGrid.IsInsidePlayableArea(worldPosition)) {
-        return false;
-      }
-
-      // Check if the position is available for placement
-      Vector2Int gridPos = _levelGrid.WorldToGrid(worldPosition);
-      return _levelGrid.CanPlace(_playableElement, gridPos);
-    }
+    private bool IsValidDropLocation(Vector3 worldPosition) => _playableGrid != null && _playableGrid.CanPlaceElement(_playableElement, worldPosition);
 
     #endregion
-
-    #region Public API
-
-    /// <summary>
-    /// Set the ghost appearance settings
-    /// </summary>
-    public void SetGhostSettings(bool enabled, float alpha, float scale, Color validColor, Color invalidColor, Color neutralColor) {
-      EnableGhost = enabled;
-      GhostAlpha = Mathf.Clamp01(alpha);
-      GhostScale = scale;
-      ValidGhostColor = validColor;
-      InvalidGhostColor = invalidColor;
-      NeutralGhostColor = neutralColor;
-    }
-
-    /// <summary>
-    /// Set the feel feedback players for ghost functionality
-    /// </summary>
-    public void SetGhostFeedbacks(MMF_Player ghostModeStart, MMF_Player ghostModeEnd, MMF_Player validPlacement, MMF_Player invalidPlacement) {
-      OnGhostModeStartFeedback = ghostModeStart;
-      OnGhostModeEndFeedback = ghostModeEnd;
-      OnValidPlacementFeedback = validPlacement;
-      OnInvalidPlacementFeedback = invalidPlacement;
-    }
-
-
-    #endregion
-
-    protected override void ResetComponent() {
-      if (_isDragging) {
-        _isDragging = false;
-      }
-
-      // End ghost mode if active
-      if (_isInGhostMode) {
-        EndGhostMode();
-      }
-
-      _lastPlacementWasValid = true;
-    }
-
-    protected override void FinalizeComponent() {
-      DestroyOriginalPlaceholder();
-    }
-
-    private void OnDestroy() {
-      DestroyOriginalPlaceholder();
-    }
 
     // Gizmos for debugging drag constraints
     void OnDrawGizmosSelected() {

@@ -68,7 +68,7 @@ namespace GMTK {
 
 
     public override string ToString() {
-      return $"PlayableElementEventArgs: Element={Element?.name}, EventType={EventType}, WorldPosition={WorldPosition}, Handled={Handled}";
+      return $"PlayableElementEventArgs: Element={Element.name}, EventType={EventType}, WorldPosition={WorldPosition}, Handled={Handled}";
     }
   }
 }

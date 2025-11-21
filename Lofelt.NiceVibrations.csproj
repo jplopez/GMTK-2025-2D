@@ -61,14 +61,14 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\AssemblyInfo.cs" />
     <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\HapticSource.cs" />
     <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\HapticPatterns.cs" />
-    <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\HapticReceiver.cs" />
     <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\JNIHelpers.cs" />
+    <Compile Include="Assets\Feel\NiceVibrations\Define\NiceVibrationsDefineSymbols.cs" />
+    <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\AssemblyInfo.cs" />
+    <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\HapticReceiver.cs" />
     <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\DeviceCapabilities.cs" />
     <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\Gamepad.cs" />
-    <Compile Include="Assets\Feel\NiceVibrations\Define\NiceVibrationsDefineSymbols.cs" />
     <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\HapticClip.cs" />
     <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\LofeltHaptics.cs" />
     <Compile Include="Assets\Feel\NiceVibrations\Scripts\Components\HapticController.cs" />
@@ -634,6 +634,14 @@
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.ProjectData.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="NuGetForUnity.PluginAPI">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NuGetForUnity.PluginAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
@@ -644,6 +652,10 @@
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient">
       <HintPath>Packages\com.merry-yellow.code-assist\Editor\ExternalReferences\Meryel.UnityCodeAssist.MQTTnet.Extensions.ManagedClient.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NugetForUnity">
+      <HintPath>Library\PackageCache\com.unityessentials.nuget@6d7fa2dc4614\Editor\NugetForUnity.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Meryel.UnityCodeAssist.MQTTnet">

@@ -35,7 +35,7 @@ namespace GMTK {
       if (IsBeingDragged) {
         UpdatePosition(worldPosition.Value);
         if(CanDoDraggingUpdate) {
-          this.Log($"PlayableElement '{name}' raising dragging update event");
+          //this.Log($"PlayableElement '{name}' raising dragging update event");
           RaiseGameEvent(GameEventType.ElementDragging, PlayableElementEventType.DragUpdate);
           //RaisePlayableElementEvent(PlayableElementEventType.DragUpdate);
           OnDragging?.Invoke(BuildEventArgs(GameEventType.ElementDragging, PlayableElementEventType.DragUpdate));

@@ -59,7 +59,8 @@ namespace GMTK {
     public bool IsActive => CommonSettings.IsActive;
 
     protected PlayableElement _playableElement;
-    protected LevelGrid _levelGrid;
+    //protected LevelGrid _levelGrid;
+    protected PlayableGrid _playableGrid;
     protected GameEventChannel _gameEventChannel;
     protected bool isInitialized = false;
     private Coroutine _delayedUpdateCoroutine;
@@ -95,7 +96,8 @@ namespace GMTK {
       _playableElement = (_playableElement == null) ? gameObject.GetComponent<PlayableElement>() : _playableElement;
       if (_playableElement == null) Debug.LogWarning($"PlayableElementComponent {name} is missing PlayableElement. This component will not function");
 
-      _levelGrid = (_levelGrid == null) ? FindAnyObjectByType<LevelGrid>() : _levelGrid;
+      //_levelGrid = (_levelGrid == null) ? FindAnyObjectByType<LevelGrid>() : _levelGrid;
+      _playableGrid = (_playableGrid == null) ? FindAnyObjectByType<PlayableGrid>() : _playableGrid;
 
       _gameEventChannel = (_gameEventChannel == null) ? ServiceLocator.Get<GameEventChannel>() : _gameEventChannel;
       if (_gameEventChannel == null) Debug.LogWarning($"PlayableElementComponent {name} can't find GameEventChannel. This component won't listen or trigger game events");
@@ -320,6 +322,14 @@ namespace GMTK {
       PlayableElementEventArgs eventArgs = new(_playableElement, position, eventType, otherObject);
       _gameEventChannel.Raise(GameEventType.PlayableElementEvent, eventArgs);
     }
+
+    protected virtual Vector2 SnapToGrid(Vector2? position) {
+      position ??= _playableElement.SnapTransform.position;
+      if (_playableGrid == null) return position.Value;
+      Vector2Int gridPos = _playableGrid.WorldToGrid(position.Value);
+      return _playableGrid.GridToWorld(gridPos); 
+    }
+
 
     #endregion
   }

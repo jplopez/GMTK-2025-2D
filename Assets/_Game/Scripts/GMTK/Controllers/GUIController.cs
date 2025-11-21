@@ -15,6 +15,7 @@ namespace GMTK {
     [SerializeField] protected TMP_Text scoreText;
     public bool PauseScore = false;
     [Tooltip("How the score will be calculated: elapsed time, distance, etc.")]
+
     public ScoreCalculationStrategy ScoreStrategy;
 
     [Header("Playback")]
@@ -155,7 +156,7 @@ namespace GMTK {
 
     #region Events Handling
 
-    private void HandlePlayButtonClick() {
+    public void HandlePlayButtonClick() {
       Debug.Log(this);
       this.Log("Play button clicked");
       if (_eventsChannel != null) {
@@ -167,7 +168,7 @@ namespace GMTK {
       }
     }
 
-    private void HandleResetButtonClick() {
+    public void HandleResetButtonClick() {
       this.Log("Reset button clicked");
       if (_eventsChannel != null) {
         _eventsChannel.Raise(GameEventType.LevelReset);
