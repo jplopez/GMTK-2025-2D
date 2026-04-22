@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace GMTK {
-  [CustomEditor(typeof(PlayableElement))]
+  //[CustomEditor(typeof(PlayableElement))]
   public class PlayableElementEditor : UnityEditor.Editor {
 
     private PlayableElement _element;
@@ -571,21 +571,17 @@ namespace GMTK {
 
     private SpriteRenderer GetSpriteRenderer(PlayableElement element) {
       // First check the Model transform if specified
-      if (element.Model != null) {
-        var renderer = element.Model.GetComponent<SpriteRenderer>();
-        if (renderer != null) return renderer;
-
-        // Also check children of Model
-        renderer = element.Model.GetComponentInChildren<SpriteRenderer>();
-        if (renderer != null) return renderer;
+      if (element.ModelRenderer == null) {
+        if (element.TryGetComponent(out SpriteRenderer directRenderer)) {
+          return directRenderer;
+        }
+        else {
+          SpriteRenderer childRenderer = element.GetComponentInChildren<SpriteRenderer>();
+          if (childRenderer != null) return childRenderer;
+        }
       }
 
-      // Fallback to checking the element's own GameObject
-      var elementRenderer = element.GetComponent<SpriteRenderer>();
-      if (elementRenderer != null) return elementRenderer;
-
-      // Final fallback - check children
-      return element.GetComponentInChildren<SpriteRenderer>();
+      return null;
     }
 
   }

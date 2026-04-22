@@ -1,4 +1,5 @@
 using Ameba;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GMTK {
@@ -67,7 +68,10 @@ namespace GMTK {
       }
     }
 
+    [Button]
     public void OnHover() => MarkHovered(true);
+
+    [Button]
     public void OnUnhover() => MarkHovered(false);
 
     public void OnHoverUpdate() {

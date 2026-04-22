@@ -1,4 +1,5 @@
 using Ameba;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GMTK {
@@ -14,6 +15,8 @@ namespace GMTK {
 
     // IDraggable interface properties
     public bool IsDraggable => Draggable;
+
+
     public bool IsBeingDragged { get => _isDragging; private set => _isDragging = value; }
     
     [DisplayWithoutEdit] public bool IsActive { get; set; }
@@ -23,6 +26,7 @@ namespace GMTK {
 
     #region IDraggable Implementation
 
+    [Button]
     public virtual void DragStart() {
       IsBeingDragged = true;
       RaiseGameEvent(GameEventType.ElementDragStart, PlayableElementEventType.DragStart);
@@ -30,6 +34,7 @@ namespace GMTK {
       OnDragStart?.Invoke(BuildEventArgs(GameEventType.ElementDragStart, PlayableElementEventType.DragStart));
     }
 
+    [Button]
     public virtual void DraggingUpdate(Vector3? worldPosition) {
       worldPosition = worldPosition ?? GetPosition();
       if (IsBeingDragged) {
@@ -44,6 +49,7 @@ namespace GMTK {
       }
     }
 
+    [Button]
     public virtual void DragEnd() {
       IsBeingDragged = false;
       RaiseGameEvent(GameEventType.ElementDropped, PlayableElementEventType.DragEnd);

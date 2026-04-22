@@ -6,7 +6,6 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEssentials;
 
 namespace GMTK {
 
@@ -38,7 +37,6 @@ namespace GMTK {
     public PlayableElement[] InitialElements;
     [Space(10)]
 
-    [Foldout("Bounds", true)]
     [Header("Bounds")]
     [Tooltip("Collider to define the top boundary of the grid")]
     public EdgeCollider2D TopBound;
@@ -48,20 +46,16 @@ namespace GMTK {
     public EdgeCollider2D LeftBound;
     [Tooltip("Collider to define the right boundary of the grid")]
     public EdgeCollider2D RightBound;
-    [EndFoldout]
-
+    
     [Space]
-    [Foldout("Events", true)]
     [Header("Events")]
     [Tooltip("Invoked when an element is successfully added to the grid")]
     public UnityEvent<PlayableElement> OnElementAdded = new();
     [Tooltip("Invoked when an element is removed from the grid")]
     public UnityEvent<PlayableElement> OnElementRemoved = new();
-    [EndFoldout]
 
     [Space]
     [Header("Feedbacks")]
-    [Foldout("Feedbacks", true)]
     [Tooltip("Feedback played when an element moves over the grid")]
     public MMF_Player OnElementOverGridFeedback;
     [Tooltip("Feedback played when an element is picked from the grid")]
@@ -70,24 +64,23 @@ namespace GMTK {
     public MMF_Player OnElementDroppedSuccessFeedback;
     [Tooltip("Feedback played when an element drop is invalid")]
     public MMF_Player OnElementDroppedInvalidFeedback;
-    [EndFoldout]
 
     [Space]
-    [Header("Gizmos")]
+    //[Header("Gizmos")]
     public bool ShowGizmos = true;
 
-    [Foldout("Gizmos", true)]
-    [MMFCondition("ShowGizmos", true)]
+    //[Foldout("Gizmos", true)]
+    //[MMFCondition("ShowGizmos", true)]
     [Tooltip("Enable/disable grid gizmo visualization")]
     [SerializeField] private bool _showGridGizmo = true;
-    [MMFCondition("ShowGizmos", true)]
-    [Help("Enabling tile position labels may impact editor performance on large grids.", MessageType.Warning)]
+    //[MMFCondition("ShowGizmos", true)]
+    //[Help("Enabling tile position labels may impact editor performance on large grids.", MessageType.Warning)]
     [Tooltip("Show tile position text in each cell")]
     [SerializeField] private bool _showTilePositions = true;
-    [MMFCondition("ShowGizmos", true)]
+    //[MMFCondition("ShowGizmos", true)]
     [Tooltip("Highlight occupied cells with red color")]
     [SerializeField] private bool _colorOccupiedCells = true;
-    [EndFoldout]
+    //[EndFoldout]
 
     public AmebaGrid Grid => _grid;
 
@@ -225,13 +218,16 @@ namespace GMTK {
         this.LogDebug($"Element '{element.name}' added to grid with rotation {rotationAngle}° (normalized: {normalizedRotation}°)\n\tTiles: {occupiedTiles}\n\tReplaced elements: {replacedNames}");
       }
 
-      // Snap element position to grid
-      var snappedPos = GridToWorld(gridPos);
-      if (!snappedPos.Equals(element.GetPosition())) {
-        element.UpdatePosition(snappedPos);
-      }
+      // Place element to grid, the GridToWorld will snap to grid position
+      PlaceElement(element, GridToWorld(gridPos));
 
       return replacedElements;
+    }
+
+    private void PlaceElement(PlayableElement element, Vector2 worldPosition) {
+      if (element != null && !worldPosition.Equals(element.GetPosition())) {
+        element.UpdatePosition(worldPosition);
+      }
     }
 
     private void RollbackTiles(List<Vector2Int> tilesToRollback, PlayableElement elementToRemove) {
@@ -327,7 +323,8 @@ namespace GMTK {
         RemoveElementFromGrid(args.Element, gridPos);
         OnElementRemoved?.Invoke(args.Element);
 
-        PlayFeedback(OnElementPickedFeedback);
+        //PlayFeedback(OnElementPickedFeedback);
+        SyncPlaybacks(GameEventType.ElementSelected);
         this.LogDebug($"Element '{args.Element.name}' picked from grid at {gridPos}");
       }
     }
@@ -342,7 +339,8 @@ namespace GMTK {
       _canPlaceTrackedElement = CanPlaceElement(args.Element, worldPos);
 
       if (_canPlaceTrackedElement) {
-        PlayFeedback(OnElementOverGridFeedback);
+        //PlayFeedback(OnElementOverGridFeedback);
+        SyncPlaybacks(GameEventType.ElementDragging);
       }
     }
 
@@ -362,7 +360,8 @@ namespace GMTK {
         List<PlayableElement> replacedElements = AddElementToGrid(args.Element, gridPos);
 
         // Drop success feedback and event
-        PlayFeedback(OnElementDroppedSuccessFeedback);
+        //PlayFeedback(OnElementDroppedSuccessFeedback);
+        SyncPlaybacks(GameEventType.ElementDropped, true);
         OnElementAdded?.Invoke(args.Element);
 
         // If replacing, invoke removal event
@@ -374,21 +373,31 @@ namespace GMTK {
 
         this.LogDebug($"Element '{args.Element.name}' placed at grid position {gridPos}");
       }
-      else {
-        // Invalid placement - return to original position if it was in grid
-        if (_trackedElement == args.Element && _trackedElementOriginalPosition.HasValue) {
+      else { //can't place element
 
-          var originalPos = _trackedElementOriginalPosition.Value;
-          //var snappedPos = SnapToGrid(GridToWorld(originalPos));
-          //args.Element.UpdatePosition(snappedPos);
-          //_grid.Add(originalPos.x, originalPos.y, args.Element);
-          AddElementToGrid(args.Element, originalPos);
-
-          PlayFeedback(OnElementDroppedInvalidFeedback);
-          this.LogDebug($"Element '{args.Element.name}' returned to original position {originalPos}");
+        // if is not part of the initial elements, then is movable by player, so we allow to drop it anywhere
+        if (!InitialElements.Contains(args.Element)) {
+          PlaceElement(args.Element, worldPos);
         }
+        // part of the initial grid, if can't be placed, return to original position
+        // TODO check why this could happen. InitialElement are not movable by player. Perhaps during level editing? or future feature?
         else {
-          this.LogDebug($"Element '{args.Element.name}' dropped outside grid and not returned (was not originally in grid)");
+
+          if (_trackedElement == args.Element && _trackedElementOriginalPosition.HasValue) {
+
+            var originalPos = _trackedElementOriginalPosition.Value;
+            //var snappedPos = SnapToGrid(GridToWorld(originalPos));
+            //args.Element.UpdatePosition(snappedPos);
+            //_grid.Add(originalPos.x, originalPos.y, args.Element);
+            AddElementToGrid(args.Element, originalPos);
+
+            //PlayFeedback(OnElementDroppedInvalidFeedback);
+            SyncPlaybacks(GameEventType.ElementDropped, false);
+            this.LogDebug($"Element '{args.Element.name}' returned to original position {originalPos}");
+          }
+          else {
+            this.LogDebug($"Element '{args.Element.name}' dropped outside grid and not returned (was not originally in grid)");
+          }
         }
       }
 
@@ -477,6 +486,37 @@ namespace GMTK {
 
     #endregion
 
+    /// <summary>
+    /// Based on the GameEventType, this methods Play/Stops the corresponding Feel Feedbacks.
+    /// </summary>
+    /// <param name="eventType"></param>
+    private void SyncPlaybacks(GameEventType eventType, bool success = true) {
+      switch (eventType) {
+        case GameEventType.ElementDropped:
+          StopFeedback(OnElementPickedFeedback);
+          StopFeedback(OnElementOverGridFeedback);
+          if (success) {
+            PlayFeedback(OnElementDroppedSuccessFeedback);
+          }
+          else {
+            PlayFeedback(OnElementDroppedInvalidFeedback);
+          }
+          break;
+        case GameEventType.ElementSelected:
+          //TODO stop on hover when is implemented
+          StopFeedback(OnElementOverGridFeedback);
+          StopFeedback(OnElementDroppedSuccessFeedback);
+          StopFeedback(OnElementDroppedInvalidFeedback);
+          PlayFeedback(OnElementPickedFeedback);
+          break;
+        case GameEventType.ElementDragging:
+          StopFeedback(OnElementDroppedSuccessFeedback);
+          StopFeedback(OnElementDroppedInvalidFeedback);
+          StopFeedback(OnElementPickedFeedback);
+          PlayFeedback(OnElementOverGridFeedback);
+          break;
+      }
+    }
 
     /// <summary>
     /// Plays a Feel Feedback if it's assigned.
@@ -485,6 +525,11 @@ namespace GMTK {
       if (feedback != null && feedback.gameObject.activeInHierarchy) {
         if (reverse) feedback.PlayFeedbacksInReverse();
         else feedback.PlayFeedbacks();
+      }
+    }
+    private void StopFeedback(MMF_Player feedback) {
+      if (feedback != null && feedback.gameObject.activeInHierarchy) {
+        feedback.StopFeedbacks();
       }
     }
 

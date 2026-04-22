@@ -157,11 +157,13 @@ namespace GMTK {
     private void ApplyFeedback(bool selectedChanged = false, bool hoverChanged = false) {
       // select/deselect feedback has priority over hover/unhover feedback
       if (selectedChanged) {
+        StopFeedback(_playableElement.IsSelected ? OnDeselectedFeedback : OnSelectedFeedback);
         PlayFeedback(_playableElement.IsSelected ? OnSelectedFeedback : OnDeselectedFeedback);
         this.LogDebug($"Played {(_playableElement.IsSelected ? "OnSelectedFeedback" : "OnDeselectedFeedback")} for {_playableElement.name}");
       }
       else if (hoverChanged) {
         if (!_playableElement.IsSelected) { //skip hover feedback if we are selected, to avoid feedback overlap
+          StopFeedback(_playableElement.IsHovered ? OnUnhoverFeedback : OnHoverFeedback);
           PlayFeedback(_playableElement.IsHovered ? OnHoverFeedback : OnUnhoverFeedback);
           this.LogDebug($"Played {(_playableElement.IsHovered ? "OnHoverFeedback" : "OnUnhoverFeedback")} for {_playableElement.name}");
         }

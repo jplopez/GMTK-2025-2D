@@ -1,6 +1,7 @@
 using UnityEngine;
 using Ameba;
 using MoreMountains.Feedbacks;
+using Sirenix.OdinInspector;
 
 namespace GMTK {
 
@@ -74,7 +75,10 @@ namespace GMTK {
       }
     }
 
+    [Button]
     public void OnSelect() => MarkSelected(true);
+
+    [Button]
     public void OnDeselect() => MarkSelected(false);
 
     public void OnSelectUpdate() {

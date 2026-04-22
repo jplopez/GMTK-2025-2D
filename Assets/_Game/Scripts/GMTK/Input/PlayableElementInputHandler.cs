@@ -16,7 +16,7 @@ namespace GMTK {
   ///   <item><b>InputSelected</b>: The pointer's primary action acts on an element (left-click or touch). Relevant for Select and UI controls</item>
   ///   <item><b>InputSecondary</b>:The pointer's secondary action acts on an element (right-click or two-point-touch). Relevant for Unselect</item>
   ///   <item><b>InputRotateCW</b>: The rotate clockwise button is pressed</item>
-  ///   <item><b>InputRotateCCW</b>:The rotate counter clockwise button is pressed</item>
+  ///   <item><b>InputRotateCCW</b>:The rotate counterclockwise button is pressed</item>
   ///   <item><b>InputFlippedX</b>: The flip in X axis button is pressed</item>
   ///   <item><b>InputFlippedY</b>: The flip in Y axis button is pressed.</item>
   /// </list>
@@ -42,7 +42,7 @@ namespace GMTK {
     [SerializeField] private Vector2 _pointerScreenPos;
     [SerializeField] private Vector3 _pointerWorldPos;
 
-    protected GameEventChannel _eventsChannel;
+    private GameEventChannel _eventsChannel;
 
     #region Button Properties
 
@@ -110,27 +110,27 @@ namespace GMTK {
       }
     }
 
-    private void Start() {
-      if (_eventsChannel != null) {
-        _eventsChannel.AddListener<InputActionEventArgs>(InputPointerPosition, UpdatePointerPosition);
-        _eventsChannel.AddListener<InputActionEventArgs>(InputSelected, HandleSelect);
-        _eventsChannel.AddListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
-        _eventsChannel.AddListener<InputActionEventArgs>(InputRotateCW, RotateCW);
-        _eventsChannel.AddListener<InputActionEventArgs>(InputRotateCCW, RotateCCW);
-        _eventsChannel.AddListener<InputActionEventArgs>(InputFlippedX, FlipX);
-        _eventsChannel.AddListener<InputActionEventArgs>(InputFlippedY, FlipY);
-      }
+    private void Start()
+    {
+      if (_eventsChannel == null) return;
+      _eventsChannel.AddListener<InputActionEventArgs>(InputPointerPosition, UpdatePointerPosition);
+      _eventsChannel.AddListener<InputActionEventArgs>(InputSelected, HandleSelect);
+      _eventsChannel.AddListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
+      _eventsChannel.AddListener<InputActionEventArgs>(InputRotateCW, RotateCW);
+      _eventsChannel.AddListener<InputActionEventArgs>(InputRotateCCW, RotateCCW);
+      _eventsChannel.AddListener<InputActionEventArgs>(InputFlippedX, FlipX);
+      _eventsChannel.AddListener<InputActionEventArgs>(InputFlippedY, FlipY);
     }
 
-    private void OnDestroy() {
-      if (_eventsChannel != null) {
-        _eventsChannel.RemoveListener<InputActionEventArgs>(InputSelected, HandleSelect);
-        _eventsChannel.RemoveListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
-        _eventsChannel.RemoveListener<InputActionEventArgs>(InputRotateCW, RotateCW);
-        _eventsChannel.RemoveListener<InputActionEventArgs>(InputRotateCCW, RotateCCW);
-        _eventsChannel.RemoveListener<InputActionEventArgs>(InputFlippedX, FlipX);
-        _eventsChannel.RemoveListener<InputActionEventArgs>(InputFlippedY, FlipY);
-      }
+    private void OnDestroy()
+    {
+      if (_eventsChannel == null) return;
+      _eventsChannel.RemoveListener<InputActionEventArgs>(InputSelected, HandleSelect);
+      _eventsChannel.RemoveListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
+      _eventsChannel.RemoveListener<InputActionEventArgs>(InputRotateCW, RotateCW);
+      _eventsChannel.RemoveListener<InputActionEventArgs>(InputRotateCCW, RotateCCW);
+      _eventsChannel.RemoveListener<InputActionEventArgs>(InputFlippedX, FlipX);
+      _eventsChannel.RemoveListener<InputActionEventArgs>(InputFlippedY, FlipY);
     }
 
     #endregion
@@ -439,7 +439,7 @@ namespace GMTK {
     #endregion
 
 
-    protected void DebugLog(string message) { if (_debugLogging) this.Log($"{_currentElement.name} - {message}"); }
+    private void DebugLog(string message) { if (_debugLogging) this.Log($"{_currentElement.name} - {message}"); }
 
 
 #if UNITY_EDITOR

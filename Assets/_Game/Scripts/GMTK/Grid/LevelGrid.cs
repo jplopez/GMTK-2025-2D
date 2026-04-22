@@ -382,7 +382,7 @@ namespace GMTK {
 
     protected virtual void HandleElementDropped(PlayableElementEventArgs args) {
       if (args.Element is PlayableElement element) {
-        var elemModel = element.Model.transform;
+        var elemModel = element.transform;
         var newGridOrigin = WorldToGrid(elemModel.position);
         // Change to Placing state
         ChangeState(LevelGridState.Placing);

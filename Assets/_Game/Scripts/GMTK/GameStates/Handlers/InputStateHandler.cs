@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GMTK {
   public class InputStateHandler : BaseGameStateHandler {
 
     [Header("Input References")]
-    public PlayableElementInputHandler snappableInput;
+    [FormerlySerializedAs("snappableInput")] 
+    public PlayableElementInputHandler playerInputHandler;
 
     private void OnEnable() {
       Priority = 50;
@@ -12,15 +14,15 @@ namespace GMTK {
     }
 
     protected override void Init() {
-      if (snappableInput == null) {
-        snappableInput = FindFirstObjectByType<PlayableElementInputHandler>();
+      if (playerInputHandler == null) {
+        playerInputHandler = FindFirstObjectByType<PlayableElementInputHandler>();
       }
     }
 
-    protected override void ToPreparation() => snappableInput.UpdateFromGameState(GameStates.Preparation);
-    protected override void ToPlaying() => snappableInput.UpdateFromGameState(GameStates.Playing);
-    protected override void ToPause() => snappableInput.UpdateFromGameState(GameStates.Pause);
-    protected override void ToOptions() => snappableInput.UpdateFromGameState(GameStates.Options);
+    protected override void ToPreparation() => playerInputHandler.UpdateFromGameState(GameStates.Preparation);
+    protected override void ToPlaying() => playerInputHandler.UpdateFromGameState(GameStates.Playing);
+    protected override void ToPause() => playerInputHandler.UpdateFromGameState(GameStates.Pause);
+    protected override void ToOptions() => playerInputHandler.UpdateFromGameState(GameStates.Options);
   }
 
 }

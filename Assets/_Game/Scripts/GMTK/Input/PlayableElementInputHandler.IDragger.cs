@@ -1,4 +1,5 @@
 using Ameba;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GMTK {
@@ -120,11 +121,14 @@ namespace GMTK {
 
     #endregion
 
-    #region Public Dragging API
+#if UNITY_EDITOR
+
+    #region Odin Inspector Methods
 
     /// <summary>
     /// Programmatically start dragging an element
     /// </summary>
+    [Button]
     public bool StartDragElement(PlayableElement element) {
       return TryStartDrag(element);
     }
@@ -132,17 +136,20 @@ namespace GMTK {
     /// <summary>
     /// Programmatically stop dragging the current element
     /// </summary>
+    [Button]
     public bool StopDragElement() {
       return TryStopDrag();
     }
 
-    /// <summary>
-    /// Check if an element is currently being dragged
-    /// </summary>
-    public bool IsElementDragged(PlayableElement element) {
-      return _draggedElement == element;
+    [Button]
+    public void UpdateDragging() {
+      if (IsDragging) {
+        UpdateDrag(_pointerWorldPos);
+      }
     }
 
+
     #endregion
+#endif
   }
 }

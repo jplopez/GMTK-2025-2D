@@ -1,5 +1,5 @@
 ﻿#if UNITY_EDITOR
-using DG.Tweening.Plugins;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace GMTK {
   [CustomEditor(typeof(LevelService))]
   public class LevelServiceEditor : UnityEditor.Editor {
 
-    protected LevelService _targetService;
+    protected LevelService TargetService;
 
     private SerializedProperty _configurationsProperty;
 
@@ -42,7 +42,7 @@ namespace GMTK {
 
     private void OnEnable() {
 
-      _targetService = target as LevelService;
+      TargetService = target as LevelService;
 
       SetupProperties();
 
@@ -86,7 +86,7 @@ namespace GMTK {
 
       //these lists are used in dropdowns
       //so we populate them after all SerializedProperties are obtained
-      _presetConfigNames = GetPresetConfigNames(_targetService, true);
+      _presetConfigNames = GetPresetConfigNames(TargetService, true);
       _sceneNames = EditorUtils.GetAllSceneNamesArray(true);
 
       serializedObject.Update();
@@ -282,7 +282,7 @@ namespace GMTK {
 
     private void UpdatePresetConfig(SerializedProperty levelConfigProp, int presetIndex) {
       var configName = _presetConfigNames[presetIndex];
-      if (_targetService.TryFindConfig(configName, out var config)) {
+      if (TargetService.TryFindConfig(configName, out var config)) {
         levelConfigProp.boxedValue = config;
         //Debug.Log($"UpdatePresetConfig: config preset: '{configName}'");
         serializedObject.ApplyModifiedProperties();

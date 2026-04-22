@@ -1,62 +1,75 @@
-using Ameba;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using GMTK.Extensions;
 using UnityEngine.Events;
+using Sirenix.OdinInspector;
+using Ameba;
+using GMTK.Extensions;
 
 namespace GMTK {
 
   [Flags]
   public enum SelectionTrigger {
-    None = 0,
-    OnHover = 1,
-    OnClick = 2,
-    OnDoubleClick = 4,
-
+    None = 0, OnHover = 1, OnClick = 2, OnDoubleClick = 4,
   }
 
   /// <summary>
-  /// Represents any object in the game that can be snapped into a LevelGrid and dragged by the player.
-  /// This class replaces GridSnappable and implements the IDraggable, ISelectable, and IHoverable interfaces for improved interaction support.
-  /// Additional abilities are provided by PlayableElementComponent-derived classes.
+  /// Represents any object in the game that can be added into a Grid, and can be hovered, selected and dragged by the player.
   /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This class implements the <see cref="IDraggable"/>, <see cref="ISelectable"/>, and <see cref="IHoverable"/> interfaces for compatibility with <see cref="PlayableElementInputHandler"/>.<br/>
+  /// To calculate the occupied cells in a grid, it uses the <see cref="OccupiedCells"/> property, which is a list of (x,y) coordinates relative to the <see cref="SnapTransform"/> position.
+  /// </para>
+  /// <para>
+  /// <b>PlayableElementComponents</b><br/>
+  /// You can extend the functionality of PlayableElement by adding components derived from <see cref="PlayableElementComponent"/> to the same GameObject.<br/>
+  /// These components can hook into the PlayableElement lifecycle (enable, disable, before or after update, destroy) and unity events to provide additional behaviors.<br/>
+  /// By default, an instance of <see cref="ElementPointerComponent"/> is always added to the GameObject. This component handles pointer interactions (hover, click, double click) and raises the corresponding events and feedbacks.
+  /// </para>
+  /// <para>
+  /// <b>UnityEvents :</b><br/>
+  /// All events are raised with a <see cref="PlayableElementEventArgs"/> parameter that provides context about the event.<br/>
+  /// <list type="bullet">
+  /// <item><see cref="OnSelected"/>: Invoked when the element is selected.</item>
+  /// <item><see cref="OnDeselected"/>: Invoked when the element is deselected.</item>
+  /// <item><see cref="OnHovered"/>: Invoked when the element is hovered.</item>
+  /// <item><see cref="OnUnhovered"/>: Invoked when the element is unhovered.</item>
+  /// <item><see cref="OnDragStart"/>: Invoked when the element starts being dragged.</item>
+  /// <item><see cref="OnDragging"/>: Invoked while the element is being dragged.</item>
+  /// <item><see cref="OnDragEnd"/>: Invoked when the element is released after being dragged.</item>
+  /// <item><see cref="OnPlayerInput"/>: Invoked when the player press any key or buttons while the element is selected.</item>
+  /// <item><see cref="OnFlip"/>: Invoked when the element is flipped on its X or Y axis. OnPlayerInput is also invoked, so you could also use that event for detecting flipping</item>
+  /// <item><see cref="OnRotate"/>: Invoked when the element is rotated clockwise or counter-clockwise. OnPlayerInput is also invoked, so you could also use that event for detecting rotations</item>
+  /// </list>
+  /// </para>
+  /// </remarks>
   [AddComponentMenu("GMTK/Playable Element")]
   [RequireComponent(typeof(ElementPointerComponent))]
   public partial class PlayableElement : MonoBehaviour, IDraggable, ISelectable, IHoverable {
 
-    [Header("Model Settings")]
-    [Tooltip("If set, this transform will be used for snapping instead of the GameObject's transform.")]
+    [Tooltip("If set, this transform will be used for positioning and snapping into the grid instead of the GameObject's transform.")]
     public Transform SnapTransform; // if null, uses this.transform
-    [Tooltip("If set, this transform will be used to look for SpriteRenderers, RigidBody and Collisions. If empty, it will use the GameObject's transform")]
-    public Transform Model;
-    [Tooltip("(Optional) highlight model to show when hovering or dragging.")]
-    public GameObject HighlightModel;
-    [Tooltip("If true, the object can be dragged. Set it to false for elements that you want static in the playable area")]
-    public bool Draggable = true;
 
-    [Header("Local Grid Footprint")]
+    [Tooltip("Collection of (x,y) cells occupied by this element in local space, relative to the SnapTransform's position")]
     public List<Vector2Int> OccupiedCells = new();
 
-    //[Header("Actions")]
+    //Actions
     [Tooltip("If true, the object can be flipped on the X and Y axis")]
     public bool Flippable = false;
     [Tooltip("If true, the object can be rotated in its Z axis")]
     public bool CanRotate = false;
-    [Space(10)]
+    [Tooltip("If true, the object can be dragged. Set it to false for elements that you want static in the playable area")]
+    public bool Draggable = true;
 
     //UnityEvents
-    //[Help("UnityEvents to add additional behaviors to PlayableElements. PlayableElementComponent-derived components attached to the same GameObject subscribe to this events automatically")]
-    [Space]
-    [Header("Selection")]
+    //Selection
     public UnityEvent<PlayableElementEventArgs> OnSelected = new();
     public UnityEvent<PlayableElementEventArgs> OnDeselected = new();
-    [Space]
-    [Header("Hovering")]
+    //Hovering
     public UnityEvent<PlayableElementEventArgs> OnHovered = new();
     public UnityEvent<PlayableElementEventArgs> OnUnhovered = new();
-    [Space]
-    [Header("Drag Start")]
+    //Dragging
     public UnityEvent<PlayableElementEventArgs> OnDragStart = new();
     public UnityEvent<PlayableElementEventArgs> OnDragging = new();
     [Tooltip("The minimum distance the element needs to be dragged to notify 'OnDragging'")]
@@ -66,15 +79,11 @@ namespace GMTK {
     [Range(0.1f, 1f)]
     public float DragCooldown = 0.1f;
     public UnityEvent<PlayableElementEventArgs> OnDragEnd = new();
-    [Space]
-    [Header("Input Controls (rotate, flip)")]
+
+    //Input Controls (rotate, flip)
     public UnityEvent<PlayableElementEventArgs> OnPlayerInput = new();
     public UnityEvent<PlayableElementEventArgs> OnFlip = new();
     public UnityEvent<PlayableElementEventArgs> OnRotate = new();
-
-
-    // Public properties for compatibility with existing code
-    public bool IsRegistered => _isRegistered;
 
     // Private fields
     private Vector3 _initialPosition;
@@ -83,8 +92,10 @@ namespace GMTK {
     protected bool _isRegistered = false;
     private float _lastDragUpdateTime = 0f;
     private bool _canDoDraggingUpdate = true;
+
     protected SpriteRenderer _modelRenderer;
     protected PolygonCollider2D _collider;
+
     protected List<PlayableElementComponent> _components = new();
 
     protected GameEventChannel _gameEventChannel;
@@ -129,7 +140,7 @@ namespace GMTK {
     public virtual void Initialize() {
       // Default assignments
       if (SnapTransform == null) SnapTransform = transform;
-      if (Model == null) Model = transform;
+      //if (Model == null) Model = transform;
 
       // Get GameEventChannel from ServiceLocator
       _gameEventChannel = ServiceLocator.Get<GameEventChannel>();
@@ -156,29 +167,41 @@ namespace GMTK {
 
     private bool CheckForRenderers() {
       // Check Model has a sprite renderer
-      if (Model.TryGetComponent(out SpriteRenderer renderer)) {
+      if (TryGetComponent(out SpriteRenderer renderer)) {
         _modelRenderer = renderer;
         return true;
       }
       else {
-        SpriteRenderer[] renderers = Model.GetComponentsInChildren<SpriteRenderer>();
+        // If not found on GO, check children
+        SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>();
         if (renderers == null || renderers.Length == 0) {
-          this.LogWarning($"No SpriteRenderer found on {Model.name}.");
+          this.LogWarning($"No SpriteRenderer found on {name}.");
+          return false;
+        }
+        else {
+          _modelRenderer = renderers[0];
+          return true;
         }
       }
-      return false;
+
     }
 
     private void InitPlayableElement() {
-      // Hide existing highlight
-      if (HighlightModel != null) HighlightModel.SetActive(false);
 
-      if (Model.gameObject.TryGetComponent(out PolygonCollider2D collider)) {
+      // Check GO has a PolygonCollider2D in itself or children
+      if (TryGetComponent(out PolygonCollider2D collider)) {
         _collider = collider;
       }
       else {
-        this.LogWarning($"No PolygonCollider2D found on {Model.gameObject.name}. Adding one.");
-        _collider = Model.gameObject.AddComponent<PolygonCollider2D>();
+        PolygonCollider2D[] colliders = GetComponentsInChildren<PolygonCollider2D>();
+        if (colliders != null && colliders.Length > 0) {
+          _collider = colliders[0];
+        }
+      }
+      //if not found, add one
+      if (_collider == null) {
+        this.LogWarning($"No PolygonCollider2D found on {name}. Adding one.");
+        _collider = gameObject.AddComponent<PolygonCollider2D>();
       }
     }
 
@@ -276,6 +299,7 @@ namespace GMTK {
       return true;
     }
 
+    [ReadOnly]
     protected bool CanDoDraggingUpdate => _canDoDraggingUpdate;
 
     protected void ResetDraggingUpdateTimer() {
@@ -314,11 +338,13 @@ namespace GMTK {
     /// <summary>
     /// Rotates the PlayableElement clockwise, if CanRotate is true
     /// </summary>
+    [Button]
     public void RotateClockwise() => InnerRotate(PlayableElementEventType.RotateCW);
 
     /// <summary>
     /// Rotates the PlayableElement counter clockwise, if CanRotate is true
     /// </summary>
+    [Button]
     public void RotateCounterClockwise() => InnerRotate(PlayableElementEventType.RotateCCW);
 
     /// <summary>
@@ -350,11 +376,13 @@ namespace GMTK {
     /// <summary>
     /// Flips the PlayableElement on the X-axis (up-down), if Flippable is true
     /// </summary>
+    [Button]
     public void FlipX() => InnerFlip(flipX: true);
 
     /// <summary>
     /// Flips the PlayableElement on the Y-axis (left-right), if Flippable is true
     /// </summary>
+    [Button]
     public void FlipY() => InnerFlip(flipY: true);
 
     /// <summary>
@@ -369,7 +397,7 @@ namespace GMTK {
       PlayableElementEventType eventType = flipX ? PlayableElementEventType.FlippedX : PlayableElementEventType.FlippedY;
 
       // Notify components first - they might handle the flip
-      PlayableElementEventArgs eventArgs = new(this, transform.position, eventType); 
+      PlayableElementEventArgs eventArgs = new(this, transform.position, eventType);
       OnFlip?.Invoke(eventArgs);
 
       // If no component handled it, do the default flip using extension methods
@@ -385,6 +413,182 @@ namespace GMTK {
     }
 
     #endregion
+
+#if UNITY_EDITOR
+
+    #region Editor Utilities
+
+    [ShowInInspector, ReadOnly]
+    public SpriteRenderer ModelRenderer => _modelRenderer;
+
+    [ShowInInspector, ReadOnly]
+    public bool IsRegistered => _isRegistered;
+
+    [ShowInInspector, ReadOnly]
+    public Vector3 InitialPosition => _initialPosition;
+
+    [ShowInInspector, ReadOnly]
+    public Quaternion InitialRotation => _initialRotation;
+
+    [ShowInInspector, ReadOnly]
+    public Vector3 InitialScale => _initialScale;
+
+    [ShowInInspector, ReadOnly]
+    public float LastDragUpdateTime => _lastDragUpdateTime;
+    
+
+
+    [Button]
+    public void AddDraggingComponent() => TryAddingComponent<ElementDraggingComponent>();
+
+    public bool HasDraggingComponent() => Draggable && HasComponent<ElementDraggingComponent>();
+
+    [Button]
+    public void AddPhysicsComponent() => TryAddingComponent<ElementPhysicsComponent>();
+
+    public bool HasPhysicsComponent() => CanRotate && HasComponent<ElementPhysicsComponent>();
+
+    protected bool HasComponent<T>() where T : PlayableElementComponent {
+      return TryGetComponent(out T _);
+    }
+
+    protected bool TryAddingComponent<T>() where T : PlayableElementComponent {
+      if (TryGetComponent(out T _)) {
+        this.LogWarning($"{typeof(T).Name} already exists on {name}");
+        return false;
+      }
+      else {
+        gameObject.AddComponent<T>();
+        this.LogDebug($"Added {typeof(T).Name} to {name}");
+        return true;
+      }
+    }
+
+
+    [Button]
+    public void ClearOccupiedCells() {
+      OccupiedCells.Clear();
+    }
+
+    [Button]
+    public void AutoFillOccupiedCells() {
+
+      if (_modelRenderer == null || _modelRenderer.sprite == null) {
+        this.LogWarning($"No valid SpriteRenderer or Sprite found on {name}");
+        return;
+      }
+
+      // Clamp tolerance to valid range
+      float tolerance = 0.1f;
+      float cellSize = 1.0f;
+
+      // Calculate occupied cells based on sprite bounds and SnapTransform scale
+      var occupiedCells = CalculateOccupiedCells(cellSize, tolerance);
+
+      // Update the element's occupied cells
+      OccupiedCells.Clear();
+      OccupiedCells.AddRange(occupiedCells);
+    }
+
+
+    /// <summary>
+    /// Calculates occupied cells using SnapTransform as the source of truth.
+    /// </summary>
+    private List<Vector2Int> CalculateOccupiedCells(float cellSize, float tolerance) {
+      var occupiedCells = new List<Vector2Int>();
+      Sprite sprite = _modelRenderer.sprite;
+
+      // Get sprite bounds in local space
+      Bounds spriteBounds = sprite.bounds;
+
+      // Get the SnapTransform's scale - this affects the actual world size
+      Vector3 scale = transform.lossyScale;
+
+      //// Calculate scaled sprite bounds
+      //Vector2 scaledSpriteSize = new Vector2(
+      //  spriteBounds.size.x * Mathf.Abs(scale.x),
+      //  spriteBounds.size.y * Mathf.Abs(scale.y)
+      //);
+
+      // Use SnapTransform position as the pivot
+      Vector2 pivotWorldPosition = transform.position;
+
+      // Get the sprite's bounds in world coordinates relative to the pivot, accounting for scale
+      Vector2 scaledBoundsMin = new Vector2(
+        spriteBounds.min.x * scale.x,
+        spriteBounds.min.y * scale.y
+      );
+      Vector2 scaledBoundsMax = new Vector2(
+        spriteBounds.max.x * scale.x,
+        spriteBounds.max.y * scale.y
+      );
+
+      Vector2 spriteBottomLeft = pivotWorldPosition + scaledBoundsMin;
+      Vector2 spriteTopRight = pivotWorldPosition + scaledBoundsMax;
+
+      // Calculate the range of cells the sprite potentially covers
+      int minCellX = Mathf.FloorToInt((spriteBottomLeft.x - pivotWorldPosition.x) / cellSize);
+      int maxCellX = Mathf.FloorToInt((spriteTopRight.x - pivotWorldPosition.x) / cellSize);
+      int minCellY = Mathf.FloorToInt((spriteBottomLeft.y - pivotWorldPosition.y) / cellSize);
+      int maxCellY = Mathf.FloorToInt((spriteTopRight.y - pivotWorldPosition.y) / cellSize);
+
+      // Calculate cell coverage for each potential cell
+      for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
+        for (int cellY = minCellY; cellY <= maxCellY; cellY++) {
+          float coveragePercentage = CalculateCellCoverage(cellX, cellY, cellSize, pivotWorldPosition, spriteBottomLeft, spriteTopRight);
+
+          if (coveragePercentage >= tolerance) {
+            occupiedCells.Add(new Vector2Int(cellX, cellY));
+          }
+        }
+      }
+
+      // Ensure we have at least one cell (fallback for very small sprites)
+      if (occupiedCells.Count == 0) {
+        occupiedCells.Add(Vector2Int.zero);
+        Debug.LogWarning("[PlayableElementEditor] No cells met tolerance threshold, adding (0,0) as fallback");
+      }
+
+      return occupiedCells;
+    }
+
+    private float CalculateCellCoverage(int cellX, int cellY, float cellSize, Vector2 pivotWorldPosition, Vector2 spriteBottomLeft, Vector2 spriteTopRight) {
+      // Calculate the bounds of the grid cell
+      Vector2 cellBottomLeft = pivotWorldPosition + new Vector2(cellX * cellSize, cellY * cellSize);
+      Vector2 cellTopRight = cellBottomLeft + new Vector2(cellSize, cellSize);
+
+      // Calculate the intersection rectangle between sprite and cell
+      Vector2 intersectionBottomLeft = new Vector2(
+        Mathf.Max(cellBottomLeft.x, spriteBottomLeft.x),
+        Mathf.Max(cellBottomLeft.y, spriteBottomLeft.y)
+      );
+
+      Vector2 intersectionTopRight = new Vector2(
+        Mathf.Min(cellTopRight.x, spriteTopRight.x),
+        Mathf.Min(cellTopRight.y, spriteTopRight.y)
+      );
+
+      // Check if there's actually an intersection
+      if (intersectionBottomLeft.x >= intersectionTopRight.x || intersectionBottomLeft.y >= intersectionTopRight.y) {
+        return 0f; // No intersection
+      }
+
+      // Calculate intersection area
+      float intersectionWidth = intersectionTopRight.x - intersectionBottomLeft.x;
+      float intersectionHeight = intersectionTopRight.y - intersectionBottomLeft.y;
+      float intersectionArea = intersectionWidth * intersectionHeight;
+
+      // Calculate cell area
+      float cellArea = cellSize * cellSize;
+
+      // Return coverage percentage
+      float coverage = intersectionArea / cellArea;
+
+      return Mathf.Clamp01(coverage);
+    }
+
+    #endregion
+#endif
 
     public override string ToString() => name;
   }

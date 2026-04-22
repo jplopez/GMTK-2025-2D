@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEssentials;
 using MoreMountains.Feedbacks;
 
 namespace GMTK {
@@ -12,7 +11,7 @@ namespace GMTK {
   [AddComponentMenu("GMTK/Playable Element Components/Element Dragging Component")]
   public class ElementDraggingComponent : PlayableElementComponent {
 
-    [Header("Drag Settings")]
+    //[Header("Drag Settings")]
     [Tooltip("Minimum dragged Distance for this component to act on the element")]
     public float DragMinMovement = 0.5f;
     [Space]
@@ -38,12 +37,12 @@ namespace GMTK {
       Event = 4
     }
 
-    [Header("Position Change")]
+    //[Header("Position Change")]
     [Tooltip("Controls when position updates and events are triggered. OnDrop: updates position on drop, DuringDrag: updates during drag, Event: triggers events without updating the element's position")]
     public PositionChangeFlags ChangeUpdate = PositionChangeFlags.OnDrop;
 
-    [Foldout("Feedbacks (optional)")]
-    [Header("Drag Feedbacks")]
+    //[Foldout("Feedbacks (optional)")]
+    //[Header("Drag Feedbacks")]
     [Tooltip("feedback to play when drag starts")]
     public MMF_Player OnDragStartFeedback;
     [Tooltip("feedback to play when element is dropped")]
@@ -53,8 +52,8 @@ namespace GMTK {
     public MMF_Player OnDragUpdateFeedback;
     [Tooltip("The waiting time en beetween OnDragUpdateFeedback plays")]
     public float DragUpdateWaitInterval = 0.2f;
-    [Space]
-    [Header("Placement Feedbacks")]
+    
+    //Placement Feedbacks
     [Tooltip("feedback to play when ghost placement is valid")]
     public MMF_Player OnValidPlacementFeedback;
     [Tooltip("feedback to play when ghost placement is invalid")]
@@ -62,8 +61,8 @@ namespace GMTK {
 
     [Space(10)]
 
-    [Foldout("Ghost Settings")]
-    [Header("Ghost Settings")]
+    //[Foldout("Ghost Settings")]
+    //[Header("Ghost Settings")]
     [Tooltip("Enable ghost functionality during drag")]
     public bool EnableGhost = true;
     [MMFCondition("EnableGhost", true)]
@@ -87,7 +86,7 @@ namespace GMTK {
     [Tooltip("Color tint for the ghost when placement is neutral")]
     public Color NeutralGhostColor = Color.yellow;
 
-    [Header("Ghost Feedbacks (optionals)")]
+    //[Header("Ghost Feedbacks (optionals)")]
     [MMFCondition("EnableGhostFeedbacks", true)]
     [Tooltip("feedback to play when ghost mode starts")]
     public MMF_Player OnGhostModeStartFeedback;
@@ -122,7 +121,7 @@ namespace GMTK {
 
       // Get the original renderer for ghost functionality
       if (EnableGhost) {
-        _originalRenderer = _playableElement.Model.GetComponent<SpriteRenderer>();
+        _originalRenderer = _playableElement.ModelRenderer;
         if (_originalRenderer == null) {
           Debug.LogError($"[ElementDraggingComponent] No SpriteRenderer found on {_playableElement.name} - Ghost functionality disabled");
           EnableGhost = false;

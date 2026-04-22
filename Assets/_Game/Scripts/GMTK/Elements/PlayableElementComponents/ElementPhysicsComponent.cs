@@ -4,6 +4,7 @@ using GMTK.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.OdinInspector;
 
 namespace GMTK {
 
@@ -35,95 +36,58 @@ namespace GMTK {
 
     #region Serialized Fields
 
-    [Header("Collision Settings")]
-    [Space]
+    //Collision Settings
     public bool DisableAllCollisions = false;
-    [Space]
     [Tooltip("If true, the element will dispatch GameEvents on collisions. Otherwise, collisions won't be notified. Set it to false if the element will be static in the level.")]
-    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
     public bool TriggerCollisionEvents = true;
+    [Tooltip("If true, the element will not be able to move through other elements (eg: will collide and stop)")]
+    public bool SolidOnCollision = true;
+    [Tooltip("Collision intensity calculator to use for this object. If null, no collision intensity will be calculated.")]
+    public CollisionIntensityCalculator IntensityCalculator;
+    [Tooltip("MMF Player for constraint violation feedback")]
+    public MMF_Player ConstraintViolationFeedback;
 
-    [Space(10)]
     [Header("Movement Settings")]
-    [Space]
-
     [Tooltip("Whether this element can change its position when colliding (default) with other element, while dragging when overlaping with other elements, both or none.")]
-    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
     public TransformChangeSource PositionChanges = TransformChangeSource.None;
     [Tooltip("Determines which objects can move this element on collisions")]
-    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
     public CollisionSourceFilter CanBeMovedBy = CollisionSourceFilter.Everything;
     [Tooltip("MMF Player for collision feedback")]
     public MMF_Player PositionChangeFeedback;
 
+
     [Header("Movement Constraints")]
-
-    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.None)]
-    [Help("Add a Position Change condition to enable movement constrains",UnityEditor.MessageType.None)]
-    [DisplayWithoutEdit] public string NoMovementConstrains = string.Empty;
-
-    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("If true, the element's movement will be constrained vertically (Y axis)")]
     public bool ConstrainVerticalMovement = false;
-    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("If true, the element's movement will be constrained horizontally (X axis)")]
     public bool ConstrainHorizontalMovement = false;
-    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("Minimum position bounds for the element")]
     public Vector2Int MinPosition = new(-100, -100);
-    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("Maximum position bounds for the element")]
     public Vector2Int MaxPosition = new(100, 100);
-    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("If true, the element's movement will be constrained to a grid (eg: only move in increments of grid cell size)")]
     public bool SnapToGridOnMove = true;
-    [MMFEnumCondition("PositionChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
-    [Tooltip("If true, the element will not be able to move through other elements (eg: will collide and stop)")]
-    public bool SolidOnCollision = true;
-  
-    [Space(10)]
-    [Header("Rotation Settings")]
-    [Space]
 
+
+    [Header("Rotation Settings")]
     [Tooltip("Whether this element can change its rotation when colliding (default) with other element, while dragging when overlaping with other elements, both or none.")]
-    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
     public TransformChangeSource RotationChanges = TransformChangeSource.None;
     [Tooltip("Determines which objects can rotate this element through collision")]
-    [MMFCondition("DisableAllCollisions", Hidden = true, Negative = true)]
     public CollisionSourceFilter CanBeRotatedBy = CollisionSourceFilter.Everything;
     [Tooltip("MMF Player for rotation feedback")]
     public MMF_Player RotationChangeFeedback;
-    
+
     [Header("Rotation Constrains")]
-
-    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.None)]
-    [Help("Add a Rotation Change condition to enable rotation constrains", UnityEditor.MessageType.None)]
-    [DisplayWithoutEdit] public string NoRotationConstrains = string.Empty;
-
-    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("How many degrees the element will rotate every time is requested. Uses extension methods that handle flip state automatically.")]
     public float RotationStep = 90;
-    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("If true, you can limit the rotation angle using MinRotationAngle and MaxRotationAngle")]
     public bool LimitRotationAngle = false;
-    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Tooltip("The min and max angle the element can rotate")]
     [Range(-180f, 180f)]
     public float MinRotationAngle = -45f;
-    [MMFEnumCondition("RotationChanges", (int)TransformChangeSource.OnDrag, (int)TransformChangeSource.OnCollision)]
     [Range(-180f, 180f)]
     public float MaxRotationAngle = 45f;
 
-    [Space(10)]
-    [Header("Feedbacks")]
-    [Tooltip("Collision intensity calculator to use for this object. If null, no collision intensity will be calculated.")]
-    public CollisionIntensityCalculator IntensityCalculator;
-    [Space(5)]
-    [Tooltip("MMF Player for constraint violation feedback")]
-    public MMF_Player ConstraintViolationFeedback;
-
-    [Space(10)]
-    [Header("Debug")]
     [SerializeField, DisplayWithoutEdit] private Rigidbody2D _rigidbody2D;
     [SerializeField, DisplayWithoutEdit] private PolygonCollider2D _collider2D;
     [SerializeField, DisplayWithoutEdit] private float _currentRotation = 0f;
@@ -539,19 +503,6 @@ namespace GMTK {
       }
     }
 
-    //protected void OnRotateCW(PlayableElementEventArgs evt) {
-    //  if (AllowsRotationChanges) {
-    //    ApplyExtensionRotation(true); // Use extension method for clockwise rotation
-    //    evt.Handled = true; // Prevent default rotation behavior
-    //  }
-    //}
-    //protected void OnRotateCCW(PlayableElementEventArgs evt) {
-    //  if (AllowsRotationChanges) {
-    //    ApplyExtensionRotation(false); // Use extension method for counter-clockwise rotation
-    //    evt.Handled = true; // Prevent default rotation behavior
-    //  }
-    //}
-
     #endregion
 
     #region Collision
@@ -686,7 +637,7 @@ namespace GMTK {
         _isValidatingMovement = true;
         _playableElement.SnapTransform.position = _lastValidPosition;
         _rigidbody2D.position = _lastValidPosition;
-        if(_rigidbody2D.bodyType != RigidbodyType2D.Static) _rigidbody2D.linearVelocity = Vector2.zero; // Stop any movement
+        if (_rigidbody2D.bodyType != RigidbodyType2D.Static) _rigidbody2D.linearVelocity = Vector2.zero; // Stop any movement
         _isValidatingMovement = false;
         //this.Log($"RestoreLastValidPosition {_playableElement.name} : {_lastValidPosition}");
       }
@@ -871,6 +822,14 @@ namespace GMTK {
     // Public API methods - using extension-based rotation logic
     #region Public API
 
+    [Button]
+    public void MoveTo(Vector2 position) {
+      Vector3 constrainedPos = ApplyPositionConstraints(position);
+      _playableElement.SnapTransform.position = constrainedPos;
+      _rigidbody2D.MovePosition(constrainedPos);
+      _lastValidPosition = constrainedPos;
+    }
+
     public void RotateBy(float degrees) {
       // Use extension methods if the degrees match RotationStep for consistency
       if (Mathf.Approximately(Mathf.Abs(degrees), RotationStep)) {
@@ -884,13 +843,18 @@ namespace GMTK {
     /// <summary>
     /// Rotates the element clockwise using the extension method with flip-state awareness.
     /// </summary>
+    [Button]
     public void RotateClockwise() {
       ApplyExtensionRotation(true);
     }
 
+    //TODO create TriggerRotation method for the OdinInspector that calls OnRotate with clockwise or counterclockwise. Similar, create methods for OnCollision methods too
+    //TODO create method to apply force to element for testing collision response
+
     /// <summary>
     /// Rotates the element counter-clockwise using the extension method with flip-state awareness.
     /// </summary>
+    [Button]
     public void RotateCounterClockwise() {
       ApplyExtensionRotation(false);
     }
@@ -900,6 +864,7 @@ namespace GMTK {
     /// </summary>
     /// <param name="angle">The angle to rotate by</param>
     /// <param name="clockwise">If true, rotates clockwise; otherwise counter-clockwise</param>
+    [Button]
     public void RotateByAngle(float angle, bool clockwise = true) {
       if (clockwise) {
         _playableElement.SnapTransform.RotateClockwise(angle);
