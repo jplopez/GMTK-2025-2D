@@ -20,7 +20,18 @@ Assets/UnityTechnologies
 *.suo
 *.user
 *.userosscache
+*.sln
 *.sln.docstates
+*.csproj
+*.csproj.user
+*.dwlt
+
+# Ameba and project specific exceptions
+!Ameba*.csproj
+!Ameba*.csproj.user
+!GMTK*.csproj
+!GMTK*.csproj.user
+!GMTK*.sln
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
