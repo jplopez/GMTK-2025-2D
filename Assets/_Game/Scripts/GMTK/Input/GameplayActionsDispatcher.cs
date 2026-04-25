@@ -6,22 +6,29 @@ using UnityEngine.InputSystem;
 namespace GMTK {
 
   /// <summary>
-  /// This class implements the <see cref="PlayerControls.IPlayerActions"/> interface to listen to InputAction events and resolves them as game events.
-  /// Also, this class tracks the Pointer position in both Screen and World coordinates.
-  /// 
-  /// TODO: extend so MonoBehaviours can subscribe to inputs done over specific GameObjects (ie: UI Buttons, in-game objects, etc)
+  /// <para>
+  /// This class implements the <see cref="PlayerControls.IGameplayActions"/> interface.
+  /// Its main role is handling InputActions defined in the "Gameplay" ActionMap, and propagate
+  /// them through the <see cref="GameEventChannel"/> system, and tracking the Pointer position
+  /// in both Screen and World coordinates.<br/>
+  /// It serves as an abstraction to Unity's Input System, translating player inputs to game events.
+  /// </para>
+  /// <para>
+  /// The events are raised with an <see cref="InputActionEventArgs"/> argument,
+  /// containing the original InputAction context and the current pointer position in both Screen and World coordinates.
+  /// </para>
   /// </summary>
-  public class PlayerControlsDispatcher : MonoBehaviour, PlayerControls.IGameplayActions {
+  public class GameplayActionsDispatcher : MonoBehaviour, PlayerControls.IGameplayActions {
 
     //Reference to the _eventChannel used to propagate InputAction events
     [Tooltip("Reference to the GameEventChannel used to propagate InputAction events")]
-    [SerializeField] protected GameEventChannel _eventChannel;
+    [SerializeField] protected GameEventChannel eventChannel;
 
     [Tooltip("Current Pointer position in Screen coordinates")]
-    [SerializeField] protected Vector2 _pointerScreenPosition;
+    [SerializeField] protected Vector2 pointerScreenPosition;
 
     [Tooltip("Current Pointer position in World coordinates")]
-    [SerializeField] protected Vector3 _pointerWorldPoition;
+    [SerializeField] protected Vector3 pointerWorldPosition;
 
     [Tooltip("Minimum movement threshold to consider the pointer position has changed")]
     [Range(0.01f, 1f)]
@@ -31,29 +38,29 @@ namespace GMTK {
     [Range(0.01f, 0.5f)]
     public float PointerEventFrequency = 0.02f;
 
-    private PlayerControls.GameplayActions gameplayActions;
-    private float _timeSinceLastPointerEvent = 0f;
+    private PlayerControls.GameplayActions _gameplayActions;
+    private float _timeSinceLastPointerEvent;
 
     private bool CanRaisePointerEvent => _timeSinceLastPointerEvent >= PointerEventFrequency;
 
     private void Awake() {
      
       //Getting the _eventChannel with 2 fallbacks
-      if (_eventChannel == null) {
-        _eventChannel = ServiceLocator.Get<GameEventChannel>();
+      if (eventChannel == null) {
+        eventChannel = ServiceLocator.Get<GameEventChannel>();
       }
-      if (_eventChannel == null) {
-        _eventChannel = Resources.Load<GameEventChannel>("GameEventChannel");
+      if (eventChannel == null) {
+        eventChannel = Resources.Load<GameEventChannel>("GameEventChannel");
       }
-      if (_eventChannel == null) {
+      if (eventChannel == null) {
         this.LogError($"GameEventChannel instance could not be found. The PlayerControlsDispatcher will not work");
         return;
       }
       try {
         PlayerControls controls = new();
-        gameplayActions = controls.Gameplay;
-        gameplayActions.Enable();
-        gameplayActions.AddCallbacks(this);
+        _gameplayActions = controls.Gameplay;
+        _gameplayActions.Enable();
+        _gameplayActions.AddCallbacks(this);
       }
       catch (Exception e) {
         this.LogError($"Enabling ActionMap threw an exception: {e.Message}");
@@ -71,7 +78,7 @@ namespace GMTK {
 
     public void OnDestroy() {
       try {
-        gameplayActions.Disable();
+        _gameplayActions.Disable();
       } catch (Exception e) {
         this.LogWarning($"Disabling ActionMap ended in exception: {e.Message}");
       }
@@ -90,7 +97,6 @@ namespace GMTK {
         if(CanRaisePointerEvent) {
           RaiseEvent(GameEventType.InputPointerPosition, context);
           _timeSinceLastPointerEvent = 0f;
-          this.LogDebug($"Input Pointer Position event raised.");
         }
       }
     }
@@ -98,19 +104,19 @@ namespace GMTK {
     /// <summary>
     /// This method updates both ScreenPos and WorldPos properties if the pointer has moved enough from the last recorded position.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="pointerPos"></param>
     private bool TryUpdatePointerPosition(Vector2 pointerPos) {
-      if (Vector2.Distance(pointerPos, _pointerScreenPosition) >= PointerMoveThreshold) {
-        _pointerScreenPosition = pointerPos;
+      if (Vector2.Distance(pointerPos, pointerScreenPosition) >= PointerMoveThreshold) {
+        pointerScreenPosition = pointerPos;
         if (Camera.main == null) {
-          _pointerWorldPoition = Vector3.zero;
+          pointerWorldPosition = Vector3.zero;
         }
         else {
-          //obtain world position from Camera, forzing z to zero to maintaing the 2d restrictions
-          var camWorldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPosition);
-          _pointerWorldPoition = new(camWorldPos.x, camWorldPos.y, 0f);
+          //obtain world position from Camera, forcing z to zero to maintaining the 2d restrictions
+          var camWorldPos = Camera.main.ScreenToWorldPoint(pointerScreenPosition);
+          pointerWorldPosition = new(camWorldPos.x, camWorldPos.y, 0f);
         }
-        this.LogDebug($"Pointer position updated. ScreenPos: {_pointerScreenPosition} | WorldPos: {_pointerWorldPoition}");
+        //this.LogDebug($"Pointer position updated. ScreenPos: {pointerScreenPosition} | WorldPos: {pointerWorldPosition}");
         return true;
       }
       return false;
@@ -141,7 +147,7 @@ namespace GMTK {
     public void OnRotateCW(InputAction.CallbackContext context) => RaiseEvent(GameEventType.InputRotateCW, context);
 
     /// <summary>
-    /// Input handler for the Rotate counter clockwise. Raises the <see cref="GameEventType.InputRotateCCW"/> event.
+    /// Input handler for the Rotate counterclockwise. Raises the <see cref="GameEventType.InputRotateCCW"/> event.
     /// </summary>
     /// <param name="context"></param>
     public void OnRotateCCW(InputAction.CallbackContext context) => RaiseEvent(GameEventType.InputRotateCCW, context);
@@ -160,12 +166,12 @@ namespace GMTK {
 
 
     private void RaiseEvent(GameEventType actionType, InputAction.CallbackContext context) {
-      this.LogDebug($"Raising Input Action Event: {actionType} | Phase: {context.phase} | ScreenPos: {_pointerScreenPosition} | WorldPos: {_pointerWorldPoition}");
-      _eventChannel.Raise(actionType, BuildEventArgs(actionType, context));
+      this.LogDebug($"Raising InputAction Event: {actionType} | InputAction: {context.action} | Phase: {context.phase} | Interaction: {context.interaction} | ScreenPos: {pointerScreenPosition} | WorldPos: {pointerWorldPosition}");
+      eventChannel.Raise(actionType, BuildEventArgs(actionType, context));
     }
 
     private InputActionEventArgs BuildEventArgs(GameEventType actionType, InputAction.CallbackContext context) {
-      return new InputActionEventArgs(actionType, context.phase, context, _pointerScreenPosition, _pointerWorldPoition);
+      return new InputActionEventArgs(actionType, context.phase, context, pointerScreenPosition, pointerWorldPosition);
     }
 
   }

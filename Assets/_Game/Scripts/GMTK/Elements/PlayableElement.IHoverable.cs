@@ -43,9 +43,11 @@ namespace GMTK {
       var eventArgs = RaiseGameEvent(gameEvent, peEvent);
       
       //if selection is trigger on hover, raise selected/unselected event as well
+      /*
       if (HasSelectionTrigger(SelectionTrigger.OnHover)) {
         MarkSelected(hovered);
       }
+      */
 
       //Call pointer component, if present, to handle the hovered event effects
       if (!TryDelegateToPointerComponent(eventArgs)) {

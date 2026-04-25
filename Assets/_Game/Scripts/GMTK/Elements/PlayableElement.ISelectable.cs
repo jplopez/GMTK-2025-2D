@@ -2,6 +2,7 @@ using UnityEngine;
 using Ameba;
 using MoreMountains.Feedbacks;
 using Sirenix.OdinInspector;
+using UnityEngine.Serialization;
 
 namespace GMTK {
 
@@ -11,30 +12,31 @@ namespace GMTK {
   /// </summary>
   public partial class PlayableElement : ISelectable {
 
+    
     [Header("Selection Settings")]
     [Tooltip("Whether this element is currently selected by a pointer")]
-    [SerializeField] protected bool _isSelected = false;
+    [SerializeField] protected bool isSelected = false;
     [Tooltip("If true, this element can be selected by a pointer")]
-    [SerializeField] protected bool _canSelect = true;
+    [SerializeField] protected bool canSelect = true;
 
-    [MMFCondition("_canSelect", true)]
+    /*[MMFCondition("canSelect", true)]
     [Tooltip("Selection trigger methods. Multiple options can be selected.")]
-    public SelectionTrigger SelectionTriggers = SelectionTrigger.OnClick;
-    [MMFCondition("_canSelect", true)]
+    public SelectionTrigger SelectionTriggers = SelectionTrigger.OnClick;*/
+    [MMFCondition("canSelect", true)]
     [Tooltip("Selection accuracy within element boundaries (0 = less strict, 1 = strictly within boundaries)")]
     [Range(0f, 1f)]
     public float Accuracy = 0.8f;
-    [MMFCondition("_canSelect", true)]
+    [MMFCondition("canSelect", true)]
     [Tooltip("Maximum offset from element boundaries considered valid when accuracy is 0")]
     [Range(0f, 5f)]
     public float MaxOffset = 2f;
 
     // ISelectable interface properties
-    public bool IsSelected { get => _isSelected; protected set => _isSelected = value; }
+    public bool IsSelected { get => isSelected; protected set => isSelected = value; }
 
-    public bool CanSelect => _canSelect;
+    public bool CanSelect => canSelect;
 
-    public bool HasAnySelectionTrigger => SelectionTriggers != SelectionTrigger.None;
+    //public bool HasAnySelectionTrigger => SelectionTriggers != SelectionTrigger.None;
 
     public Transform SelectTransform => SnapTransform != null ? SnapTransform : transform;
 
@@ -42,7 +44,7 @@ namespace GMTK {
 
     public void MarkSelected(bool selected = true) {
       
-      if (IsSelected == selected || !CanSelect || !HasAnySelectionTrigger) return; //avoid redundant state change
+      if (IsSelected == selected || !CanSelect ) return; //avoid redundant state change
       IsSelected = selected;
       this.LogDebug($"[Begin MarkSelected:{(selected ? "Selected" : "Deselected")}] '{name}'");
 
@@ -66,13 +68,8 @@ namespace GMTK {
 
     public void EnableSelectable(bool selectable = true) {
       if (CanSelect == selectable) return; //avoid redundant state change
-      // Note: We don't have a direct backing field for CanSelect since it's derived from SelectionTriggers
-      // default select is onclick
-      SelectionTriggers = selectable ? SelectionTrigger.OnClick : SelectionTrigger.None;
-      
-      if (!CanSelect && IsSelected) {
-        MarkSelected(false);
-      }
+      canSelect = selectable;
+      if (!CanSelect && IsSelected) MarkSelected(false);
     }
 
     [Button]

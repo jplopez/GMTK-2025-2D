@@ -1011,8 +1011,8 @@
                     "id": "cbbbb0fa-c46f-425b-b09d-ab80f2cadfa9",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
+                    "interactions": "Hold,Press",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Cancel",

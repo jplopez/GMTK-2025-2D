@@ -16,7 +16,6 @@ namespace GMTK {
 
     [Header("Dragging Settings")]
     [SerializeField] private bool _canDrag = true;
-    [SerializeField] private PlayableElement _draggedElement;
     private Vector3 _dragOffset;
 
     // IDragger<PlayableElement> implementation
@@ -24,12 +23,14 @@ namespace GMTK {
       get => _canDrag;
       set => _canDrag = value;
     }
-    public bool IsDragging => _draggedElement != null;
-    public PlayableElement DraggedElement => _draggedElement;
+    public bool IsDragging => IsMovingElement;
+    
+    public PlayableElement DraggedElement => (_activeElement && _activeElement.IsBeingDragged) ? _activeElement : null;
 
     #region IDragger<PlayableElement> Implementation
 
     public bool TryStartDrag(PlayableElement element) {
+      this.LogDebug($"[TryStartDrag] element={element?.name ?? "null"} CanDrag={CanDrag} IsDraggable={element?.IsDraggable}");
       if (!CanDrag || element == null) return false;
 
       // Check if element can be dragged
@@ -41,9 +42,8 @@ namespace GMTK {
       }
 
       // Start dragging the new element
-      _draggedElement = element;
-      _currentElement = element; // Update current element for compatibility
-      IsMoving = true;
+      _activeElement = element;
+      IsMovingElement = true;
 
       // Calculate drag offset (difference between pointer and element center)
       _dragOffset = element.GetPosition() - _pointerWorldPos;
@@ -51,7 +51,7 @@ namespace GMTK {
       // Notify the element
       element.DragStart();
 
-      this.LogDebug($"Started dragging element: {element.name}");
+      this.LogDebug($"[TryStartDrag] SUCCESS element={element.name} pointerWorld={_pointerWorldPos} offset={_dragOffset}");
       return true;
     }
 
@@ -89,33 +89,29 @@ namespace GMTK {
       Vector3 worldPos = camera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, camera.nearClipPlane));
       return TryStartDrag(worldPos, out element);
     }
-
+    
     public void UpdateDrag(Vector3 worldPosition) {
-      if (!IsDragging || _draggedElement == null) return;
+      if (!IsDragging || !DraggedElement) return;
 
       // Calculate target position with offset
       Vector3 targetPosition = worldPosition + _dragOffset;
 
       // Update the dragged element
-      _draggedElement.DraggingUpdate(targetPosition);
+      _activeElement.DraggingUpdate(targetPosition);
     }
 
     public bool TryStopDrag() {
-      if (!IsDragging) return false;
+      this.LogDebug($"[TryStopDrag] IsDragging={IsDragging} activeElement={_activeElement?.name ?? "null"}");
+      if (!IsDragging || _activeElement == null) return false;
 
-      var elementToStop = _draggedElement;
-      _draggedElement = null;
-      IsMoving = false;
-
-      // Clear current element if it was the dragged element
-      if (_currentElement == elementToStop) {
-        _currentElement = null;
-      }
+      var elementToStop = _activeElement;
+      _activeElement = null;
+      IsMovingElement = false;
 
       // Notify the element
       elementToStop.DragEnd();
 
-      this.LogDebug($"Stopped dragging element: {elementToStop.name}");
+      this.LogDebug($"[TryStopDrag] SUCCESS stopped dragging element={elementToStop.name}");
       return true;
     }
 

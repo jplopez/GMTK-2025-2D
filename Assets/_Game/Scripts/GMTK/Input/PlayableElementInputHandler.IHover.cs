@@ -74,7 +74,7 @@ namespace GMTK {
 
       // Start hovering over new element
       _hoveredElement = element;
-      _lastElementOver = element; // Update for compatibility
+      _currentHoveredElement = element; // Update for compatibility
       IsOverElement = true;
 
       // Notify the element
@@ -91,8 +91,8 @@ namespace GMTK {
       IsOverElement = false;
 
       // Clear last element over if it was the hovered element
-      if (_lastElementOver == elementToStop) {
-        _lastElementOver = null;
+      if (_currentHoveredElement == elementToStop) {
+        _currentHoveredElement = null;
       }
 
       // Notify the element

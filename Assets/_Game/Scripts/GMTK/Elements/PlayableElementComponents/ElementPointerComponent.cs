@@ -7,7 +7,7 @@ namespace GMTK {
 
   /// <summary>
   /// Component that enhances the PlayableElement with pointer-based selection functionality.<br/>
-  /// This component enables interactions when the element is selected, hovered or dragged (mouse, touch input or both) as well as playing feedbacks.<br/>
+  /// This component enables interactions when the element is selected, hovered or dragged (mouse, touch input or both) and playing feedbacks.<br/>
   /// </summary>
   [AddComponentMenu("GMTK/Playable Element Components/Element Pointer Component")]
   public class ElementPointerComponent : PlayableElementComponent {
@@ -65,38 +65,22 @@ namespace GMTK {
           StopCoroutine(_hoverCoroutine);
           _hoverCoroutine = null;
         }
+        
+        if (toggle) { //pointer over
+          //skip unhover feedback if we are selected, to avoid feedback overlap
+          if (_playableElement.IsSelected) return;
 
-        // check if hover triggers selection
-        if (HasSelectionTrigger(SelectionTrigger.OnHover) && _playableElement.CanSelect) {
-            this.LogDebug($"Element {_playableElement.name} selected by hover, delegating to " + (toggle ? "OnSelect" : "OnDeselected"));
-          //we check if toggle matches element.IsSelected, because
-          //that change occurs in the PlayableElement before raising the event
-          if (toggle && _playableElement.IsSelected) {
-            OnSelected(args);
-            return;
+          this.LogDebug($"Starting hover coroutine for {_playableElement.name}");
+          if (_hoverCoroutine != null) {
+            StopCoroutine(_hoverCoroutine);
           }
-          else if (!toggle && !_playableElement.IsSelected) {
-            OnDeselected(args);
-            return;
-          }
+          _hoverCoroutine = StartCoroutine(HoverSelectionCoroutine());
         }
-        // otherwise we just play unhover feedback
-        else {
-          if (toggle) { //pointer over
-            //skip unhover feedback if we are selected, to avoid feedback overlap
-            if (_playableElement.IsSelected) return;
-
-            this.LogDebug($"Starting hover coroutine for {_playableElement.name}");
-            if (_hoverCoroutine != null) {
-              StopCoroutine(_hoverCoroutine);
-            }
-            _hoverCoroutine = StartCoroutine(HoverSelectionCoroutine());
-          }
-          else { //pointer out
-            //skip unhover feedback if we are selected, to avoid feedback overlap
-            if (!_playableElement.IsSelected) PlayFeedback(OnUnhoverFeedback);
-          }
+        else { //pointer out
+          //skip unhover feedback if we are selected, to avoid feedback overlap
+          if (!_playableElement.IsSelected) PlayFeedback(OnUnhoverFeedback);
         }
+        
       }
     }
 
@@ -132,22 +116,12 @@ namespace GMTK {
       this.LogDebug($"Hover threshold reached for {_playableElement.name}");
       // if hovering after threshold we apply hover selection logic
       if (_playableElement.IsHovered) {
-
-        // select if still hovering and selection by hover is enabled
-        if (HasSelectionTrigger(SelectionTrigger.OnHover) && _playableElement.CanSelect && !_playableElement.IsSelected) {
-          this.LogDebug($"Element {_playableElement.name} selected via hovering");
-          ApplyFeedback(selectedChanged: true, hoverChanged: true);
-        }
-        // play hover feedback if not selecting
-        else {
-          this.LogDebug($"Element {_playableElement.name} hover feedback played");
-          ApplyFeedback(hoverChanged: true);
-        }
+        this.LogDebug($"Element {_playableElement.name} hover feedback played");
+        ApplyFeedback(hoverChanged: true);
       }
       // reset coroutine reference
       _hoverCoroutine = null;
     }
-    private bool HasSelectionTrigger(SelectionTrigger trigger) => (_playableElement.SelectionTriggers & trigger) != 0;
 
     /// <summary>
     /// Plays the correct feedback based on selection and hover state changes.

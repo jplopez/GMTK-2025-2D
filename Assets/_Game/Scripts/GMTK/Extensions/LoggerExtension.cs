@@ -20,7 +20,7 @@ namespace GMTK {
       { LoggerLevels.Debug, false }
     };
 
-    public static string DateFormat = "HH:mm:ss";
+    public static string DateFormat = "HH:mm:ss.fff";
 
     public static string GetTimestamp() {
       return DateTime.Now.ToString(DateFormat);

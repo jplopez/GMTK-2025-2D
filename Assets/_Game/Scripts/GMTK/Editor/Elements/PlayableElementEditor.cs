@@ -42,7 +42,7 @@ namespace GMTK {
     private SerializedProperty _canSelectProp;
     private SerializedProperty _flippableProp;
     //input properties for ElementPointerComponent
-    private SerializedProperty _selectionTriggerProp;
+    //private SerializedProperty _selectionTriggerProp;
     private SerializedProperty _accuracyProp;
     private SerializedProperty _maxOffsetProp;
     private SerializedProperty _hoverThresholdProp;
@@ -106,7 +106,7 @@ namespace GMTK {
       _canHoverProp = serializedObject.FindProperty("_canHover");
       _isHoveredProp = serializedObject.FindProperty("_isHovered");
       //selection properties
-      _selectionTriggerProp = serializedObject.FindProperty("SelectionTriggers");
+      //_selectionTriggerProp = serializedObject.FindProperty("SelectionTriggers");
       _accuracyProp = serializedObject.FindProperty("Accuracy");
       _maxOffsetProp = serializedObject.FindProperty("MaxOffset");
       //hovering properties
@@ -139,21 +139,21 @@ namespace GMTK {
       if (_draggingHelpIcon == null) {
         _draggingHelpIcon = new GUIContent(_helpIconContent.image,
           "ElementDraggingComponent provides drag behavior settings such as:\n" +
-          "• Drag threshold distance\n" +
-          "• Drag constraints (horizontal/vertical only)\n" +
-          "• Visual feedback during dragging\n" +
-          "• Snap-to-grid behavior\n" +
-          "• Event callbacks for drag start/end");
+          "ï¿½ Drag threshold distance\n" +
+          "ï¿½ Drag constraints (horizontal/vertical only)\n" +
+          "ï¿½ Visual feedback during dragging\n" +
+          "ï¿½ Snap-to-grid behavior\n" +
+          "ï¿½ Event callbacks for drag start/end");
       }
 
       if (_physicsHelpIcon == null) {
         _physicsHelpIcon = new GUIContent(_helpIconContent.image,
           "ElementPhysicsComponent provides physics-based rotation settings such as:\n" +
-          "• Custom rotation behavior overrides\n" +
-          "• Physics-based rotation constraints\n" +
-          "• Rotation damping and limits\n" +
-          "• Integration with Unity's physics system\n" +
-          "• Advanced rotation event handling");
+          "ï¿½ Custom rotation behavior overrides\n" +
+          "ï¿½ Physics-based rotation constraints\n" +
+          "ï¿½ Rotation damping and limits\n" +
+          "ï¿½ Integration with Unity's physics system\n" +
+          "ï¿½ Advanced rotation event handling");
       }
     }
 
@@ -215,7 +215,7 @@ namespace GMTK {
       EditorGUILayout.Space();
       using (new EditorGUI.IndentLevelScope()) {
         EditorGUILayout.PropertyField(_canSelectProp);
-        EditorGUILayout.PropertyField(_selectionTriggerProp);
+//        EditorGUILayout.PropertyField(_selectionTriggerProp);
         EditorGUILayout.PropertyField(_accuracyProp);
         EditorGUILayout.PropertyField(_maxOffsetProp);
         EditorGUILayout.Space();
@@ -418,7 +418,7 @@ namespace GMTK {
             Transform snapTransform = _element.SnapTransform != null ? _element.SnapTransform : _element.transform;
             float currentRotation = snapTransform.rotation.eulerAngles.z;
             if (Mathf.Abs(currentRotation) > 0.1f) {
-              EditorGUILayout.HelpBox($"Element rotated: {currentRotation:F1}°", MessageType.Info);
+              EditorGUILayout.HelpBox($"Element rotated: {currentRotation:F1}ï¿½", MessageType.Info);
             }
 
             // Force scene view refresh when gizmo settings change

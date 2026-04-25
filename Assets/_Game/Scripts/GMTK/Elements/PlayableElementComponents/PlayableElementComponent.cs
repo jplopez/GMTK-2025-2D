@@ -298,10 +298,12 @@ namespace GMTK {
     #endregion
 
     #region UTILS
+
     /// <summary>
     /// null safe method to play a MMF_Player feedback
     /// </summary>
     /// <param name="feedback"></param>
+    /// <param name="playInReverse"></param>
     protected virtual void PlayFeedback(MMF_Player feedback, bool playInReverse = false) {
       if (feedback != null && feedback.gameObject.activeInHierarchy) {
         if (playInReverse) {
@@ -334,10 +336,10 @@ namespace GMTK {
     #endregion
   }
 
-  [Serializable]
   /// <summary>
   /// Common settings for all PlayableElement components. Encapsulated in this class for UnityEditor to show it as a foldable section
   /// </summary>
+  [Serializable]
   public class CommonComponentSettings {
     [Tooltip("Main switch to turn on/off a Component. Useful for debugging")]
     public bool IsActive = true;

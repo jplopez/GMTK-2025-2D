@@ -1,20 +1,26 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions;
 using Ameba;
+using Meryel.Serilog;
 using static GMTK.GameEventType;
 
 namespace GMTK {
 
+  [Flags]
+  public enum SelectionTrigger {
+    None = 0, OnClick = 1, OnKeyPress = 2
+  }
+  
   /// <summary>
-  /// MonoBehaviour to handle player input for PlayableElement objects, enabling selection, dragging, rotation, and flipping.
-  /// Implements events through several partial classes:
+  /// This class listens to game events related to <see cref="PlayableElement"/> for hovering, selecting, dragging, rotation, and flipping.
+  /// It maintains the state of the currently active element (selected or hovered) and updates it based on the input events received.
   /// 
   /// <para><b>Events:</b></para>
   /// <list type="bullet">
   ///   <item><b>InputPointerPosition</b>:when the pointer moves. Relevant for Hover and Dragging</item>
-  ///   <item><b>InputSelected</b>: The pointer's primary action acts on an element (left-click or touch). Relevant for Select and UI controls</item>
-  ///   <item><b>InputSecondary</b>:The pointer's secondary action acts on an element (right-click or two-point-touch). Relevant for Unselect</item>
+  ///   <item><b>InputSelected</b>: The pointer's primary action (left-click or space bar). Depending on the interaction type (press or hold), the element is selected or dragged </item>
   ///   <item><b>InputRotateCW</b>: The rotate clockwise button is pressed</item>
   ///   <item><b>InputRotateCCW</b>:The rotate counterclockwise button is pressed</item>
   ///   <item><b>InputFlippedX</b>: The flip in X axis button is pressed</item>
@@ -24,81 +30,32 @@ namespace GMTK {
   /// <para>This class has room to support double-click or double-taps in the future. Currently not used in the game</para>
   /// <para>This class is split in 4 partial class files: PlayableElementInputHandler, PlayableElementInputHandler.IDragger, PlayableElementInputHandler.IHover, PlayableElementInputHandler.ISelector. The last 3 contain the implementation of interfaces IDragger, IHover and ISelector respectively</para>
   /// </summary>
-  public partial class PlayableElementInputHandler : MonoBehaviour, ISelector<PlayableElement>, IDragger<PlayableElement>, IHover<PlayableElement> {
+  public partial class PlayableElementInputHandler : MonoBehaviour{
 
-    [Header("Input Handler Settings")]
     [SerializeField] private bool _enableInput = true;
-    [SerializeField] private bool _debugLogging = false;
-    [SerializeField] private PlayableElement _currentElement;
-    [SerializeField] private PlayableElement _lastElementOver;
+    [SerializeField] private bool _debugLogging;
+    [SerializeField] private PlayableElement _activeElement;
+    [SerializeField] private PlayableElement _currentHoveredElement;
 
     // New properties for PlayableElement
-    public PlayableElement CurrentElement => _currentElement;
-    public PlayableElement LastElementOver => _lastElementOver;
+    public PlayableElement ActiveElement => _activeElement;
+    public PlayableElement CurrentHoveredElement => _currentHoveredElement;
 
-    public bool IsMoving { get; private set; } = false;
-    public bool IsOverElement { get; private set; } = false;
+    public bool IsMovingElement { get; private set; }
+    public bool IsOverElement { get; private set; }
+    public bool IsSelectPressed { get; private set; }
+    public bool IsSelectHold { get; private set; }
 
     [SerializeField] private Vector2 _pointerScreenPos;
     [SerializeField] private Vector3 _pointerWorldPos;
 
     private GameEventChannel _eventsChannel;
 
-    #region Button Properties
-
-    // Input phase tracking for proper event handling
-    private bool _primaryPressed = false;
-    private bool _primaryReleased = false;
-    private bool _secondaryPressed = false;
-    private bool _secondaryReleased = false;
+    #region Pointer/Button Properties
 
     public Vector2 PointerScreenPosition => _pointerScreenPos;
 
     public Vector3 PointerWorldPosition => _pointerWorldPos;
-
-    public bool PrimaryButtonDown {
-      get {
-        bool result = _primaryPressed;
-        _primaryPressed = false; // Reset after reading
-        return result;
-      }
-    }
-
-    public bool PrimaryButtonUp {
-      get {
-        bool result = _primaryReleased;
-        _primaryReleased = false; // Reset after reading
-        return result;
-      }
-    }
-
-    public bool PrimaryButtonHeld {
-      get {
-        return IsMoving; // Use our existing tracking
-      }
-    }
-
-    public bool SecondaryButtonDown {
-      get {
-        bool result = _secondaryPressed;
-        _secondaryPressed = false; // Reset after reading
-        return result;
-      }
-    }
-
-    public bool SecondaryButtonUp {
-      get {
-        bool result = _secondaryReleased;
-        _secondaryReleased = false; // Reset after reading
-        return result;
-      }
-    }
-
-    public bool SecondaryButtonHeld => IsMoving; // Use our existing tracking
-
-    public bool PrimaryDoubleClick => false; // Not implemented in the current system
-
-    public bool SecondaryDoubleClick => false; // Not implemented in the current system
 
     #endregion
 
@@ -115,7 +72,7 @@ namespace GMTK {
       if (_eventsChannel == null) return;
       _eventsChannel.AddListener<InputActionEventArgs>(InputPointerPosition, UpdatePointerPosition);
       _eventsChannel.AddListener<InputActionEventArgs>(InputSelected, HandleSelect);
-      _eventsChannel.AddListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
+      //_eventsChannel.AddListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
       _eventsChannel.AddListener<InputActionEventArgs>(InputRotateCW, RotateCW);
       _eventsChannel.AddListener<InputActionEventArgs>(InputRotateCCW, RotateCCW);
       _eventsChannel.AddListener<InputActionEventArgs>(InputFlippedX, FlipX);
@@ -126,7 +83,7 @@ namespace GMTK {
     {
       if (_eventsChannel == null) return;
       _eventsChannel.RemoveListener<InputActionEventArgs>(InputSelected, HandleSelect);
-      _eventsChannel.RemoveListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
+      //_eventsChannel.RemoveListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
       _eventsChannel.RemoveListener<InputActionEventArgs>(InputRotateCW, RotateCW);
       _eventsChannel.RemoveListener<InputActionEventArgs>(InputRotateCCW, RotateCCW);
       _eventsChannel.RemoveListener<InputActionEventArgs>(InputFlippedX, FlipX);
@@ -138,47 +95,13 @@ namespace GMTK {
     #region Core Update Logic
 
     public void Update() {
-      if (!_enableInput) return;
-      UpdateInput();
-    }
-
-    public virtual void UpdateInput() {
+      if(!_enableInput) return;
+      
       // Update hover detection
       UpdateHover();
 
       // Handle element position updates during dragging
-      if (IsDragging && DraggedElement != null) {
-        UpdateDrag(_pointerWorldPos);
-      }
-
-      // Handle primary button press
-      if (PrimaryButtonDown) {
-        HandlePrimaryPress();
-      }
-
-      // Handle primary button release
-      if (PrimaryButtonUp) {
-        HandlePrimaryRelease();
-      }
-
-      // Handle secondary button press
-      if (SecondaryButtonDown) {
-        HandleSecondaryPress();
-      }
-
-      // Handle secondary button release
-      if (SecondaryButtonUp) {
-        HandleSecondaryRelease();
-      }
-
-      // Handle double clicks (if implemented in the future)
-      if (PrimaryDoubleClick) {
-        HandlePrimaryDoubleClick();
-      }
-
-      if (SecondaryDoubleClick) {
-        HandleSecondaryDoubleClick();
-      }
+      UpdateDrag(_pointerWorldPos);
     }
 
     // The element dragging is disabled during Playing, to prevent players
@@ -203,68 +126,38 @@ namespace GMTK {
 
     #endregion
 
-    #region Button Press/Release
-
-    protected virtual void HandlePrimaryPress() {
-
-      if (TryGetObjectAtPointer<PlayableElement>(out var element)) {
-        //if is draggable, try starting drag
-        if (element.IsDraggable && TryStartDrag(element)) {
-          SetActiveElement(element);
-        }
-        else {
-          // Clicked on empty space - clear active object
-          SetActiveElement(null);
-        }
-      }
-    }
-
-    protected virtual void HandlePrimaryRelease() {
-      if (IsDragging && DraggedElement != null) {
-        if (TryStopDrag()) {
-          //SetActiveElement(DraggedElement);
-        }
-      }
-    }
-
-    protected virtual void HandleSecondaryPress() { }
-
-    protected virtual void HandleSecondaryRelease() { }
-
-    protected virtual void HandlePrimaryDoubleClick() { }
-
-    protected virtual void HandleSecondaryDoubleClick() { }
-
+    #region Active Element Management
+    
     /// <summary>
     /// Sets the specified <see cref="PlayableElement"/> as the active element, deactivating the previously active
     /// element if necessary.
     /// </summary>
     /// <remarks>This method ensures that only one <see cref="PlayableElement"/> is active at a time. If the
     /// specified element is already active, no changes are made. When an element is activated, its <see
-    /// cref="PlayableElement.OnSelected"/> method is invoked. Similarly, when an element is deactivated, its <see
-    /// cref="PlayableElement.OnElementDeselected"/> method is invoked.</remarks>
+    /// cref="PlayableElement.OnSelect"/> method is invoked. Similarly, when an element is deactivated, its <see
+    /// cref="PlayableElement.OnDeselect"/> method is invoked.</remarks>
     /// <param name="element">The <see cref="PlayableElement"/> to activate. If <c>null</c>, the currently active element will be deactivated.</param>
     protected virtual void SetActiveElement(PlayableElement element) {
-      if (element != null) {
+      if (element != null && element != _activeElement) {
         // Deactivate previous
-        if (_currentElement != null && _currentElement != element) {
-          _currentElement.IsActive = false;
-          _currentElement.OnDeselect();
+        if (_activeElement != null && _activeElement != element) {
+          _activeElement.IsActive = false;
+          _activeElement.OnDeselect();
         }
 
         // Activate new
-        _currentElement = element;
-        if (_currentElement != null) {
-          _currentElement.IsActive = true;
-          _currentElement.OnSelect();
+        _activeElement = element;
+        if (_activeElement != null) {
+          _activeElement.IsActive = true;
+          _activeElement.OnSelect();
         }
       }
       else {
         // Deactivate current
-        if (_currentElement != null) {
-          _currentElement.IsActive = false;
-          _currentElement.OnDeselect();
-          _currentElement = null;
+        if (_activeElement != null) {
+          _activeElement.IsActive = false;
+          _activeElement.OnDeselect();
+          _activeElement = null;
         }
       }
       DebugLog($"Active object changed to " + (element != null ? element.name : "null"));
@@ -272,16 +165,16 @@ namespace GMTK {
 
     /// <summary>
     /// Obtains the object of type T located at the current pointer position.<br/>
-    /// This methods uses a raycast to detect objects under the pointer and attempts to retrieve the component of type T from the hit collider or its parent.<br/>
+    /// This method uses a raycast to detect objects under the pointer and attempts to retrieve the component of type T from the hit collider or its parent.<br/>
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T"> </typeparam>
     /// <returns></returns>
     protected virtual T GetObjectAtPointer<T>() where T : IDraggable, IHoverable, ISelectable
-          => TryGetObjectAtPointer<T>(out T obj) ? obj : default(T);
+          => TryGetObjectAtPointer(out T obj) ? obj : default(T);
 
     /// <summary>
     /// Tries to obtain the object of type T located at the current pointer position.<br/>
-    /// This methods uses a raycast to detect objects under the pointer and attempts to retrieve the component of type T from the hit collider or its parent.<br/>
+    /// This method uses a raycast to detect objects under the pointer and attempts to retrieve the component of type T from the hit collider or its parent.<br/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="obj"></param>
@@ -293,11 +186,11 @@ namespace GMTK {
 
       if (hit.collider != null) {
         //attempt to get obj from collider
-        if (hit.collider.TryGetComponent<T>(out obj)) {
+        if (hit.collider.TryGetComponent(out obj)) {
           return true;
         }
         //attempt to get it from parent
-        else if (hit.collider.transform.parent.TryGetComponent<T>(out obj)) {
+        else if (hit.collider.transform.parent.TryGetComponent(out obj)) {
           return true;
         }
       }
@@ -305,13 +198,13 @@ namespace GMTK {
       return false;
     }
 
-    protected Vector2 ToScreenPosition(Vector3 worldPos) {
-      Camera camera = Camera.main;
-      if (camera == null) {
+    private Vector2 ToScreenPosition(Vector3 worldPos) {
+      Camera mainCamera = Camera.main;
+      if (mainCamera == null) {
         this.LogWarning("[PlayableElementInputHandler] No main camera found for world to screen conversion");
         return Vector2.zero;
       }
-      Vector3 screenPos = camera.WorldToScreenPoint(worldPos);
+      Vector3 screenPos = mainCamera.WorldToScreenPoint(worldPos);
       return new(screenPos.x, screenPos.y);
     }
 
@@ -319,50 +212,104 @@ namespace GMTK {
 
     #region Input Event Listeners
 
-    public void UpdatePointerPosition(InputActionEventArgs inputArgs) {
+    private void UpdatePointerPosition(InputActionEventArgs inputArgs) {
       _pointerScreenPos = inputArgs.ScreenPos;
       _pointerWorldPos = inputArgs.WorldPos;
     }
 
-    public void HandleSelect(InputActionEventArgs inputArgs) {
+    private void HandleSelect(InputActionEventArgs inputArgs) {
       var phase = inputArgs.Phase;
-      switch (phase) {
-        case InputActionPhase.Performed:
-          _primaryPressed = true;
+      var interaction = inputArgs.Context.interaction;
+      
+      // Handle Started phase for both Press and Hold interactions
+      // determine what is pointer is over and select it
+      if (phase is InputActionPhase.Started)
+      {
+        HandleSelectStartedPhase();
+      }
 
-          // Try to select element at current pointer position
-          if (TryGetElementOnCurrentPointer(out PlayableElement element)) {
-            TrySelect(element);
+      // HoldInteraction is triggered when the button is held down for a certain duration (default 0.5s)
+      if (interaction is HoldInteraction) 
+      {
+        // Select button held down for hold threshold duration, trigger dragging
+        if (phase is InputActionPhase.Performed)
+        {
+          if (!IsDragging)
+          {
+            // If there is an active element that is draggable, start dragging it
+            if (ActiveElement && ActiveElement.IsDraggable)
+            {
+              IsSelectHold = TryStartDrag(ActiveElement);
+            }
           }
-          else {
-            // If clicking on empty space, deselect current element
-            TryDeselect();
-          }
+        }
 
-          //_eventsChannel.Raise(GameEventType.InputSelected);
-          break;
-        case InputActionPhase.Canceled:
-          _primaryReleased = true;
-          break;
+        // Hold button released before hold threshold met (canceled)
+        if (phase is InputActionPhase.Canceled)
+        {
+          if (IsDragging)
+          {
+            TryStopDrag();
+            IsSelectPressed = false;
+            IsSelectHold = false;
+          }
+        }
+      } // end of HoldInteraction handling
+      
+      
+      // Handle PressInteraction for selection/deselection
+      if (interaction is PressInteraction) // PressInteraction is triggered on button press and release
+      {
+        
+        // Press performed: button pressed and released before hold threshold
+        if (phase is InputActionPhase.Performed)
+        {
+          if (IsDragging)
+          {
+            TryStopDrag();
+            IsSelectHold = false;
+          }
+          else
+          {
+            HandleSelectStartedPhase();
+          }
+        }
+ 
+        // Press canceled (button released without triggering a hold)
+        if (phase is InputActionPhase.Canceled)
+        {
+          IsSelectPressed = !TryDeselect();
+        }
+      } // end of PressInteraction handling
+      
+    }
+
+    private void HandleSelectStartedPhase()
+    {
+      IsSelectPressed = true;
+      PlayableElement oldSelected = null;
+      // If there is no currently hovered element, try to update hover state to find one under the pointer.
+      if (!CurrentHoveredElement) UpdateHover();
+
+      // Deselect current selected if any
+      if (SelectedElement)
+      {
+        oldSelected = SelectedElement;
+        if (TryDeselect()) // The no-arg Deselect, deselects the currently selected element
+        {
+          SetActiveElement(null);
+        }
+      }
+
+      // Try selecting the currently hovered element.
+      // hovered element must be selectable and different from the previously selected.
+      if (CurrentHoveredElement && CurrentHoveredElement.CanSelect && !CurrentHoveredElement.Equals(oldSelected))
+      {
+        TrySelect(CurrentHoveredElement);
       }
     }
 
-    public void HandleSecondary(InputActionEventArgs inputArgs) {
-      var phase = inputArgs.Phase;
-      switch (phase) {
-        case InputActionPhase.Performed:
-          _secondaryPressed = true;
-
-          // Secondary click for deselection
-          TryDeselect();
-          break;
-        case InputActionPhase.Canceled:
-          _secondaryReleased = true;
-          break;
-      }
-    }
-
-    public void RotateCW(InputActionEventArgs inputArgs) {
+    private void RotateCW(InputActionEventArgs inputArgs) {
       if (inputArgs.Phase == InputActionPhase.Performed) {
         //_eventsChannel.Raise(GameEventType.InputRotateCW);
 
@@ -377,7 +324,7 @@ namespace GMTK {
 
     }
 
-    public void RotateCCW(InputActionEventArgs inputArgs) {
+    private void RotateCCW(InputActionEventArgs inputArgs) {
       if (inputArgs.Phase == InputActionPhase.Performed) {
         //_eventsChannel.Raise(GameEventType.InputRotateCCW);
 
@@ -390,7 +337,8 @@ namespace GMTK {
         }
       }
     }
-    public void FlipX(InputActionEventArgs inputArgs) {
+    
+    private void FlipX(InputActionEventArgs inputArgs) {
       if (inputArgs.Phase == InputActionPhase.Performed) {
         //_eventsChannel.Raise(GameEventType.InputFlippedX);
 
@@ -404,7 +352,7 @@ namespace GMTK {
       }
     }
 
-    public void FlipY(InputActionEventArgs inputArgs) {
+    private void FlipY(InputActionEventArgs inputArgs) {
       if (inputArgs.Phase == InputActionPhase.Performed) {
         //_eventsChannel.Raise(GameEventType.InputFlippedY);
 
@@ -417,34 +365,20 @@ namespace GMTK {
         }
       }
     }
+    
     private void TryExecuteOnCurrentElement(Action<PlayableElement> action) {
-      if (_currentElement != null) action.Invoke(_currentElement);
-    }
-    private bool TryGetElementOnCurrentPointer(out PlayableElement element) {
-      // Raycast to detect the element under the cursor
-      Vector2 worldPos = Camera.main.ScreenToWorldPoint(_pointerScreenPos);
-      RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
-
-      // Check if we hit something
-      if (hit && hit.collider != null && hit.collider.gameObject is var selected) {
-        // Check if it's a PlayableElement
-        if (selected.TryGetComponent(out element)) {
-          return true;
-        }
-      }
-      element = null;
-      return false;
+      if (_activeElement != null) action.Invoke(_activeElement);
     }
 
     #endregion
 
 
-    private void DebugLog(string message) { if (_debugLogging) this.Log($"{_currentElement.name} - {message}"); }
+    private void DebugLog(string message) { if (_debugLogging) this.Log($"{_activeElement.name} - {message}"); }
 
 
 #if UNITY_EDITOR
     public void TriggerHoveredEvent() => TriggerEvent(InputPointerPosition, InputActionPhase.Performed, 
-      ToScreenPosition(_currentElement.transform.position), _currentElement.transform.position);
+      ToScreenPosition(_activeElement.transform.position), _activeElement.transform.position);
 
     public void TriggerUnhoveredEvent() => TriggerEvent(InputPointerPosition, InputActionPhase.Performed);
 

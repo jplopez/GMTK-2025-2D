@@ -11,15 +11,19 @@ namespace GMTK {
 
     [Header("Selection Settings")]
     [SerializeField] private bool _canSelect = true;
-    [SerializeField] private PlayableElement _selectedElement;
-
+    [SerializeField]
+    private SelectionTrigger _selectionTriggers = SelectionTrigger.OnClick | SelectionTrigger.OnKeyPress;
+    
+    public bool HasSelectionTrigger(SelectionTrigger trigger) => (_selectionTriggers & trigger) != 0;
+    
     // ISelector<PlayableElement> implementation
     public bool CanSelect {
       get => _canSelect;
       set => _canSelect = value;
     }
-    public bool IsSelecting => _selectedElement != null;
-    public PlayableElement SelectedElement => _selectedElement;
+    public bool IsSelecting => _activeElement != null;
+    
+    public PlayableElement SelectedElement => (_activeElement && _activeElement.IsSelected)? _activeElement : null;
 
     #region ISelector<PlayableElement> Implementation
 
@@ -61,36 +65,41 @@ namespace GMTK {
       return TrySelect(worldPos, out element);
     }
 
+    // ReSharper disable Unity.PerformanceAnalysis
     public bool TrySelect(PlayableElement element) {
-      if (!CanSelect || element == null || !element.CanSelect) return false;
-      this.LogDebug($"Attempting to select element: {element.name} CanSelect: {element.CanSelect}");
-      this.LogDebug($"IsSelecting: {IsSelecting} CanSelect {CanSelect}");
-      this.LogDebug("_selectedElement: " + ((_selectedElement == null) ? "null" : _selectedElement.name));
 
-      // deselect current if different than new
-      if (_selectedElement != null && _selectedElement != element) {
-        this.LogDebug($"Deselecting current element");
-        DeselectCurrentElement();
+      var selectedElementName = _activeElement != null ? _activeElement.name : "null";
+      this.LogDebug($"[TrySelect] element: '{element.name}' selectable? {element.CanSelect} " +
+                    $"_activeElement: {selectedElementName}");
+      
+      if (!CanSelect || element == null || !element.CanSelect) return false;
+
+      // deselect current if different from new
+      if (_activeElement != null && _activeElement != element) {
+        DeselectActiveElement();
       }
 
-      this.LogDebug($"Marking element: {element.name}");
       element.MarkSelected(true);
-      _selectedElement = element;
+      _activeElement = element;
 
-      this.LogDebug($"Selected element: {element.name}");
+      this.LogDebug($"[TrySelect] Selected element: '{element.name}'");
       return true;
     }
 
+    /// <summary>
+    /// Attempts to deselect <see cref="SelectedElement"/>. 
+    /// </summary>
+    /// <returns> <see langword="true"/> if an element was deselected, <see langword="false"/> if there was no active selection to deselect</returns>
     public bool TryDeselect() {
-      if (_selectedElement == null) return false;
-      DeselectCurrentElement();
+      if (_activeElement == null) return false;
+      DeselectActiveElement();
       return true;
     }
 
-    private void DeselectCurrentElement() {
-      if (_selectedElement != null) {
-        var elementToDeselect = _selectedElement;
-        _selectedElement = null;
+    private void DeselectActiveElement() {
+      if (_activeElement != null) {
+        var elementToDeselect = _activeElement;
+        _activeElement = null;
         elementToDeselect.MarkSelected(false);
 
         this.LogDebug($"Deselected element: {elementToDeselect.name}");

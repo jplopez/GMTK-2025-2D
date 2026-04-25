@@ -158,8 +158,8 @@ namespace GMTK {
 
     private void CheckForTrackingStart() {
       // Check if input handler has an element moving
-      if (_inputHandler.CurrentElement != null && _inputHandler.IsMoving) {
-        var currentElement = _inputHandler.CurrentElement;
+      if (_inputHandler.ActiveElement != null && _inputHandler.IsMovingElement) {
+        var currentElement = _inputHandler.ActiveElement;
 
         // If this is a new element being tracked or different from current
         if (_trackedElement == null || _trackedElement != currentElement) {
@@ -171,7 +171,7 @@ namespace GMTK {
 
     private void UpdateElementTracking() {
       // Verify we're still tracking
-      if (_inputHandler.CurrentElement == null || !_inputHandler.IsMoving) {
+      if (_inputHandler.ActiveElement == null || !_inputHandler.IsMovingElement) {
         // No longer tracking - return to idle
         ChangeState(LevelGridState.Idle);
         return;
