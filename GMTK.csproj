@@ -79,7 +79,6 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\PlayableElementComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElement.IDraggable.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\CollisionIntensityCalculator.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayerControlsDispatcher.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Marble\PlayableMarbleController.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Enums\FrictionLevel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Marble\CollisionIntensityContext.cs" />
@@ -108,6 +107,7 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Input\PlayableElementInputHandler.IHover.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementDraggingComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Physics\Intensity\IIntensityCalculator.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Input\GameplayActionsDispatcher.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\Configurations\RaiseGameEventConfig.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementGravityComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementPointerComponent.cs" />
