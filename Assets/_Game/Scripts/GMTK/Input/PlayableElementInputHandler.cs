@@ -211,8 +211,9 @@ namespace GMTK {
       return false;
     }
 
-    private Vector2 ToScreenPosition(Vector3 worldPos) {
-      Camera mainCamera = Camera.main;
+    private Vector2 ToScreenPosition(Vector3 worldPos)
+    {
+      Camera mainCamera = GetActiveCamera();
       if (mainCamera == null) {
         this.LogWarning("[PlayableElementInputHandler] No main camera found for world to screen conversion");
         return Vector2.zero;
@@ -380,65 +381,57 @@ namespace GMTK {
       }
     }
 
-    private void RotateCW(InputActionEventArgs inputArgs) {
-      if (inputArgs.Phase == InputActionPhase.Performed) {
-        //_eventsChannel.Raise(GameEventType.InputRotateCW);
+    /// <summary>
+    /// Handles the input event of pressing the rotate clockwise button.
+    /// If there is no selected element, or the element cannot perform the action, this method does nothing
+    /// </summary>
+    /// <param name="inputArgs"></param>
+    private void RotateCW(InputActionEventArgs inputArgs) =>
+      ExecuteOnSelectedElement((e) => {
+        e.RotateClockwise();
+      }, inputArgs);
 
-        // Rotate the selected element if any, otherwise rotate current element
-        if (SelectedElement != null) {
-          SelectedElement.RotateClockwise();
-        }
-        else {
-          TryExecuteOnCurrentElement(e => e.RotateClockwise());
-        }
-      }
-
-    }
-
-    private void RotateCCW(InputActionEventArgs inputArgs) {
-      if (inputArgs.Phase == InputActionPhase.Performed) {
-        //_eventsChannel.Raise(GameEventType.InputRotateCCW);
-
-        // Rotate the selected element if any, otherwise rotate current element
-        if (SelectedElement != null) {
-          SelectedElement.RotateCounterClockwise();
-        }
-        else {
-          TryExecuteOnCurrentElement(e => e.RotateCounterClockwise());
-        }
-      }
-    }
+    /// <summary>
+    /// Handles the input event of pressing the rotate counterclockwise button.
+    /// If there is no selected element, or the element cannot perform the action, this method does nothing
+    /// </summary>
+    /// <param name="inputArgs"></param>
+    private void RotateCCW(InputActionEventArgs inputArgs) =>
+      ExecuteOnSelectedElement((e) => {
+        e.RotateCounterClockwise();
+      }, inputArgs);
     
-    private void FlipX(InputActionEventArgs inputArgs) {
-      if (inputArgs.Phase == InputActionPhase.Performed) {
-        //_eventsChannel.Raise(GameEventType.InputFlippedX);
+    /// <summary>
+    /// Handles the input event of pressing the flip horizontally button.
+    /// If there is no selected element, or the element cannot perform the action, this method does nothing
+    /// </summary>
+    /// <param name="inputArgs"></param>
+    private void FlipX(InputActionEventArgs inputArgs)  =>
+      ExecuteOnSelectedElement((e) => {
+        e.FlipX();
+      }, inputArgs);
 
-        // Flip the selected element if any, otherwise flip current element
-        if (SelectedElement != null) {
-          SelectedElement.FlipX();
-        }
-        else {
-          TryExecuteOnCurrentElement(e => e.FlipX());
-        }
-      }
-    }
+    /// <summary>
+    /// Handles the input event of pressing the flip vertically button.
+    /// If there is no selected element, or the element cannot perform the action, this method does nothing
+    /// </summary>
+    /// <param name="inputArgs"></param>
+    private void FlipY(InputActionEventArgs inputArgs) =>
+      ExecuteOnSelectedElement((e) => {
+        e.FlipY();
+      }, inputArgs);
 
-    private void FlipY(InputActionEventArgs inputArgs) {
-      if (inputArgs.Phase == InputActionPhase.Performed) {
-        //_eventsChannel.Raise(GameEventType.InputFlippedY);
-
-        // Flip the selected element if any, otherwise flip current element
-        if (SelectedElement != null) {
-          SelectedElement.FlipY();
-        }
-        else {
-          TryExecuteOnCurrentElement(e => e.FlipY());
-        }
-      }
-    }
     
-    private void TryExecuteOnCurrentElement(Action<PlayableElement> action) {
-      if (_activeElement != null) action.Invoke(_activeElement);
+    /// <summary>
+    /// Helper method to execute methods on PlayableElement based on input events, if the element is selected and the input phase matches the expected phase.
+    /// </summary>
+    /// <param name="action">Delegate with the action over the element</param>
+    /// <param name="inputArgs">The arguments received from the input event</param>
+    /// <param name="phase">The expected phase for the input. If not specified, assumes <c>InputActionPhase.Performed</c> </param>
+    private void ExecuteOnSelectedElement(Action<PlayableElement> action, InputActionEventArgs inputArgs, InputActionPhase phase = InputActionPhase.Performed)
+    {
+      if (!SelectedElement) return;
+      if (inputArgs.Phase == phase) action.Invoke(SelectedElement);
     }
 
     #endregion
