@@ -36,8 +36,11 @@ namespace GMTK {
     [SerializeField] private bool _debugLogging;
     [SerializeField] private PlayableElement _activeElement;
     [SerializeField] private PlayableElement _currentHoveredElement;
-
-    // New properties for PlayableElement
+   
+    /// <summary>
+    /// Active PlayableElement, which is the element currently selected or being dragged.
+    /// This is the main reference for the element that input events will act upon. It can be null if no element is currently active.
+    /// </summary>
     public PlayableElement ActiveElement => _activeElement;
     public PlayableElement CurrentHoveredElement => _currentHoveredElement;
 
@@ -45,6 +48,9 @@ namespace GMTK {
     public bool IsOverElement { get; private set; }
     public bool IsSelectPressed { get; private set; }
     public bool IsSelectHold { get; private set; }
+
+    public bool IsMovePressed { get; private set; }
+    private Vector2 _currentMoveDirection;
 
     [SerializeField] private Vector2 _pointerScreenPos;
     [SerializeField] private Vector3 _pointerWorldPos;
@@ -56,6 +62,8 @@ namespace GMTK {
     public Vector2 PointerScreenPosition => _pointerScreenPos;
 
     public Vector3 PointerWorldPosition => _pointerWorldPos;
+
+    public float MoveSpeed = 10f;
 
     #endregion
 
@@ -71,8 +79,8 @@ namespace GMTK {
     {
       if (_eventsChannel == null) return;
       _eventsChannel.AddListener<InputActionEventArgs>(InputPointerPosition, UpdatePointerPosition);
+      _eventsChannel.AddListener<InputActionEventArgs>(InputMove, MoveActiveElement);
       _eventsChannel.AddListener<InputActionEventArgs>(InputSelected, HandleSelect);
-      //_eventsChannel.AddListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
       _eventsChannel.AddListener<InputActionEventArgs>(InputRotateCW, RotateCW);
       _eventsChannel.AddListener<InputActionEventArgs>(InputRotateCCW, RotateCCW);
       _eventsChannel.AddListener<InputActionEventArgs>(InputFlippedX, FlipX);
@@ -82,8 +90,9 @@ namespace GMTK {
     private void OnDestroy()
     {
       if (_eventsChannel == null) return;
+      _eventsChannel.RemoveListener<InputActionEventArgs>(InputPointerPosition, UpdatePointerPosition);
+      _eventsChannel.RemoveListener<InputActionEventArgs>(InputMove, MoveActiveElement);
       _eventsChannel.RemoveListener<InputActionEventArgs>(InputSelected, HandleSelect);
-      //_eventsChannel.RemoveListener<InputActionEventArgs>(InputSecondary, HandleSecondary);
       _eventsChannel.RemoveListener<InputActionEventArgs>(InputRotateCW, RotateCW);
       _eventsChannel.RemoveListener<InputActionEventArgs>(InputRotateCCW, RotateCCW);
       _eventsChannel.RemoveListener<InputActionEventArgs>(InputFlippedX, FlipX);
@@ -102,6 +111,10 @@ namespace GMTK {
 
       // Handle element position updates during dragging
       UpdateDrag(_pointerWorldPos);
+      
+      // To handle 'hold' of arrow keys or dpad for moving elements,
+      // we need to continuously update the position while the input is held.
+      if(IsMovePressed) UpdateActiveElementPosition(_currentMoveDirection);
     }
 
     // The element dragging is disabled during Playing, to prevent players
@@ -215,6 +228,64 @@ namespace GMTK {
     private void UpdatePointerPosition(InputActionEventArgs inputArgs) {
       _pointerScreenPos = inputArgs.ScreenPos;
       _pointerWorldPos = inputArgs.WorldPos;
+    }
+
+    /// <summary>
+    /// Moves the active element in the direction of the arrow key or dpad pressed.
+    /// This input exists for accessibility purposes, when a player can't hold and move the pointer simultaneously.
+    /// The move inputs are expected as press only, therefore, the 'hold' interaction is implemented internally,
+    /// because we assume the player might be unable to perform it. 
+    /// </summary>
+    /// <param name="inputArgs"></param>
+    private void MoveActiveElement(InputActionEventArgs inputArgs)
+    {
+      this.Log($"MoveActiveElement - control: {inputArgs.Context.action.activeControl.name} | phase: {inputArgs.Phase} | " +
+               $"IsMovePressed : {IsMovePressed} | CurrentDirection: {_currentMoveDirection} ");
+      var phase = inputArgs.Phase;
+      switch (phase)
+      {
+        // arrow key or dpad is pressed
+        case InputActionPhase.Started:
+          IsMovePressed = TryStartDrag(ActiveElement);
+          break;
+        // arrow key or dpad is released
+        // because the input is expected to be a button press,
+        // we consider both Performed and Canceled as the end of the movement, and reset the move state.
+        case InputActionPhase.Performed:
+          var inputValue = inputArgs.Context.ReadValue<Vector2>();
+          this.Log($"MoveActiveElement - direction {inputValue} | IsMovePressed: {IsMovePressed}");
+          if(IsMovePressed) UpdateActiveElementPosition(inputValue);
+          break;
+        case InputActionPhase.Canceled:
+          var currentElement = ActiveElement;
+          if (TryStopDrag())
+          {
+            //_activeElement = currentElement; // Keep the element selected after stopping drag
+            IsMovePressed = false;
+            _currentMoveDirection = Vector2.zero;
+          }
+
+          break;
+      }
+
+    }
+
+    private void UpdateActiveElementPosition(Vector2 direction)
+    {
+      // only updates if active element exists, is selected and is draggable. Otherwise, the input is ignored.
+      if (ActiveElement == null || !ActiveElement.IsSelected || !ActiveElement.IsDraggable) return;
+
+      // direction is expected as normalized (0,1), (0,-1), (1,0) or (-1,0)
+      // because comes from arrow keys or a dpad
+      _currentMoveDirection = direction.normalized;
+      
+      // ignore zero
+      if (_currentMoveDirection == Vector2.zero) return;
+      
+      var moveVector = _currentMoveDirection; //* (MoveSpeed * Time.deltaTime);
+      var newPosition = (Vector2)ActiveElement.transform.position + moveVector ;
+      // Update element position directly
+      ActiveElement.transform.position = newPosition;
     }
 
     private void HandleSelect(InputActionEventArgs inputArgs) {
@@ -375,7 +446,34 @@ namespace GMTK {
 
     private void DebugLog(string message) { if (_debugLogging) this.Log($"{_activeElement.name} - {message}"); }
 
+    /// <summary>
+    ///   Utility method to validate a RaycastHit2D is suited to for dragging.
+    /// </summary>
+    /// <returns>
+    ///   <see langword="true"/> if <c>hit</c> is not-null and not-destroyed,
+    ///   and has a non-null collider with a valid GameObject. Otherwise, <see langword="false"/>
+    /// </returns>
+    private static bool ValidRaycastHit(RaycastHit2D hit) => hit && hit.collider && hit.collider.gameObject;
 
+    private static Camera GetActiveCamera()
+    {
+      var activeCamera = Camera.main;
+      if (activeCamera != null) return activeCamera;
+      
+      // If no main camera is tagged, fallback to the first available camera in the scene
+      activeCamera = Camera.allCameras.Length > 0 ? Camera.allCameras[0] : null;
+      foreach (var camera in Camera.allCameras)
+      {
+        if (!camera || !camera.isActiveAndEnabled) continue;
+        activeCamera = camera;
+        break;
+      }
+      if (activeCamera == null) { 
+        Debug.LogWarning("[PlayableElementInputHandler] No active camera found for screen/world position conversions");
+      }
+      return activeCamera;
+    }
+    
 #if UNITY_EDITOR
     public void TriggerHoveredEvent() => TriggerEvent(InputPointerPosition, InputActionPhase.Performed, 
       ToScreenPosition(_activeElement.transform.position), _activeElement.transform.position);

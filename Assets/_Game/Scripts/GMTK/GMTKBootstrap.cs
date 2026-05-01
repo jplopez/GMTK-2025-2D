@@ -1,6 +1,7 @@
 ﻿using Ameba;
 
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 
 namespace GMTK {
 
@@ -27,7 +28,7 @@ namespace GMTK {
     [Header("Log Levels")]
     [Help("Configure which log levels are enabled for this component")]
     [Tooltip("Be cautious this is very verbose and can impact performance")]
-    public bool LogDebug = true;
+    public bool LogDebug = false;
     public bool LogInfo = true;
     [Tooltip("Heads up on edge cases that do not impact the game flow")]
     public bool LogWarning = true;
@@ -36,33 +37,26 @@ namespace GMTK {
     [Tooltip("The code trace from Unity about an error")]
     public bool LogExceptions = true;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
     private void OnValidate() {
       SetLogLevels();
       this.LogDebug("=== UE: SERVICES INITIALIZATION START ===");
       InitializeAllServices();
       this.LogDebug("=== UE: SERVICES INITIALIZATION COMPLETE ===");
     }
-
-    private void SetLogLevels() {
-      //update log levels only if they have changed
-      if(LogDebug != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Debug])
-        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Debug, LogDebug);
-
-      if(LogInfo != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Info])
-        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Info, LogInfo);
-
-      if(LogWarning != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Warning])
-        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Warning, LogWarning);
-
-      if(LogError != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Error])
-        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Error, LogError);
-
-      if(LogExceptions != LoggerExtension.EnabledLogLevels[LoggerExtension.LoggerLevels.Exception])
-        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Exception, LogExceptions);
-    }
-
 #endif
+    
+    private void SetLogLevels() {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Debug, LogDebug);
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Info, LogInfo);
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Warning, LogWarning);
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Error, LogError);
+        LoggerExtension.SetLogLevel(LoggerExtension.LoggerLevels.Exception, LogExceptions);
+#else 
+        LoggerExtension.DisableAllLogging = true;
+#endif
+    }
 
 
     private void Awake() {

@@ -48,6 +48,7 @@ namespace GMTK {
     //some of these events will be triggered along the 'Element' events group below.
     //use these events if you care about the actual input being pressed.
     InputPointerPosition, //when the pointer position is updated
+    InputMove, // when the arrow keys are pressed
     InputSelected, //when mouse left-button is clicked
     InputSecondary,//when mouse right-button is clicked
     InputCancel,   //when the input to Cancel is pressed

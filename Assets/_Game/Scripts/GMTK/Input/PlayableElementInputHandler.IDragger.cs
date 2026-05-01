@@ -30,16 +30,14 @@ namespace GMTK {
     #region IDragger<PlayableElement> Implementation
 
     public bool TryStartDrag(PlayableElement element) {
+      
       this.LogDebug($"[TryStartDrag] element={element?.name ?? "null"} CanDrag={CanDrag} IsDraggable={element?.IsDraggable}");
-      if (!CanDrag || element == null) return false;
-
-      // Check if element can be dragged
-      if (!element.IsDraggable) return false;
+      
+      // Validations
+      if (!CanDrag || !element || !element.IsDraggable) return false;
 
       // Stop any current dragging operation
-      if (IsDragging) {
-        TryStopDrag();
-      }
+      if (IsDragging) TryStopDrag();
 
       // Start dragging the new element
       _activeElement = element;
@@ -64,13 +62,12 @@ namespace GMTK {
       Vector2 worldPos2D = new(worldPosition.x, worldPosition.y);
       RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
 
-      if (hit && hit.collider != null) {
-        if (hit.collider.gameObject.TryGetComponent(out PlayableElement foundElement)) {
-          element = foundElement;
-          return TryStartDrag(foundElement);
-        }
+      if (!ValidRaycastHit(hit)) return false;
+      
+      if (hit.collider.gameObject.TryGetComponent(out PlayableElement foundElement)) {
+        element = foundElement;
+        return TryStartDrag(foundElement);
       }
-
       return false;
     }
 
@@ -80,16 +77,13 @@ namespace GMTK {
       if (!CanDrag) return false;
 
       // Convert screen position to world position
-      Camera camera = Camera.main;
-      if (camera == null) {
-        this.LogWarning("No main camera found for screen to world conversion");
-        return false;
-      }
+      var activeCamera = GetActiveCamera();
 
-      Vector3 worldPos = camera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, camera.nearClipPlane));
+      var worldPos = activeCamera.ScreenToWorldPoint(
+        new Vector3(screenPosition.x, screenPosition.y, activeCamera.nearClipPlane));
       return TryStartDrag(worldPos, out element);
     }
-    
+
     public void UpdateDrag(Vector3 worldPosition) {
       if (!IsDragging || !DraggedElement) return;
 
@@ -102,10 +96,9 @@ namespace GMTK {
 
     public bool TryStopDrag() {
       this.LogDebug($"[TryStopDrag] IsDragging={IsDragging} activeElement={_activeElement?.name ?? "null"}");
-      if (!IsDragging || _activeElement == null) return false;
+      if (!IsDragging || !_activeElement) return false;
 
       var elementToStop = _activeElement;
-      _activeElement = null;
       IsMovingElement = false;
 
       // Notify the element

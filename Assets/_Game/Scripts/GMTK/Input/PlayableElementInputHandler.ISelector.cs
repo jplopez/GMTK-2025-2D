@@ -11,19 +11,18 @@ namespace GMTK {
 
     [Header("Selection Settings")]
     [SerializeField] private bool _canSelect = true;
+    
     [SerializeField]
     private SelectionTrigger _selectionTriggers = SelectionTrigger.OnClick | SelectionTrigger.OnKeyPress;
     
     public bool HasSelectionTrigger(SelectionTrigger trigger) => (_selectionTriggers & trigger) != 0;
     
     // ISelector<PlayableElement> implementation
-    public bool CanSelect {
-      get => _canSelect;
-      set => _canSelect = value;
-    }
+    public bool CanSelect { get => _canSelect; set => _canSelect = value; }
+
     public bool IsSelecting => _activeElement != null;
-    
-    public PlayableElement SelectedElement => (_activeElement && _activeElement.IsSelected)? _activeElement : null;
+
+    public PlayableElement SelectedElement => _activeElement && _activeElement.IsSelected? _activeElement : null;
 
     #region ISelector<PlayableElement> Implementation
 
@@ -36,16 +35,15 @@ namespace GMTK {
       Vector2 worldPos2D = new(worldPosition.x, worldPosition.y);
       RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
 
-      if (hit && hit.collider != null) {
-        if (hit.collider.gameObject.TryGetComponent(out PlayableElement foundElement)) {
-          //validates click using the element accuracy parameters
-          if (IsValidClickPosition(element, worldPosition)) {
-            element = foundElement;
-            return TrySelect(foundElement);
-          }
+      if (!ValidRaycastHit(hit)) return false; 
+        
+      if (hit.collider.gameObject.TryGetComponent(out PlayableElement foundElement)) {
+        //validates click using the element accuracy parameters
+        if (IsValidClickPosition(element, worldPosition)) {
+          element = foundElement;
+          return TrySelect(foundElement);
         }
       }
-
       return false;
     }
 
@@ -55,34 +53,31 @@ namespace GMTK {
       if (!CanSelect) return false;
 
       // Convert screen position to world position
-      Camera camera = Camera.main;
-      if (camera == null) {
-        this.LogWarning("No main camera found for screen to world conversion");
-        return false;
-      }
+      var activeCamera = GetActiveCamera();
 
-      Vector3 worldPos = camera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, camera.nearClipPlane));
+      Vector3 worldPos = activeCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, activeCamera.nearClipPlane));
       return TrySelect(worldPos, out element);
     }
 
-    // ReSharper disable Unity.PerformanceAnalysis
+  
     public bool TrySelect(PlayableElement element) {
 
-      var selectedElementName = _activeElement != null ? _activeElement.name : "null";
+      var selectedElementName = _activeElement ? _activeElement.name : "null";
+      
       this.LogDebug($"[TrySelect] element: '{element.name}' selectable? {element.CanSelect} " +
                     $"_activeElement: {selectedElementName}");
       
-      if (!CanSelect || element == null || !element.CanSelect) return false;
+      if (!CanSelect || !element || !element.CanSelect) return false;
 
       // deselect current if different from new
-      if (_activeElement != null && _activeElement != element) {
+      if (_activeElement && _activeElement != element) {
         DeselectActiveElement();
       }
 
-      element.MarkSelected(true);
       _activeElement = element;
+      element.MarkSelected(true);
 
-      this.LogDebug($"[TrySelect] Selected element: '{element.name}'");
+      this.LogDebug($"[TrySelect] Selected element: '{element.name}' IsSelecting: {IsSelecting}");
       return true;
     }
 
@@ -91,22 +86,21 @@ namespace GMTK {
     /// </summary>
     /// <returns> <see langword="true"/> if an element was deselected, <see langword="false"/> if there was no active selection to deselect</returns>
     public bool TryDeselect() {
-      if (_activeElement == null) return false;
+      if (!_activeElement) return false;
       DeselectActiveElement();
       return true;
     }
 
-    private void DeselectActiveElement() {
-      if (_activeElement != null) {
-        var elementToDeselect = _activeElement;
-        _activeElement = null;
-        elementToDeselect.MarkSelected(false);
-
-        this.LogDebug($"Deselected element: {elementToDeselect.name}");
-      }
+    private void DeselectActiveElement()
+    {
+      if (!_activeElement) return;
+      var elementToDeselect = _activeElement;
+      _activeElement = null;
+      elementToDeselect.MarkSelected(false);
+      this.LogDebug($"Deselected element: {elementToDeselect.name}");
     }
 
-    private bool IsValidClickPosition(PlayableElement elem, Vector3 worldPosition) {
+    private static bool IsValidClickPosition(PlayableElement elem, Vector3 worldPosition) {
       if (elem.InteractionCollider == null) return true;
 
       // Calculate effective offset based on accuracy

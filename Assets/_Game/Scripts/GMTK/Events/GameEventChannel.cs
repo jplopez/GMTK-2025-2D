@@ -4,7 +4,8 @@
   namespace GMTK {
     [CreateAssetMenu(menuName = "GMTK/Event Channel")]
     public class GameEventChannel : EventChannel<GameEventType> {
-
+      
+      
     /// <summary>
     /// Wrapper to raise event with PlayableElementEventArgs and log debug info
     /// </summary>

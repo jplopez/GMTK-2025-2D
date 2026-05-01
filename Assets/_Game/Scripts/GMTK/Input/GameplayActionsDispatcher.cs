@@ -92,7 +92,10 @@ namespace GMTK {
     /// cref="GameEventType.InputPointerPosition"/>.</remarks>
     /// <param name="context">The input context containing the pointer position data. The position is expected to be a <see cref="Vector2"/>
     /// value.</param>
-    public void OnPointerPosition(InputAction.CallbackContext context) {
+    public void OnPointerPosition(InputAction.CallbackContext context)
+    {
+      this.Log($"OnPointerPosition : {context.action.activeControl.name} | Value: {context.ReadValue<Vector2>()} | Phase: {context.phase} | Interaction: {context.interaction}");
+
       if(TryUpdatePointerPosition(context.ReadValue<Vector2>())) {
         if(CanRaisePointerEvent) {
           RaiseEvent(GameEventType.InputPointerPosition, context);
@@ -122,6 +125,7 @@ namespace GMTK {
       return false;
     }
 
+    public void OnPointerMove(InputAction.CallbackContext context) => RaiseEvent(GameEventType.InputMove, context);
     /// <summary>
     /// Input handler for the primary action (Select). Raises the <see cref="GameEventType.InputSelected"/> event.
     /// </summary>

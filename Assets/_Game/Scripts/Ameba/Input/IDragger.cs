@@ -8,7 +8,7 @@ namespace Ameba {
   /// </summary>
   public interface IDragger<T> where T : IDraggable {
     /// <summary>
-    /// Whether dragging is currently enabled.
+    /// Whether this Dragger is currently enabled to drag.
     /// </summary>
     bool CanDrag { get; set; }
 
