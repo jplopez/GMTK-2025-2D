@@ -66,6 +66,8 @@ namespace GMTK {
     private Coroutine _delayedUpdateCoroutine;
 
     internal void SetPlayableElement(PlayableElement playableElement) => _playableElement = playableElement;
+    
+    public PlayableElement Owner => _playableElement;
 
     public void ExcludeAllEvents(bool exclude = true) {
       CommonSettings.ExcludeInitializeEvents = exclude;

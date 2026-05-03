@@ -25,40 +25,6 @@ namespace GMTK {
     public PlayableElement SelectedElement => _activeElement && _activeElement.IsSelected? _activeElement : null;
 
     #region ISelector<PlayableElement> Implementation
-
-    public bool TrySelect(Vector3 worldPosition, out PlayableElement element) {
-      element = null;
-
-      if (!CanSelect) return false;
-
-      // Find element at world position using raycast
-      Vector2 worldPos2D = new(worldPosition.x, worldPosition.y);
-      RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
-
-      if (!ValidRaycastHit(hit)) return false; 
-        
-      if (hit.collider.gameObject.TryGetComponent(out PlayableElement foundElement)) {
-        //validates click using the element accuracy parameters
-        if (IsValidClickPosition(element, worldPosition)) {
-          element = foundElement;
-          return TrySelect(foundElement);
-        }
-      }
-      return false;
-    }
-
-    public bool TrySelect(Vector2 screenPosition, out PlayableElement element) {
-      element = null;
-
-      if (!CanSelect) return false;
-
-      // Convert screen position to world position
-      var activeCamera = GetActiveCamera();
-
-      Vector3 worldPos = activeCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, activeCamera.nearClipPlane));
-      return TrySelect(worldPos, out element);
-    }
-
   
     public bool TrySelect(PlayableElement element) {
 

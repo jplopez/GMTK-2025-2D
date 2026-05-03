@@ -94,7 +94,7 @@ namespace GMTK {
     /// value.</param>
     public void OnPointerPosition(InputAction.CallbackContext context)
     {
-      this.Log($"OnPointerPosition : {context.action.activeControl.name} | Value: {context.ReadValue<Vector2>()} | Phase: {context.phase} | Interaction: {context.interaction}");
+      this.LogDebug($"OnPointerPosition : {context.action.activeControl.name} | Value: {context.ReadValue<Vector2>()} | Phase: {context.phase} | Interaction: {context.interaction}");
 
       if(TryUpdatePointerPosition(context.ReadValue<Vector2>())) {
         if(CanRaisePointerEvent) {

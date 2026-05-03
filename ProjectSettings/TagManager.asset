@@ -10,6 +10,10 @@ TagManager:
   - BottomBound
   - Manager
   - Marble
+  - InputRotateCcw
+  - InputRotateCw
+  - InputFlipX
+  - InputFlipY
   layers:
   - Default
   - TransparentFX

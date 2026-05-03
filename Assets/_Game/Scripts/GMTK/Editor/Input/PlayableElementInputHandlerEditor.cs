@@ -9,6 +9,7 @@ namespace GMTK {
     private SerializedProperty _enableInputProp;
     private SerializedProperty _pointerWorldPosProp;
     private SerializedProperty _selectionTriggersProp;
+    private SerializedProperty _pointerToleranceProp;
     
     private SerializedProperty _activeElementProp;
     private SerializedProperty _currentHoveredElementProp;
@@ -19,11 +20,15 @@ namespace GMTK {
       _enableInputProp = serializedObject.FindProperty("_enableInput");
       _pointerWorldPosProp = serializedObject.FindProperty("_pointerWorldPos");
       _selectionTriggersProp = serializedObject.FindProperty("_selectionTriggers");
+      _pointerToleranceProp = serializedObject.FindProperty("PointerTolerance");
       _activeElementProp = serializedObject.FindProperty("_activeElement");
       _currentHoveredElementProp = serializedObject.FindProperty("_currentHoveredElement");
     }
 
     public override void OnInspectorGUI() {
+      
+      serializedObject.Update();
+      
       PlayableElementInputHandler handler = (PlayableElementInputHandler)target;
 
       EditorGUILayout.Space();
@@ -32,6 +37,7 @@ namespace GMTK {
       {
         EditorGUILayout.PropertyField(_enableInputProp);
         EditorGUILayout.PropertyField(_selectionTriggersProp);
+        EditorGUILayout.PropertyField(_pointerToleranceProp);
       }
       
       EditorGUILayout.Space(10);
@@ -60,6 +66,8 @@ namespace GMTK {
 
       EditorGUILayout.Space();
       DrawEventButtons(handler);
+      
+      serializedObject.ApplyModifiedProperties();
     }
 
     private void DrawInputs(PlayableElementInputHandler handler)

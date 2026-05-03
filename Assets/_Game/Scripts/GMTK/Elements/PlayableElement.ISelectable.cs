@@ -11,7 +11,6 @@ namespace GMTK {
   /// Handles selection behavior and delegates to ElementPointerComponent, if present.
   /// </summary>
   public partial class PlayableElement : ISelectable {
-
     
     [Header("Selection Settings")]
     [Tooltip("Whether this element is currently selected by a pointer")]
@@ -32,7 +31,7 @@ namespace GMTK {
     public float MaxOffset = 2f;
 
     // ISelectable interface properties
-    public bool IsSelected { get => isSelected; protected set => isSelected = value; }
+    public bool IsSelected { get => isSelected; private set => isSelected = value; }
 
     public bool CanSelect => canSelect;
 
@@ -66,25 +65,12 @@ namespace GMTK {
       this.LogDebug($"[End MarkSelected:{IsSelected}] '{name}'");
     }
 
-    public void EnableSelectable(bool selectable = true) {
-      if (CanSelect == selectable) return; //avoid redundant state change
-      canSelect = selectable;
-      if (!CanSelect && IsSelected) MarkSelected(false);
-    }
-
     [Button]
     public void OnSelect() => MarkSelected(true);
 
     [Button]
     public void OnDeselect() => MarkSelected(false);
-
-    public void OnSelectUpdate() {
-      // Delegate to component if it implements this functionality
-      // For now, we don't have specific update behavior
-    }
-
-    public void OnSelectEnabled() => EnableSelectable(true);
-    public void OnSelectDisabled() => EnableSelectable(false);
+    
 
     #endregion
 
