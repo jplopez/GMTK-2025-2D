@@ -224,9 +224,9 @@ namespace GMTK {
       this.Log($"Initializing Grid for {allOccupants.Length} occupants");
       foreach (var occupant in allOccupants) {
         if (IsInsidePlayableArea(occupant.transform.position)) {
-          occupant.SnapTransform.position = SnapToGrid(occupant.SnapTransform.position);
+          occupant.ModelTransform.position = SnapToGrid(occupant.ModelTransform.position);
           occupant.Draggable = false;
-          var gridOrigin = WorldToGrid(occupant.SnapTransform.position);
+          var gridOrigin = WorldToGrid(occupant.ModelTransform.position);
           _occupancyMap.Register(occupant, gridOrigin);
         }
       }
@@ -339,7 +339,7 @@ namespace GMTK {
       _isTrackingMovement = true;
 
       // Store original worldPosition and check if it was in the grid
-      var currentPosition = element.SnapTransform.position;
+      var currentPosition = element.ModelTransform.position;
       _elementWasInGrid = _occupancyMap.ContainsElement(element);
 
       if (_elementWasInGrid) {
@@ -366,7 +366,7 @@ namespace GMTK {
     protected virtual void HandleElementSelected(PlayableElementEventArgs args) {
       if (args.Element is PlayableElement element) {
         // Store initial data for tracking
-        _elementOriginalWorldPosition = element.SnapTransform.position;
+        _elementOriginalWorldPosition = element.ModelTransform.position;
         _elementWasInGrid = _occupancyMap.ContainsElement(element);
 
         if (_elementWasInGrid) {
@@ -466,7 +466,7 @@ namespace GMTK {
       }
 
       // Calculate current grid worldPosition
-      _currentElementGridPosition = WorldToGrid(_trackedElement.SnapTransform.position);
+      _currentElementGridPosition = WorldToGrid(_trackedElement.ModelTransform.position);
 
       // Get the cells this element would occupy
       _currentElementOccupiedCells.Clear();
@@ -475,7 +475,7 @@ namespace GMTK {
       }
 
       // Check if we can place at current worldPosition
-      _canPlaceCurrentElement = IsInsidePlayableArea(_trackedElement.SnapTransform.position) &&
+      _canPlaceCurrentElement = IsInsidePlayableArea(_trackedElement.ModelTransform.position) &&
                                CanPlace(_trackedElement, _currentElementGridPosition);
 
       this.LogDebug($"Element '{_trackedElement.name}' at grid {_currentElementGridPosition} - Can place: {_canPlaceCurrentElement}");
@@ -483,7 +483,7 @@ namespace GMTK {
 
     private void ReturnElementToOriginalPosition(PlayableElement element) {
       if (_elementWasInGrid) {
-        element.SnapTransform.position = SnapToGrid(_elementOriginalGridPosition);
+        element.ModelTransform.position = SnapToGrid(_elementOriginalGridPosition);
         _occupancyMap.Register(element, _elementOriginalGridPosition);
         this.LogDebug($"Returned '{element.name}' to original worldPosition {_elementOriginalGridPosition}");
       }

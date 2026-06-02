@@ -34,17 +34,27 @@ namespace GMTK
   /// </summary>
   public partial class PlayableElementInputHandler : MonoBehaviour
   {
+    [Header("Settings")]
+    [Tooltip("Enables/Disables this component")]
     [SerializeField] private bool _enableInput = true;
-    [SerializeField] private PlayableElement _activeElement;
-    [SerializeField] private PlayableElement _currentHoveredElement;
+    
+    [Tooltip("Layer Masks to be considered for Input handling. Typically 'Interactives'")]
+    public LayerMask PlayableElementMasks;
 
+    [Header("Elements")]
+    [Tooltip("Active Element. Depends on the status of elements, in this priority order: drag, select and hover.")]
+    [SerializeField] private PlayableElement _activeElement;
+    
+    [Tooltip("Current Hovered Element")]
+    public PlayableElement CurrentHoveredElement;
+    
     /// <summary>
     /// Active PlayableElement, which is the element currently selected or being dragged.
     /// This is the main reference for the element that input events will act upon. It can be null if no element is currently active.
     /// </summary>
     public PlayableElement ActiveElement => _activeElement;
 
-    public PlayableElement CurrentHoveredElement => _currentHoveredElement;
+    //public PlayableElement CurrentHoveredElement => _currentHoveredElement;
 
     public bool IsMovingElement { get; private set; }
     public bool IsOverElement { get; private set; }

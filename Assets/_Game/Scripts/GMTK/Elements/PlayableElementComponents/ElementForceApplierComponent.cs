@@ -99,7 +99,7 @@ namespace GMTK {
 
     protected override void Initialize() {
       // Default transform
-      if (ForceTransform == null) ForceTransform = _playableElement.SnapTransform;
+      if (ForceTransform == null) ForceTransform = _playableElement.ModelTransform;
 
       // Ensure other entities list is initialized
       OtherEntities ??= new();

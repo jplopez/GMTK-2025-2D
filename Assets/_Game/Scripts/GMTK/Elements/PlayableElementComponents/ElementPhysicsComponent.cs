@@ -157,9 +157,9 @@ namespace GMTK {
 
     protected override void Initialize() {
       // Store initial transform to be able to reset object to initial state on LevelReset
-      _initialPosition = _playableElement.SnapTransform.position;
-      _initialScale = _playableElement.SnapTransform.localScale;
-      _initialRotation = _playableElement.SnapTransform.rotation;
+      _initialPosition = _playableElement.ModelTransform.position;
+      _initialScale = _playableElement.ModelTransform.localScale;
+      _initialRotation = _playableElement.ModelTransform.rotation;
       _lastValidPosition = _initialPosition;
       _lastValidRotation = _initialRotation.eulerAngles;
 
@@ -198,9 +198,9 @@ namespace GMTK {
     }
 
     protected override void ResetComponent() {
-      _playableElement.SnapTransform.position = _initialPosition;
-      _playableElement.SnapTransform.localScale = _initialScale;
-      _playableElement.SnapTransform.rotation = _initialRotation;
+      _playableElement.ModelTransform.position = _initialPosition;
+      _playableElement.ModelTransform.localScale = _initialScale;
+      _playableElement.ModelTransform.rotation = _initialRotation;
       _currentRotation = _initialRotation.eulerAngles.z;
       if (_rigidbody2D.bodyType != RigidbodyType2D.Static) {
         _rigidbody2D.linearVelocity = Vector2.zero;
@@ -358,12 +358,12 @@ namespace GMTK {
       // Only apply constraints if movement is allowed or element is being dragged
       if (!AllowsPositionChanges) return;
 
-      Vector3 currentPos = _playableElement.SnapTransform.position;
+      Vector3 currentPos = _playableElement.ModelTransform.position;
       Vector3 constrainedPos = ApplyPositionConstraints(currentPos);
 
       if (constrainedPos != currentPos && !_isValidatingMovement) {
         _isValidatingMovement = true;
-        _playableElement.SnapTransform.position = constrainedPos;
+        _playableElement.ModelTransform.position = constrainedPos;
         if (_rigidbody2D.bodyType == RigidbodyType2D.Dynamic) {
           _rigidbody2D.position = constrainedPos;
         }
@@ -375,14 +375,14 @@ namespace GMTK {
     protected virtual void UpdateCollisionRules() {
       // Enforce position collision rules
       if (AllowsPositionChangesOnCollision) {
-        Vector3 currentPos = _playableElement.SnapTransform.position;
+        Vector3 currentPos = _playableElement.ModelTransform.position;
         if (Vector3.Distance(currentPos, _lastValidPosition) > 0.01f) {
           RestoreLastValidPosition();
         }
       }
       else {
         // Update last valid position if movement is allowed
-        _lastValidPosition = _playableElement.SnapTransform.position;
+        _lastValidPosition = _playableElement.ModelTransform.position;
       }
 
       // Enforce rotation collision rules
@@ -512,12 +512,12 @@ namespace GMTK {
 
       // Apply the accumulated force from collisions
       if (force.magnitude > 0.001f) {
-        Vector3 currentPos = _playableElement.SnapTransform.position;
+        Vector3 currentPos = _playableElement.ModelTransform.position;
         Vector3 newPos = currentPos + force * Time.deltaTime;
         Vector3 constrainedPos = ApplyPositionConstraints(newPos);
 
         if (constrainedPos != currentPos) {
-          _playableElement.SnapTransform.position = constrainedPos;
+          _playableElement.ModelTransform.position = constrainedPos;
           _rigidbody2D.position = constrainedPos;
         }
       }
@@ -612,7 +612,7 @@ namespace GMTK {
 
     private float CalculateCollisionTorque(Collision2D collision) {
       float totalTorque = 0f;
-      Vector3 centerOfMass = _playableElement.SnapTransform.position;
+      Vector3 centerOfMass = _playableElement.ModelTransform.position;
 
       // Use contact points to calculate realistic collision torque
       for (int i = 0; i < collision.contactCount; i++) {
@@ -635,7 +635,7 @@ namespace GMTK {
     private void RestoreLastValidPosition() {
       if (!_isValidatingMovement) {
         _isValidatingMovement = true;
-        _playableElement.SnapTransform.position = _lastValidPosition;
+        _playableElement.ModelTransform.position = _lastValidPosition;
         _rigidbody2D.position = _lastValidPosition;
         if (_rigidbody2D.bodyType != RigidbodyType2D.Static) _rigidbody2D.linearVelocity = Vector2.zero; // Stop any movement
         _isValidatingMovement = false;
@@ -668,7 +668,7 @@ namespace GMTK {
     }
 
     private void ValidateCurrentPosition() {
-      Vector3 currentPos = _playableElement.SnapTransform.position;
+      Vector3 currentPos = _playableElement.ModelTransform.position;
 
       // Check if current position violates solid collision rules
       if (SolidOnCollision && IsPositionBlocked(currentPos)) {
@@ -685,7 +685,7 @@ namespace GMTK {
       Collider2D[] overlapping = Physics2D.OverlapBoxAll(
         position,
         _collider2D.bounds.size,
-        _playableElement.SnapTransform.rotation.eulerAngles.z
+        _playableElement.ModelTransform.rotation.eulerAngles.z
       );
 
       foreach (var collider in overlapping) {
@@ -721,14 +721,14 @@ namespace GMTK {
 
         // Apply the rotation using extension methods with RotationStep parameter
         if (clockwise) {
-          _playableElement.SnapTransform.RotateClockwise(RotationStep);
+          _playableElement.ModelTransform.RotateClockwise(RotationStep);
         }
         else {
-          _playableElement.SnapTransform.RotateCounterClockwise(RotationStep);
+          _playableElement.ModelTransform.RotateCounterClockwise(RotationStep);
         }
 
         // Get the new rotation after applying extension method
-        float newRotation = _playableElement.SnapTransform.eulerAngles.z;
+        float newRotation = _playableElement.ModelTransform.eulerAngles.z;
 
         // Apply rotation limits if enabled
         if (LimitRotationAngle) {
@@ -752,7 +752,7 @@ namespace GMTK {
         _currentRotation = newRotation;
         _lastValidRotation = new Vector3(0, 0, newRotation);
 
-        this.LogDebug($"Applied extension rotation {(clockwise ? "CW" : "CCW")} to {newRotation}° with step {RotationStep}° (flippedX: {_playableElement.SnapTransform.IsFlippedX()}, flippedY: {_playableElement.SnapTransform.IsFlippedY()})");
+        this.LogDebug($"Applied extension rotation {(clockwise ? "CW" : "CCW")} to {newRotation}ï¿½ with step {RotationStep}ï¿½ (flippedX: {_playableElement.ModelTransform.IsFlippedX()}, flippedY: {_playableElement.ModelTransform.IsFlippedY()})");
 
         // Feel integration - provide rotation feedback
         if (RotationChangeFeedback != null && newRotation != previousRotation) {
@@ -808,7 +808,7 @@ namespace GMTK {
       _rigidbody2D.angularVelocity = 0f; // Stop any ongoing rotation
 
       // Ensure transform is synchronized
-      _playableElement.SnapTransform.rotation = Quaternion.Euler(0, 0, angle);
+      _playableElement.ModelTransform.rotation = Quaternion.Euler(0, 0, angle);
 
       // Update our tracking variables
       _currentRotation = angle;
@@ -825,7 +825,7 @@ namespace GMTK {
     [Button]
     public void MoveTo(Vector2 position) {
       Vector3 constrainedPos = ApplyPositionConstraints(position);
-      _playableElement.SnapTransform.position = constrainedPos;
+      _playableElement.ModelTransform.position = constrainedPos;
       _rigidbody2D.MovePosition(constrainedPos);
       _lastValidPosition = constrainedPos;
     }
@@ -867,14 +867,14 @@ namespace GMTK {
     [Button]
     public void RotateByAngle(float angle, bool clockwise = true) {
       if (clockwise) {
-        _playableElement.SnapTransform.RotateClockwise(angle);
+        _playableElement.ModelTransform.RotateClockwise(angle);
       }
       else {
-        _playableElement.SnapTransform.RotateCounterClockwise(angle);
+        _playableElement.ModelTransform.RotateCounterClockwise(angle);
       }
 
       // Sync with rigidbody
-      float newRotation = _playableElement.SnapTransform.eulerAngles.z;
+      float newRotation = _playableElement.ModelTransform.eulerAngles.z;
       _rigidbody2D.MoveRotation(newRotation);
       _currentRotation = newRotation;
       _lastValidRotation = new Vector3(0, 0, newRotation);
@@ -885,7 +885,7 @@ namespace GMTK {
     /// Useful for correcting rotation after free rotation or collision.
     /// </summary>
     public void SnapToCardinal() {
-      int cardinalRotation = _playableElement.SnapTransform.GetCardinalRotation();
+      int cardinalRotation = _playableElement.ModelTransform.GetCardinalRotation();
       SetRotation(cardinalRotation, true);
     }
 
@@ -894,7 +894,7 @@ namespace GMTK {
     /// </summary>
     /// <returns>The current rotation rounded to the nearest 90-degree increment</returns>
     public int GetCardinalRotation() {
-      return _playableElement.SnapTransform.GetCardinalRotation();
+      return _playableElement.ModelTransform.GetCardinalRotation();
     }
 
     /// <summary>
@@ -902,9 +902,9 @@ namespace GMTK {
     /// </summary>
     /// <param name="degrees">Target cardinal direction (will be rounded to nearest 90-degree increment)</param>
     public void SetCardinalRotation(int degrees) {
-      _playableElement.SnapTransform.SetCardinalRotation(degrees);
+      _playableElement.ModelTransform.SetCardinalRotation(degrees);
       // Sync rigidbody with the new transform rotation
-      float newRotation = _playableElement.SnapTransform.eulerAngles.z;
+      float newRotation = _playableElement.ModelTransform.eulerAngles.z;
       _rigidbody2D.MoveRotation(newRotation);
       _currentRotation = newRotation;
       _lastValidRotation = new Vector3(0, 0, newRotation);
@@ -923,12 +923,12 @@ namespace GMTK {
     void OnDrawGizmosSelected() {
       if (_playableElement == null) return;
 
-      Vector3 pos = _playableElement.SnapTransform.position;
+      Vector3 pos = _playableElement.ModelTransform.position;
 
       // Show rotation limits
       //bool rotationAllowed = ChangeRotationOnCollision ? AllowRotation : _playableElement.CanRotate;
       if (AllowsRotationChanges && LimitRotationAngle) {
-        float zRotation = _playableElement.SnapTransform.rotation.eulerAngles.z;
+        float zRotation = _playableElement.ModelTransform.rotation.eulerAngles.z;
         Gizmos.color = Color.red;
         Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, zRotation + MinRotationAngle) * Vector3.right * 2f);
         Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, zRotation + MaxRotationAngle) * Vector3.right * 2f);
@@ -939,7 +939,7 @@ namespace GMTK {
       //if (rotationAllowed || ChangeRotationOnCollision) {
       if (AllowsRotationChanges) { 
         Gizmos.color = Color.cyan;
-        float currentRotation = _playableElement.SnapTransform.eulerAngles.z;
+        float currentRotation = _playableElement.ModelTransform.eulerAngles.z;
         // Show current rotation direction
         Gizmos.DrawLine(pos, pos + Quaternion.Euler(0, 0, currentRotation) * Vector3.right * 1.2f);
         // Show next rotation steps
@@ -949,9 +949,9 @@ namespace GMTK {
       }
 
       // Show flip state indicators
-      if (_playableElement.SnapTransform.IsFlippedX() || _playableElement.SnapTransform.IsFlippedY()) {
+      if (_playableElement.ModelTransform.IsFlippedX() || _playableElement.ModelTransform.IsFlippedY()) {
         Gizmos.color = Color.magenta;
-        string flipState = $"{(_playableElement.SnapTransform.IsFlippedX() ? "X" : "")}{(_playableElement.SnapTransform.IsFlippedY() ? "Y" : "")}";
+        string flipState = $"{(_playableElement.ModelTransform.IsFlippedX() ? "X" : "")}{(_playableElement.ModelTransform.IsFlippedY() ? "Y" : "")}";
         // Draw a small indicator for flip state
         Gizmos.DrawWireCube(pos + Vector3.up * 1f, Vector3.one * 0.2f);
       }

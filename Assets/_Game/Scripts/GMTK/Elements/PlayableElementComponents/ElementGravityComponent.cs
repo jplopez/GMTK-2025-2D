@@ -125,7 +125,7 @@ namespace GMTK {
     void OnDrawGizmosSelected() {
       if (_playableElement == null || !HasGravity) return;
 
-      Vector3 pos = _playableElement.SnapTransform.position;
+      Vector3 pos = _playableElement.ModelTransform.position;
 
       // Draw gravity direction
       if (!UseWorldGravity) {

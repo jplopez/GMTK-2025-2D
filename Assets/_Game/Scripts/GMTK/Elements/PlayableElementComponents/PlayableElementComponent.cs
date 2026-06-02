@@ -322,13 +322,13 @@ namespace GMTK {
       }
     }
     protected virtual void RaisePlayableElementEvent(PlayableElementEventType eventType, Vector3? worldPosition = null, GameObject otherObject = null) {
-      var position = worldPosition ?? _playableElement.SnapTransform.position;
+      var position = worldPosition ?? _playableElement.ModelTransform.position;
       PlayableElementEventArgs eventArgs = new(_playableElement, position, eventType, otherObject);
       _gameEventChannel.Raise(GameEventType.PlayableElementEvent, eventArgs);
     }
 
     protected virtual Vector2 SnapToGrid(Vector2? position) {
-      position ??= _playableElement.SnapTransform.position;
+      position ??= _playableElement.ModelTransform.position;
       if (_playableGrid == null) return position.Value;
       Vector2Int gridPos = _playableGrid.WorldToGrid(position.Value);
       return _playableGrid.GridToWorld(gridPos); 

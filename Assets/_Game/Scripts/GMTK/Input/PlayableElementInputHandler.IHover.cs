@@ -12,7 +12,8 @@ namespace GMTK {
     [Header("Hover Settings")]
     [SerializeField] private bool _canHover = true;
     [SerializeField] private PlayableElement _hoveredElement;
-
+    
+    
     // IHover<PlayableElement> implementation
     public bool CanHover {
       get => _canHover;
@@ -30,16 +31,27 @@ namespace GMTK {
 
       // Find hoverable element at world position
       Vector2 worldPos2D = new(worldPosition.x, worldPosition.y);
-      RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
+      // ReSharper disable once StringLiteralTypo
+      var hits = Physics2D.RaycastAll(worldPos2D, Vector2.zero);
 
-      if (hit && hit.collider != null) {
-        if (hit.collider.gameObject.TryGetComponent(out PlayableElement foundElement)) {
-          // Check if element can be hovered
-          if (foundElement.CanHover) {
-            element = foundElement;
-            return true;
-          }
-        }
+      if (hits == null || hits.Length == 0) return false;
+      
+      foreach (var hit in hits)
+      {
+        //validate raycast hit is usable
+        if (!hit || !hit.collider) continue;
+        
+        //try to find PlayableElement on parent, in case the raycast captured the Model child gameobject
+        var foundElement = hit.collider.GetComponentInParent<PlayableElement>();
+        //try to find in children
+        if (!foundElement) {
+          foundElement = hit.collider.GetComponentInChildren<PlayableElement>();
+        } 
+        // if non found, or element can't be hovered, continue to next
+        if (!foundElement || !foundElement.CanHover) continue;
+          
+        element = foundElement;
+        return true;
       }
 
       return false;
@@ -74,7 +86,7 @@ namespace GMTK {
 
       // Start hovering over new element
       _hoveredElement = element;
-      _currentHoveredElement = element; // Update for compatibility
+      CurrentHoveredElement = element; // Update for compatibility
       IsOverElement = true;
 
       // Notify the element
@@ -91,8 +103,8 @@ namespace GMTK {
       IsOverElement = false;
 
       // Clear last element over if it was the hovered element
-      if (_currentHoveredElement == elementToStop) {
-        _currentHoveredElement = null;
+      if (CurrentHoveredElement == elementToStop) {
+        CurrentHoveredElement = null;
       }
 
       // Notify the element

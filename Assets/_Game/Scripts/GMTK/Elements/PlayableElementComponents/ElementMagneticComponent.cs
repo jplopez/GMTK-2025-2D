@@ -174,7 +174,7 @@ namespace GMTK {
       if (targetRb == null) return;
 
       // Calculate force direction (from target to magnet center for attraction, opposite for repulsion)
-      Vector2 magnetCenter = _playableElement.SnapTransform.position;
+      Vector2 magnetCenter = _playableElement.ModelTransform.position;
       Vector2 targetPosition = targetRb.position;
       Vector2 direction = (magnetCenter - targetPosition).normalized;
 

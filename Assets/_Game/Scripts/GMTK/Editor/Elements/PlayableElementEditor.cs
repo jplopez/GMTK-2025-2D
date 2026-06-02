@@ -415,7 +415,7 @@ namespace GMTK {
             EditorGUILayout.HelpBox($"Tolerance: {toleranceText}", MessageType.Info);
 
             // Show rotation info if element is rotated
-            Transform snapTransform = _element.SnapTransform != null ? _element.SnapTransform : _element.transform;
+            Transform snapTransform = _element.ModelTransform != null ? _element.ModelTransform : _element.transform;
             float currentRotation = snapTransform.rotation.eulerAngles.z;
             if (Mathf.Abs(currentRotation) > 0.1f) {
               EditorGUILayout.HelpBox($"Element rotated: {currentRotation:F1}�", MessageType.Info);
@@ -457,7 +457,7 @@ namespace GMTK {
       }
 
       // Use SnapTransform as the source of truth
-      Transform snapTransform = element.SnapTransform != null ? element.SnapTransform : element.transform;
+      Transform snapTransform = element.ModelTransform != null ? element.ModelTransform : element.transform;
 
       // Calculate occupied cells based on sprite bounds and SnapTransform scale
       var occupiedCells = CalculateOccupiedCells(spriteRenderer, snapTransform, cellSize, tolerance);

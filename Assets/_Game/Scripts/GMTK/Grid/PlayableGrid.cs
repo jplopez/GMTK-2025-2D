@@ -177,7 +177,7 @@ namespace GMTK {
       List<Vector2Int> tilesToOccupy = new();
 
       // Get the element's current rotation from SnapTransform
-      float rotationAngle = element.SnapTransform.rotation.eulerAngles.z;
+      float rotationAngle = element.ModelTransform.rotation.eulerAngles.z;
       // Normalize to 90-degree increments (0, 90, 180, 270)
       int normalizedRotation = Mathf.RoundToInt(rotationAngle / 90f) * 90;
 
@@ -215,7 +215,7 @@ namespace GMTK {
       if (this.CanLogDebug()) {
         string replacedNames = replacedElements.Count > 0 ? string.Join(", ", replacedElements.Select(e => e.name)) : "none";
         string occupiedTiles = string.Join(", ", tilesToOccupy);
-        this.LogDebug($"Element '{element.name}' added to grid with rotation {rotationAngle}° (normalized: {normalizedRotation}°)\n\tTiles: {occupiedTiles}\n\tReplaced elements: {replacedNames}");
+        this.LogDebug($"Element '{element.name}' added to grid with rotation {rotationAngle}ï¿½ (normalized: {normalizedRotation}ï¿½)\n\tTiles: {occupiedTiles}\n\tReplaced elements: {replacedNames}");
       }
 
       // Place element to grid, the GridToWorld will snap to grid position
@@ -241,11 +241,11 @@ namespace GMTK {
 
     protected virtual void RemoveElementFromGrid(PlayableElement element, Vector2Int gridPos) {
       // Get the element's current rotation from SnapTransform
-      float rotationAngle = element.SnapTransform.rotation.eulerAngles.z;
+      float rotationAngle = element.ModelTransform.rotation.eulerAngles.z;
       // Normalize to 90-degree increments (0, 90, 180, 270)
       int normalizedRotation = Mathf.RoundToInt(rotationAngle / 90f) * 90;
 
-      this.LogDebug($"Removing element '{element.name}' from grid position {gridPos} with rotation {rotationAngle}° (normalized: {normalizedRotation}°)");
+      this.LogDebug($"Removing element '{element.name}' from grid position {gridPos} with rotation {rotationAngle}ï¿½ (normalized: {normalizedRotation}ï¿½)");
 
       int removedTiles = 0;
 

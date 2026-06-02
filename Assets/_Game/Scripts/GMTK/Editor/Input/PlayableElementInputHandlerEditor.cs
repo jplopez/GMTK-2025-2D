@@ -22,7 +22,7 @@ namespace GMTK {
       _selectionTriggersProp = serializedObject.FindProperty("_selectionTriggers");
       _pointerToleranceProp = serializedObject.FindProperty("PointerTolerance");
       _activeElementProp = serializedObject.FindProperty("_activeElement");
-      _currentHoveredElementProp = serializedObject.FindProperty("_currentHoveredElement");
+      _currentHoveredElementProp = serializedObject.FindProperty("CurrentHoveredElement");
     }
 
     public override void OnInspectorGUI() {

@@ -225,7 +225,7 @@ namespace GMTK {
     void OnDrawGizmosSelected() {
       if (_playableElement == null || !EnableAutoRotation) return;
 
-      Vector3 pos = _playableElement.SnapTransform.position;
+      Vector3 pos = _playableElement.ModelTransform.position;
 
       // Show rotation direction and speed
       Gizmos.color = IsCurrentlyRotating() ? Color.green : (_isPaused ? Color.yellow : Color.red);

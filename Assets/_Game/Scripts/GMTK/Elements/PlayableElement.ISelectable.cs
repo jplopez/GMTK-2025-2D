@@ -37,7 +37,7 @@ namespace GMTK {
 
     //public bool HasAnySelectionTrigger => SelectionTriggers != SelectionTrigger.None;
 
-    public Transform SelectTransform => SnapTransform != null ? SnapTransform : transform;
+    public Transform SelectTransform => ModelTransform != null ? ModelTransform : transform;
 
     #region ISelectable Implementation
 

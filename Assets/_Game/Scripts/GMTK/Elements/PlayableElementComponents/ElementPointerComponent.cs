@@ -116,7 +116,6 @@ namespace GMTK {
       this.LogDebug($"Hover threshold reached for {_playableElement.name}");
       // if hovering after threshold we apply hover selection logic
       if (_playableElement.IsHovered) {
-        this.LogDebug($"Element {_playableElement.name} hover feedback played");
         ApplyFeedback(hoverChanged: true);
       }
       // reset coroutine reference
@@ -124,23 +123,54 @@ namespace GMTK {
     }
 
     /// <summary>
-    /// Plays the correct feedback based on selection and hover state changes.
+    /// Plays the correct feedback based on the changes on 'selected' and 'hovered' states.
     /// </summary>
     /// <param name="selectedChanged"></param>
     /// <param name="hoverChanged"></param>
     private void ApplyFeedback(bool selectedChanged = false, bool hoverChanged = false) {
       // select/deselect feedback has priority over hover/unhover feedback
-      if (selectedChanged) {
-        StopFeedback(_playableElement.IsSelected ? OnDeselectedFeedback : OnSelectedFeedback);
-        PlayFeedback(_playableElement.IsSelected ? OnSelectedFeedback : OnDeselectedFeedback);
-        this.LogDebug($"Played {(_playableElement.IsSelected ? "OnSelectedFeedback" : "OnDeselectedFeedback")} for {_playableElement.name}");
+      if (selectedChanged) ToggleSelectedFeedbacks();
+      if (hoverChanged) ToggleHoverFeedbacks();
+    }
+
+    /// <summary>
+    /// Toggles between the Selected and Deselected feedbacks depending on the actual selected state
+    /// </summary>
+    private void ToggleSelectedFeedbacks()
+    {
+      if (!_playableElement.IsSelected) // this is the CURRENT state, meaning we have to play the opposite
+      {
+        StopFeedback(OnSelectedFeedback);
+        PlayFeedback(OnDeselectedFeedback);
+        this.LogDebug($"Feedbacks: Played OnSelectedFeedback for {_playableElement.name}");
       }
-      else if (hoverChanged) {
-        if (!_playableElement.IsSelected) { //skip hover feedback if we are selected, to avoid feedback overlap
-          StopFeedback(_playableElement.IsHovered ? OnUnhoverFeedback : OnHoverFeedback);
-          PlayFeedback(_playableElement.IsHovered ? OnHoverFeedback : OnUnhoverFeedback);
-          this.LogDebug($"Played {(_playableElement.IsHovered ? "OnHoverFeedback" : "OnUnhoverFeedback")} for {_playableElement.name}");
-        }
+      else
+      {
+        StopFeedback(OnDeselectedFeedback);
+        PlayFeedback(OnSelectedFeedback);
+        this.LogDebug($"Feedbacks: Played OnDeselectedFeedback for {_playableElement.name}");
+      }
+    }
+
+    /// <summary>
+    /// Toggles between the Hover and UnHover feedbacks depending on the actual hovered state.
+    /// If the element is selected, this method will do nothing to prevent feedback overlaps
+    /// </summary>
+    private void ToggleHoverFeedbacks()
+    {
+      if (_playableElement.IsSelected) return; 
+        
+      if (_playableElement.IsHovered) // this is the CURRENT state, meaning we have to play the opposite
+      {
+        StopFeedback(OnUnhoverFeedback);
+        PlayFeedback(OnHoverFeedback);
+        this.LogDebug($"Feedbacks: Played OnUnhoverFeedback for {_playableElement.name}");
+      }
+      else
+      {
+        StopFeedback(OnHoverFeedback);
+        PlayFeedback(OnUnhoverFeedback);
+        this.LogDebug($"Feedbacks: Played OnHoverFeedback for {_playableElement.name}");
       }
     }
 

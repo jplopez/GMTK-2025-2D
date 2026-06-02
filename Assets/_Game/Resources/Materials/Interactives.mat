@@ -103,7 +103,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _InnerOutlineTintTexture:
-        m_Texture: {fileID: 2800000, guid: 5af9a397a8643994c829e696a24a7845, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -139,7 +139,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OuterOutlineTintTexture:
-        m_Texture: {fileID: 2800000, guid: 5af9a397a8643994c829e696a24a7845, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -147,7 +147,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _PixelOutlineTintTexture:
-        m_Texture: {fileID: 2800000, guid: 5af9a397a8643994c829e696a24a7845, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RecolorRGBTexture:
@@ -175,11 +175,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureLayer1Texture:
-        m_Texture: {fileID: 2800000, guid: 9685c3a024e22a946a7e8c2ce3542300, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureLayer2Texture:
-        m_Texture: {fileID: 2800000, guid: 9685c3a024e22a946a7e8c2ce3542300, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _UVDistortMask:
@@ -474,6 +474,7 @@ Material:
     - _RecolorRGBYCPTextureToggle: 0
     - _RectHeight: 100
     - _RectWidth: 100
+    - _ResizableTexture: 0
     - _Saturation: 3.02
     - _ScreenTilingPixelsPerUnit: 100
     - _ScreenWidthUnits: 10

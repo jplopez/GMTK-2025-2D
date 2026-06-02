@@ -25,7 +25,7 @@ namespace GMTK {
     public bool CanHover => _canHover; 
     public bool IsHovered => _isHovered;
 
-    public Transform HoverTransform => SnapTransform != null ? SnapTransform : transform;
+    public Transform HoverTransform => ModelTransform != null ? ModelTransform : transform;
 
     #region IHoverable Implementation
 

@@ -56,7 +56,6 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\GameStateEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Scenes\LevelManager.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Physics\Intensity\MarbleCollisionIntensityCalculator.cs" />
-    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementControlsComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementAutoRotationComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Grid\OccupancyCell.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementPhysicsComponent.cs" />
@@ -99,6 +98,7 @@
     <Compile Include="Assets\_Game\Scripts\GMTK\GameStates\GameStateMachineEventChannel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\InputActionEventArgs.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Controllers\GUIController.cs" />
+    <Compile Include="Assets\_Game\Scripts\GMTK\Elements\PlayableElementComponents\ElementUIControlsComponent.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Elements\Booster.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Enums\BouncinessLevel.cs" />
     <Compile Include="Assets\_Game\Scripts\GMTK\Events\Args\MarbleEventArgs.cs" />

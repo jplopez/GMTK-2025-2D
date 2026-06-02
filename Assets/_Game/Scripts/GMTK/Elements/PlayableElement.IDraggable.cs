@@ -21,7 +21,7 @@ namespace GMTK {
     
     [DisplayWithoutEdit] public bool IsActive { get; set; }
 
-    public Transform DragTransform => SnapTransform != null ? SnapTransform : transform;
+    public Transform DragTransform => ModelTransform != null ? ModelTransform : transform;
     public Collider2D InteractionCollider => _collider;
 
     #region IDraggable Implementation

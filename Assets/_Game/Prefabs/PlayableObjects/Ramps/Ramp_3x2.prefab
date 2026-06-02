@@ -136,13 +136,15 @@ MonoBehaviour:
   InScriptDrivenPause: 0
   FeedbacksList:
   - rid: 7297120588920258822
-  - rid: 7297120479013503154
   - rid: 2536243946878402760
   KeepPlayModeChanges: 0
   PerformanceMode: 0
   RestoreInitialValuesOnDisable: 0
   StopFeedbacksOnDisable: 0
   PlayCount: 0
+  MMF_ChannelMode: 0
+  MMF_Channel: 0
+  MMF_ChannelDefinition: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -274,114 +276,6 @@ MonoBehaviour:
           ConditionPropertyName: InterpolateValue
           EnumConditionPropertyName: 
           EnumConditions: 0000000000000000000000000000000000000000000000000000000000000000
-    - rid: 7297120479013503154
-      type: {class: MMF_Material, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
-      data:
-        Active: 1
-        UniqueID: -1139800144
-        Label: Material
-        OriginalLabel: Material
-        ChannelMode: 0
-        Channel: 0
-        MMChannelDefinition: {fileID: 0}
-        Chance: 100
-        Timing:
-          TimescaleMode: 0
-          ExcludeFromHoldingPauses: 0
-          ContributeToTotalDuration: 1
-          InitialDelay: 0
-          CooldownDuration: 0
-          InterruptsOnStop: 1
-          NumberOfRepeats: 0
-          RepeatForever: 0
-          DelayBetweenRepeats: 1
-          PlayCount: 0
-          LimitPlayCount: 0
-          MaxPlayCount: 3
-          SetPlayCountToZeroOnReset: 0
-          MMFeedbacksDirectionCondition: 0
-          PlayDirection: 0
-          ConstantIntensity: 0
-          UseIntensityInterval: 0
-          IntensityIntervalMin: 0
-          IntensityIntervalMax: 0
-          Sequence: {fileID: 0}
-          TrackID: 0
-          Quantized: 0
-          TargetBPM: 120
-        AutomatedTargetAcquisition:
-          Mode: 0
-          ChildIndex: 0
-        RandomizeOutput: 0
-        RandomMultiplier: {x: 0.8, y: 1}
-        RandomizeDuration: 0
-        RandomDurationMultiplier: {x: 0.5, y: 2}
-        UseRange: 0
-        RangeDistance: 5
-        UseRangeFalloff: 0
-        RangeFalloff:
-          serializedVersion: 2
-          m_Curve:
-          - serializedVersion: 3
-            time: 0
-            value: 1
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          - serializedVersion: 3
-            time: 1
-            value: 0
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          m_PreInfinity: 2
-          m_PostInfinity: 2
-          m_RotationOrder: 4
-        RemapRangeFalloff: {x: 0, y: 1}
-        AutomaticShakerSetupButton:
-          ButtonText: 
-        Owner: {fileID: 6807082416150413325}
-        DebugActive: 0
-        TargetRenderer: {fileID: 6007282902875389682}
-        RendererMaterialIndexes: 
-        Method: 0
-        Loop: 0
-        AlwaysNewMaterial: 1
-        InitialIndex: 0
-        Materials:
-        - {fileID: 2100000, guid: 578a4bac36d17234bb02b6d4d007e188, type: 2}
-        InterpolateTransition: 0
-        TransitionDuration: 1
-        TransitionCurve:
-          serializedVersion: 2
-          m_Curve:
-          - serializedVersion: 3
-            time: 0
-            value: 0
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          - serializedVersion: 3
-            time: 1
-            value: 1
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          m_PreInfinity: 2
-          m_PostInfinity: 2
-          m_RotationOrder: 4
     - rid: 7297120588920258822
       type: {class: MMF_MMSoundManagerSound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
@@ -476,11 +370,12 @@ MonoBehaviour:
         Loop: 0
         Persistent: 0
         DoNotPlayIfClipAlreadyPlaying: 0
+        MaximumConcurrentInstances: 3
         StopSoundOnFeedbackStop: 0
-        Fade: 0
-        FadeInitialVolume: 0
-        FadeDuration: 1
-        FadeTween:
+        FadeIn: 0
+        FadeInInitialVolume: 0
+        FadeInDuration: 1
+        FadeInTween:
           MMTweenDefinitionType: 0
           MMTweenCurve: 9
           Curve:
@@ -509,6 +404,39 @@ MonoBehaviour:
             m_RotationOrder: 4
           Initialized: 0
           ConditionPropertyName: Fade
+          EnumConditionPropertyName: 
+          EnumConditions: 0000000000000000000000000000000000000000000000000000000000000000
+        FadeOutOnStop: 0
+        FadeOutDuration: 1
+        FadeOutTween:
+          MMTweenDefinitionType: 0
+          MMTweenCurve: 9
+          Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          Initialized: 0
+          ConditionPropertyName: FadeOutOnStop
           EnumConditionPropertyName: 
           EnumConditions: 0000000000000000000000000000000000000000000000000000000000000000
         SoloSingleTrack: 0
@@ -708,6 +636,9 @@ MonoBehaviour:
   RestoreInitialValuesOnDisable: 0
   StopFeedbacksOnDisable: 0
   PlayCount: 0
+  MMF_ChannelMode: 0
+  MMF_Channel: 0
+  MMF_ChannelDefinition: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -868,7 +799,7 @@ MonoBehaviour:
   AutoInitialization: 1
   SafeMode: 3
   Direction: 0
-  AutoChangeDirectionOnEnd: 0
+  AutoChangeDirectionOnEnd: 1
   AutoPlayOnStart: 0
   AutoPlayOnEnable: 0
   ForceTimescaleMode: 0
@@ -955,11 +886,15 @@ MonoBehaviour:
   InScriptDrivenPause: 0
   FeedbacksList:
   - rid: 7297120479013503154
+  - rid: 9142023616749895781
   KeepPlayModeChanges: 0
   PerformanceMode: 0
   RestoreInitialValuesOnDisable: 0
   StopFeedbacksOnDisable: 0
   PlayCount: 0
+  MMF_ChannelMode: 0
+  MMF_Channel: 0
+  MMF_ChannelDefinition: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -988,7 +923,7 @@ MonoBehaviour:
           LimitPlayCount: 0
           MaxPlayCount: 3
           SetPlayCountToZeroOnReset: 0
-          MMFeedbacksDirectionCondition: 0
+          MMFeedbacksDirectionCondition: 1
           PlayDirection: 0
           ConstantIntensity: 0
           UseIntensityInterval: 0
@@ -1045,6 +980,114 @@ MonoBehaviour:
         InitialIndex: 0
         Materials:
         - {fileID: 2100000, guid: bb0eea3421e1bb54eae075df4df4454c, type: 2}
+        InterpolateTransition: 0
+        TransitionDuration: 1
+        TransitionCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+    - rid: 9142023616749895781
+      type: {class: MMF_Material, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
+      data:
+        Active: 1
+        UniqueID: -1451098938
+        Label: Material
+        OriginalLabel: Material
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 2
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: 
+        Owner: {fileID: 233890716277176042}
+        DebugActive: 0
+        TargetRenderer: {fileID: 6007282902875389682}
+        RendererMaterialIndexes: 
+        Method: 0
+        Loop: 0
+        AlwaysNewMaterial: 1
+        InitialIndex: 0
+        Materials:
+        - {fileID: 2100000, guid: 7bd7ae9cb79dece4e90cabe345748c32, type: 2}
         InterpolateTransition: 0
         TransitionDuration: 1
         TransitionCurve:
@@ -1213,6 +1256,9 @@ MonoBehaviour:
   RestoreInitialValuesOnDisable: 0
   StopFeedbacksOnDisable: 0
   PlayCount: 0
+  MMF_ChannelMode: 0
+  MMF_Channel: 0
+  MMF_ChannelDefinition: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -1454,11 +1500,12 @@ MonoBehaviour:
         Loop: 0
         Persistent: 0
         DoNotPlayIfClipAlreadyPlaying: 0
+        MaximumConcurrentInstances: 3
         StopSoundOnFeedbackStop: 0
-        Fade: 0
-        FadeInitialVolume: 0
-        FadeDuration: 1
-        FadeTween:
+        FadeIn: 0
+        FadeInInitialVolume: 0
+        FadeInDuration: 1
+        FadeInTween:
           MMTweenDefinitionType: 0
           MMTweenCurve: 9
           Curve:
@@ -1487,6 +1534,39 @@ MonoBehaviour:
             m_RotationOrder: 4
           Initialized: 0
           ConditionPropertyName: Fade
+          EnumConditionPropertyName: 
+          EnumConditions: 0000000000000000000000000000000000000000000000000000000000000000
+        FadeOutOnStop: 0
+        FadeOutDuration: 1
+        FadeOutTween:
+          MMTweenDefinitionType: 0
+          MMTweenCurve: 9
+          Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          Initialized: 0
+          ConditionPropertyName: FadeOutOnStop
           EnumConditionPropertyName: 
           EnumConditions: 0000000000000000000000000000000000000000000000000000000000000000
         SoloSingleTrack: 0
@@ -1593,6 +1673,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6007282902875389682
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1611,10 +1692,12 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 7bd7ae9cb79dece4e90cabe345748c32, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1632,9 +1715,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 1878654211
   m_SortingLayer: 4
   m_SortingOrder: 1
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 996a41f597fb3004198026d9c6ce630c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1644,7 +1729,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!50 &7553339179308787632
 Rigidbody2D:
@@ -1710,7 +1794,7 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0.12, y: 0.089999996, z: 0.07, w: 0.089999996}
-    pivot: {x: 0.040984068, y: 0.030722797}
+    pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 3.1, y: 3.2}
     newSize: {x: 1.2, y: 1.36}
     adaptiveTilingThreshold: 0.5
@@ -1719,10 +1803,10 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 2.932949, y: -0.008312988}
-      - {x: -0.0070506283, y: 3.051687}
-      - {x: -0.0070506283, y: -0.008312988}
-  m_UseDelaunayMesh: 0
+    - - {x: 1.51, y: -1.51}
+      - {x: -1.43, y: 1.55}
+      - {x: -1.43, y: -1.51}
+  m_UseDelaunayMesh: 1
 --- !u!114 &6806016553035810237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1735,7 +1819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 852fbbe6cb9b6614fa2190a842d3fec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SnapTransform: {fileID: 7258827595930639120}
+  ModelTransform: {fileID: 7258827595930639120}
   OccupiedCells:
   - {x: 0, y: 0}
   - {x: 0, y: 1}
@@ -1806,9 +1890,8 @@ MonoBehaviour:
   _isHovered: 0
   _canHover: 1
   HoverThreshold: 0.2
-  _isSelected: 1
-  _canSelect: 1
-  SelectionTriggers: 2
+  isSelected: 0
+  canSelect: 1
   Accuracy: 0.8
   MaxOffset: 2
 --- !u!114 &3574685323232286227
@@ -1838,7 +1921,7 @@ MonoBehaviour:
   OnSelectedFeedback: {fileID: 6807082416150413325}
   OnDeselectedFeedback: {fileID: 16302961875183533}
   OnHoverFeedback: {fileID: 233890716277176042}
-  OnUnhoverFeedback: {fileID: 16302961875183533}
+  OnUnhoverFeedback: {fileID: 233890716277176042}
 --- !u!114 &3624307545403926056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1911,26 +1994,24 @@ MonoBehaviour:
     TriggersInnerEvent: 0
   DisableAllCollisions: 0
   TriggerCollisionEvents: 0
+  SolidOnCollision: 1
+  IntensityCalculator: {fileID: 2529108697867342202}
+  ConstraintViolationFeedback: {fileID: 0}
   PositionChanges: 2
   CanBeMovedBy: 1
   PositionChangeFeedback: {fileID: 0}
-  NoMovementConstrains: 
   ConstrainVerticalMovement: 0
   ConstrainHorizontalMovement: 0
   MinPosition: {x: -100, y: -100}
   MaxPosition: {x: 100, y: 100}
   SnapToGridOnMove: 1
-  SolidOnCollision: 1
   RotationChanges: 0
   CanBeRotatedBy: 0
   RotationChangeFeedback: {fileID: 0}
-  NoRotationConstrains: 
   RotationStep: 15
   LimitRotationAngle: 0
   MinRotationAngle: -45
   MaxRotationAngle: 45
-  IntensityCalculator: {fileID: 2529108697867342202}
-  ConstraintViolationFeedback: {fileID: 0}
   _rigidbody2D: {fileID: 0}
   _collider2D: {fileID: 0}
   _currentRotation: 0
@@ -2322,6 +2403,10 @@ PrefabInstance:
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeIn
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].Source
       value: 0
       objectReference: {fileID: 0}
@@ -2426,6 +2511,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutOnStop
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].OriginalLabel
       value: MMSoundManager Sound
       objectReference: {fileID: 0}
@@ -2439,6 +2528,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].SoloAllTracks
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInDuration
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
@@ -2459,6 +2552,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].AutoUnSoloOnEnd
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutDuration
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
@@ -2566,6 +2663,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInInitialVolume
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].MMChannelDefinition
       value: 
       objectReference: {fileID: 0}
@@ -2638,6 +2739,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.Initialized
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].SequentialOrderHoldLast
       value: 0
       objectReference: {fileID: 0}
@@ -2654,7 +2759,19 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.MMTweenCurve
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.Initialized
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].Timing.ConstantIntensity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.MMTweenCurve
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
@@ -2668,6 +2785,10 @@ PrefabInstance:
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].TestStopButton.ButtonText
       value: Debug Stop Sound
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].MaximumConcurrentInstances
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].RandomDurationMultiplier.x
@@ -2734,6 +2855,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.Curve.m_PreInfinity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].FadeTween.ConditionPropertyName
       value: Fade
       objectReference: {fileID: 0}
@@ -2762,6 +2887,14 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.Curve.m_PostInfinity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.Curve.m_PreInfinity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].ReverbZoneMixCurve.m_PreInfinity
       value: 2
       objectReference: {fileID: 0}
@@ -2782,6 +2915,22 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.ConditionPropertyName
+      value: Fade
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.Curve.m_RotationOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.MMTweenDefinitionType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.Curve.m_PostInfinity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].ReverbZoneMixCurve.m_PostInfinity
       value: 2
       objectReference: {fileID: 0}
@@ -2792,6 +2941,18 @@ PrefabInstance:
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].CustomRolloffCurve.m_RotationOrder
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.ConditionPropertyName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.Curve.m_RotationOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.MMTweenDefinitionType
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].FadeTween.Curve.m_Curve.Array.size
@@ -2814,6 +2975,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.Curve.m_Curve.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].SpatialBlendCurve.m_Curve.Array.size
       value: 0
       objectReference: {fileID: 0}
@@ -2834,11 +2999,31 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.EnumConditionPropertyName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeInTween.EnumConditions.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.Curve.m_Curve.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].ResetSequentialIndexButton.ButtonText
       value: Reset Sequential Index
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
       propertyPath: managedReferences[7297120588920258816].ReverbZoneMixCurve.m_Curve.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.EnumConditionPropertyName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}
+      propertyPath: managedReferences[7297120588920258816].FadeOutTween.EnumConditions.Array.size
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8798416825754982955, guid: a298efa5ff3d79e408d9db8dd0a3f01c, type: 3}

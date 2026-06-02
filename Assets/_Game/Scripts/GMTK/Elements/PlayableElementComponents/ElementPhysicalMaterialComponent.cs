@@ -172,7 +172,7 @@ namespace GMTK {
     void OnDrawGizmosSelected() {
       if (_playableElement == null || _collider2D == null) return;
 
-      Vector3 pos = _playableElement.SnapTransform.position;
+      Vector3 pos = _playableElement.ModelTransform.position;
       Vector3 size = _collider2D.bounds.size;
 
       // Color code based on friction

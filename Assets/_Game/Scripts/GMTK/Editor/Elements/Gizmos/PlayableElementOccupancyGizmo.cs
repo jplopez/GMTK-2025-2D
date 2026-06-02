@@ -83,7 +83,7 @@ namespace GMTK {
       if (element == null) return gizmoData;
 
       // Use SnapTransform as the source of truth
-      Transform snapTransform = element.SnapTransform != null ? element.SnapTransform : element.transform;
+      Transform snapTransform = element.ModelTransform != null ? element.ModelTransform : element.transform;
       
       // Get sprite renderer for validation
       SpriteRenderer spriteRenderer = GetSpriteRenderer(element);
