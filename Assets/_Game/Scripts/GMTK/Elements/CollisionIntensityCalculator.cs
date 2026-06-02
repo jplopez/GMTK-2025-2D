@@ -260,7 +260,7 @@ public class CollisionIntensityCalculator : MonoBehaviour, IIntensityCalculator 
       || !_physicsElementComponent.AllowsRotationChanges) return DefaultIntensity;
 
     // read rotation angle from PlayableElement, clamp to AngleRange and eval with AngleCurve
-    float rawAngle = _playableElement.SnapTransform.rotation.eulerAngles.z;
+    float rawAngle = _playableElement.ModelTransform.rotation.eulerAngles.z;
     float angle = Mathf.Clamp(rawAngle, MinAngle, MaxAngle);
     return AngleCurve.Evaluate(angle);
   }
